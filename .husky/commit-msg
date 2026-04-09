@@ -1,0 +1,25 @@
+# .husky/commit-msg
+
+COMMIT_MSG=$(cat "$1")
+
+# Merge 커밋은 검사 제외
+if echo "$COMMIT_MSG" | grep -qE "^Merge "; then
+  exit 0
+fi
+
+TYPES="FEAT|MOD|ADD|CHORE|DEL|UI|FIX|MOVE|RENAME|REFACTOR|DOCS"
+PATTERN="^(#[0-9]+ )?\[(${TYPES})\] .+"
+
+if ! echo "$COMMIT_MSG" | grep -qE "$PATTERN"; then
+  echo ""
+  echo "🚫 커밋 메시지 형식이 올바르지 않습니다."
+  echo ""
+  echo "  올바른 형식: #이슈번호 [타입] 작업명"
+  echo "  예시:        #7 [UI] 로그인 컴포넌트 구현"
+  echo ""
+  echo "  사용 가능한 타입:"
+  echo "  [FEAT] [MOD] [ADD] [CHORE] [DEL] [UI]"
+  echo "  [FIX] [MOVE] [RENAME] [REFACTOR] [DOCS]"
+  echo ""
+  exit 1
+fi

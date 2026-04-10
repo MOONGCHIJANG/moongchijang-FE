@@ -7,7 +7,8 @@
     "dev:mock": "concurrently \"next dev\" \"tsx mocks/dev-server.ts\"",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "prepare": "husky"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -31,10 +32,21 @@
     "eslint-config-next": "16.2.2",
     "eslint-config-prettier": "^10.1.8",
     "express": "^5.2.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
     "msw": "^2.13.0",
     "prettier": "^3.8.1",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "^5"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --cache --fix",
+      "prettier --cache --write"
+    ],
+    "*.{css,md,json,yaml}": [
+      "prettier --cache --write"
+    ]
   }
 }

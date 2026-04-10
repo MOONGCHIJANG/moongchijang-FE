@@ -1,0 +1,10 @@
+# .husky/pre-push
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+if [ "$BRANCH" = "main" ]; then
+  echo "🚫 main 브랜치에 직접 push할 수 없습니다."
+  exit 1
+fi
+
+echo "📦 빌드 타입 체크..."
+pnpm tsc --noEmit --project tsconfig.json

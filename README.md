@@ -30,10 +30,10 @@ cp .env.example .env
 
 ## 스크립트
 
-| 명령어 | 설명 |
-|--------|------|
-| `pnpm dev` | 개발 서버 실행 |
+| 명령어          | 설명                            |
+| --------------- | ------------------------------- |
+| `pnpm dev`      | 개발 서버 실행                  |
 | `pnpm dev:mock` | 개발 서버 + Mock 서버 동시 실행 |
-| `pnpm build` | 프로덕션 빌드 |
-| `pnpm start` | 빌드된 앱 실행 |
-| `pnpm lint` | ESLint 실행 |
+| `pnpm build`    | 프로덕션 빌드                   |
+| `pnpm start`    | 빌드된 앱 실행                  |
+| `pnpm lint`     | ESLint 실행                     |

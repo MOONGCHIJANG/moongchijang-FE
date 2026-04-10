@@ -46,3 +46,5 @@ next-env.d.ts
 .omc/
 
 .eslintcache
+*storybook.log
+storybook-static

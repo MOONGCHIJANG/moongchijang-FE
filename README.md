@@ -37,3 +37,7 @@ cp .env.example .env
 | `pnpm build`    | 프로덕션 빌드                   |
 | `pnpm start`    | 빌드된 앱 실행                  |
 | `pnpm lint`     | ESLint 실행                     |
+
+## Jira-Github 연동
+
+브랜치명에 SCRUM-XX를 포함하여 Jira 티켓과 연결합니다.

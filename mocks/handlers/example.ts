@@ -1,11 +1,9 @@
 import { http, HttpResponse, delay } from 'msw';
+import { exampleData } from '../data/example';
 
 export const exampleHandlers = [
-  // 예시: GET /api/example
   http.get('/api/example', async () => {
     await delay(3000);
-    return HttpResponse.json({
-      message: 'MSW가 성공적으로 작동합니다.',
-    });
+    return HttpResponse.json(exampleData);
   }),
 ];

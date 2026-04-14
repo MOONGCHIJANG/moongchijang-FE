@@ -16,7 +16,7 @@
 
 ### 📌 관련 이슈
 
-- Jira 링크:
+- Jira 링크: https://moongchijang.atlassian.net/browse/MCJ-
 
 ---
 

@@ -36,7 +36,7 @@ export const GNB = ({
     >
       {TABS.map((tab) => {
         const isActive = activeTab === tab.id;
-        const colorClass = isActive ? 'text-gray-700' : 'text-gray-300';
+        const colorClass = isActive ? 'text-icon-basic' : 'text-icon-disabled';
 
         return (
           <button

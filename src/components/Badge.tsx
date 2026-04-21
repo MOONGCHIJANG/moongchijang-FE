@@ -21,7 +21,7 @@ export const Badge = ({ label, onDelete, className }: BadgeProps) => {
         className,
       )}
     >
-      <span className="text-center text-sm font-normal text-gray-500 leading-5">
+      <span className="text-center text-body-sm-regular text-text-tertiary">
         {label}
       </span>
       {onDelete && (

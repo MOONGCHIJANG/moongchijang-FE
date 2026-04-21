@@ -19,13 +19,13 @@ export const Button = ({
 }: ButtonProps) => {
   const variants = {
     primary:
-      'bg-primary-400 text-white shadow-sm active:scale-[0.98] disabled:bg-gray-200 disabled:text-white',
-    outline: 'border border-gray-200 bg-white text-gray-500 active:bg-gray-50',
+      'bg-button-primary-fill text-white shadow-sm active:scale-[0.98] disabled:bg-button-disabled-fill disabled:text-button-white',
+    outline: 'border border-border-default bg-button-white text-text-tertiary active:bg-surface-default',
     ghost: 'bg-transparent text-gray-400 hover:text-gray-600',
   };
 
   const sizes = {
-    sm: 'h-8 px-3 text-caption-md-medium rounded-full',
+    sm: 'h-8 px-3 text-caption-md-medium rounded-lg',
     // 버튼 M 규격: h-11, w-80(옵션), rounded-xl, text-base(16px), font-bold, gap-2.5
     md: 'h-11 px-6 text-body-lg-bold rounded-xl gap-2.5',
     // 버튼 L 규격: h-14, rounded-lg, text-base(16px), font-semibold, leading-6

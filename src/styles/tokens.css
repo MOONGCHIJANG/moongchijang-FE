@@ -70,6 +70,141 @@
   --color-alpha-black-10: rgba(0, 0, 0, 0.1);
   --color-alpha-black-5: rgba(0, 0, 0, 0.05);
 
+  /* Colors - Accent (Red) */
+  --color-accent-red-25: #fff5f6;
+  --color-accent-red-50: #ffe5ea;
+  --color-accent-red-100: #ffccd4;
+  --color-accent-red-200: #ff99aa;
+  --color-accent-red-300: #ff6680;
+  --color-accent-red-400: #ff3355;
+  --color-accent-red-500: #ff002b;
+  --color-accent-red-600: #cc0022;
+  --color-accent-red-700: #99001a;
+  --color-accent-red-800: #660011;
+  --color-accent-red-900: #330009;
+
+  /* Semantic - Button */
+  --color-button-primary-fill: var(--color-primary-400);
+  --color-button-primary-fill-pressed: var(--color-primary-500);
+  --color-button-tertiary-fill: var(--color-gray-25);
+  --color-button-tertiary-fill-pressed: var(--color-gray-100);
+  --color-button-disabled-fill: var(--color-gray-300);
+  --color-button-disabled-border: var(--color-gray-400);
+  --color-button-natural: var(--color-gray-700);
+  --color-button-white: var(--color-gray-0);
+
+  /* Semantic - Brand */
+  --color-brand-primary: var(--color-primary-400);
+  --color-brand-secondary: var(--color-secondary-400);
+
+  /* Semantic - Background */
+  --color-bg-white: var(--color-gray-0);
+  --color-bg-dim-darkest: var(--color-alpha-black-80);
+  --color-bg-dim-darker: var(--color-alpha-black-50);
+  --color-bg-dim-dark: var(--color-alpha-black-20);
+  --color-bg-white-muted: var(--color-gray-25);
+
+  /* Semantic - Border */
+  --color-border-default: var(--color-gray-200);
+  --color-border-subtle: var(--color-gray-100);
+  --color-border-strong: var(--color-gray-300);
+  --color-border-focus: var(--color-gray-400);
+  --color-border-error: var(--color-accent-red-500);
+  --color-border-success: var(--color-success-400);
+  --color-border-brand: var(--color-primary-400);
+  --color-border-natural: var(--color-alpha-black-10);
+  --color-border-brand-lighter: var(--color-primary-200);
+
+  /* Semantic - Divider */
+  --color-divider-default: var(--color-gray-100);
+  --color-divider-light: var(--color-gray-50);
+  --color-divider-strong: var(--color-gray-200);
+
+  /* Semantic - Surface */
+  --color-surface-inverse: var(--color-gray-800);
+  --color-surface-inverse-default: var(--color-gray-900);
+  --color-surface-elevated: var(--color-gray-25);
+  --color-surface-muted: var(--color-gray-100);
+  --color-surface-info: var(--color-alpha-black-80);
+  --color-surface-default: var(--color-gray-50);
+  --color-surface-white: var(--color-gray-0);
+  --color-surface-brand: var(--color-primary-400);
+  --color-surface-brand-lighter: var(--color-primary-50);
+  --color-surface-secondary-lighter: var(--color-secondary-25);
+  --color-surface-alpha: var(--color-alpha-black-50);
+
+  /* Semantic - Text */
+  --color-text-brand: var(--color-primary-400);
+  --color-text-basic: var(--color-gray-900);
+  --color-text-tertiary: var(--color-gray-500);
+  --color-text-success: var(--color-success-700);
+  --color-text-subtle-inverse: var(--color-gray-200);
+  --color-text-disabled: var(--color-gray-400);
+  --color-text-subtle: var(--color-gray-700);
+  --color-text-basic-inverse: var(--color-gray-0);
+  --color-text-error: var(--color-accent-red-600);
+
+  /* Semantic - Icon */
+  --color-icon-disabled: var(--color-gray-300);
+  --color-icon-secondary: var(--color-secondary-400);
+  --color-icon-primary-dark: var(--color-primary-600);
+  --color-icon-inverse: var(--color-gray-0);
+  --color-icon-primary: var(--color-primary-400);
+  --color-icon-tertiary: var(--color-gray-200);
+  --color-icon-subtle: var(--color-gray-500);
+  --color-icon-basic: var(--color-gray-700);
+  --color-icon-success: var(--color-success-400);
+  --color-icon-error: var(--color-accent-red-500);
+
+  /* Spacing - Padding */
+  --spacing-p1: 2px;
+  --spacing-p2: 4px;
+  --spacing-p3: 8px;
+  --spacing-p4: 10px;
+  --spacing-p5: 12px;
+  --spacing-p6: 16px;
+  --spacing-p7: 20px;
+  --spacing-p8: 24px;
+  --spacing-p9: 32px;
+  --spacing-p10: 40px;
+
+  /* Spacing - Gap */
+  --spacing-g1: 2px;
+  --spacing-g2: 4px;
+  --spacing-g3: 8px;
+  --spacing-g4: 12px;
+  --spacing-g5: 16px;
+  --spacing-g6: 20px;
+  --spacing-g7: 24px;
+  --spacing-g8: 32px;
+  --spacing-g9: 40px;
+  --spacing-g10: 48px;
+  --spacing-g11: 64px;
+  --spacing-g12: 80px;
+
+  /* Size - Height */
+  --size-height-1: 8px;
+  --size-height-2: 16px;
+  --size-height-3: 20px;
+  --size-height-4: 24px;
+  --size-height-5: 32px;
+  --size-height-6: 40px;
+  --size-height-7: 48px;
+  --size-height-8: 56px;
+  --size-height-9: 64px;
+  --size-height-10: 72px;
+  --size-height-11: 80px;
+
+  /* Border Radius */
+  --radius-xsmall: 2px;
+  --radius-small: 4px;
+  --radius-medium: 6px;
+  --radius-large: 8px;
+  --radius-xlarge: 10px;
+  --radius-2xlarge: 12px;
+  --radius-3xlarge: 20px;
+  --radius-max: 1000px;
+
   /* Font Families */
   --font-pretendard:
     'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto,

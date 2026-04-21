@@ -6,13 +6,25 @@ interface ChipProps {
   label: string;
   className?: string;
   active?: boolean;
+  onClick?: () => void;
+  disabled?: boolean;
 }
 
-export const Chip = ({ label, className, active = false }: ChipProps) => {
+export const Chip = ({
+  label,
+  className,
+  active = false,
+  onClick,
+  disabled = false,
+}: ChipProps) => {
   return (
-    <div
+    <button
+      type="button"
+      aria-pressed={active}
+      disabled={disabled}
+      onClick={onClick}
       className={cn(
-        'inline-flex h-6 items-center justify-center gap-0.5 px-3 py-1 rounded-2xl transition-colors shrink-0 font-pretendard cursor-pointer select-none',
+        'inline-flex h-6 items-center justify-center gap-0.5 px-3 py-1 rounded-2xl transition-colors shrink-0 font-pretendard select-none disabled:cursor-not-allowed disabled:opacity-50',
         active
           ? 'bg-primary-400 text-white'
           : 'bg-gray-25 outline outline-1 outline-offset-[-1px] outline-gray-100 text-gray-900',
@@ -27,6 +39,6 @@ export const Chip = ({ label, className, active = false }: ChipProps) => {
       >
         {label}
       </span>
-    </div>
+    </button>
   );
 };

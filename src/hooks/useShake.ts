@@ -1,8 +1,5 @@
-'use client';
-
 import { useState, useEffect, useCallback, useRef } from 'react';
 
-// iOS 13+ Safari에서 요구하는 권한 요청 인터페이스 확장
 interface DeviceMotionEventWithPermission extends DeviceMotionEvent {
   requestPermission?: () => Promise<'granted' | 'denied' | 'default'>;
 }
@@ -11,29 +8,32 @@ export const useShake = (onShake: () => void) => {
   const [isSupported, setIsSupported] = useState(true);
   const [isEnabled, setIsEnabled] = useState(false);
   const [permissionGranted, setPermissionGranted] = useState(false);
+  const onShakeRef = useRef(onShake);
+  const lastShakeTimeRef = useRef(0);
 
-  // 쿨타임 관리를 위한 ref (리렌더링을 유발하지 않음)
-  const lastShakeTimeRef = useRef<number>(0);
+  useEffect(() => {
+    onShakeRef.current = onShake;
+  });
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    // 초기 상태 확인 및 설정을 비동기로 처리하여 린트 에러 방지
-    Promise.resolve().then(() => {
+    setTimeout(() => {
       if (typeof window.DeviceMotionEvent === 'undefined') {
         setIsSupported(false);
+        return;
       }
 
       const saved = localStorage.getItem('shake_to_qr_enabled');
-      if (saved === 'true') {
-        setIsEnabled(true);
-        const MotionEvent =
-          DeviceMotionEvent as unknown as DeviceMotionEventWithPermission;
-        if (typeof MotionEvent.requestPermission !== 'function') {
-          setPermissionGranted(true);
-        }
+      if (saved !== 'true') return;
+
+      setIsEnabled(true);
+      const MotionEvent =
+        DeviceMotionEvent as unknown as DeviceMotionEventWithPermission;
+      if (typeof MotionEvent.requestPermission !== 'function') {
+        setPermissionGranted(true);
       }
-    });
+    }, 0);
   }, []);
 
   const toggleShake = useCallback(async () => {
@@ -54,10 +54,13 @@ export const useShake = (onShake: () => void) => {
           setIsEnabled(true);
           localStorage.setItem('shake_to_qr_enabled', 'true');
         } else {
-          alert('기기 모션 권한이 필요합니다.');
+          alert(
+            '기기 모션 권한이 필요합니다. 브라우저 설정에서 센서 접근 권한을 허용해주세요.',
+          );
         }
       } catch (error) {
-        console.error('Error requesting permission:', error);
+        console.error('Error requesting device motion permission:', error);
+        alert('권한 요청 중 오류가 발생했습니다. 버튼을 다시 눌러주세요.');
       }
     } else {
       setPermissionGranted(true);
@@ -74,41 +77,38 @@ export const useShake = (onShake: () => void) => {
       lastZ = 0;
     let lastUpdate = 0;
     const SHAKE_THRESHOLD = 15;
-    const COOLDOWN = 1500; // 1.5초간 중복 감지 방지
 
     const handleDeviceMotion = (event: DeviceMotionEvent) => {
       const current = event.accelerationIncludingGravity;
       if (!current) return;
 
       const currentTime = Date.now();
-      if (currentTime - lastUpdate > 100) {
-        const diffTime = currentTime - lastUpdate;
-        lastUpdate = currentTime;
+      if (currentTime - lastUpdate <= 100) return;
 
-        const { x, y, z } = current;
-        if (x === null || y === null || z === null) return;
+      const diffTime = currentTime - lastUpdate;
+      lastUpdate = currentTime;
 
-        const speed =
-          (Math.abs(x + y + z - lastX - lastY - lastZ) / diffTime) * 10000;
+      const { x, y, z } = current;
+      if (x === null || y === null || z === null) return;
 
-        if (speed > SHAKE_THRESHOLD) {
-          const now = Date.now();
-          // 쿨타임 확인: 마지막 흔들림으로부터 1.5초가 지났을 때만 호출
-          if (now - lastShakeTimeRef.current > COOLDOWN) {
-            lastShakeTimeRef.current = now;
-            onShake();
-          }
+      const speed =
+        (Math.abs(x + y + z - lastX - lastY - lastZ) / diffTime) * 10000;
+      if (speed > SHAKE_THRESHOLD) {
+        const now = Date.now();
+        if (now - lastShakeTimeRef.current > 3000) {
+          lastShakeTimeRef.current = now;
+          onShakeRef.current();
         }
-
-        lastX = x;
-        lastY = y;
-        lastZ = z;
       }
+
+      lastX = x;
+      lastY = y;
+      lastZ = z;
     };
 
     window.addEventListener('devicemotion', handleDeviceMotion);
     return () => window.removeEventListener('devicemotion', handleDeviceMotion);
-  }, [isEnabled, permissionGranted, onShake]);
+  }, [isEnabled, permissionGranted]);
 
   return { isSupported, isEnabled, toggleShake };
 };

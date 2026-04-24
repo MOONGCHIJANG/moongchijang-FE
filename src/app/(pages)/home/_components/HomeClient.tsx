@@ -56,12 +56,8 @@ export default function HomeClient() {
   // QR 모달 상태
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
 
-  // 흔들기 감지 시 QR 모달 오픈 (메모이제이션 추가)
   const handleShake = useCallback(() => {
-    setIsQrModalOpen((prev) => {
-      if (prev) return prev; // 이미 열려있으면 중복 실행 방지
-      return true;
-    });
+    setIsQrModalOpen((prev) => (prev ? prev : true));
   }, []);
 
   const { isEnabled, toggleShake } = useShake(handleShake);
@@ -154,7 +150,7 @@ export default function HomeClient() {
         {renderContent()}
       </main>
 
-      <footer className="fixed bottom-0 z-50 w-[393px]">
+      <footer className="fixed bottom-0 z-50 w-full max-w-[393px]">
         <GNB activeTab={activeTab} onTabChange={setActiveTab} />
       </footer>
 

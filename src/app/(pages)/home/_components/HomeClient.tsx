@@ -62,8 +62,7 @@ export default function HomeClient() {
 
   const { isEnabled, toggleShake } = useShake(handleShake);
 
-  // 데모용 데이터 (qr.png와 일치)
-  const isPickupDay = Math.random() < 0.5;
+  const [isPickupDay] = useState(() => Math.random() < 0.5);
 
   useEffect(() => {
     const fetchFeeds = async () => {

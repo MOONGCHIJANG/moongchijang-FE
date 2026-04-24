@@ -76,7 +76,7 @@ export const useShake = (onShake: () => void) => {
       lastY = 0,
       lastZ = 0;
     let lastUpdate = 0;
-    const SHAKE_THRESHOLD = 15;
+    const SHAKE_THRESHOLD = 1000;
 
     const handleDeviceMotion = (event: DeviceMotionEvent) => {
       const current = event.accelerationIncludingGravity;

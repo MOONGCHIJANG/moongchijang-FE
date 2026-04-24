@@ -10,6 +10,10 @@ import { LocationBottomSheet } from './LocationBottomSheet';
 import { Feed, FilterId } from '../_types/feed';
 import { REGIONS_DATA, Region } from '@/constants/regions';
 
+// QR 기능 연동용
+import { useShake } from '@/hooks/useShake';
+import { QrModal } from '@/app/(pages)/home/_components/QrModal';
+
 // 추후 API로 대체될 목 데이터 (상수화)
 const MOCK_DATA: Feed[] = [
   {
@@ -49,6 +53,17 @@ export default function HomeClient() {
     REGIONS_DATA[0].regions[0],
   ]);
 
+  // QR 모달 상태
+  const [isQrModalOpen, setIsQrModalOpen] = useState(false);
+
+  // 흔들기 감지 시 QR 모달 오픈
+  const { isEnabled, toggleShake } = useShake(() => {
+    setIsQrModalOpen(true);
+  });
+
+  // 데모용 데이터 (qr.png와 일치)
+  const isPickupDay = Math.random() < 0.5;
+
   useEffect(() => {
     const fetchFeeds = async () => {
       setIsLoading(true);
@@ -87,6 +102,7 @@ export default function HomeClient() {
         <FeedTopBar
           location={locationDisplayText}
           onLocationClick={() => setIsLocationSheetOpen(true)}
+          onQrClick={() => setIsQrModalOpen(true)}
         />
         <SearchBar onSearch={(value) => console.log('검색어:', value)} />
         <FilterBar
@@ -126,20 +142,38 @@ export default function HomeClient() {
   };
 
   return (
-    <div className="mx-auto flex h-screen w-[393px] flex-col overflow-hidden bg-surface-default">
+    <div className="mx-auto flex h-screen w-[393px] relative flex-col overflow-hidden bg-surface-default">
       {renderHeader()}
+
       <main className="flex-1 overflow-y-auto pb-[84px]">
         {renderContent()}
       </main>
+
       <footer className="fixed bottom-0 z-50 w-[393px]">
         <GNB activeTab={activeTab} onTabChange={setActiveTab} />
       </footer>
 
+      {/* 위치 바텀시트 */}
       <LocationBottomSheet
         isOpen={isLocationSheetOpen}
         onClose={() => setIsLocationSheetOpen(false)}
         selectedRegions={selectedRegions}
         onApply={handleApplyLocation}
+      />
+
+      {/* QR 모달 (디자인에 따라 중앙 모달 및 하단 토글 포함) */}
+      <QrModal
+        isOpen={isQrModalOpen}
+        onClose={() => setIsQrModalOpen(false)}
+        isPickupDay={isPickupDay}
+        orderNumber="20260419245"
+        pickupLocation="서울 성동구 성동로 32길, 사이드템포"
+        pickupTime="4월 15일 (화) 14:00~18:00"
+        storeName="밤티 말빵"
+        qrValue="https://moongchijang.com/verify/20260419245"
+        dDayText={isPickupDay ? 'D-day' : 'D-7'}
+        shakeEnabled={isEnabled}
+        onShakeToggle={toggleShake}
       />
     </div>
   );

@@ -18,7 +18,11 @@ export const useShake = (onShake: () => void) => {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    setTimeout(() => {
+    const MotionEvent =
+      DeviceMotionEvent as unknown as DeviceMotionEventWithPermission;
+    let touchHandler: (() => void) | null = null;
+
+    const timer = setTimeout(() => {
       if (typeof window.DeviceMotionEvent === 'undefined') {
         setIsSupported(false);
         return;
@@ -28,12 +32,25 @@ export const useShake = (onShake: () => void) => {
       if (saved !== 'true') return;
 
       setIsEnabled(true);
-      const MotionEvent =
-        DeviceMotionEvent as unknown as DeviceMotionEventWithPermission;
+
       if (typeof MotionEvent.requestPermission !== 'function') {
         setPermissionGranted(true);
+      } else {
+        // iOS: 첫 터치 시 자동으로 권한 재요청
+        touchHandler = async () => {
+          try {
+            const state = await MotionEvent.requestPermission!();
+            if (state === 'granted') setPermissionGranted(true);
+          } catch {}
+        };
+        window.addEventListener('touchstart', touchHandler, { once: true });
       }
     }, 0);
+
+    return () => {
+      clearTimeout(timer);
+      if (touchHandler) window.removeEventListener('touchstart', touchHandler);
+    };
   }, []);
 
   const toggleShake = useCallback(async () => {

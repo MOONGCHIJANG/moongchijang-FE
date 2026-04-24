@@ -1,3 +1,3 @@
-import { exampleHandlers } from './handlers/example';
+import { generatedHandlers } from '@/api/generated/index.msw';
 
-export const handlers = [...exampleHandlers];
+export const handlers = [...generatedHandlers];

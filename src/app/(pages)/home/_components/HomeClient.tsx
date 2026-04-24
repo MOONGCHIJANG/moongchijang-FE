@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { GNB, TabId } from '@/components/GNB';
 import { FeedTopBar } from './FeedTopBar';
 import { SearchBar } from './SearchBar';
@@ -56,10 +56,15 @@ export default function HomeClient() {
   // QR 모달 상태
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
 
-  // 흔들기 감지 시 QR 모달 오픈
-  const { isEnabled, toggleShake } = useShake(() => {
-    setIsQrModalOpen(true);
-  });
+  // 흔들기 감지 시 QR 모달 오픈 (메모이제이션 추가)
+  const handleShake = useCallback(() => {
+    setIsQrModalOpen((prev) => {
+      if (prev) return prev; // 이미 열려있으면 중복 실행 방지
+      return true;
+    });
+  }, []);
+
+  const { isEnabled, toggleShake } = useShake(handleShake);
 
   // 데모용 데이터 (qr.png와 일치)
   const isPickupDay = Math.random() < 0.5;
@@ -142,7 +147,7 @@ export default function HomeClient() {
   };
 
   return (
-    <div className="mx-auto flex h-screen w-[393px] relative flex-col overflow-hidden bg-surface-default">
+    <div className="mx-auto flex h-dvh w-full max-w-[393px] relative flex-col overflow-hidden bg-surface-default">
       {renderHeader()}
 
       <main className="flex-1 overflow-y-auto pb-[84px]">

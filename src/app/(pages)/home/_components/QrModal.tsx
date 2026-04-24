@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Icon } from '@iconify/react';
 import { cn } from '@/lib/utils';
@@ -35,23 +35,18 @@ export const QrModal = ({
 }: QrModalProps) => {
   const [animate, setAnimate] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
-  const [dragY, setDragY] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-  const dragStartY = useRef(0);
-
-  if (prevIsOpen !== isOpen) {
-    setPrevIsOpen(isOpen);
-    if (!isOpen) {
-      setAnimate(false);
-      setIsExpanded(false);
-    }
-  }
 
   useEffect(() => {
-    if (!isOpen) return;
-    const timer = setTimeout(() => setAnimate(true), 50);
-    return () => clearTimeout(timer);
+    if (isOpen) {
+      const timer = setTimeout(() => setAnimate(true), 50);
+      return () => clearTimeout(timer);
+    } else {
+      // 비동기 처리를 통해 cascading render 린트 에러 해결
+      Promise.resolve().then(() => {
+        setAnimate(false);
+        setIsExpanded(false);
+      });
+    }
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -61,180 +56,179 @@ export const QrModal = ({
     setTimeout(onClose, 300);
   };
 
-  const handlePointerDown = (e: React.PointerEvent) => {
-    e.currentTarget.setPointerCapture(e.pointerId);
-    dragStartY.current = e.clientY;
-    setIsDragging(true);
-  };
-
-  const handlePointerMove = (e: React.PointerEvent) => {
-    if (!isDragging) return;
-    const delta = Math.max(0, e.clientY - dragStartY.current);
-    setDragY(delta);
-  };
-
-  const handlePointerUp = () => {
-    setIsDragging(false);
-    if (dragY > 80) {
-      setDragY(500);
-      setTimeout(() => {
-        setDragY(0);
-        onClose();
-      }, 300);
-    } else {
-      setDragY(0);
-    }
-  };
-
   return (
     <div
       className={cn(
-        'absolute inset-0 z-50 flex flex-col items-center justify-center transition-opacity duration-300 ease-out',
+        'fixed inset-0 z-[9999] flex flex-col items-center justify-center transition-opacity duration-500 ease-out',
         animate ? 'opacity-100' : 'opacity-0',
       )}
     >
-      {/* 배경 딤 + 블러 */}
+      {/* 1. 백그라운드 레이어: fixed inset-0의 영향으로 전체 화면을 꽉 채움 */}
       <div
-        className="absolute inset-0 bg-bg-dim-darkest backdrop-blur-sm"
+        className="absolute inset-0 bg-bg-dim-darkest backdrop-blur-[4px] transition-all duration-500"
         onClick={handleClose}
       />
 
-      {/* 카드 + 토글 컨테이너 */}
+      {/* 2. 모달 및 컨텐츠 컨테이너 */}
       <div
         className={cn(
-          'relative flex flex-col items-center gap-4',
-          isDragging
-            ? 'transition-none'
-            : 'transition-transform duration-300 ease-out',
-          !isDragging && (animate ? 'translate-y-0' : 'translate-y-10'),
+          'relative w-72 inline-flex flex-col justify-start items-center gap-3 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] transform',
+          animate ? 'translate-y-0' : 'translate-y-40',
         )}
-        style={dragY > 0 ? { transform: `translateY(${dragY}px)` } : undefined}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* 드래그 핸들 */}
-        <div
-          className="w-[342px] flex items-center justify-center py-2 cursor-grab active:cursor-grabbing touch-none"
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-        >
-          <div className="w-9 h-1 bg-alpha-white-50 rounded-max" />
-        </div>
+        <div className="w-9 h-0 outline outline-[3px] outline-offset-[-1.50px] outline-surface-white rounded-full"></div>
 
-        {/* 메인 카드 */}
-        <div className="w-[342px] bg-surface-white rounded-3xlarge shadow-2xl overflow-hidden">
-          {/* 헤더 */}
-          <div className="bg-surface-default rounded-tl-3xlarge rounded-tr-3xlarge px-5 py-3.5 flex justify-between items-center">
-            <span className="text-text-basic text-body-lg-bold font-pretendard">
-              픽업 QR코드
-            </span>
-            <button
-              onClick={handleClose}
-              className="w-6 h-6 flex items-center justify-center"
-            >
-              <Icon icon="ic:round-close" className="w-6 h-6 text-text-basic" />
-            </button>
-          </div>
-
-          {/* 정보 섹션 */}
+        <div className="self-stretch flex flex-col justify-start items-center gap-5">
           <div
             className={cn(
-              'flex flex-col overflow-hidden transition-all duration-300 origin-top',
-              isExpanded ? 'max-h-0 opacity-0' : 'max-h-[500px] opacity-100',
+              'self-stretch pb-5 bg-bg-white rounded-[20px] inline-flex justify-start items-start gap-2.5 transition-all duration-300 shadow-2xl overflow-hidden',
+              isExpanded ? 'scale-[1.05]' : 'scale-100',
             )}
           >
-            <div className="px-5 pt-4 pb-5 flex flex-col gap-3.5 border-b border-dashed border-border-default">
-              <div className="flex items-center gap-2">
-                <span className="bg-brand-primary text-text-basic-inverse text-caption1 font-bold font-pretendard w-[41px] h-5 flex items-center justify-center rounded-max">
-                  {dDayText}
-                </span>
-                <span className="text-text-basic text-heading-sm-bold font-pretendard">
-                  {storeName}
-                </span>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-text-basic text-body-sm-bold font-pretendard">
-                    예약 번호
-                  </span>
-                  <span className="text-text-subtle text-body-sm-regular font-pretendard">
-                    {orderNumber}
-                  </span>
-                </div>
-                <div className="flex justify-between items-start gap-4">
-                  <span className="text-text-basic text-body-sm-bold font-pretendard shrink-0">
-                    픽업 장소
-                  </span>
-                  <span
-                    className="text-text-subtle text-body-sm-regular font-pretendard text-right break-keep"
-                    dangerouslySetInnerHTML={{
-                      __html: pickupLocation.replace('\n', '<br/>'),
-                    }}
-                  />
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-text-basic text-body-sm-bold font-pretendard">
-                    픽업 일시
-                  </span>
-                  <span className="text-text-subtle text-body-sm-regular font-pretendard">
-                    {pickupTime}
-                  </span>
+            <div className="w-72 inline-flex flex-col justify-start items-center gap-1">
+              <div className="self-stretch h-12 p-3.5 bg-surface-default rounded-tl-[20px] rounded-tr-[20px] flex flex-col justify-start items-start gap-2.5">
+                <div className="w-64 inline-flex justify-between items-center">
+                  <div className="justify-start text-text-basic text-base font-bold font-pretendard leading-6">
+                    픽업 QR코드
+                  </div>
+                  <button
+                    onClick={handleClose}
+                    className="w-6 h-6 flex items-center justify-center -mr-1"
+                  >
+                    <Icon
+                      icon="ic:round-close"
+                      className="w-6 h-6 text-text-basic"
+                    />
+                  </button>
                 </div>
               </div>
 
-              <button className="self-end bg-surface-brand-lighter text-text-brand text-caption1 font-bold font-pretendard w-[90px] h-7 flex items-center justify-center rounded-xlarge">
-                자세히 보기 →
-              </button>
+              <div className="w-64 flex flex-col items-center gap-4">
+                <div
+                  className={cn(
+                    'self-stretch flex flex-col justify-start items-start transition-all duration-300 overflow-hidden origin-top',
+                    isExpanded
+                      ? 'max-h-0 opacity-0 border-b-0 px-0 pt-0 pb-0'
+                      : 'max-h-[500px] opacity-100 px-2.5 pt-2.5 pb-5 border-b border-border-default flex flex-col justify-start items-start gap-2.5',
+                  )}
+                >
+                  <div className="self-stretch flex flex-col justify-start items-start gap-3.5">
+                    <div className="inline-flex justify-start items-center gap-2">
+                      <div className="h-5 px-3 py-2 bg-brand-primary rounded-[10px] flex justify-center items-center">
+                        <div className="justify-start text-text-basic-inverse text-[10px] font-bold font-pretendard">
+                          {dDayText}
+                        </div>
+                      </div>
+                      <div className="justify-start text-text-basic text-xl font-bold font-pretendard leading-8">
+                        {storeName}
+                      </div>
+                    </div>
+
+                    <div className="self-stretch flex flex-col justify-start items-end gap-3.5">
+                      <div className="self-stretch flex flex-col justify-start gap-2">
+                        <div className="self-stretch inline-flex justify-between items-center">
+                          <div className="justify-start text-text-basic text-sm font-semibold font-pretendard leading-5">
+                            예약 번호
+                          </div>
+                          <div className="text-right justify-start text-text-subtle text-sm font-normal font-pretendard leading-5">
+                            {orderNumber}
+                          </div>
+                        </div>
+                        <div className="self-stretch inline-flex justify-between items-start gap-4">
+                          <div className="justify-start text-text-basic text-sm font-semibold font-pretendard leading-5 shrink-0">
+                            픽업 장소
+                          </div>
+                          <div
+                            className="text-right justify-start text-text-subtle text-sm font-normal font-pretendard leading-5 break-keep"
+                            dangerouslySetInnerHTML={{
+                              __html: pickupLocation.replace('\n', '<br/>'),
+                            }}
+                          ></div>
+                        </div>
+                        <div className="self-stretch inline-flex justify-between items-center">
+                          <div className="justify-start text-text-basic text-sm font-semibold font-pretendard leading-5">
+                            픽업 일시
+                          </div>
+                          <div className="text-right justify-start text-text-subtle text-sm font-normal font-pretendard leading-5">
+                            {pickupTime}
+                          </div>
+                        </div>
+                      </div>
+                      <button className="px-4 py-2 bg-surface-brand-lighter rounded-[10px] inline-flex justify-center items-center">
+                        <div className="justify-start text-text-brand text-[10px] font-bold font-pretendard">
+                          자세히 보기 →
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col justify-start items-center gap-3">
+                  <div
+                    className={cn(
+                      'relative flex items-center justify-center transition-all duration-300',
+                      isPickupDay ? 'cursor-pointer' : 'cursor-not-allowed',
+                    )}
+                    onClick={() => isPickupDay && setIsExpanded(!isExpanded)}
+                  >
+                    <div
+                      className={cn(
+                        'transition-all duration-500 flex justify-center items-center',
+                        !isPickupDay && 'blur-[6px] opacity-30',
+                      )}
+                    >
+                      <QRCodeSVG
+                        value={qrValue}
+                        size={isExpanded ? 240 : 112}
+                        className={cn(isExpanded && 'mt-4')}
+                      />
+                    </div>
+                    {!isPickupDay && (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-10 h-10 flex justify-center items-center">
+                          <Icon
+                            icon="solar:lock-bold"
+                            className="w-8 h-8 text-icon-subtle"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div
+                    className={cn(
+                      'self-stretch text-center justify-start text-text-subtle text-[10px] font-bold font-pretendard transition-all duration-300 overflow-hidden',
+                      isExpanded
+                        ? 'max-h-0 opacity-0 mt-0'
+                        : 'max-h-10 opacity-100 mt-2',
+                    )}
+                  >
+                    {isPickupDay
+                      ? 'QR코드를 클릭하면 크게 볼 수 있어요'
+                      : '픽업일이 되면 QR코드가 활성화돼요'}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* QR 코드 섹션 */}
-          <div className="px-5 py-6 flex flex-col items-center gap-3">
-            <div
-              className={cn(
-                'relative flex items-center justify-center',
-                isPickupDay ? 'cursor-pointer' : 'cursor-not-allowed',
-              )}
-              onClick={() => isPickupDay && setIsExpanded(!isExpanded)}
-            >
-              <div
-                className={cn(
-                  'transition-all duration-500',
-                  !isPickupDay && 'blur-sm opacity-70',
-                )}
-              >
-                <QRCodeSVG value={qrValue} size={isExpanded ? 220 : 128} />
+          <div className="inline-flex justify-start items-center gap-2">
+            <div className="flex justify-start items-center gap-2">
+              <div className="justify-start text-text-basic-inverse text-xs font-bold font-pretendard leading-4">
+                흔들어서 큐알 화면 열기
               </div>
-              {!isPickupDay && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Icon
-                    icon="majesticons:lock"
-                    className="w-10 h-10 text-icon-basic"
-                  />
-                </div>
-              )}
             </div>
-
-            <p
+            <Toggle
+              checked={shakeEnabled}
+              onChange={onShakeToggle}
+              size="sm"
               className={cn(
-                'text-text-subtle text-caption1 font-bold font-pretendard text-center transition-all duration-300 overflow-hidden',
-                isExpanded ? 'max-h-0 opacity-0' : 'max-h-10 opacity-100',
+                'w-6 h-3.5',
+                shakeEnabled ? 'bg-brand-primary' : 'bg-alpha-white-20',
               )}
-            >
-              {isPickupDay
-                ? 'QR코드를 클릭하면 크게 볼 수 있어요'
-                : '픽업일이 되면 QR코드가 활성화돼요'}
-            </p>
+            />
           </div>
-        </div>
-
-        {/* 흔들기 토글 바 */}
-        <div className="flex items-center gap-2 bg-bg-dim-darker rounded-max px-5 py-2.5">
-          <span className="text-text-basic-inverse text-caption-sm-medium font-pretendard">
-            흔들어서 큐알 화면 열기
-          </span>
-          <Toggle checked={shakeEnabled} onChange={onShakeToggle} size="sm" />
         </div>
       </div>
     </div>

@@ -11,8 +11,8 @@ export type StaticLoader = () => Promise<unknown>;
 
 /** 정적 응답을 반환할 엔드포인트 맵 (path -> dynamic import loader) */
 export const STATIC_FALLBACK: Record<string, StaticLoader> = {
-  '/api/example': () =>
-    import('@mocks/data/example').then((m) => m.exampleData),
+  // 엔드포인트 준비되면 여기에 추가
+  // 예: '/api/v1/group-buys': () => import('@/api/generated/group-buy/group-buy.msw').then(m => m.getGetApiV1GroupBuysResponseMock()),
 };
 
 /** "아직 개발 중입니다" 로 처리할 엔드포인트 집합 */

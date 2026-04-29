@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Icon } from '@iconify/react';
+import { cn } from '@/lib/utils';
 
 interface SearchBarProps {
   /**
@@ -50,7 +51,10 @@ export const SearchBar = ({
 
   return (
     <div
-      className={`flex h-11 w-full items-center gap-2 rounded-full border border-primary-400 bg-white px-4 shadow-sm ${className}`}
+      className={cn(
+        'flex h-11 w-full items-center gap-2 rounded-full border border-primary-400 bg-white px-4 shadow-sm',
+        className,
+      )}
     >
       <Icon icon="solar:magnifer-linear" className="h-5 w-5 text-primary-400" />
       <input

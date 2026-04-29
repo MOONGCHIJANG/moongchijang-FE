@@ -166,12 +166,14 @@ export const QrModal = ({
                   <span className="text-text-basic text-body-sm-bold font-pretendard shrink-0">
                     픽업 장소
                   </span>
-                  <span
-                    className="text-text-subtle text-body-sm-regular font-pretendard text-right break-keep"
-                    dangerouslySetInnerHTML={{
-                      __html: pickupLocation.replace('\n', '<br/>'),
-                    }}
-                  />
+                  <span className="text-text-subtle text-body-sm-regular font-pretendard text-right break-keep">
+                    {pickupLocation.split('\n').map((line, i, arr) => (
+                      <span key={i}>
+                        {line}
+                        {i < arr.length - 1 && <br />}
+                      </span>
+                    ))}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-text-basic text-body-sm-bold font-pretendard">

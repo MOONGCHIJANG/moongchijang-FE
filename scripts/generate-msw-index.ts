@@ -19,7 +19,10 @@ function generateMswIndex() {
       const stat = fs.statSync(fullPath);
       if (stat && stat.isDirectory()) {
         walk(fullPath);
-      } else if (file.endsWith('.msw.ts') && file !== 'index.msw.ts') {
+      } else if (
+        (file.endsWith('.msw.ts') || file === 'api.ts') &&
+        file !== 'index.msw.ts'
+      ) {
         files.push(fullPath);
       }
     });
@@ -30,25 +33,29 @@ function generateMswIndex() {
   const imports: string[] = [];
   const handlerNames: string[] = [];
 
-  files.forEach((file, index) => {
+  files.forEach((file) => {
     const relativePath = path
       .relative(GENERATED_DIR, file)
       .replace(/\\/g, '/')
       .replace(/\.ts$/, '');
 
-    // 파일 내용에서 'get...Mock' 혹은 '...Mock'으로 끝나는 함수 이름 추출 (Orval 컨벤션)
     const content = fs.readFileSync(file, 'utf8');
-    const mockFunctions = content.match(/export const (get\w+Mock) = \(\) =>/g);
+
+    // orval이 생성하는 핸들러 함수: get{HttpMethod}ApiV1...MockHandler
+    // mode: 'single'(api.ts)과 mode: 'tags-split'(.msw.ts) 모두 지원
+    const mockFunctions = content.match(
+      /export const (get[A-Z]\w+MockHandler) = /g,
+    );
 
     if (mockFunctions) {
       const funcNames = mockFunctions.map((f) =>
-        f.replace('export const ', '').replace(' = () =>', ''),
+        f.replace('export const ', '').replace(' = ', ''),
       );
-      const alias = `handlers${index}`;
       imports.push(
         `import { ${funcNames.join(', ')} } from './${relativePath}';`,
       );
-      funcNames.forEach((name) => handlerNames.push(`...${name}()`));
+      // 각 핸들러는 단일 MSW RequestHandler를 반환하므로 spread 없이 배열 원소로 추가
+      funcNames.forEach((name) => handlerNames.push(`${name}()`));
     }
   });
 
@@ -64,7 +71,7 @@ export const generatedHandlers = [
 `;
 
   fs.writeFileSync(OUTPUT_FILE, output);
-  console.log('✅ Generated MSW index at:', OUTPUT_FILE);
+  console.log(`✅ Generated MSW index: ${handlerNames.length}개 핸들러`);
 }
 
 generateMswIndex();

@@ -29,7 +29,8 @@ function findMockServiceWorkerFilePaths(directoryPath: string): string[] {
     if (directoryEntry.isDirectory()) {
       filePaths.push(...findMockServiceWorkerFilePaths(fullPath));
     } else if (
-      directoryEntry.name.endsWith('.msw.ts') &&
+      (directoryEntry.name.endsWith('.msw.ts') ||
+        directoryEntry.name === 'api.ts') &&
       directoryEntry.name !== 'index.msw.ts' &&
       directoryEntry.name !== 'index.static.ts'
     ) {
@@ -50,7 +51,7 @@ function extractGetHandlerEntries(
   // export const getGet[Path]MockHandler = ... http.get('[url]', ...
   // 핸들러 함수명이 getGet으로 시작하는 것만 GET 메서드 핸들러
   const getHandlerWithUrlPattern =
-    /export const (getGet\w+MockHandler)\b[\s\S]*?http\.get\('([^']+)'/g;
+    /export const (getGet\w+MockHandler)\b[\s\S]*?http\.get\(\s*'([^']+)'/g;
 
   let regexMatch: RegExpExecArray | null;
   while ((regexMatch = getHandlerWithUrlPattern.exec(fileContent)) !== null) {

@@ -5,7 +5,7 @@ import 'server-only';
  *
  * 용도:
  * - 서버 컴포넌트에서 직접 호출 (SSR)
- * - Route Handler(`app/api/proxy/**`)에서 호출 (CSR 의 프록시 진입점)
+ * - Route Handler(`src/app/api/v1/**`)에서 호출 (CSR 의 프록시 진입점)
  *
  * 배포/로컬 환경을 `NEXT_PUBLIC_API_MODE` 로 분기합니다.
  * - mock   : 로컬 개발, Express 목서버로 프록시 (BASE = http://localhost:9090)

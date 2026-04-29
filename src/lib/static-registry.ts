@@ -26,7 +26,12 @@ export type StaticLoader = () => Promise<unknown>;
  *   또는 직접 JSON 파일을 import:
  *   '/api/v1/group-buys': () => import('@/mocks/data/group-buys.json'),
  */
-export const STATIC_FALLBACK: Record<string, StaticLoader> = {};
+export const STATIC_FALLBACK: Record<string, StaticLoader> = {
+  '/api/v1/group-buys': () =>
+    import('../../mocks/mock-helpers').then((m) =>
+      Promise.resolve(m.createGroupBuysFeedMock()),
+    ),
+};
 
 /**
  * "아직 개발 중입니다" 로 처리할 엔드포인트 집합

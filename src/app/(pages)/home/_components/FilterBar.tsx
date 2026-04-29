@@ -1,9 +1,9 @@
 'use client';
 
 import { Chip } from '@/components/Chip';
-import { FilterId } from '../_types/feed';
+import { cn } from '@/lib/utils';
 
-export type { FilterId };
+export type FilterId = 'all' | 'due' | 'target';
 
 interface FilterBarProps {
   activeFilter?: FilterId;
@@ -23,7 +23,7 @@ export const FilterBar = ({
   className = '',
 }: FilterBarProps) => {
   return (
-    <div className={`flex gap-2 ${className}`}>
+    <div className={cn('flex gap-2', className)}>
       {FILTERS.map((filter) => (
         <Chip
           key={filter.id}

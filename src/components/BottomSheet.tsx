@@ -86,7 +86,7 @@ export const BottomSheet = ({
     >
       <div
         className={cn(
-          'relative w-[393px] rounded-t-[20px] bg-white ease-out',
+          'relative w-full min-w-[360px] max-w-[440px] rounded-t-[20px] bg-white ease-out',
           !isDragging && 'transition-transform duration-300',
           className,
         )}

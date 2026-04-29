@@ -32,7 +32,7 @@ export const GNB = ({
 }: GNBProps) => {
   return (
     <div
-      className={`inline-flex w-[393px] h-[58px] items-center justify-around px-4 rounded-t-2xl bg-white py-1 shadow-[0_-6px_8px_rgba(0,0,0,0.05)] ${className}`}
+      className={`inline-flex w-full min-w-[360px] max-w-[440px] h-[58px] items-center justify-around px-4 rounded-t-2xl bg-white py-1 shadow-[0_-6px_8px_rgba(0,0,0,0.05)] ${className}`}
     >
       {TABS.map((tab) => {
         const isActive = activeTab === tab.id;

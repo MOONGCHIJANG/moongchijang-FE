@@ -1,0 +1,113 @@
+/* /* eslint-disable *\/ */
+/**
+ * // 이 파일은 Orval이 자동 생성합니다. 직접 수정하지 마세요.
+ */
+import * as zod from 'zod';
+
+/**
+ * 픽업 대기/완료 건수, 진행 중 공구 수, 다음 픽업 시간을 반환한다.
+ * @summary 사장님 홈 요약 정보
+ */
+export const GetApiV1OwnerHomeSummaryResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    pickupWaitingCount: zod.number(),
+    pickupCompletedCount: zod.number(),
+    activeGroupBuyCount: zod.number(),
+    nextPickupTime: zod.iso.time({}).nullable(),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * @summary 시간대별 픽업 현황 조회
+ */
+export const GetApiV1OwnerHomePickupScheduleResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.array(
+    zod.object({
+      timeSlot: zod.string(),
+      totalReservationCount: zod.number(),
+      waitingCount: zod.number(),
+      completedCount: zod.number(),
+    }),
+  ),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * @summary 진행 중인 공구 목록 조회 (사장님용)
+ */
+export const GetApiV1OwnerGroupBuysResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.array(
+    zod.object({
+      groupBuyId: zod.number(),
+      productName: zod.string(),
+      achievementRate: zod.number(),
+      currentQuantity: zod.number(),
+      targetQuantity: zod.number(),
+      deadline: zod.iso.date(),
+      status: zod.enum(['IN_PROGRESS', 'ACHIEVED', 'FAILED']),
+    }),
+  ),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * @summary 픽업 예약자 목록 조회
+ */
+export const getApiV1OwnerReservationsQueryStatusDefault = `ALL`;
+export const getApiV1OwnerReservationsQueryPageDefault = 0;
+export const getApiV1OwnerReservationsQuerySizeDefault = 20;
+export const getApiV1OwnerReservationsQuerySizeMax = 100;
+
+export const GetApiV1OwnerReservationsQueryParams = zod.object({
+  status: zod
+    .enum(['ALL', 'WAITING', 'COMPLETED'])
+    .default(getApiV1OwnerReservationsQueryStatusDefault),
+  page: zod.number().default(getApiV1OwnerReservationsQueryPageDefault),
+  size: zod
+    .number()
+    .max(getApiV1OwnerReservationsQuerySizeMax)
+    .default(getApiV1OwnerReservationsQuerySizeDefault),
+});
+
+export const GetApiV1OwnerReservationsResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    content: zod.array(
+      zod.object({
+        participationId: zod.number(),
+        userName: zod.string(),
+        productName: zod.string(),
+        quantity: zod.number(),
+        pickupDate: zod.iso.date(),
+        pickupTimeStart: zod.iso.time({}),
+        pickupTimeEnd: zod.iso.time({}),
+        status: zod.enum(['WAITING', 'COMPLETED']),
+      }),
+    ),
+    waitingCount: zod.number(),
+    completedCount: zod.number(),
+    totalElements: zod.number(),
+    totalPages: zod.number(),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * QR 없이 수동으로 수령 완료 처리한다.
+ * @summary 수령 처리 (수동)
+ */
+export const PatchApiV1OwnerReservationsParticipationIdCompleteParams =
+  zod.object({
+    participationId: zod.number(),
+  });
+
+export const PatchApiV1OwnerReservationsParticipationIdCompleteResponse =
+  zod.object({
+    success: zod.boolean(),
+    data: zod.unknown().nullable(),
+    error: zod.unknown().nullable(),
+  });

@@ -1,0 +1,133 @@
+/* /* eslint-disable *\/ */
+/**
+ * // 이 파일은 Orval이 자동 생성합니다. 직접 수정하지 마세요.
+ */
+import * as zod from 'zod';
+
+/**
+ * 매장명 또는 주소 입력 시 외부 지도/장소 API 기반 매장 후보 목록을 반환한다.
+각 항목은 매장명과 주소를 함께 포함한다. 예: 모모양과 / 서울 성북구 화랑로11길 23
+
+ * @summary 매장 검색 자동완성 (2.1.1-1)
+ */
+
+export const GetApiV1StoresSearchQueryParams = zod.object({
+  keyword: zod.string().min(1).describe('매장명 또는 주소 검색어'),
+});
+
+export const GetApiV1StoresSearchResponse = zod.object({
+  success: zod.boolean().optional(),
+  data: zod
+    .object({
+      stores: zod
+        .array(
+          zod.object({
+            placeId: zod
+              .string()
+              .optional()
+              .describe(
+                '외부 지도 API 장소 고유 ID (운영자 공구 개설 시 storeId 대신 활용)',
+              ),
+            storeName: zod.string().optional().describe('매장명. 예) 모모양과'),
+            roadAddress: zod
+              .string()
+              .optional()
+              .describe('도로명 주소. 예) 서울 성북구 화랑로11길 23'),
+            lotAddress: zod.string().nullish().describe('지번 주소'),
+            latitude: zod.number().optional().describe('위도'),
+            longitude: zod.number().optional().describe('경도'),
+          }),
+        )
+        .optional()
+        .describe('외부 지도 API 기반 매장 후보 목록'),
+    })
+    .optional(),
+  error: zod.unknown().nullish(),
+});
+
+/**
+ * @summary 공구 개설 요청 제출
+ */
+export const postApiV1GroupBuyRequestsBodyStoreNameMax = 100;
+
+export const postApiV1GroupBuyRequestsBodyStoreAddressMax = 200;
+
+export const postApiV1GroupBuyRequestsBodyProductNameMax = 100;
+
+export const postApiV1GroupBuyRequestsBodyAdditionalNoteMax = 500;
+
+export const PostApiV1GroupBuyRequestsBody = zod.object({
+  storeName: zod.string().max(postApiV1GroupBuyRequestsBodyStoreNameMax),
+  storeAddress: zod
+    .string()
+    .max(postApiV1GroupBuyRequestsBodyStoreAddressMax)
+    .nullish()
+    .describe('외부 지도 API로 선택한 매장 도로명 주소'),
+  storeLatitude: zod.number().nullish(),
+  storeLongitude: zod.number().nullish(),
+  productName: zod.string().max(postApiV1GroupBuyRequestsBodyProductNameMax),
+  desiredQuantity: zod.number().min(1),
+  desiredPickupDate: zod.iso.date().describe('오늘 이후 날짜'),
+  additionalNote: zod
+    .string()
+    .max(postApiV1GroupBuyRequestsBodyAdditionalNoteMax)
+    .nullish(),
+});
+
+/**
+ * @summary 내 공구 요청 목록 조회
+ */
+export const GetApiV1GroupBuyRequestsResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.array(
+    zod.object({
+      requestId: zod.number(),
+      storeName: zod.string(),
+      productName: zod.string(),
+      desiredQuantity: zod.number(),
+      desiredPickupDate: zod.iso.date(),
+      additionalNote: zod.string().nullish(),
+      status: zod
+        .enum(['SUBMITTED', 'IN_REVIEW', 'IN_CONTACT', 'OPENED', 'REJECTED'])
+        .describe(
+          'SUBMITTED=요청 접수 \/ IN_REVIEW=검토 중 \/ IN_CONTACT=매장 컨택 중 \/\nOPENED=공구 개설 완료 \/ REJECTED=개설 불가\n',
+        ),
+      rejectionReason: zod
+        .string()
+        .nullable()
+        .describe('status=REJECTED 시 노출'),
+      createdAt: zod.iso.datetime({ offset: true }),
+    }),
+  ),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * @summary 공구 요청 상세 조회
+ */
+export const GetApiV1GroupBuyRequestsRequestIdParams = zod.object({
+  requestId: zod.number(),
+});
+
+export const GetApiV1GroupBuyRequestsRequestIdResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    requestId: zod.number(),
+    storeName: zod.string(),
+    productName: zod.string(),
+    desiredQuantity: zod.number(),
+    desiredPickupDate: zod.iso.date(),
+    additionalNote: zod.string().nullish(),
+    status: zod
+      .enum(['SUBMITTED', 'IN_REVIEW', 'IN_CONTACT', 'OPENED', 'REJECTED'])
+      .describe(
+        'SUBMITTED=요청 접수 \/ IN_REVIEW=검토 중 \/ IN_CONTACT=매장 컨택 중 \/\nOPENED=공구 개설 완료 \/ REJECTED=개설 불가\n',
+      ),
+    rejectionReason: zod
+      .string()
+      .nullable()
+      .describe('status=REJECTED 시 노출'),
+    createdAt: zod.iso.datetime({ offset: true }),
+  }),
+  error: zod.unknown().nullable(),
+});

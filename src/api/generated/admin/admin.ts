@@ -1,0 +1,643 @@
+/* /* eslint-disable *\/ */
+/**
+ * // 이 파일은 Orval이 자동 생성합니다. 직접 수정하지 마세요.
+ */
+import type {
+  AdminGroupBuyCreate,
+  AdminGroupBuyUpdate,
+  AdminManualRefund,
+  AdminRequestStatusUpdate,
+  AdminSettlementCreate,
+  ApiResponseAdminDashboardSummary,
+  ApiResponseAdminGroupBuyDetail,
+  ApiResponseAdminGroupBuyList,
+  ApiResponseAdminRefundPage,
+  ApiResponseAdminRequestDetail,
+  ApiResponseAdminRequestPage,
+  ApiResponseGroupBuyId,
+  ApiResponseSettlementId,
+  ApiResponseSettlementPage,
+  BadRequestResponse,
+  ConflictResponse,
+  ForbiddenResponse,
+  GetApiV1AdminGroupBuyRequestsParams,
+  GetApiV1AdminGroupBuysParams,
+  GetApiV1AdminRefundsParams,
+  GetApiV1AdminSettlementsParams,
+  SuccessNoDataResponse
+} from '../api.schemas';
+
+import { customFetch } from '../../../lib/custom-fetch';
+
+/**
+ * 헤더에 항상 노출되는 대기중 요청 / 진행 중 공구 / 달성률 / 대기 환불 요약을 반환한다.
+ * @summary 운영자 대시보드 요약 정보
+ */
+export type getApiV1AdminSummaryResponse200 = {
+  data: ApiResponseAdminDashboardSummary
+  status: 200
+}
+
+export type getApiV1AdminSummaryResponse403 = {
+  data: ForbiddenResponse
+  status: 403
+}
+
+export type getApiV1AdminSummaryResponseSuccess = (getApiV1AdminSummaryResponse200) & {
+  headers: Headers;
+};
+export type getApiV1AdminSummaryResponseError = (getApiV1AdminSummaryResponse403) & {
+  headers: Headers;
+};
+
+export type getApiV1AdminSummaryResponse = (getApiV1AdminSummaryResponseSuccess | getApiV1AdminSummaryResponseError)
+
+export const getGetApiV1AdminSummaryUrl = () => {
+
+
+
+
+  return `/api/v1/admin/summary`
+}
+
+export const getApiV1AdminSummary = async ( options?: RequestInit): Promise<getApiV1AdminSummaryResponse> => {
+
+  return customFetch<getApiV1AdminSummaryResponse>(getGetApiV1AdminSummaryUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+/**
+ * @summary 공구 요청 목록 조회 (운영자)
+ */
+export type getApiV1AdminGroupBuyRequestsResponse200 = {
+  data: ApiResponseAdminRequestPage
+  status: 200
+}
+
+export type getApiV1AdminGroupBuyRequestsResponse403 = {
+  data: ForbiddenResponse
+  status: 403
+}
+
+export type getApiV1AdminGroupBuyRequestsResponseSuccess = (getApiV1AdminGroupBuyRequestsResponse200) & {
+  headers: Headers;
+};
+export type getApiV1AdminGroupBuyRequestsResponseError = (getApiV1AdminGroupBuyRequestsResponse403) & {
+  headers: Headers;
+};
+
+export type getApiV1AdminGroupBuyRequestsResponse = (getApiV1AdminGroupBuyRequestsResponseSuccess | getApiV1AdminGroupBuyRequestsResponseError)
+
+export const getGetApiV1AdminGroupBuyRequestsUrl = (params?: GetApiV1AdminGroupBuyRequestsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/admin/group-buy-requests?${stringifiedParams}` : `/api/v1/admin/group-buy-requests`
+}
+
+export const getApiV1AdminGroupBuyRequests = async (params?: GetApiV1AdminGroupBuyRequestsParams, options?: RequestInit): Promise<getApiV1AdminGroupBuyRequestsResponse> => {
+
+  return customFetch<getApiV1AdminGroupBuyRequestsResponse>(getGetApiV1AdminGroupBuyRequestsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+/**
+ * @summary 공구 요청 상세 조회 (운영자)
+ */
+export type getApiV1AdminGroupBuyRequestsRequestIdResponse200 = {
+  data: ApiResponseAdminRequestDetail
+  status: 200
+}
+
+export type getApiV1AdminGroupBuyRequestsRequestIdResponseSuccess = (getApiV1AdminGroupBuyRequestsRequestIdResponse200) & {
+  headers: Headers;
+};
+;
+
+export type getApiV1AdminGroupBuyRequestsRequestIdResponse = (getApiV1AdminGroupBuyRequestsRequestIdResponseSuccess)
+
+export const getGetApiV1AdminGroupBuyRequestsRequestIdUrl = (requestId: number,) => {
+
+
+
+
+  return `/api/v1/admin/group-buy-requests/${requestId}`
+}
+
+export const getApiV1AdminGroupBuyRequestsRequestId = async (requestId: number, options?: RequestInit): Promise<getApiV1AdminGroupBuyRequestsRequestIdResponse> => {
+
+  return customFetch<getApiV1AdminGroupBuyRequestsRequestIdResponse>(getGetApiV1AdminGroupBuyRequestsRequestIdUrl(requestId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+/**
+ * @summary 공구 요청 상태 변경
+ */
+export type patchApiV1AdminGroupBuyRequestsRequestIdStatusResponse200 = {
+  data: SuccessNoDataResponse
+  status: 200
+}
+
+export type patchApiV1AdminGroupBuyRequestsRequestIdStatusResponse400 = {
+  data: BadRequestResponse
+  status: 400
+}
+
+export type patchApiV1AdminGroupBuyRequestsRequestIdStatusResponseSuccess = (patchApiV1AdminGroupBuyRequestsRequestIdStatusResponse200) & {
+  headers: Headers;
+};
+export type patchApiV1AdminGroupBuyRequestsRequestIdStatusResponseError = (patchApiV1AdminGroupBuyRequestsRequestIdStatusResponse400) & {
+  headers: Headers;
+};
+
+export type patchApiV1AdminGroupBuyRequestsRequestIdStatusResponse = (patchApiV1AdminGroupBuyRequestsRequestIdStatusResponseSuccess | patchApiV1AdminGroupBuyRequestsRequestIdStatusResponseError)
+
+export const getPatchApiV1AdminGroupBuyRequestsRequestIdStatusUrl = (requestId: number,) => {
+
+
+
+
+  return `/api/v1/admin/group-buy-requests/${requestId}/status`
+}
+
+export const patchApiV1AdminGroupBuyRequestsRequestIdStatus = async (requestId: number,
+    adminRequestStatusUpdate: AdminRequestStatusUpdate, options?: RequestInit): Promise<patchApiV1AdminGroupBuyRequestsRequestIdStatusResponse> => {
+
+  return customFetch<patchApiV1AdminGroupBuyRequestsRequestIdStatusResponse>(getPatchApiV1AdminGroupBuyRequestsRequestIdStatusUrl(requestId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      adminRequestStatusUpdate,)
+  }
+);}
+
+
+/**
+ * @summary 진행 중인 공구 현황 목록 (운영자)
+ */
+export type getApiV1AdminGroupBuysResponse200 = {
+  data: ApiResponseAdminGroupBuyList
+  status: 200
+}
+
+export type getApiV1AdminGroupBuysResponseSuccess = (getApiV1AdminGroupBuysResponse200) & {
+  headers: Headers;
+};
+;
+
+export type getApiV1AdminGroupBuysResponse = (getApiV1AdminGroupBuysResponseSuccess)
+
+export const getGetApiV1AdminGroupBuysUrl = (params?: GetApiV1AdminGroupBuysParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/admin/group-buys?${stringifiedParams}` : `/api/v1/admin/group-buys`
+}
+
+export const getApiV1AdminGroupBuys = async (params?: GetApiV1AdminGroupBuysParams, options?: RequestInit): Promise<getApiV1AdminGroupBuysResponse> => {
+
+  return customFetch<getApiV1AdminGroupBuysResponse>(getGetApiV1AdminGroupBuysUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+/**
+ * @summary 공구 개설 (운영자)
+ */
+export type postApiV1AdminGroupBuysResponse201 = {
+  data: ApiResponseGroupBuyId
+  status: 201
+}
+
+export type postApiV1AdminGroupBuysResponseSuccess = (postApiV1AdminGroupBuysResponse201) & {
+  headers: Headers;
+};
+;
+
+export type postApiV1AdminGroupBuysResponse = (postApiV1AdminGroupBuysResponseSuccess)
+
+export const getPostApiV1AdminGroupBuysUrl = () => {
+
+
+
+
+  return `/api/v1/admin/group-buys`
+}
+
+export const postApiV1AdminGroupBuys = async (adminGroupBuyCreate: AdminGroupBuyCreate, options?: RequestInit): Promise<postApiV1AdminGroupBuysResponse> => {
+
+  return customFetch<postApiV1AdminGroupBuysResponse>(getPostApiV1AdminGroupBuysUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      adminGroupBuyCreate,)
+  }
+);}
+
+
+/**
+ * @summary 공구 상세 조회 (운영자)
+ */
+export type getApiV1AdminGroupBuysGroupBuyIdResponse200 = {
+  data: ApiResponseAdminGroupBuyDetail
+  status: 200
+}
+
+export type getApiV1AdminGroupBuysGroupBuyIdResponseSuccess = (getApiV1AdminGroupBuysGroupBuyIdResponse200) & {
+  headers: Headers;
+};
+;
+
+export type getApiV1AdminGroupBuysGroupBuyIdResponse = (getApiV1AdminGroupBuysGroupBuyIdResponseSuccess)
+
+export const getGetApiV1AdminGroupBuysGroupBuyIdUrl = (groupBuyId: number,) => {
+
+
+
+
+  return `/api/v1/admin/group-buys/${groupBuyId}`
+}
+
+export const getApiV1AdminGroupBuysGroupBuyId = async (groupBuyId: number, options?: RequestInit): Promise<getApiV1AdminGroupBuysGroupBuyIdResponse> => {
+
+  return customFetch<getApiV1AdminGroupBuysGroupBuyIdResponse>(getGetApiV1AdminGroupBuysGroupBuyIdUrl(groupBuyId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+/**
+ * @summary 공구 정보 수정 (운영자)
+ */
+export type patchApiV1AdminGroupBuysGroupBuyIdResponse200 = {
+  data: SuccessNoDataResponse
+  status: 200
+}
+
+export type patchApiV1AdminGroupBuysGroupBuyIdResponseSuccess = (patchApiV1AdminGroupBuysGroupBuyIdResponse200) & {
+  headers: Headers;
+};
+;
+
+export type patchApiV1AdminGroupBuysGroupBuyIdResponse = (patchApiV1AdminGroupBuysGroupBuyIdResponseSuccess)
+
+export const getPatchApiV1AdminGroupBuysGroupBuyIdUrl = (groupBuyId: number,) => {
+
+
+
+
+  return `/api/v1/admin/group-buys/${groupBuyId}`
+}
+
+export const patchApiV1AdminGroupBuysGroupBuyId = async (groupBuyId: number,
+    adminGroupBuyUpdate: AdminGroupBuyUpdate, options?: RequestInit): Promise<patchApiV1AdminGroupBuysGroupBuyIdResponse> => {
+
+  return customFetch<patchApiV1AdminGroupBuysGroupBuyIdResponse>(getPatchApiV1AdminGroupBuysGroupBuyIdUrl(groupBuyId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      adminGroupBuyUpdate,)
+  }
+);}
+
+
+/**
+ * ACHIEVED 상태 공구에 대해 발주를 확정한다.
+ * @summary 발주 확정 처리
+ */
+export type postApiV1AdminGroupBuysGroupBuyIdOrderConfirmResponse200 = {
+  data: SuccessNoDataResponse
+  status: 200
+}
+
+export type postApiV1AdminGroupBuysGroupBuyIdOrderConfirmResponse409 = {
+  data: ConflictResponse
+  status: 409
+}
+
+export type postApiV1AdminGroupBuysGroupBuyIdOrderConfirmResponseSuccess = (postApiV1AdminGroupBuysGroupBuyIdOrderConfirmResponse200) & {
+  headers: Headers;
+};
+export type postApiV1AdminGroupBuysGroupBuyIdOrderConfirmResponseError = (postApiV1AdminGroupBuysGroupBuyIdOrderConfirmResponse409) & {
+  headers: Headers;
+};
+
+export type postApiV1AdminGroupBuysGroupBuyIdOrderConfirmResponse = (postApiV1AdminGroupBuysGroupBuyIdOrderConfirmResponseSuccess | postApiV1AdminGroupBuysGroupBuyIdOrderConfirmResponseError)
+
+export const getPostApiV1AdminGroupBuysGroupBuyIdOrderConfirmUrl = (groupBuyId: number,) => {
+
+
+
+
+  return `/api/v1/admin/group-buys/${groupBuyId}/order-confirm`
+}
+
+export const postApiV1AdminGroupBuysGroupBuyIdOrderConfirm = async (groupBuyId: number, options?: RequestInit): Promise<postApiV1AdminGroupBuysGroupBuyIdOrderConfirmResponse> => {
+
+  return customFetch<postApiV1AdminGroupBuysGroupBuyIdOrderConfirmResponse>(getPostApiV1AdminGroupBuysGroupBuyIdOrderConfirmUrl(groupBuyId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+/**
+ * @summary 발주서 발송
+ */
+export type postApiV1AdminGroupBuysGroupBuyIdOrderSheetResponse200 = {
+  data: SuccessNoDataResponse
+  status: 200
+}
+
+export type postApiV1AdminGroupBuysGroupBuyIdOrderSheetResponseSuccess = (postApiV1AdminGroupBuysGroupBuyIdOrderSheetResponse200) & {
+  headers: Headers;
+};
+;
+
+export type postApiV1AdminGroupBuysGroupBuyIdOrderSheetResponse = (postApiV1AdminGroupBuysGroupBuyIdOrderSheetResponseSuccess)
+
+export const getPostApiV1AdminGroupBuysGroupBuyIdOrderSheetUrl = (groupBuyId: number,) => {
+
+
+
+
+  return `/api/v1/admin/group-buys/${groupBuyId}/order-sheet`
+}
+
+export const postApiV1AdminGroupBuysGroupBuyIdOrderSheet = async (groupBuyId: number, options?: RequestInit): Promise<postApiV1AdminGroupBuysGroupBuyIdOrderSheetResponse> => {
+
+  return customFetch<postApiV1AdminGroupBuysGroupBuyIdOrderSheetResponse>(getPostApiV1AdminGroupBuysGroupBuyIdOrderSheetUrl(groupBuyId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+/**
+ * @summary 환불 처리 현황 목록 (운영자)
+ */
+export type getApiV1AdminRefundsResponse200 = {
+  data: ApiResponseAdminRefundPage
+  status: 200
+}
+
+export type getApiV1AdminRefundsResponseSuccess = (getApiV1AdminRefundsResponse200) & {
+  headers: Headers;
+};
+;
+
+export type getApiV1AdminRefundsResponse = (getApiV1AdminRefundsResponseSuccess)
+
+export const getGetApiV1AdminRefundsUrl = (params?: GetApiV1AdminRefundsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/admin/refunds?${stringifiedParams}` : `/api/v1/admin/refunds`
+}
+
+export const getApiV1AdminRefunds = async (params?: GetApiV1AdminRefundsParams, options?: RequestInit): Promise<getApiV1AdminRefundsResponse> => {
+
+  return customFetch<getApiV1AdminRefundsResponse>(getGetApiV1AdminRefundsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+/**
+ * @summary 수동 환불 처리
+ */
+export type postApiV1AdminRefundsParticipationIdManualResponse200 = {
+  data: SuccessNoDataResponse
+  status: 200
+}
+
+export type postApiV1AdminRefundsParticipationIdManualResponse409 = {
+  data: ConflictResponse
+  status: 409
+}
+
+export type postApiV1AdminRefundsParticipationIdManualResponseSuccess = (postApiV1AdminRefundsParticipationIdManualResponse200) & {
+  headers: Headers;
+};
+export type postApiV1AdminRefundsParticipationIdManualResponseError = (postApiV1AdminRefundsParticipationIdManualResponse409) & {
+  headers: Headers;
+};
+
+export type postApiV1AdminRefundsParticipationIdManualResponse = (postApiV1AdminRefundsParticipationIdManualResponseSuccess | postApiV1AdminRefundsParticipationIdManualResponseError)
+
+export const getPostApiV1AdminRefundsParticipationIdManualUrl = (participationId: number,) => {
+
+
+
+
+  return `/api/v1/admin/refunds/${participationId}/manual`
+}
+
+export const postApiV1AdminRefundsParticipationIdManual = async (participationId: number,
+    adminManualRefund: AdminManualRefund, options?: RequestInit): Promise<postApiV1AdminRefundsParticipationIdManualResponse> => {
+
+  return customFetch<postApiV1AdminRefundsParticipationIdManualResponse>(getPostApiV1AdminRefundsParticipationIdManualUrl(participationId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      adminManualRefund,)
+  }
+);}
+
+
+/**
+ * @summary 정산 내역 목록 (운영자)
+ */
+export type getApiV1AdminSettlementsResponse200 = {
+  data: ApiResponseSettlementPage
+  status: 200
+}
+
+export type getApiV1AdminSettlementsResponseSuccess = (getApiV1AdminSettlementsResponse200) & {
+  headers: Headers;
+};
+;
+
+export type getApiV1AdminSettlementsResponse = (getApiV1AdminSettlementsResponseSuccess)
+
+export const getGetApiV1AdminSettlementsUrl = (params?: GetApiV1AdminSettlementsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/admin/settlements?${stringifiedParams}` : `/api/v1/admin/settlements`
+}
+
+export const getApiV1AdminSettlements = async (params?: GetApiV1AdminSettlementsParams, options?: RequestInit): Promise<getApiV1AdminSettlementsResponse> => {
+
+  return customFetch<getApiV1AdminSettlementsResponse>(getGetApiV1AdminSettlementsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+/**
+ * @summary 정산 생성 및 처리
+ */
+export type postApiV1AdminSettlementsResponse201 = {
+  data: ApiResponseSettlementId
+  status: 201
+}
+
+export type postApiV1AdminSettlementsResponse409 = {
+  data: ConflictResponse
+  status: 409
+}
+
+export type postApiV1AdminSettlementsResponseSuccess = (postApiV1AdminSettlementsResponse201) & {
+  headers: Headers;
+};
+export type postApiV1AdminSettlementsResponseError = (postApiV1AdminSettlementsResponse409) & {
+  headers: Headers;
+};
+
+export type postApiV1AdminSettlementsResponse = (postApiV1AdminSettlementsResponseSuccess | postApiV1AdminSettlementsResponseError)
+
+export const getPostApiV1AdminSettlementsUrl = () => {
+
+
+
+
+  return `/api/v1/admin/settlements`
+}
+
+export const postApiV1AdminSettlements = async (adminSettlementCreate: AdminSettlementCreate, options?: RequestInit): Promise<postApiV1AdminSettlementsResponse> => {
+
+  return customFetch<postApiV1AdminSettlementsResponse>(getPostApiV1AdminSettlementsUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      adminSettlementCreate,)
+  }
+);}
+
+
+/**
+ * @summary 에스크로 해제
+ */
+export type postApiV1AdminSettlementsSettlementIdReleaseResponse200 = {
+  data: SuccessNoDataResponse
+  status: 200
+}
+
+export type postApiV1AdminSettlementsSettlementIdReleaseResponse409 = {
+  data: ConflictResponse
+  status: 409
+}
+
+export type postApiV1AdminSettlementsSettlementIdReleaseResponseSuccess = (postApiV1AdminSettlementsSettlementIdReleaseResponse200) & {
+  headers: Headers;
+};
+export type postApiV1AdminSettlementsSettlementIdReleaseResponseError = (postApiV1AdminSettlementsSettlementIdReleaseResponse409) & {
+  headers: Headers;
+};
+
+export type postApiV1AdminSettlementsSettlementIdReleaseResponse = (postApiV1AdminSettlementsSettlementIdReleaseResponseSuccess | postApiV1AdminSettlementsSettlementIdReleaseResponseError)
+
+export const getPostApiV1AdminSettlementsSettlementIdReleaseUrl = (settlementId: number,) => {
+
+
+
+
+  return `/api/v1/admin/settlements/${settlementId}/release`
+}
+
+export const postApiV1AdminSettlementsSettlementIdRelease = async (settlementId: number, options?: RequestInit): Promise<postApiV1AdminSettlementsSettlementIdReleaseResponse> => {
+
+  return customFetch<postApiV1AdminSettlementsSettlementIdReleaseResponse>(getPostApiV1AdminSettlementsSettlementIdReleaseUrl(settlementId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+

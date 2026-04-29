@@ -1,0 +1,87 @@
+/* /* eslint-disable *\/ */
+/**
+ * // 이 파일은 Orval이 자동 생성합니다. 직접 수정하지 마세요.
+ */
+import * as zod from 'zod';
+
+/**
+ * @summary 찜 추가
+ */
+export const PostApiV1GroupBuysGroupBuyIdWishlistParams = zod.object({
+  groupBuyId: zod.number(),
+});
+
+/**
+ * @summary 찜 해제
+ */
+export const DeleteApiV1GroupBuysGroupBuyIdWishlistParams = zod.object({
+  groupBuyId: zod.number(),
+});
+
+export const DeleteApiV1GroupBuysGroupBuyIdWishlistResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.unknown().nullable(),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * @summary 찜 목록 조회
+ */
+export const getApiV1WishlistsQueryFilterDefault = `ALL`;
+export const getApiV1WishlistsQuerySortDefault = `LATEST`;
+export const getApiV1WishlistsQueryPageDefault = 0;
+export const getApiV1WishlistsQuerySizeDefault = 20;
+export const getApiV1WishlistsQuerySizeMax = 100;
+
+export const GetApiV1WishlistsQueryParams = zod.object({
+  filter: zod
+    .enum(['ALL', 'CLOSING_SOON', 'OPEN', 'CLOSED'])
+    .default(getApiV1WishlistsQueryFilterDefault)
+    .describe(
+      'ALL=전체 \/ CLOSING_SOON=마감임박(D-3) \/ OPEN=모집중 \/ CLOSED=마감공구',
+    ),
+  sort: zod
+    .enum(['LATEST', 'DEADLINE'])
+    .default(getApiV1WishlistsQuerySortDefault),
+  page: zod.number().default(getApiV1WishlistsQueryPageDefault),
+  size: zod
+    .number()
+    .max(getApiV1WishlistsQuerySizeMax)
+    .default(getApiV1WishlistsQuerySizeDefault),
+});
+
+export const GetApiV1WishlistsResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    content: zod.array(
+      zod.object({
+        id: zod.number(),
+        storeName: zod.string(),
+        region: zod.string(),
+        productName: zod.string(),
+        thumbnailUrl: zod.string(),
+        price: zod.number(),
+        achievementRate: zod.number().describe('달성률 %'),
+        currentQuantity: zod.number(),
+        targetQuantity: zod.number(),
+        maxQuantity: zod.number().nullable(),
+        deadline: zod.iso.datetime({ offset: true }),
+        pickupDate: zod.iso.date(),
+        pickupTimeStart: zod.iso.time({}),
+        pickupTimeEnd: zod.iso.time({}),
+        dDay: zod.number(),
+        isWishlisted: zod.boolean(),
+        isClosed: zod.boolean(),
+        canParticipate: zod.boolean(),
+      }),
+    ),
+    totalElements: zod.number(),
+    totalPages: zod.number(),
+    number: zod.number(),
+    size: zod.number(),
+    urgentCount: zod
+      .number()
+      .describe('마감 24시간 이내 건수 (0이면 배너 미노출)'),
+  }),
+  error: zod.unknown().nullable(),
+});

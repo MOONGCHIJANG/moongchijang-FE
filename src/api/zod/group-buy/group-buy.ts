@@ -1,0 +1,277 @@
+/* /* eslint-disable *\/ */
+/**
+ * // 이 파일은 Orval이 자동 생성합니다. 직접 수정하지 마세요.
+ */
+import * as zod from 'zod';
+
+/**
+ * 진행 중인 공구 목록을 페이지네이션으로 조회한다. 비로그인 허용.
+ * @summary 공구 피드 목록 조회
+ */
+export const getApiV1GroupBuysQueryFilterDefault = `ALL`;
+export const getApiV1GroupBuysQueryPageDefault = 0;
+export const getApiV1GroupBuysQuerySizeDefault = 20;
+export const getApiV1GroupBuysQuerySizeMax = 100;
+
+export const GetApiV1GroupBuysQueryParams = zod.object({
+  filter: zod
+    .enum(['ALL', 'CLOSING_SOON', 'ALMOST_ACHIEVED', 'SEOUL', 'GYEONGGI'])
+    .default(getApiV1GroupBuysQueryFilterDefault),
+  keyword: zod.string().optional().describe('매장명 또는 상품명 검색어'),
+  page: zod.number().default(getApiV1GroupBuysQueryPageDefault),
+  size: zod
+    .number()
+    .max(getApiV1GroupBuysQuerySizeMax)
+    .default(getApiV1GroupBuysQuerySizeDefault),
+});
+
+export const GetApiV1GroupBuysResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    content: zod.array(
+      zod.object({
+        id: zod.number(),
+        storeName: zod.string(),
+        region: zod.string(),
+        productName: zod.string(),
+        thumbnailUrl: zod.string(),
+        price: zod.number(),
+        achievementRate: zod.number().describe('달성률 %'),
+        currentQuantity: zod.number(),
+        targetQuantity: zod.number(),
+        maxQuantity: zod.number().nullable(),
+        deadline: zod.iso.datetime({ offset: true }),
+        pickupDate: zod.iso.date(),
+        pickupTimeStart: zod.iso.time({}),
+        pickupTimeEnd: zod.iso.time({}),
+        dDay: zod.number(),
+        isWishlisted: zod.boolean(),
+        isClosed: zod.boolean(),
+        canParticipate: zod.boolean(),
+      }),
+    ),
+    totalElements: zod.number(),
+    totalPages: zod.number(),
+    number: zod.number(),
+    size: zod.number(),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * 공구의 매장·상품·달성률·픽업 정보를 조회한다. 비로그인 허용.
+ * @summary 공구 상세 조회
+ */
+export const GetApiV1GroupBuysGroupBuyIdParams = zod.object({
+  groupBuyId: zod.number(),
+});
+
+export const GetApiV1GroupBuysGroupBuyIdResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    id: zod.number(),
+    storeName: zod.string(),
+    region: zod.string(),
+    productName: zod.string(),
+    productDescription: zod.string(),
+    notice: zod.string().describe('유의사항'),
+    imageUrls: zod.array(zod.string()),
+    price: zod.number(),
+    achievementRate: zod.number(),
+    currentQuantity: zod.number(),
+    targetQuantity: zod.number(),
+    maxQuantity: zod.number().nullable(),
+    deadline: zod.iso.datetime({ offset: true }),
+    pickupDate: zod.iso.date(),
+    pickupTimeStart: zod.iso.time({}),
+    pickupTimeEnd: zod.iso.time({}),
+    pickupLocation: zod.string(),
+    pickupLatitude: zod.number().nullable(),
+    pickupLongitude: zod.number().nullable(),
+    dDay: zod.number(),
+    isWishlisted: zod.boolean(),
+    isClosed: zod.boolean(),
+    isParticipated: zod.boolean(),
+    canParticipate: zod.boolean(),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * @summary 단일 공구 달성률 조회 (폴링용)
+ */
+export const GetApiV1GroupBuysGroupBuyIdProgressParams = zod.object({
+  groupBuyId: zod.number(),
+});
+
+export const GetApiV1GroupBuysGroupBuyIdProgressResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    groupBuyId: zod.number(),
+    achievementRate: zod.number(),
+    currentQuantity: zod.number(),
+    targetQuantity: zod.number(),
+    isClosed: zod.boolean(),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * @summary 다건 공구 달성률 조회 (피드 갱신용)
+ */
+export const getApiV1GroupBuysProgressQueryIdsMax = 20;
+
+export const GetApiV1GroupBuysProgressQueryParams = zod.object({
+  ids: zod
+    .array(zod.number())
+    .max(getApiV1GroupBuysProgressQueryIdsMax)
+    .describe('조회할 공구 ID 목록 (최대 20개)'),
+});
+
+export const GetApiV1GroupBuysProgressResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.array(
+    zod.object({
+      groupBuyId: zod.number(),
+      achievementRate: zod.number(),
+      currentQuantity: zod.number(),
+      targetQuantity: zod.number(),
+      isClosed: zod.boolean(),
+    }),
+  ),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * SNS 공유용 딥링크 URL 및 카드 메타데이터를 반환한다.
+ * @summary 공유 메타데이터 조회
+ */
+export const GetApiV1GroupBuysGroupBuyIdShareParams = zod.object({
+  groupBuyId: zod.number(),
+});
+
+export const GetApiV1GroupBuysGroupBuyIdShareResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    shareUrl: zod.string(),
+    title: zod.string(),
+    description: zod.string(),
+    imageUrl: zod.string(),
+    storeName: zod.string(),
+    deadline: zod.iso.datetime({ offset: true }),
+    pickupDate: zod.iso.date(),
+    pickupTimeStart: zod.iso.time({}).nullable(),
+    pickupTimeEnd: zod.iso.time({}).nullable(),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * 검색어를 입력하면 동네/베이커리 키워드를 AI로 분석하고 최근 검색어로 저장한다.
+분석 결과에 따라 4가지 케이스로 분기한다.
+- case 1: 베이커리 인식, 동네 미인식
+- case 2: 동네 인식, 베이커리 미인식
+- case 3: 동네+베이커리 모두 인식
+- case 4: 모두 인식 불가
+
+ * @summary 검색 실행 및 AI 키워드 분석 (1.1.4-1)
+ */
+
+export const PostApiV1SearchBody = zod.object({
+  keyword: zod.string().min(1),
+});
+
+export const PostApiV1SearchResponse = zod.object({
+  success: zod.boolean().optional(),
+  data: zod
+    .object({
+      keyword: zod.string().optional().describe('원본 검색어'),
+      detectedNeighborhood: zod
+        .string()
+        .nullish()
+        .describe('AI가 감지한 동네 키워드'),
+      detectedBakery: zod
+        .string()
+        .nullish()
+        .describe('AI가 감지한 베이커리\/상품 키워드'),
+      searchCase: zod
+        .union([zod.literal(1), zod.literal(2), zod.literal(3), zod.literal(4)])
+        .optional()
+        .describe(
+          '1=베이커리 인식·동네 미인식 \/ 2=동네 인식·베이커리 미인식 \/\n3=동네+베이커리 모두 인식 \/ 4=모두 인식 불가\n',
+        ),
+      groupBuys: zod
+        .array(
+          zod.object({
+            id: zod.number(),
+            storeName: zod.string(),
+            region: zod.string(),
+            productName: zod.string(),
+            thumbnailUrl: zod.string(),
+            price: zod.number(),
+            achievementRate: zod.number().describe('달성률 %'),
+            currentQuantity: zod.number(),
+            targetQuantity: zod.number(),
+            maxQuantity: zod.number().nullable(),
+            deadline: zod.iso.datetime({ offset: true }),
+            pickupDate: zod.iso.date(),
+            pickupTimeStart: zod.iso.time({}),
+            pickupTimeEnd: zod.iso.time({}),
+            dDay: zod.number(),
+            isWishlisted: zod.boolean(),
+            isClosed: zod.boolean(),
+            canParticipate: zod.boolean(),
+          }),
+        )
+        .optional()
+        .describe('case 3 또는 검색 결과가 있을 때 반환되는 공구 목록'),
+    })
+    .optional(),
+  error: zod.unknown().nullish(),
+});
+
+/**
+ * 검색창 탭 시 표시할 사용자의 최근 검색어를 최신순으로 반환한다. (1.1.4-10)
+검색 이력이 없으면 빈 배열 반환.
+
+ * @summary 최근 검색어 목록 조회
+ */
+export const GetApiV1SearchRecentResponse = zod.object({
+  success: zod.boolean().optional(),
+  data: zod
+    .object({
+      keywords: zod
+        .array(
+          zod.object({
+            keyword: zod.string().optional(),
+            searchedAt: zod.iso.datetime({ offset: true }).optional(),
+          }),
+        )
+        .optional()
+        .describe('최근 검색어 목록 (최신순). 이력 없으면 빈 배열.'),
+    })
+    .optional(),
+  error: zod.unknown().nullish(),
+});
+
+/**
+ * @summary 최근 검색어 전체 삭제
+ */
+export const DeleteApiV1SearchRecentResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.unknown().nullable(),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * @summary 최근 검색어 단건 삭제
+ */
+export const DeleteApiV1SearchRecentKeywordParams = zod.object({
+  keyword: zod.string(),
+});
+
+export const DeleteApiV1SearchRecentKeywordResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.unknown().nullable(),
+  error: zod.unknown().nullable(),
+});

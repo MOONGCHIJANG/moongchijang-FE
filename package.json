@@ -10,12 +10,14 @@
     "lint": "eslint",
     "prepare": "husky",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "generate": "orval && tsx scripts/generate-msw-index.ts && tsx scripts/generate-static-registry.ts"
   },
   "dependencies": {
     "@iconify/react": "^6.0.2",
     "clsx": "^2.1.1",
     "next": "16.2.2",
+    "qrcode.react": "^4.2.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "tailwind-merge": "^3.5.0",
@@ -23,6 +25,7 @@
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^5.1.1",
+    "@faker-js/faker": "^10.4.0",
     "@mswjs/http-middleware": "^0.10.3",
     "@storybook/addon-a11y": "^10.3.5",
     "@storybook/addon-docs": "^10.3.5",
@@ -40,6 +43,7 @@
     "chromatic": "^16.2.0",
     "concurrently": "^9.2.1",
     "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
     "eslint": "^9",
     "eslint-config-next": "16.2.2",
     "eslint-config-prettier": "^10.1.8",
@@ -48,6 +52,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
     "msw": "^2.13.0",
+    "orval": "^8.8.1",
     "playwright": "^1.59.1",
     "prettier": "^3.8.1",
     "storybook": "^10.3.5",

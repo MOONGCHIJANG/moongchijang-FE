@@ -5,7 +5,7 @@ import 'server-only';
  *
  * 용도:
  * - 서버 컴포넌트에서 직접 호출 (SSR)
- * - Route Handler(`app/api/proxy/**`)에서 호출 (CSR 의 프록시 진입점)
+ * - Route Handler(`src/app/api/v1/**`)에서 호출 (CSR 의 프록시 진입점)
  *
  * 배포/로컬 환경을 `NEXT_PUBLIC_API_MODE` 로 분기합니다.
  * - mock   : 로컬 개발, Express 목서버로 프록시 (BASE = http://localhost:9090)
@@ -37,9 +37,23 @@ function buildAuthHeaders(token?: string): Record<string, string> {
 }
 
 /**
+ * URL 패턴에 경로 파라미터(:param)가 포함된 경우를 포함해 매칭 여부를 반환합니다.
+ * 예: '/api/v1/group-buys/:groupBuyId' 는 '/api/v1/group-buys/123' 에 매칭됩니다.
+ */
+function matchesUrlPattern(urlPattern: string, requestPath: string): boolean {
+  const regexSource = urlPattern
+    .replace(/:[^/]+/g, '[^/]+') // :param → 임의 세그먼트
+    .replace(/\//g, '\\/'); // 슬래시 이스케이프
+  return new RegExp(`^${regexSource}$`).test(requestPath);
+}
+
+/**
  * static 모드 전용 분기.
- * - 레지스트리에서 해당 path 를 찾으면 정적/준비중 응답을 반환
- * - 매칭되는 엔트리가 없으면 null → 호출자는 실서버로 폴스루
+ * 1. PENDING_ENDPOINTS: 준비 중 응답 반환
+ * 2. STATIC_FALLBACK: 수동 등록 엔드포인트 (우선순위 높음)
+ * 3. generatedStaticMockEntries: Orval 자동 생성 엔드포인트 (패턴 매칭 포함)
+ * 4. mutation: 매핑 없어도 성공 응답 반환
+ * 5. null → 호출자가 실서버로 폴스루
  */
 async function resolveStaticResponse(
   path: string,
@@ -47,16 +61,35 @@ async function resolveStaticResponse(
 ): Promise<{ status: number; data: unknown } | null> {
   if (MODE !== 'static') return null;
 
-  if (PENDING_ENDPOINTS.has(path)) {
+  const pathWithoutQuery = path.split('?')[0];
+
+  if (PENDING_ENDPOINTS.has(pathWithoutQuery)) {
     return {
       status: 503,
-      data: { message: `API ${path} 는 아직 준비 중입니다.` },
+      data: { message: `API ${pathWithoutQuery} 는 아직 준비 중입니다.` },
     };
   }
 
-  const loader = STATIC_FALLBACK[path];
-  if (method === 'GET' && loader) {
-    return { status: 200, data: await loader() };
+  // 1. 수동 등록 엔드포인트 (STATIC_FALLBACK) - 정확한 경로 매칭
+  const manualLoader = STATIC_FALLBACK[pathWithoutQuery];
+  if (method === 'GET' && manualLoader) {
+    return { status: 200, data: await manualLoader() };
+  }
+
+  // 2. Orval 자동 생성 엔드포인트 - URL 패턴 매칭 (경로 파라미터 지원)
+  if (method === 'GET') {
+    try {
+      const { generatedStaticMockEntries } =
+        await import('@/api/generated/index.static');
+      const matchingEntry = generatedStaticMockEntries.find((entry) =>
+        matchesUrlPattern(entry.urlPattern, pathWithoutQuery),
+      );
+      if (matchingEntry) {
+        return { status: 200, data: matchingEntry.getResponseData() };
+      }
+    } catch {
+      // index.static.ts 미생성 시 (npm run generate 미실행) 무시하고 실서버로 폴스루
+    }
   }
 
   // mutation 은 매핑이 없어도 성공한 척 빈 객체

@@ -7,19 +7,19 @@ if echo "$COMMIT_MSG" | grep -qE "^Merge "; then
   exit 0
 fi
 
-TYPES="FEAT|MOD|ADD|CHORE|DEL|UI|FIX|MOVE|RENAME|REFACTOR|DOCS"
-PATTERN="^(#[0-9]+ )?\[(${TYPES})\] .+"
+TYPES="feat|mod|add|chore|del|ui|fix|move|rename|refactor|docs"
+PATTERN="^\[MCJ-[0-9]+\] (${TYPES}): .+"
 
 if ! echo "$COMMIT_MSG" | grep -qE "$PATTERN"; then
   echo ""
   echo "🚫 커밋 메시지 형식이 올바르지 않습니다."
   echo ""
-  echo "  올바른 형식: #이슈번호 [타입] 작업명"
-  echo "  예시:        #7 [UI] 로그인 컴포넌트 구현"
+  echo "  올바른 형식: [MCJ-이슈번호] 타입: 작업명"
+  echo "  예시:        [MCJ-99] feat: 로그인 UI 구현"
   echo ""
   echo "  사용 가능한 타입:"
-  echo "  [FEAT] [MOD] [ADD] [CHORE] [DEL] [UI]"
-  echo "  [FIX] [MOVE] [RENAME] [REFACTOR] [DOCS]"
+  echo "  feat mod add chore del ui"
+  echo "  fix move rename refactor docs"
   echo ""
   exit 1
 fi

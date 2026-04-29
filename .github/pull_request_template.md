@@ -14,9 +14,9 @@
 
 ---
 
-### 📌 관련 이슈
+### 📌 관련 이슈번호
 
-- Jira 링크: https://moongchijang.atlassian.net/browse/MCJ-
+- Closed #1
 
 ---
 

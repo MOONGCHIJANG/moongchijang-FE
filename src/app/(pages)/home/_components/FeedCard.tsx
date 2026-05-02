@@ -28,7 +28,7 @@ export const FeedCard = ({
       <div className="relative h-[140px] shrink-0 bg-gray-200">
         <div
           className={cn(
-            'absolute left-0 top-0 min-w-[58px] rounded-br-2xl px-2 py-1.5 text-center text-caption-md-medium font-bold text-white',
+            'absolute left-0 top-0 min-w-[58px] rounded-br-2xl px-2 py-1.5 text-center text-md-medium font-bold text-white',
             isUrgent ? 'bg-primary-400' : 'bg-surface-alpha',
           )}
         >
@@ -37,7 +37,7 @@ export const FeedCard = ({
       </div>
 
       <div className="flex flex-1 flex-col justify-between p-4">
-        <div className="flex items-center justify-between text-caption-md-medium text-gray-500">
+        <div className="flex items-center justify-between text-md-medium text-text-tertiary">
           <div className="flex items-center gap-1">
             <Icon
               icon="solar:map-point-bold"
@@ -47,7 +47,7 @@ export const FeedCard = ({
               {storeName} | {region}
             </span>
           </div>
-          <div className="flex items-center gap-1 rounded bg-primary-50 px-2 py-0.5 text-caption-sm-medium font-bold text-primary-400">
+          <div className="flex items-center gap-1 rounded bg-primary-50 px-2 py-0.5 text-sm-medium font-bold text-primary-400">
             <Icon
               icon="solar:users-group-rounded-bold"
               className="h-3.5 w-3.5"
@@ -59,15 +59,15 @@ export const FeedCard = ({
         </div>
 
         <div className="flex items-center justify-between gap-2">
-          <div className="line-clamp-1 flex-1 text-heading-sm-bold text-gray-900">
+          <div className="line-clamp-1 flex-1 text-sm-bold text-text-basic">
             {productName}
           </div>
-          <span className="shrink-0 text-caption-md-regular text-gray-400">
+          <span className="shrink-0 text-md-medium text-gray-400">
             픽업 {formattedPickupDate}
           </span>
         </div>
 
-        <div className="text-heading-md-bold text-gray-900">
+        <div className="text-md-bold text-text-basic">
           {(price ?? 0).toLocaleString()}원
         </div>
 
@@ -78,7 +78,7 @@ export const FeedCard = ({
               style={{ width: `${achievementRate}%` }}
             />
           </div>
-          <span className="text-caption-md-medium font-bold text-primary-400">
+          <span className="text-md-medium font-bold text-primary-400">
             {achievementRate}%
           </span>
         </div>

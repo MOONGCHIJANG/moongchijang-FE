@@ -61,7 +61,7 @@ export const SearchBar = ({
         type="text"
         value={inputValue}
         placeholder={placeholder}
-        className="w-full bg-transparent text-body-sm-regular text-text-basic outline-none placeholder:text-text-disabled"
+        className="w-full bg-transparent text-sm-regular text-text-basic outline-none placeholder:text-text-disabled"
         onChange={(e) => setInputValue(e.target.value)}
       />
       {inputValue && (

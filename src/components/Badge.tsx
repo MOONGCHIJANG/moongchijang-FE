@@ -17,11 +17,11 @@ export const Badge = ({ label, onDelete, className }: BadgeProps) => {
   return (
     <div
       className={cn(
-        'inline-flex h-8 items-center justify-center gap-3 rounded-lg bg-gray-50 px-2 py-1 transition-colors shrink-0 font-pretendard',
+        'inline-flex h-8 items-center justify-center gap-3 rounded-lg bg-surface-default px-2 py-1 transition-colors shrink-0 font-pretendard',
         className,
       )}
     >
-      <span className="text-center text-body-sm-regular text-text-tertiary">
+      <span className="text-center text-sm-regular text-text-tertiary">
         {label}
       </span>
       {onDelete && (
@@ -35,7 +35,7 @@ export const Badge = ({ label, onDelete, className }: BadgeProps) => {
           {/* 아이콘 영역 20px */}
           <Icon
             icon="material-symbols-light:close"
-            className="h-4 w-4 text-gray-500"
+            className="h-4 w-4 text-icon-subtle"
           />
         </button>
       )}

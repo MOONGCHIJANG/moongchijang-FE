@@ -59,7 +59,7 @@ export const Interactive: Story = {
   render: (args) => {
     const [active, setActive] = useState<TabId>('feed');
     return (
-      <div className="w-full h-[400px] flex items-end bg-gray-50 pb-4">
+      <div className="w-full h-[400px] flex items-end bg-surface-default pb-4">
         <GNB
           {...args}
           activeTab={active}

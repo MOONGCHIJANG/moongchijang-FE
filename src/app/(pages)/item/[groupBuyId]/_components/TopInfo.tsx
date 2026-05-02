@@ -1,8 +1,16 @@
+'use client';
+import ShareBtn from '@/components/ShareBtn';
 import { Icon } from '@iconify/react';
 import Image from 'next/image';
 import React from 'react';
+import BottomShare from './BottomShare';
 
 const TopInfo = () => {
+  const [isShared, setIsShared] = React.useState(false);
+  const onShareClick = () => {
+    setIsShared(!isShared);
+  };
+
   return (
     <div className="flex flex-col gap-g3 p-4">
       <div className="flex flex-col gap-g5">
@@ -26,13 +34,13 @@ const TopInfo = () => {
             </div>
             <div className="flex justify-between items-center">
               <p className="">이름이름</p>
-              <button className="rounded-medium px-p5 py-p3 bg-gray-50 flex gap-1 items-center">
-                <Icon
-                  icon="material-symbols:share"
-                  className="w-4 h-4 text-icon-basic"
+              <ShareBtn onClick={onShareClick}>공유하기</ShareBtn>
+              {isShared && (
+                <BottomShare
+                  open={isShared}
+                  onClose={() => setIsShared(false)}
                 />
-                <p className="text-button-natural">공유하기</p>
-              </button>
+              )}
             </div>
           </div>
           <p className="">18,000원</p>

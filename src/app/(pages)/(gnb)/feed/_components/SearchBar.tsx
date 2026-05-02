@@ -5,21 +5,9 @@ import { Icon } from '@iconify/react';
 import { cn } from '@/lib/utils';
 
 interface SearchBarProps {
-  /**
-   * 입력 필드의 안내 문구
-   */
   placeholder?: string;
-  /**
-   * 디바운스된 검색 실행 콜백 (기본 300ms)
-   */
   onSearch?: (value: string) => void;
-  /**
-   * 디바운스 지연 시간 (ms)
-   */
   debounceDelay?: number;
-  /**
-   * 추가적인 스타일 클래스
-   */
   className?: string;
 }
 

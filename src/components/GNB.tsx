@@ -47,7 +47,7 @@ export const GNB = ({
             <div className="relative flex h-6 w-6 items-center justify-center overflow-hidden">
               <Icon icon={tab.icon} className="h-6 w-6" />
             </div>
-            <div className="whitespace-nowrap text-center text-b4">
+            <div className="whitespace-nowrap text-center text-sm-medium">
               {tab.label}
             </div>
           </button>

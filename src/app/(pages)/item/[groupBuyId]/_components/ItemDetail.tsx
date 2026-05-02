@@ -1,11 +1,51 @@
-import React from 'react';
+'use client';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import DetailTab from './DetailTab';
+import GuideLine from './GuideLine';
 
 const ItemDetail = () => {
+  const descriptionRef = useRef<HTMLDivElement>(null);
+  const guidelinesRef = useRef<HTMLDivElement>(null);
+  const [activeTab, setActiveTab] = useState<'description' | 'guidelines'>(
+    'description',
+  );
+
+  // 스크롤 위치에 따라 탭 변경
+  useEffect(() => {
+    const handleScroll = () => {
+      const descTop = descriptionRef.current?.getBoundingClientRect().top ?? 0;
+      const guideTop = guidelinesRef.current?.getBoundingClientRect().top ?? 0;
+
+      if (descTop <= 56 && guideTop > 56) {
+        setActiveTab('description');
+      } else if (guideTop <= 56) {
+        setActiveTab('guidelines');
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // 탭 클릭 시 해당 섹션으로 스크롤
+  const handleTabClick = useCallback((tab: 'description' | 'guidelines') => {
+    setActiveTab(tab);
+    const yOffset = -56;
+    const target =
+      tab === 'description' ? descriptionRef.current : guidelinesRef.current;
+    if (target) {
+      const y = target.getBoundingClientRect().top + window.scrollY + yOffset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+  }, []);
+
   return (
     <>
-      <DetailTab />
-      <div className="pt-8 px-4">
+      <DetailTab activeTab={activeTab} onTabClick={handleTabClick} />
+      <div
+        ref={descriptionRef}
+        id="description-section"
+        className="pt-8 px-4 scroll-mt-16"
+      >
         <div className="flex flex-col gap-g4">
           <div className="flex flex-col gap-1">
             <p className="">픽업 안내</p>
@@ -33,6 +73,9 @@ const ItemDetail = () => {
           </div>
         </div>
         <div className="pt-g9 pb-g10">상세설명 텍스트 및 사진 구역</div>
+      </div>
+      <div ref={guidelinesRef} id="guidelines-section" className="scroll-mt-16">
+        <GuideLine />
       </div>
     </>
   );

@@ -1,14 +1,11 @@
 import React from 'react';
-import DetailTab from './DetailTab';
 
 const GuideLine = () => {
   return (
-    <>
-      <DetailTab />
-      <div className="px-p6 pt-p7 pb-p10 mb-26 bg-bg-white-muted flex flex-col gap-g4">
-        <p>뭉치장 단체 구매 시 유의사항</p>
-        <p className="text-text-disabled whitespace-pre-line">
-          {`결제 및 환불관련
+    <div className="px-p6 pt-p7 pb-36 bg-bg-white-muted flex flex-col gap-g4">
+      <p>뭉치장 단체 구매 시 유의사항</p>
+      <p className="text-text-disabled whitespace-pre-line">
+        {`결제 및 환불관련
           ・ 참여 시 결제 금액은 에스크로 방식으로 보관되며, 목표 수량 달성 후 매장에 정산됩니다
           ・ 목표 수량 미달성 시 마감일 기준 영업일 1일 이내 결제 수단으로 전액 자동 환불됩니다
           ・ 환불 처리 후 실제 입금까지 카드사 기준 3~5 영업일이 소요될 수 있습니다
@@ -40,9 +37,8 @@ const GuideLine = () => {
           ・ [서비스명]은 공구 개설·운영을 중개하는 플랫폼으로, 상품의 제조·품질에 대한 직접적인 책임은 해당 매장에 있습니다
           ・ 매장 사정으로 공구가 취소될 경우 결제 금액 전액이 환불되며 이 외 추가 보상은 제공되지 않습니다
           ・ 서비스 이용 중 문의사항은 앱 내 고객센터 또는 [이메일]로 접수해 주세요`}
-        </p>
-      </div>
-    </>
+      </p>
+    </div>
   );
 };
 

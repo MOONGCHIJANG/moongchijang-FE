@@ -15,12 +15,19 @@
 
 import { http, HttpResponse, delay } from 'msw';
 import { generatedHandlers } from '@/api/generated/index.msw';
-import { createGroupBuysFeedMock } from './mock-helpers';
+import {
+  createGroupBuyDetailMock,
+  createGroupBuysFeedMock,
+} from './mock-helpers';
 
 const overrideHandlers = [
   http.get('*/api/v1/group-buys', async () => {
     await delay(800);
     return HttpResponse.json(createGroupBuysFeedMock());
+  }),
+  http.get('*/api/v1/group-buys/:groupBuyId', async () => {
+    await delay(800);
+    return HttpResponse.json(createGroupBuyDetailMock());
   }),
 ];
 

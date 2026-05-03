@@ -23,7 +23,7 @@ const page = async ({ params }: Props) => {
     <div>
       <TopInfo data={data} />
       <ItemDetail data={data} />
-      <BottomJoin />
+      <BottomJoin data={data} />
     </div>
   );
 };

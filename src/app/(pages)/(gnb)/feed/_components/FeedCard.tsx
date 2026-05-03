@@ -24,12 +24,12 @@ export const FeedCard = ({
     parts?.length === 3 ? `${parts[1]}월 ${parts[2]}일` : pickupDate;
 
   return (
-    <div className="flex h-[272px] flex-col overflow-hidden rounded-2xl bg-white shadow-sm">
+    <div className="flex h-[272px] flex-col overflow-hidden rounded-2xl bg-bg-white shadow-sm">
       <div className="relative h-[140px] shrink-0 bg-gray-200">
         <div
           className={cn(
-            'absolute left-0 top-0 min-w-[58px] rounded-br-2xl px-2 py-1.5 text-center text-md-medium font-bold text-white',
-            isUrgent ? 'bg-primary-400' : 'bg-surface-alpha',
+            'absolute left-0 top-0 min-w-[58px] rounded-br-2xl px-2 py-1.5 text-center body-md-bold text-text-basic-inverse',
+            isUrgent ? 'bg-surface-brand' : 'bg-surface-alpha',
           )}
         >
           {dDayLabel}
@@ -37,17 +37,17 @@ export const FeedCard = ({
       </div>
 
       <div className="flex flex-1 flex-col justify-between p-4">
-        <div className="flex items-center justify-between text-md-medium text-gray-500">
+        <div className="flex items-center justify-between body-md-medium text-text-tertiary">
           <div className="flex items-center gap-1">
             <Icon
               icon="solar:map-point-bold"
-              className="h-4 w-4 text-primary-400"
+              className="h-4 w-4 text-icon-primary"
             />
             <span>
               {storeName} | {region}
             </span>
           </div>
-          <div className="flex items-center gap-1 rounded bg-primary-50 px-2 py-0.5 text-sm-medium font-bold text-primary-400">
+          <div className="flex items-center gap-1 rounded bg-surface-brand-lighter px-2 py-0.5 body-sm-bold text-text-brand">
             <Icon
               icon="solar:users-group-rounded-bold"
               className="h-3.5 w-3.5"
@@ -59,26 +59,26 @@ export const FeedCard = ({
         </div>
 
         <div className="flex items-center justify-between gap-2">
-          <div className="line-clamp-1 flex-1 text-sm-bold text-gray-900">
+          <div className="line-clamp-1 flex-1 body-sm-bold text-text-basic">
             {productName}
           </div>
-          <span className="shrink-0 text-md-medium text-gray-400">
+          <span className="shrink-0 body-md-medium text-text-disabled">
             픽업 {formattedPickupDate}
           </span>
         </div>
 
-        <div className="text-md-bold text-gray-900">
+        <div className="body-md-bold text-text-basic">
           {(price ?? 0).toLocaleString()}원
         </div>
 
         <div className="flex items-center gap-2">
           <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-gray-200">
             <div
-              className="absolute left-0 top-0 h-full rounded-full bg-primary-400 transition-all duration-300"
+              className="absolute left-0 top-0 h-full rounded-full bg-surface-brand transition-all duration-300"
               style={{ width: `${achievementRate}%` }}
             />
           </div>
-          <span className="text-md-medium font-bold text-primary-400">
+          <span className="body-md-bold text-text-brand">
             {achievementRate}%
           </span>
         </div>

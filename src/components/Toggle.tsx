@@ -53,7 +53,7 @@ export const Toggle = ({
         className={cn(
           'left-0 top-0 absolute rounded-full transition-colors duration-200',
           styles.container,
-          checked ? 'bg-primary-400' : 'bg-gray-200',
+          checked ? 'bg-surface-brand' : 'bg-gray-200',
         )}
       />
       <span

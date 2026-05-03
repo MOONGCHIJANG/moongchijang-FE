@@ -48,11 +48,19 @@ export function createGroupBuysFeedMock() {
 export function createGroupBuyDetailMock() {
   const base = getGetApiV1GroupBuysGroupBuyIdResponseMock();
 
+  const deadline = faker.date
+    .between({
+      from: new Date('2026-05-01'),
+      to: new Date('2026-05-31'),
+    })
+    .toISOString();
+
   return {
     ...base,
     success: true,
     data: {
       ...base.data,
+      deadline,
       price: faker.number.int({ min: 1_000, max: 1_000_000_000 }),
       achievementRate: faker.number.int({ min: 0, max: 100 }),
       currentQuantity: faker.number.int({ min: 1, max: 999 }),

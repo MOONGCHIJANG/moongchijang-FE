@@ -14,14 +14,12 @@ const FILTER_MAP: Record<FilterId, GetApiV1GroupBuysFilter> = {
   target: GetApiV1GroupBuysFilter.ALMOST_ACHIEVED,
 };
 
-export function useFeedList(activeFilter: FilterId, activeTab: string) {
+export function useFeedList(activeFilter: FilterId) {
   const [feeds, setFeeds] = useState<GroupBuyFeedItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    if (activeTab !== 'feed') return;
-
     const fetchFeeds = async () => {
       setIsLoading(true);
       try {
@@ -40,7 +38,7 @@ export function useFeedList(activeFilter: FilterId, activeTab: string) {
     };
 
     fetchFeeds();
-  }, [activeTab, activeFilter]);
+  }, [activeFilter]);
 
   return { feeds, isLoading, error };
 }

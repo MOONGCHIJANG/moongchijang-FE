@@ -57,7 +57,7 @@ export const LocationBottomSheet = ({
     >
       <div className="flex items-center justify-between px-5 pt-6 pb-2">
         <div className="flex items-center gap-2">
-          <h2 className="text-md-bold text-text-basic font-pretendard">
+          <h2 className="text-md-bold text-gray-900 font-pretendard">
             관심 지역 설정
           </h2>
         </div>
@@ -77,7 +77,7 @@ export const LocationBottomSheet = ({
       </p>
 
       <div className="flex h-[500px] border-t border-gray-50 pb-[172px]">
-        <div className="w-[110px] overflow-y-auto bg-surface-elevated scrollbar-hide">
+        <div className="w-[110px] overflow-y-auto bg-gray-25 scrollbar-hide">
           {REGIONS_DATA.map((city) => {
             const isActive = selectedCityId === city.id;
             return (
@@ -87,8 +87,8 @@ export const LocationBottomSheet = ({
                 className={cn(
                   'w-full h-[52px] flex items-center justify-center text-md-medium transition-all font-pretendard',
                   isActive
-                    ? 'bg-white text-text-basic font-normal shadow-[inset_-2px_0_0_#FFF]'
-                    : 'text-text-tertiary font-normal',
+                    ? 'bg-white text-gray-900 font-normal shadow-[inset_-2px_0_0_#FFF]'
+                    : 'text-gray-500 font-normal',
                 )}
               >
                 {city.name}
@@ -110,13 +110,11 @@ export const LocationBottomSheet = ({
                   'flex w-full h-[42px] items-center justify-between px-3 transition-all rounded-lg mb-[9px] font-pretendard border',
                   isSelected
                     ? 'bg-primary-25! border-primary-50! text-primary-400! font-bold text-sm-regular'
-                    : 'bg-transparent border-transparent text-text-basic font-normal text-sm-regular hover:bg-surface-default',
+                    : 'bg-transparent border-transparent text-gray-900 font-normal text-sm-regular hover:bg-gray-50',
                 )}
               >
                 <span
-                  className={
-                    isSelected ? 'text-primary-400!' : 'text-text-basic'
-                  }
+                  className={isSelected ? 'text-primary-400!' : 'text-gray-900'}
                 >
                   {region.name}
                 </span>
@@ -134,8 +132,8 @@ export const LocationBottomSheet = ({
       <div className="absolute bottom-0 left-0 w-full bg-white px-5 pt-6 pb-6 flex flex-col gap-3 shadow-[0_-12px_30px_rgba(0,0,0,0.08)]">
         <div className="flex items-center justify-between font-pretendard">
           <div className="flex items-center gap-1.5">
-            <span className="text-sm-regular text-text-subtle">선택한 곳</span>
-            <span className="text-sm-semibold text-text-subtle">
+            <span className="text-sm-regular text-gray-700">선택한 곳</span>
+            <span className="text-sm-semibold text-gray-700">
               {tempSelectedRegions.length}/10
             </span>
           </div>
@@ -173,7 +171,7 @@ export const LocationBottomSheet = ({
           fullWidth
           size="xl"
           onClick={() => onApply(tempSelectedRegions)}
-          className="text-white text-lg-bold h-12 shadow-none"
+          className="text-white font-bold text-[16px] h-12 shadow-none"
           disabled={tempSelectedRegions.length === 0}
         >
           적용하기

@@ -37,7 +37,7 @@ export const FeedCard = ({
       </div>
 
       <div className="flex flex-1 flex-col justify-between p-4">
-        <div className="flex items-center justify-between text-md-medium text-text-tertiary">
+        <div className="flex items-center justify-between text-md-medium text-gray-500">
           <div className="flex items-center gap-1">
             <Icon
               icon="solar:map-point-bold"
@@ -59,7 +59,7 @@ export const FeedCard = ({
         </div>
 
         <div className="flex items-center justify-between gap-2">
-          <div className="line-clamp-1 flex-1 text-sm-bold text-text-basic">
+          <div className="line-clamp-1 flex-1 text-sm-bold text-gray-900">
             {productName}
           </div>
           <span className="shrink-0 text-md-medium text-gray-400">
@@ -67,7 +67,7 @@ export const FeedCard = ({
           </span>
         </div>
 
-        <div className="text-md-bold text-text-basic">
+        <div className="text-md-bold text-gray-900">
           {(price ?? 0).toLocaleString()}원
         </div>
 

@@ -6,6 +6,7 @@ import { RequestFormStep } from './RequestFormStep';
 import { StoreSearchStep } from './StoreSearchStep';
 import { MapConfirmStep } from './MapConfirmStep';
 import { SubmitCompleteStep } from './SubmitCompleteStep';
+import { Toast } from '@/components/Toast';
 import { postApiV1GroupBuyRequests } from '@/api/generated/group-buy-request/group-buy-request';
 import type { RequestFormData } from './RequestFormStep';
 
@@ -91,13 +92,13 @@ export const GroupBuyRequestClient = () => {
         isLoading={isLoading}
       />
 
-      {toastMessage && (
-        <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 w-[calc(100%-32px)] max-w-[408px]">
-          <div className="flex items-center gap-2 rounded-xl bg-gray-800 px-4 py-3 shadow-lg">
-            <p className="text-body-sm-regular text-white">{toastMessage}</p>
-          </div>
-        </div>
-      )}
+      <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 w-[calc(100%-32px)] max-w-[408px] pointer-events-none">
+        <Toast
+          isVisible={!!toastMessage}
+          icon="lucide:circle-alert"
+          message={toastMessage ?? ''}
+        />
+      </div>
     </>
   );
 };

@@ -65,6 +65,10 @@ export function createGroupBuyDetailMock() {
       achievementRate: faker.number.int({ min: 0, max: 100 }),
       currentQuantity: faker.number.int({ min: 1, max: 999 }),
       targetQuantity: faker.number.int({ min: 1, max: 999 }),
+      maxQuantity:
+        faker.helpers.maybe(() => faker.number.int({ min: 1, max: 999 }), {
+          probability: 0.5,
+        }) ?? null,
       pickupTimeStart: faker.date.recent().toISOString().slice(11, 23) + 'Z',
       pickupTimeEnd: faker.date.recent().toISOString().slice(11, 23) + 'Z',
     },

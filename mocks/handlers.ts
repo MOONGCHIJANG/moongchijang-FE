@@ -17,6 +17,7 @@ import { http, HttpResponse, delay } from 'msw';
 import { faker } from '@faker-js/faker';
 import { generatedHandlers } from '@/api/generated/index.msw';
 import { koFaker } from './ko-faker';
+import { createGroupBuyDetailMock } from './mock-helpers';
 
 const MOCK_IMAGES = [
   '/images/img1.jpg',
@@ -62,6 +63,10 @@ const overrideHandlers = [
       },
       error: null,
     });
+  }),
+  http.get('*/api/v1/group-buys/:groupBuyId', async () => {
+    await delay(800);
+    return HttpResponse.json(createGroupBuyDetailMock());
   }),
 ];
 

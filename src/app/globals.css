@@ -1,6 +1,13 @@
 @import '../styles/tokens.css';
 @import 'tailwindcss';
 
+@layer base {
+  html,
+  body {
+    color: #111114;
+  }
+}
+
 @utility scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;

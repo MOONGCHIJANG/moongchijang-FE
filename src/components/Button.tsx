@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'outline' | 'ghost';
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  size?: 'md' | 'lg';
   fullWidth?: boolean;
 }
 
@@ -14,16 +14,12 @@ const variants = {
     'bg-button-primary-fill text-white shadow-sm active:scale-[0.98] disabled:bg-button-disabled-fill disabled:text-button-white',
   outline:
     'border border-border-default bg-button-white text-text-tertiary active:bg-surface-default',
-  ghost: 'bg-transparent text-gray-400 hover:text-gray-600',
+  ghost: 'bg-transparent text-text-disabled hover:text-gray-600',
 };
 
 const sizes = {
-  sm: 'h-8 px-3 text-md-medium rounded-lg',
-  // 버튼 M 규격: h-11, w-80(옵션), rounded-xl, text-base(16px), font-bold, gap-2.5
-  md: 'h-11 px-6 text-lg-bold rounded-xl gap-2.5',
-  // 버튼 L 규격: h-14, rounded-lg, text-base(16px), font-semibold, leading-6
-  lg: 'h-14 px-6 text-lg-semibold leading-6 rounded-lg gap-1',
-  xl: 'h-[52px] px-6 text-sm-bold rounded-xl',
+  md: 'h-11 heading-sm-bold rounded-xl gap-2.5',
+  lg: 'h-14 px-6 py-2.5 heading-md-semibold rounded-lg gap-1',
 };
 
 export const Button = ({

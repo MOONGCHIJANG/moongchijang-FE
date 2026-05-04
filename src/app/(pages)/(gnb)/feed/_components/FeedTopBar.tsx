@@ -38,7 +38,7 @@ export const FeedTopBar = ({
           className="flex items-center gap-0.5"
           type="button"
         >
-          <span className="text-lg-medium text-text-basic">{location}</span>
+          <span className="heading-sm-medium text-text-basic">{location}</span>
           <Icon
             icon="solar:alt-arrow-down-linear"
             className="h-5 w-5 text-icon-subtle"

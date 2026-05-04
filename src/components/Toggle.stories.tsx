@@ -114,12 +114,12 @@ export const SizeComparison: Story = {
   render: () => (
     <div className="flex flex-col gap-6">
       <div className="flex items-center gap-6">
-        <span className="text-sm-regular text-gray-500 w-12">md</span>
+        <span className="body-sm-regular text-text-tertiary w-12">md</span>
         <Toggle checked={false} onChange={() => {}} size="md" />
         <Toggle checked={true} onChange={() => {}} size="md" />
       </div>
       <div className="flex items-center gap-6">
-        <span className="text-sm-regular text-gray-500 w-12">sm</span>
+        <span className="body-sm-regular text-text-tertiary w-12">sm</span>
         <Toggle checked={false} onChange={() => {}} size="sm" />
         <Toggle checked={true} onChange={() => {}} size="sm" />
       </div>

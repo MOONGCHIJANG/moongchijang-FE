@@ -40,16 +40,16 @@ export const SearchBar = ({
   return (
     <div
       className={cn(
-        'flex h-11 w-full items-center gap-2 rounded-full border border-primary-400 bg-white px-4 shadow-sm',
+        'flex h-11 w-full items-center gap-2 rounded-full border border-border-brand bg-bg-white px-4 shadow-sm',
         className,
       )}
     >
-      <Icon icon="solar:magnifer-linear" className="h-5 w-5 text-primary-400" />
+      <Icon icon="solar:magnifer-linear" className="h-5 w-5 text-icon-primary" />
       <input
         type="text"
         value={inputValue}
         placeholder={placeholder}
-        className="w-full bg-transparent text-sm-regular text-text-basic outline-none placeholder:text-text-disabled"
+        className="w-full bg-transparent body-sm-regular text-text-basic outline-none placeholder:text-text-disabled"
         onChange={(e) => setInputValue(e.target.value)}
       />
       {inputValue && (

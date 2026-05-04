@@ -60,7 +60,7 @@ export function FeedClient() {
         {isLoading ? (
           <FeedSkeletonList />
         ) : feeds.length === 0 ? (
-          <div className="flex flex-1 items-center justify-center text-gray-400">
+          <div className="flex flex-1 items-center justify-center text-text-disabled">
             진행 중인 공구가 없습니다
           </div>
         ) : (

@@ -26,14 +26,14 @@ export const Chip = ({
       className={cn(
         'inline-flex h-6 items-center justify-center gap-0.5 px-3 py-1 rounded-2xl transition-colors shrink-0 font-pretendard select-none disabled:cursor-not-allowed disabled:opacity-50',
         active
-          ? 'bg-primary-400 text-white'
-          : 'bg-gray-25 outline outline-1 outline-offset-[-1px] outline-gray-100 text-gray-900',
+          ? 'bg-surface-brand text-text-basic-inverse'
+          : 'bg-surface-elevated outline outline-1 outline-offset-[-1px] outline-border-subtle text-text-basic',
         className,
       )}
     >
       <span
         className={cn(
-          'text-center text-xs leading-4',
+          'text-center text-12 leading-4',
           active ? 'font-bold' : 'font-normal',
         )}
       >

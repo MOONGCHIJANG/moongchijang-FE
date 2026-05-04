@@ -24,8 +24,8 @@ export const Example = ({
         ${sizeStyles[size]}
         ${
           primary
-            ? 'bg-blue-300 text-white border-blue-300'
-            : 'bg-white text-gray-900 border-gray-300'
+            ? 'bg-blue-300 text-text-basic-inverse border-blue-300'
+            : 'bg-bg-white text-text-basic border-border-strong'
         }
       `}
     >

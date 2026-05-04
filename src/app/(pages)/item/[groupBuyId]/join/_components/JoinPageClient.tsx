@@ -6,12 +6,12 @@ import PaymentButton from './PaymentButton';
 
 const JoinPageClient = () => {
   return (
-    <>
+    <div className="bg-bg-white-muted p-4">
       <ItemSummary />
       <JoinForm />
       <AgreeTerms />
       <PaymentButton />
-    </>
+    </div>
   );
 };
 

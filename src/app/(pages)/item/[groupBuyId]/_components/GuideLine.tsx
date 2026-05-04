@@ -2,7 +2,7 @@ import React from 'react';
 
 const GuideLine = () => {
   return (
-    <div className="px-p6 pt-p7 pb-36 bg-bg-white-muted flex flex-col gap-g4">
+    <div className="px-p6 pt-p7 pb-p10 bg-bg-white-muted flex flex-col gap-g4">
       <p>뭉치장 단체 구매 시 유의사항</p>
       <p className="text-text-disabled whitespace-pre-line">
         {`결제 및 환불관련

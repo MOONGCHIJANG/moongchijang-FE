@@ -4,6 +4,7 @@ import ItemDetail from './_components/ItemDetail';
 import BottomJoin from './_components/BottomJoin';
 import { getApiV1GroupBuysGroupBuyId } from '@/api/generated/group-buy/group-buy';
 import { notFound } from 'next/navigation';
+import Footer from '@/components/Footer';
 
 interface Props {
   params: Promise<{ groupBuyId: string }>;
@@ -24,6 +25,7 @@ const page = async ({ params }: Props) => {
       <TopInfo data={data} />
       <ItemDetail data={data} />
       <BottomJoin data={data} />
+      <Footer />
     </div>
   );
 };

@@ -46,7 +46,7 @@ export const GNB = ({ className = '' }: GNBProps) => {
             <div className="relative flex h-6 w-6 items-center justify-center overflow-hidden">
               <Icon icon={tab.icon} className="h-6 w-6" />
             </div>
-            <div className="whitespace-nowrap text-center text-sm-medium">
+            <div className="whitespace-nowrap text-center body-sm-medium">
               {tab.label}
             </div>
           </Link>

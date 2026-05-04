@@ -18,7 +18,7 @@ export const Primary: Story = {
     variant: 'primary',
     children: '적용하기',
     fullWidth: true,
-    size: 'xl',
+    size: 'lg',
   },
 };
 
@@ -26,14 +26,14 @@ export const Outline: Story = {
   args: {
     variant: 'outline',
     children: '초기화',
-    size: 'sm',
+    size: 'md',
   },
 };
 
-export const Small: Story = {
+export const Medium: Story = {
   args: {
     variant: 'primary',
-    size: 'sm',
+    size: 'md',
     children: '설정하기',
   },
 };

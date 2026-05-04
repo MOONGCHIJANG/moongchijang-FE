@@ -1,27 +1,27 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { FeedTopBar } from '../FeedTopBar';
-import { SearchBar } from '../SearchBar';
-import { FilterBar, FilterId } from '../FilterBar';
-import { FeedCard } from '../FeedCard';
-import { FeedSkeletonList } from '../FeedSkeleton';
-import { LocationBottomSheet } from '../LocationBottomSheet';
-import { QrModal } from '../QrModal';
+import { FeedTopBar } from './FeedTopBar';
+import { SearchBar } from './SearchBar';
+import { FilterBar, FilterId } from './FilterBar';
+import { FeedCard } from './FeedCard';
+import { FeedSkeletonList } from './FeedSkeleton';
+import { LocationBottomSheet } from './LocationBottomSheet';
+import { QrModal } from './QrModal';
 import { REGIONS_DATA, Region } from '@/constants/regions';
 import { useShake } from '@/hooks/useShake';
-import { useFeedList } from '../../_hooks/useFeedList';
+import { useFeedList } from '../_hooks/useFeedList';
 
-export function FeedTab() {
+export function FeedClient() {
   const [activeFilter, setActiveFilter] = useState<FilterId>('all');
   const [isLocationSheetOpen, setIsLocationSheetOpen] = useState(false);
   const [selectedRegions, setSelectedRegions] = useState<Region[]>([
     REGIONS_DATA[0].regions[0],
   ]);
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
-  const [isPickupDay] = useState(() => Math.random() < 0.5);
+  const isPickupDay = false;
 
-  const { feeds, isLoading } = useFeedList(activeFilter, 'feed');
+  const { feeds, isLoading } = useFeedList(activeFilter);
 
   const handleShake = useCallback(() => {
     setIsQrModalOpen(true);

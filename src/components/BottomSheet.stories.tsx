@@ -23,8 +23,8 @@ export const Default: Story = {
         <Button onClick={() => setIsOpen(true)}>바텀시트 열기</Button>
         <BottomSheet isOpen={isOpen} onClose={() => setIsOpen(false)}>
           <div className="p-6">
-            <h2 className="text-heading-md-bold mb-4">바텀시트 제목</h2>
-            <p className="text-body-md-regular text-gray-500 mb-6">
+            <h2 className="text-md-bold mb-4">바텀시트 제목</h2>
+            <p className="text-sm-regular text-gray-500 mb-6">
               바텀시트 내용이 여기에 들어갑니다.
             </p>
             <Button fullWidth onClick={() => setIsOpen(false)}>
@@ -50,11 +50,11 @@ export const DragToDismiss: Story = {
         <Button onClick={() => setIsOpen(true)}>바텀시트 열기</Button>
         <BottomSheet isOpen={isOpen} onClose={() => setIsOpen(false)}>
           <div className="p-6">
-            <h2 className="text-heading-md-bold mb-4">드래그로 닫기</h2>
-            <p className="text-body-md-regular text-gray-500 mb-2">
+            <h2 className="text-md-bold mb-4">드래그로 닫기</h2>
+            <p className="text-sm-regular text-gray-500 mb-2">
               상단 핸들 바를 아래로 끌어내려 보세요.
             </p>
-            <ul className="text-body-sm-regular text-gray-500 mb-6 list-disc pl-5 space-y-1">
+            <ul className="text-sm-regular text-gray-500 mb-6 list-disc pl-5 space-y-1">
               <li>100px 이상 내린 상태에서 손을 떼면 닫힙니다.</li>
               <li>떼기 전에 다시 위로 끌어올리면 원위치로 돌아옵니다.</li>
               <li>임계값 이하에서 떼면 자동으로 스냅백됩니다.</li>

@@ -1,0 +1,30 @@
+{
+  "success": true,
+  "data": {
+    "id": 3,
+    "storeName": "밀랩",
+    "region": "성수",
+    "productName": "명란 소금빵 5개입",
+    "productDescription": "바삭한 소금빵 위에 국내산 명란젓을 올려 구운 성수 맛집의 시그니처 메뉴입니다. 짭조름한 명란과 버터 향이 어우러져 한 번 먹으면 자꾸 생각나는 맛입니다. 5개입 구성으로 혼자 즐기거나 소수 인원과 나눠 드실 수 있습니다.",
+    "notice": "- 당일 제조 제품으로 픽업 후 즉시 섭취를 권장합니다.\n- 명란 알레르기가 있으신 분은 섭취에 주의해주세요.\n- 밀(글루텐), 갑각류(명란), 유제품 함유.\n- 달성률 90% 이상으로 조기 마감될 수 있습니다.",
+    "imageUrls": ["/images/img3.webp"],
+    "price": 15000,
+    "achievementRate": 90,
+    "currentQuantity": 27,
+    "targetQuantity": 30,
+    "maxQuantity": 60,
+    "deadline": "2026-05-07T23:59:00",
+    "pickupDate": "2026-05-09",
+    "pickupTimeStart": "11:00",
+    "pickupTimeEnd": "16:00",
+    "pickupLocation": "서울 성동구 성수동2가 밀랩 성수점",
+    "pickupLatitude": 37.5444,
+    "pickupLongitude": 127.0567,
+    "dDay": 3,
+    "isWishlisted": false,
+    "isClosed": false,
+    "isParticipated": false,
+    "canParticipate": true
+  },
+  "error": null
+}

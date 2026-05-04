@@ -17,8 +17,17 @@
  *   }
  */
 
+import { faker } from '@faker-js/faker';
 import { getGetApiV1GroupBuysGroupBuyIdResponseMock } from '../src/api/generated/group-buy/group-buy.msw';
 import { koFaker } from './ko-faker';
+
+const MOCK_IMAGES = [
+  '/images/img1.jpg',
+  '/images/img2.jpg',
+  '/images/img3.webp',
+  '/images/img4.jpg',
+  '/images/img5.jpg',
+];
 
 export { koFaker } from './ko-faker';
 
@@ -33,6 +42,7 @@ export function createGroupBuyDetailMock() {
     success: true,
     data: {
       ...base.data,
+      imageUrls: [faker.helpers.arrayElement(MOCK_IMAGES)],
       storeName: koFaker.store.name(),
       productName: koFaker.product.name(),
       productDescription: koFaker.product.description(),

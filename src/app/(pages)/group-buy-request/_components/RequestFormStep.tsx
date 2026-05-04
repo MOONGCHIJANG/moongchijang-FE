@@ -127,6 +127,15 @@ export const RequestFormStep = ({
             placeholder="원하는 상품명을 정확히 입력해주세요"
             className="w-full px-3 py-4 bg-gray-50 rounded-xl text-body-sm-regular text-gray-700 placeholder:text-gray-300 outline-none font-pretendard"
           />
+          <div className="flex items-center gap-[2px]">
+            <Icon
+              icon="lucide:info"
+              className="w-3 h-3 text-primary-400 shrink-0"
+            />
+            <span className="text-caption-sm-regular text-primary-400">
+              1자 이상 20자 이내로 작성해주세요.
+            </span>
+          </div>
         </div>
 
         {/* 희망 참여 수량 */}

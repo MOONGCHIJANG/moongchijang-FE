@@ -45,12 +45,7 @@ const TopInfo = ({ data }: Props) => {
               <ShareBtn onClick={() => setIsShared(!isShared)}>
                 공유하기
               </ShareBtn>
-              {isShared && (
-                <BottomShare
-                  open={isShared}
-                  onClose={() => setIsShared(false)}
-                />
-              )}
+              <BottomShare open={isShared} onClose={() => setIsShared(false)} />
             </div>
           </div>
           <p className="heading-1xl-bold">{data.price.toLocaleString()}원</p>

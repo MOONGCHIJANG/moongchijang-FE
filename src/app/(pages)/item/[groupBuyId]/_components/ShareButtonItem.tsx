@@ -7,7 +7,7 @@ type ShareButtonItemProps = {
 
 const ShareButtonItem = ({ platform }: ShareButtonItemProps) => {
   return (
-    <button className="flex flex-col gap-g2 items-center">
+    <button className="flex flex-col gap-g2 items-center caption-sm-medium">
       <Image
         src={`/icons/${platform}.svg`}
         alt="공유하기"

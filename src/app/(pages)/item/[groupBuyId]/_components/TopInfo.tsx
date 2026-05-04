@@ -1,4 +1,5 @@
 'use client';
+import Image from 'next/image';
 import ShareBtn from '@/components/ShareBtn';
 import { Icon } from '@iconify/react';
 import React from 'react';
@@ -18,17 +19,13 @@ const TopInfo = ({ data }: Props) => {
   return (
     <div className="flex flex-col gap-g3 p-4">
       <div className="flex flex-col gap-g5">
-        {/* TODO: 추후 이미지로 연동 */}
-        {/* <Image
+        <Image
           src={data.imageUrls[0] ?? ''}
           alt="상품 이미지"
           width={400}
           height={260}
           className="w-full h-65 rounded-3xlarge bg-gray-100"
-        /> */}
-        <div className="w-full h-65 rounded-3xlarge bg-gray-100 flex items-center justify-center">
-          <p className="text-gray-400">상품 이미지</p>
-        </div>
+        />
         <div className="flex flex-col gap-g2">
           <div className="flex flex-col gap-g1">
             <div className="flex gap-g2 text-text-tertiary items-center caption-sm-medium">
@@ -106,7 +103,9 @@ const TopInfo = ({ data }: Props) => {
           <p className="text-text-disabled caption-sm-bold">
             최대 구매 가능 수량
           </p>
-          <p className="caption-sm-medium">{data.maxQuantity}개</p>
+          <p className="caption-sm-medium">
+            {data.maxQuantity != null ? `${data.maxQuantity}개` : '제한 없음'}
+          </p>
         </div>
       </div>
     </div>

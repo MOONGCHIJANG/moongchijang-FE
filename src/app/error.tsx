@@ -1,7 +1,6 @@
 'use client';
 
 import { Icon } from '@iconify/react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 interface Props {
@@ -38,12 +37,14 @@ export default function Error({ reset }: Props) {
         >
           다시 시도
         </button>
-        <Link
-          href="/"
-          className="w-full py-p4 rounded-2xlarge border border-border-default text-text-secondary body-md-medium text-center block"
+        <button
+          onClick={() => {
+            window.location.href = '/';
+          }}
+          className="w-full py-p4 rounded-2xlarge border border-border-default text-text-secondary body-md-medium cursor-pointer"
         >
           홈으로
-        </Link>
+        </button>
       </div>
     </div>
   );

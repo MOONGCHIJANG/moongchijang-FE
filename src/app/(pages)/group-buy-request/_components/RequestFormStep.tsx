@@ -200,10 +200,14 @@ export const RequestFormStep = ({
           </span>
           <textarea
             value={additionalNote}
-            onChange={(e) => setAdditionalNote(e.target.value)}
+            onChange={(e) => {
+              setAdditionalNote(e.target.value);
+              e.target.style.height = 'auto';
+              e.target.style.height = e.target.scrollHeight + 'px';
+            }}
             placeholder="자유롭게 입력해주세요"
             rows={1}
-            className="w-full px-3 py-4 bg-gray-50 rounded-xl text-body-sm-regular text-gray-700 placeholder:text-gray-300 outline-none font-pretendard resize-none"
+            className="w-full px-3 py-4 bg-gray-50 rounded-xl text-body-sm-regular text-gray-700 placeholder:text-gray-300 outline-none font-pretendard resize-none overflow-hidden max-h-[120px]"
           />
         </div>
 

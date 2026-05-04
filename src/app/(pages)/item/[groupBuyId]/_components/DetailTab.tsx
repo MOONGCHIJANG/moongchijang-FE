@@ -11,8 +11,8 @@ const DetailTab = ({ activeTab, onTabClick }: DetailTabProps) => {
       <button
         className={`flex-1 text-center pt-p6 pb-p5 cursor-pointer transition-colors duration-150 font-medium text-base ${
           activeTab === 'description'
-            ? 'text-text-basic border-b-2 border-button-natural '
-            : 'text-text-tertiary'
+            ? 'text-text-basic border-b-2 border-button-natural body-md-bold'
+            : 'text-text-tertiary body-md-regular'
         }`}
         onClick={() => onTabClick('description')}
         tabIndex={0}
@@ -23,8 +23,8 @@ const DetailTab = ({ activeTab, onTabClick }: DetailTabProps) => {
       <button
         className={`flex-1 text-center pt-p6 pb-p5 cursor-pointer transition-colors duration-150 font-medium text-base ${
           activeTab === 'guidelines'
-            ? 'text-text-basic border-b-2 border-button-natural '
-            : 'text-text-tertiary'
+            ? 'text-text-basic border-b-2 border-button-natural body-md-bold'
+            : 'text-text-tertiary body-md-regular'
         }`}
         onClick={() => onTabClick('guidelines')}
         tabIndex={0}

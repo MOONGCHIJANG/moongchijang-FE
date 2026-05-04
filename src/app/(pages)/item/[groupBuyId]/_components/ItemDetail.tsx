@@ -54,27 +54,27 @@ const ItemDetail = ({ data }: Props) => {
       >
         <div className="flex flex-col gap-g4">
           <div className="flex flex-col gap-1">
-            <p>픽업 안내</p>
-            <p className="text-text-brand">
+            <p className="heading-md-bold">픽업 안내</p>
+            <p className="text-text-brand caption-sm-medium">
               수령 일시를 꼭 확인해주세요. 미수령 시 환불이 불가해요.
             </p>
           </div>
           <div className="flex flex-col gap-g5">
             {/* TODO: 지도 컴포넌트 (pickupLatitude, pickupLongitude 활용) */}
-            <p>지도</p>
+            <div className="w-full h-56 rounded-medium bg-gray-200">지도</div>
             <div className="flex gap-g5 items-start">
-              <div className="shrink-0 px-g3 py-g2 rounded-large bg-surface-brand-lighter text-text-brand">
+              <div className="shrink-0 px-g3 py-g2 rounded-large bg-surface-brand-lighter text-text-brand caption-sm-bold">
                 픽업 장소
               </div>
-              <div className="flex flex-col gap-g2">
+              <div className="flex flex-col gap-g2 heading-sm-semibold">
                 <p>{data.pickupLocation}</p>
               </div>
             </div>
             <div className="flex gap-g5 items-center">
-              <div className="shrink-0 px-g3 py-g2 rounded-large bg-surface-brand-lighter text-text-brand">
+              <div className="shrink-0 px-g3 py-g2 rounded-large bg-surface-brand-lighter text-text-brand caption-sm-bold">
                 픽업 일시
               </div>
-              <p>
+              <p className="heading-sm-semibold">
                 {formatPickupDate(data.pickupDate)}
                 {formatPickupTime(data.pickupTimeStart)}~
                 {formatPickupTime(data.pickupTimeEnd)}
@@ -83,7 +83,9 @@ const ItemDetail = ({ data }: Props) => {
           </div>
         </div>
         {/* TODO: 상품 설명 확정 후 수정 적용 예정 */}
-        <div className="pt-g9 pb-g10">{data.productDescription}</div>
+        <div className="pt-g9 pb-g10 body-md-regular">
+          {data.productDescription}
+        </div>
       </div>
       <div ref={guidelinesRef} id="guidelines-section" className="scroll-mt-16">
         <GuideLine />

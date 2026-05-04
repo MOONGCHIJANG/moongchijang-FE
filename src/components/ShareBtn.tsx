@@ -14,7 +14,7 @@ const ShareBtn = ({ children, onClick }: ShareBtnProps) => {
       type="button"
     >
       <Icon icon="material-symbols:share" className="w-4 h-4 text-icon-basic" />
-      <p className="text-button-natural">{children}</p>
+      <p className="text-button-natural caption-xs-bold">{children}</p>
     </button>
   );
 };

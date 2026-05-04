@@ -31,7 +31,7 @@ const TopInfo = ({ data }: Props) => {
         </div>
         <div className="flex flex-col gap-g2">
           <div className="flex flex-col gap-g1">
-            <div className="flex gap-g2 text-text-tertiary items-center">
+            <div className="flex gap-g2 text-text-tertiary items-center caption-sm-medium">
               <Icon
                 icon="teenyicons:pin-alt-solid"
                 className="h-3 w-3 text-primary-400"
@@ -41,7 +41,7 @@ const TopInfo = ({ data }: Props) => {
               <p>{pickupText}</p>
             </div>
             <div className="flex justify-between items-center">
-              <p>{data.productName}</p>
+              <p className="heading-lg-bold">{data.productName}</p>
               <ShareBtn onClick={() => setIsShared(!isShared)}>
                 공유하기
               </ShareBtn>
@@ -53,15 +53,15 @@ const TopInfo = ({ data }: Props) => {
               )}
             </div>
           </div>
-          <p>{data.price.toLocaleString()}원</p>
+          <p className="heading-1xl-bold">{data.price.toLocaleString()}원</p>
         </div>
       </div>
 
       <div className="px-p6 py-p5 rounded-2xlarge flex flex-col gap-g3 bg-bg-white-muted">
         <div className="flex gap-g1 items-center">
-          <p>달성까지</p>
-          <p className="text-text-tertiary">・</p>
-          <p className="text-text-tertiary">
+          <p className="body-md-semibold">달성까지</p>
+          <p className="text-text-tertiary caption-sm-medium">・</p>
+          <p className="text-text-tertiary caption-sm-medium">
             마감일 {formatDeadline(data.deadline)}
           </p>
         </div>
@@ -71,7 +71,7 @@ const TopInfo = ({ data }: Props) => {
               icon="mynaui:ticket-solid"
               className="text-primary-400 w-4 h-4"
             />
-            <p className="text-text-brand">
+            <p className="text-text-brand body-md-bold">
               {data.currentQuantity}/{data.targetQuantity}
             </p>
           </div>
@@ -83,34 +83,36 @@ const TopInfo = ({ data }: Props) => {
                 style={{ width: `${Math.min(data.achievementRate, 100)}%` }}
               />
             </div>
-            <p className="text-text-brand">{data.achievementRate}%</p>
+            <p className="text-text-brand heading-sm-bold">
+              {data.achievementRate}%
+            </p>
           </div>
         </div>
       </div>
 
       <div className="p-p2 divide-y divide-dashed divide-border-default">
         <div className="flex justify-between p-p3">
-          <p className="text-text-disabled">픽업 일시</p>
-          <p>
+          <p className="text-text-disabled caption-sm-bold">픽업 일시</p>
+          <p className="caption-sm-medium">
             {formatPickupDate(data.pickupDate)}
             {formatPickupTime(data.pickupTimeStart)}~
             {formatPickupTime(data.pickupTimeEnd)}
           </p>
         </div>
         <div className="flex justify-between p-p3">
-          <p className="text-text-disabled">픽업 장소</p>
-          <p>{data.pickupLocation}</p>
+          <p className="text-text-disabled caption-sm-bold">픽업 장소</p>
+          <p className="caption-sm-medium">{data.pickupLocation}</p>
         </div>
         <div className="flex justify-between p-p3">
-          <p className="text-text-disabled">매장명</p>
-          <p>{data.storeName}</p>
+          <p className="text-text-disabled caption-sm-bold">매장명</p>
+          <p className="caption-sm-medium">{data.storeName}</p>
         </div>
-        {data.maxQuantity && (
-          <div className="flex justify-between p-p3">
-            <p className="text-text-disabled">최대 구매 가능 수량</p>
-            <p>{data.maxQuantity}개</p>
-          </div>
-        )}
+        <div className="flex justify-between p-p3">
+          <p className="text-text-disabled caption-sm-bold">
+            최대 구매 가능 수량
+          </p>
+          <p className="caption-sm-medium">{data.maxQuantity}개</p>
+        </div>
       </div>
     </div>
   );

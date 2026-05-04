@@ -3,8 +3,8 @@ import React from 'react';
 const GuideLine = () => {
   return (
     <div className="px-p6 pt-p7 pb-p10 bg-bg-white-muted flex flex-col gap-g4">
-      <p>뭉치장 단체 구매 시 유의사항</p>
-      <p className="text-text-disabled whitespace-pre-line">
+      <p className="heading-md-bold">뭉치장 단체 구매 시 유의사항</p>
+      <p className="text-text-disabled whitespace-pre-line caption-sm-medium">
         {`결제 및 환불관련
           ・ 참여 시 결제 금액은 에스크로 방식으로 보관되며, 목표 수량 달성 후 매장에 정산됩니다
           ・ 목표 수량 미달성 시 마감일 기준 영업일 1일 이내 결제 수단으로 전액 자동 환불됩니다

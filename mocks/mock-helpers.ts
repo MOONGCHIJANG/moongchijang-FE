@@ -13,7 +13,10 @@
  */
 
 import { faker } from '@faker-js/faker';
-import { getGetApiV1GroupBuysResponseMock } from '../src/api/generated/group-buy/group-buy.msw';
+import {
+  getGetApiV1GroupBuysGroupBuyIdResponseMock,
+  getGetApiV1GroupBuysResponseMock,
+} from '../src/api/generated/group-buy/group-buy.msw';
 
 export function createGroupBuysFeedMock() {
   const base = getGetApiV1GroupBuysResponseMock();
@@ -38,6 +41,36 @@ export function createGroupBuysFeedMock() {
           }) ?? null,
         dDay: faker.number.int({ min: 0, max: 30 }),
       })),
+    },
+  };
+}
+
+export function createGroupBuyDetailMock() {
+  const base = getGetApiV1GroupBuysGroupBuyIdResponseMock();
+
+  const deadline = faker.date
+    .between({
+      from: new Date('2026-05-01'),
+      to: new Date('2026-05-31'),
+    })
+    .toISOString();
+
+  return {
+    ...base,
+    success: true,
+    data: {
+      ...base.data,
+      deadline,
+      price: faker.number.int({ min: 1_000, max: 1_000_000_000 }),
+      achievementRate: faker.number.int({ min: 0, max: 100 }),
+      currentQuantity: faker.number.int({ min: 1, max: 999 }),
+      targetQuantity: faker.number.int({ min: 1, max: 999 }),
+      maxQuantity:
+        faker.helpers.maybe(() => faker.number.int({ min: 1, max: 999 }), {
+          probability: 0.5,
+        }) ?? null,
+      pickupTimeStart: faker.date.recent().toISOString().slice(11, 23) + 'Z',
+      pickupTimeEnd: faker.date.recent().toISOString().slice(11, 23) + 'Z',
     },
   };
 }

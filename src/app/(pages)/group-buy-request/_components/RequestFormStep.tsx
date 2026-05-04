@@ -7,7 +7,7 @@ import { Button } from '@/components/Button';
 import { type Store } from './StoreSearchStep';
 import { DatePickerBottomSheet } from './DatePickerBottomSheet';
 
-interface RequestFormData {
+export interface RequestFormData {
   store: Store;
   productName: string;
   quantity: string;
@@ -20,6 +20,7 @@ interface RequestFormStepProps {
   onSearchStore?: () => void;
   onSubmit?: (data: RequestFormData) => void;
   onBack?: () => void;
+  isLoading?: boolean;
   className?: string;
 }
 
@@ -33,6 +34,7 @@ export const RequestFormStep = ({
   onSearchStore,
   onSubmit,
   onBack,
+  isLoading = false,
   className,
 }: RequestFormStepProps) => {
   const store = selectedStore ?? null;
@@ -220,10 +222,10 @@ export const RequestFormStep = ({
           size="lg"
           fullWidth
           className="text-white font-bold text-[16px] h-12 shadow-none"
-          disabled={!isSubmittable}
+          disabled={!isSubmittable || isLoading}
           onClick={handleSubmit}
         >
-          요청 제출하기
+          {isLoading ? '제출 중...' : '요청 제출하기'}
         </Button>
       </div>
 

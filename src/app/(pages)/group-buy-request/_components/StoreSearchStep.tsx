@@ -5,11 +5,19 @@ import { Icon } from '@iconify/react';
 import { cn } from '@/lib/utils';
 import { getApiV1StoresSearch } from '@/api/generated/group-buy-request/group-buy-request';
 import { type ApiResponseStoreSearchListDataStoresItem } from '@/api/generated/api.schemas';
-import { type Store } from './StoreSearchSheet';
 
 interface StoreSearchStepProps {
   onSelectStore: (store: Store) => void;
   onBack: () => void;
+}
+
+export interface Store {
+  placeId: string;
+  storeName: string;
+  roadAddress: string;
+  lotAddress?: string | null;
+  latitude: number;
+  longitude: number;
 }
 
 export const StoreSearchStep = ({

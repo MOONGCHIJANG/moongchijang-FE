@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { type Store } from './StoreSearchSheet';
+import { type Store } from './StoreSearchStep';
 import { RequestFormStep } from './RequestFormStep';
 import { StoreSearchStep } from './StoreSearchStep';
 import { MapConfirmStep } from './MapConfirmStep';
@@ -18,7 +18,7 @@ export const GroupBuyRequestClient = () => {
       <StoreSearchStep
         onSelectStore={(store) => {
           setSelectedStore(store);
-          setStep('form');
+          setStep('map');
         }}
         onBack={() => setStep('form')}
       />
@@ -27,7 +27,11 @@ export const GroupBuyRequestClient = () => {
 
   if (step === 'map') {
     return (
-      <MapConfirmStep store={selectedStore} onBack={() => setStep('form')} />
+      <MapConfirmStep
+        store={selectedStore}
+        onBack={() => setStep('search')}
+        onConfirm={() => setStep('form')}
+      />
     );
   }
 

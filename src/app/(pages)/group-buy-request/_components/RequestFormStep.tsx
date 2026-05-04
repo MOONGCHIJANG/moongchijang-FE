@@ -1,10 +1,11 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { Icon } from '@iconify/react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/Button';
-import { type Store } from './StoreSearchSheet';
+import { type Store } from './StoreSearchStep';
+import { DatePickerBottomSheet } from './DatePickerBottomSheet';
 
 interface RequestFormData {
   store: Store;
@@ -39,7 +40,7 @@ export const RequestFormStep = ({
   const [quantity, setQuantity] = useState('');
   const [pickupDate, setPickupDate] = useState('');
   const [additionalNote, setAdditionalNote] = useState('');
-  const dateInputRef = useRef<HTMLInputElement>(null);
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
 
   const isSubmittable = Boolean(
     store && productName.trim() && quantity.trim() && pickupDate,
@@ -48,12 +49,6 @@ export const RequestFormStep = ({
   const handleSubmit = () => {
     if (!isSubmittable || !store) return;
     onSubmit?.({ store, productName, quantity, pickupDate, additionalNote });
-  };
-
-  const handleDateClick = () => {
-    if (dateInputRef.current) {
-      dateInputRef.current.showPicker?.();
-    }
   };
 
   return (
@@ -113,7 +108,7 @@ export const RequestFormStep = ({
               icon="lucide:search"
               className="w-4 h-4 text-gray-500 shrink-0"
             />
-            {store ? store.name : '매장 이름 또는 주소 검색'}
+            {store ? store.storeName : '매장 이름 또는 주소 검색'}
           </button>
         </div>
 
@@ -172,7 +167,7 @@ export const RequestFormStep = ({
           </div>
           <button
             type="button"
-            onClick={handleDateClick}
+            onClick={() => setIsDatePickerOpen(true)}
             className={`text-body-sm-regular ${cn(
               pickupDate ? 'text-gray-700' : 'text-gray-300',
               'flex items-center gap-2 px-3 py-4 bg-gray-50 rounded-xl font-pretendard',
@@ -184,15 +179,6 @@ export const RequestFormStep = ({
             />
             {pickupDate ? formatPickupDate(pickupDate) : '날짜 선택'}
           </button>
-          <input
-            ref={dateInputRef}
-            type="date"
-            value={pickupDate}
-            onChange={(e) => setPickupDate(e.target.value)}
-            className="sr-only font-pretendard"
-            tabIndex={-1}
-            aria-label="희망 픽업 날짜"
-          />
           <div className="flex items-start gap-[2px]">
             <Icon
               icon="lucide:info"
@@ -212,12 +198,12 @@ export const RequestFormStep = ({
           <span className="text-body-sm-semibold text-gray-600">
             추가 요청사항 (선택)
           </span>
-          <input
-            type="text"
+          <textarea
             value={additionalNote}
             onChange={(e) => setAdditionalNote(e.target.value)}
             placeholder="자유롭게 입력해주세요"
-            className="w-full px-3 py-4 bg-gray-50 rounded-xl text-body-sm-regular text-gray-700 placeholder:text-gray-300 outline-none font-pretendard"
+            rows={1}
+            className="w-full px-3 py-4 bg-gray-50 rounded-xl text-body-sm-regular text-gray-700 placeholder:text-gray-300 outline-none font-pretendard resize-none"
           />
         </div>
 
@@ -225,12 +211,20 @@ export const RequestFormStep = ({
         <Button
           size="lg"
           fullWidth
+          className="text-white font-bold text-[16px] h-12 shadow-none"
           disabled={!isSubmittable}
           onClick={handleSubmit}
         >
           요청 제출하기
         </Button>
       </div>
+
+      <DatePickerBottomSheet
+        isOpen={isDatePickerOpen}
+        onClose={() => setIsDatePickerOpen(false)}
+        selectedDate={pickupDate}
+        onSelect={setPickupDate}
+      />
     </div>
   );
 };

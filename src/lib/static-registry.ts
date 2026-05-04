@@ -27,10 +27,12 @@ export type StaticLoader = () => Promise<unknown>;
  *   '/api/v1/group-buys': () => import('@/mocks/data/group-buys.json'),
  */
 export const STATIC_FALLBACK: Record<string, StaticLoader> = {
-  '/api/v1/group-buys': () =>
-    import('../../mocks/mock-helpers').then((m) =>
-      Promise.resolve(m.createGroupBuysFeedMock()),
-    ),
+  '/api/v1/group-buys': () => import('../../mocks/data/group-buys.json'),
+  '/api/v1/group-buys/1': () => import('../../mocks/data/group-buy-detail-1.json'),
+  '/api/v1/group-buys/2': () => import('../../mocks/data/group-buy-detail-2.json'),
+  '/api/v1/group-buys/3': () => import('../../mocks/data/group-buy-detail-3.json'),
+  '/api/v1/group-buys/4': () => import('../../mocks/data/group-buy-detail-4.json'),
+  '/api/v1/group-buys/5': () => import('../../mocks/data/group-buy-detail-5.json'),
 };
 
 /**

@@ -114,7 +114,9 @@ export const LocationBottomSheet = ({
                 )}
               >
                 <span
-                  className={isSelected ? 'text-text-brand!' : 'text-text-basic'}
+                  className={
+                    isSelected ? 'text-text-brand!' : 'text-text-basic'
+                  }
                 >
                   {region.name}
                 </span>
@@ -169,9 +171,8 @@ export const LocationBottomSheet = ({
 
         <Button
           fullWidth
-          size="xl"
+          size="md"
           onClick={() => onApply(tempSelectedRegions)}
-          className="text-white font-bold text-[16px] h-12 shadow-none"
           disabled={tempSelectedRegions.length === 0}
         >
           적용하기

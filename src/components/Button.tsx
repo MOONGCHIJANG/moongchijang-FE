@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'outline' | 'ghost';
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  size?: 'md' | 'lg';
   fullWidth?: boolean;
 }
 
@@ -18,10 +18,8 @@ const variants = {
 };
 
 const sizes = {
-  sm: 'h-8 px-3 body-md-medium rounded-lg',
-  md: 'h-11 px-6 heading-sm-bold rounded-xl gap-2.5',
-  lg: 'h-14 px-6 heading-sm-semibold rounded-lg gap-1',
-  xl: 'h-[52px] px-6 body-sm-bold rounded-xl',
+  md: 'h-11 heading-sm-bold rounded-xl gap-2.5',
+  lg: 'h-14 px-6 py-2.5 heading-md-semibold rounded-lg gap-1',
 };
 
 export const Button = ({

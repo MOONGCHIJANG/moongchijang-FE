@@ -4,6 +4,7 @@ import ItemDetail from './_components/ItemDetail';
 import BottomJoin from './_components/BottomJoin';
 import { getApiV1GroupBuysGroupBuyId } from '@/api/generated/group-buy/group-buy';
 import { notFound } from 'next/navigation';
+import ViewerToast from './_components/ViewerToast';
 import Footer from '@/components/Footer';
 
 interface Props {
@@ -22,6 +23,7 @@ const page = async ({ params }: Props) => {
 
   return (
     <div>
+      <ViewerToast />
       <TopInfo data={data} />
       <ItemDetail data={data} />
       <BottomJoin data={data} />

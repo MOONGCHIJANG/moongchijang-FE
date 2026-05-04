@@ -10,7 +10,7 @@ const JoinPageClient = () => {
       <ItemSummary />
       <JoinForm />
       <AgreeTerms />
-      <PaymentButton />
+      <PaymentButton price={18000} />
     </div>
   );
 };

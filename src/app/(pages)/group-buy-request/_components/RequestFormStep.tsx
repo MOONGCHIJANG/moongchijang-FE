@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/Button';
 import { type Store } from './StoreSearchStep';
 import { DatePickerBottomSheet } from './DatePickerBottomSheet';
+import { RequestConfirmModal } from './RequestConfirmModal';
 
 export interface RequestFormData {
   store: Store;
@@ -43,13 +44,15 @@ export const RequestFormStep = ({
   const [pickupDate, setPickupDate] = useState('');
   const [additionalNote, setAdditionalNote] = useState('');
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
   const isSubmittable = Boolean(
     store && productName.trim() && quantity.trim() && pickupDate,
   );
 
-  const handleSubmit = () => {
+  const handleConfirm = () => {
     if (!isSubmittable || !store) return;
+    setIsConfirmModalOpen(false);
     onSubmit?.({ store, productName, quantity, pickupDate, additionalNote });
   };
 
@@ -223,7 +226,7 @@ export const RequestFormStep = ({
           fullWidth
           className="text-white font-bold text-[16px] h-12 shadow-none"
           disabled={!isSubmittable || isLoading}
-          onClick={handleSubmit}
+          onClick={() => setIsConfirmModalOpen(true)}
         >
           {isLoading ? '제출 중...' : '요청 제출하기'}
         </Button>
@@ -235,6 +238,15 @@ export const RequestFormStep = ({
         selectedDate={pickupDate}
         onSelect={setPickupDate}
       />
+
+      {store && (
+        <RequestConfirmModal
+          isOpen={isConfirmModalOpen}
+          onClose={() => setIsConfirmModalOpen(false)}
+          onConfirm={handleConfirm}
+          data={{ store, productName, quantity, pickupDate, additionalNote }}
+        />
+      )}
     </div>
   );
 };

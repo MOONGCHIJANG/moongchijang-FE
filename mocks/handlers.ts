@@ -78,7 +78,7 @@ const overrideHandlers = [
   }),
   http.post('*/api/v1/group-buy-requests', async () => {
     await delay(800);
-    return HttpResponse.json(createGroupBuyRequestMock());
+    return HttpResponse.json(createGroupBuyRequestMock(), { status: 201 });
   }),
 ];
 

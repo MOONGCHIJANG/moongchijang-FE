@@ -442,11 +442,11 @@
     line-height: var(--line-height-18);
     font-weight: var(--font-weight-regular);
   }
-}
 
-/* caption / xs */
-.caption-xs-bold {
-  font-size: var(--font-size-10);
-  line-height: var(--line-height-18);
-  font-weight: var(--font-weight-bold);
+  /* caption / xs */
+  .caption-xs-bold {
+    font-size: var(--font-size-10);
+    line-height: var(--line-height-18);
+    font-weight: var(--font-weight-bold);
+  }
 }

@@ -57,14 +57,21 @@ export const StoreSearchStep = ({
   }, [query]);
 
   const handleSelect = (item: ApiResponseStoreSearchListDataStoresItem) => {
-    if (!item.placeId || !item.storeName || !item.roadAddress) return;
+    if (
+      !item.placeId ||
+      !item.storeName ||
+      !item.roadAddress ||
+      item.latitude == null ||
+      item.longitude == null
+    )
+      return;
     onSelectStore({
       placeId: item.placeId,
       storeName: item.storeName,
       roadAddress: item.roadAddress,
       lotAddress: item.lotAddress,
-      latitude: item.latitude ?? 0,
-      longitude: item.longitude ?? 0,
+      latitude: item.latitude,
+      longitude: item.longitude,
     });
   };
 

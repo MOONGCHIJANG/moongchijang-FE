@@ -39,12 +39,21 @@ export const StoreSearchStep = ({
 
     if (debounceRef.current) clearTimeout(debounceRef.current);
 
+    const controller = new AbortController();
+
     debounceRef.current = setTimeout(async () => {
       setIsLoading(true);
       try {
-        const res = await getApiV1StoresSearch({ keyword: query.trim() });
+        const res = await getApiV1StoresSearch(
+          { keyword: query.trim() },
+          { signal: controller.signal },
+        );
         if (res.status === 200) {
           setResults(res.data.data?.stores ?? []);
+        }
+      } catch (err) {
+        if (err instanceof Error && err.name !== 'AbortError') {
+          console.error(err);
         }
       } finally {
         setIsLoading(false);
@@ -52,6 +61,7 @@ export const StoreSearchStep = ({
     }, 300);
 
     return () => {
+      controller.abort();
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
   }, [query]);

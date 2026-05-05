@@ -7,6 +7,7 @@ import {
   deleteApiV1GroupBuysGroupBuyIdWishlist,
 } from '@/api/generated/wishlist/wishlist';
 import { ApiResponseGroupBuyDetailData } from '@/api/generated/api.schemas';
+import { useRouter } from 'next/navigation';
 
 interface Props {
   data: ApiResponseGroupBuyDetailData;
@@ -53,10 +54,12 @@ const BottomJoin = ({ data }: Props) => {
     }
   };
 
+  const router = useRouter();
+
   const handleJoin = () => {
     // TODO: 로그인한 사용자만 참여 가능하도록 수정 필요
     if (isExpired) return;
-    window.location.href = `/item/${data.id}/join`;
+    router.push(`/item/${data.id}/join`);
   };
 
   return (

@@ -38,7 +38,7 @@ const JoinForm = ({
       <div className="rounded-2xlarge bg-surface-white border border-border-subtle p-p5 flex items-center justify-between">
         <div className="flex gap-g4 items-center">
           <Image
-            src={`${productImage}`}
+            src={productImage}
             alt="상품 이미지"
             width={60}
             height={60}

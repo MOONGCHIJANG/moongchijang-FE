@@ -62,6 +62,7 @@ const EditNumber = ({
         <div className="bg-white p-p7 pb-p8 rounded-t-2xlarge flex flex-col gap-g4">
           <p className="heading-md-bold">전화번호</p>
           <input
+            type="tel"
             className="border border-border-default focus:outline-none rounded-xlarge px-p5 py-p4 body-md-regular"
             placeholder="전화번호를 입력하세요"
             value={input}

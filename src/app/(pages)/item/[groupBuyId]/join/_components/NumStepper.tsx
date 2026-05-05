@@ -21,8 +21,11 @@ const NumStepper = ({ max, value, onChange }: NumStepperProps) => {
   const update = (next: number) => {
     if (next < 1) return;
     if (max != null && next > max) return;
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    onChange ? onChange(next) : setInternalCount(next);
+    if (onChange) {
+      onChange(next);
+    } else {
+      setInternalCount(next);
+    }
 
     if (max != null && next === max) {
       setShowToast(true);

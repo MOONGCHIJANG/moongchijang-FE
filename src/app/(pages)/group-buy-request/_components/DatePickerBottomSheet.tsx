@@ -129,22 +129,22 @@ export const DatePickerBottomSheet = ({
             className={cn(
               'p-1.5 rounded-full transition-colors',
               isPrevMonthDisabled
-                ? 'text-gray-200 cursor-not-allowed'
-                : 'text-gray-700',
+                ? 'text-icon-disabled cursor-not-allowed'
+                : 'text-icon-basic',
             )}
             aria-label="이전 달"
           >
             <Icon icon="lucide:chevron-left" className="w-6 h-6" />
           </button>
 
-          <span className="text-heading-sm-semibold text-gray-900 font-pretendard">
+          <span className="heading-sm-semibold text-text-basic">
             {viewYear}년 {viewMonth + 1}월
           </span>
 
           <button
             type="button"
             onClick={handleNextMonth}
-            className="p-1.5 rounded-full text-gray-700 transition-colors"
+            className="p-1.5 text-icon-basic transition-colors"
             aria-label="다음 달"
           >
             <Icon icon="lucide:chevron-right" className="w-6 h-6" />
@@ -157,7 +157,7 @@ export const DatePickerBottomSheet = ({
             <div
               key={day}
               className={cn(
-                'text-center text-[18px] font-medium text-gray-900 py-4 font-pretendard',
+                'text-center heading-md-medium text-text-basic py-4',
               )}
             >
               {day}
@@ -183,14 +183,14 @@ export const DatePickerBottomSheet = ({
                 onClick={() => handleDayClick(day)}
                 disabled={past}
                 className={cn(
-                  'relative mx-auto flex h-11 w-12.5 flex-col items-center justify-center rounded-small font-pretendard text-[18px] font-medium transition-colors',
+                  'relative mx-auto flex h-11 w-12.5 flex-col items-center justify-center rounded-small heading-md-medium transition-colors',
                   selected
-                    ? 'bg-primary-400 text-white'
+                    ? 'bg-surface-brand text-text-basic-inverse'
                     : past
-                      ? 'text-gray-200 cursor-not-allowed'
+                      ? 'text-text-subtle-inverse cursor-not-allowed'
                       : isToday
-                        ? 'bg-gray-100'
-                        : 'text-gray-900',
+                        ? 'bg-surface-muted text-text-basic'
+                        : 'text-text-basic',
                 )}
               >
                 {day}
@@ -203,8 +203,8 @@ export const DatePickerBottomSheet = ({
         <div className="-mx-5 px-5 py-4 shadow-[0px_-2px_20px_0px_rgba(0,0,0,0.10)]">
           <Button
             fullWidth
-            size="xl"
-            className="text-white font-bold text-[16px] h-12 shadow-none"
+            size="lg"
+            className="w-full text-text-basic-inverse cursor-pointer"
             disabled={!tempSelected}
             onClick={handleConfirm}
           >

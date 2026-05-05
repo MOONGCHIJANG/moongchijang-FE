@@ -42,7 +42,7 @@ export const GroupBuyRequestClient = () => {
         storeLatitude: data.store.latitude,
         storeLongitude: data.store.longitude,
         productName: data.productName,
-        desiredQuantity: Number(data.quantity),
+        desiredQuantity: data.quantity,
         desiredPickupDate: data.pickupDate,
         additionalNote: data.additionalNote || null,
       });

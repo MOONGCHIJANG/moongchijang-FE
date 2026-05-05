@@ -11,7 +11,7 @@ import { RequestConfirmModal } from './RequestConfirmModal';
 export interface RequestFormData {
   store: Store;
   productName: string;
-  quantity: string;
+  quantity: number;
   pickupDate: string;
   additionalNote: string;
 }
@@ -46,14 +46,22 @@ export const RequestFormStep = ({
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
+  const quantityNum = Number(quantity);
+
   const isSubmittable = Boolean(
-    store && productName.trim() && quantity.trim() && pickupDate,
+    store && productName.trim() && quantityNum > 0 && pickupDate,
   );
 
   const handleConfirm = () => {
     if (!isSubmittable || !store) return;
     setIsConfirmModalOpen(false);
-    onSubmit?.({ store, productName, quantity, pickupDate, additionalNote });
+    onSubmit?.({
+      store,
+      productName,
+      quantity: quantityNum,
+      pickupDate,
+      additionalNote,
+    });
   };
 
   return (
@@ -243,7 +251,13 @@ export const RequestFormStep = ({
           isOpen={isConfirmModalOpen}
           onClose={() => setIsConfirmModalOpen(false)}
           onConfirm={handleConfirm}
-          data={{ store, productName, quantity, pickupDate, additionalNote }}
+          data={{
+            store,
+            productName,
+            quantity: quantityNum,
+            pickupDate,
+            additionalNote,
+          }}
         />
       )}
     </div>

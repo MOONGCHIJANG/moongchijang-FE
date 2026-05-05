@@ -22,7 +22,6 @@ interface RequestFormStepProps {
   onSubmit: (data: RequestFormData) => void;
   onBack: () => void;
   isLoading?: boolean;
-  className?: string;
 }
 
 const formatPickupDate = (dateStr: string) => {
@@ -36,7 +35,6 @@ export const RequestFormStep = ({
   onSubmit,
   onBack,
   isLoading = false,
-  className,
 }: RequestFormStepProps) => {
   const store = selectedStore ?? null;
   const [productName, setProductName] = useState('');
@@ -65,7 +63,7 @@ export const RequestFormStep = ({
   };
 
   return (
-    <div className={cn('flex flex-col bg-white', className)}>
+    <div className="flex flex-col bg-white">
       {/* 헤더 */}
       <header className="flex items-center h-[57px] px-4 border-b border-border-subtle shrink-0 gap-[2px]">
         <button

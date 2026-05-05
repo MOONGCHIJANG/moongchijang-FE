@@ -130,6 +130,7 @@ export const RequestFormStep = ({
             value={productName}
             onChange={(e) => setProductName(e.target.value)}
             placeholder="원하는 상품명을 정확히 입력해주세요"
+            maxLength={20}
             className="w-full px-3 py-4 bg-surface-default rounded-2xlarge body-md-regular text-text-subtle placeholder:text-icon-disabled outline-none"
           />
           <div className="flex items-center gap-[2px]">

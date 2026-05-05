@@ -26,7 +26,7 @@ export const FeedCard = ({
     parts?.length === 3 ? `${parts[1]}월 ${parts[2]}일` : pickupDate;
 
   return (
-    <div className="flex h-[272px] flex-col overflow-hidden rounded-2xl bg-bg-white shadow-sm">
+    <div className="flex h-[272px] flex-col overflow-hidden rounded-xl bg-bg-white shadow-sm">
       <div className="relative h-[140px] shrink-0 bg-gray-200">
         {thumbnailUrl && (
           <Image
@@ -38,8 +38,8 @@ export const FeedCard = ({
         )}
         <div
           className={cn(
-            'absolute left-0 top-0 min-w-[58px] rounded-br-2xl px-2 py-1.5 text-center body-md-bold text-text-basic-inverse',
-            isUrgent ? 'bg-surface-brand' : 'bg-surface-alpha',
+            'absolute left-0 top-0 min-w-[58px] h-[36px] rounded-br-[16px] px-2 py-1.5 text-center body-md-bold text-text-basic-inverse',
+            isUrgent ? 'bg-surface-brand' : 'bg-surface-inverse',
           )}
         >
           {dDayLabel}
@@ -50,34 +50,31 @@ export const FeedCard = ({
         <div className="flex items-center justify-between body-md-medium text-text-tertiary">
           <div className="flex items-center gap-1">
             <Icon
-              icon="solar:map-point-bold"
-              className="h-4 w-4 text-icon-primary"
+              icon="typcn:location"
+              className="h-[18px] w-4 text-icon-primary"
             />
-            <span>
+            <span className="caption-sm-bold">
               {storeName} | {region}
             </span>
           </div>
-          <div className="flex items-center gap-1 rounded bg-surface-brand-lighter px-2 py-0.5 body-sm-bold text-text-brand">
-            <Icon
-              icon="solar:users-group-rounded-bold"
-              className="h-3.5 w-3.5"
-            />
-            <span>
+          <div className="flex items-center gap-1 rounded-lg bg-surface-brand-lighter px-2 py-0.5 body-sm-bold text-text-brand">
+            <Icon icon="fa7-solid:bag-shopping" className="h-3.5 w-3.5" />
+            <span className="caption-xs-bold">
               {currentQuantity} / {targetQuantity}
             </span>
           </div>
         </div>
 
         <div className="flex items-center justify-between gap-2">
-          <div className="line-clamp-1 flex-1 body-sm-bold text-text-basic">
+          <div className="line-clamp-1 flex-1 heading-md-bold text-text-basic">
             {productName}
           </div>
-          <span className="shrink-0 body-md-medium text-text-disabled">
-            픽업 {formattedPickupDate}
+          <span className="shrink-0 caption-sm-medium text-text-disabled">
+            • 픽업 {formattedPickupDate}
           </span>
         </div>
 
-        <div className="body-md-bold text-text-basic">
+        <div className="heading-1xl-bold text-text-basic">
           {(price ?? 0).toLocaleString()}원
         </div>
 
@@ -88,7 +85,7 @@ export const FeedCard = ({
               style={{ width: `${achievementRate}%` }}
             />
           </div>
-          <span className="body-md-bold text-text-brand">
+          <span className="body-lg-bold text-text-brand">
             {achievementRate}%
           </span>
         </div>

@@ -57,27 +57,18 @@ export const LocationBottomSheet = ({
     >
       <div className="flex items-center justify-between px-5 pt-6 pb-2">
         <div className="flex items-center gap-2">
-          <h2 className="body-md-bold text-text-basic font-pretendard">
+          <h2 className="heading-lg-bold text-text-basic font-pretendard">
             관심 지역 설정
           </h2>
         </div>
-        <button
-          onClick={onClose}
-          className="p-1 hover:opacity-70 transition-opacity"
-        >
-          <Icon
-            icon="material-symbols-light:close"
-            className="h-8 w-8 text-text-disabled"
-          />
-        </button>
       </div>
 
-      <p className="px-5 body-sm-regular text-text-disabled mb-5 font-pretendard">
+      <p className="px-5 caption-sm-bold text-text-disabled mb-5 font-pretendard">
         설정하신 지역 기반으로 공구 상품을 추천해드려요.
       </p>
 
-      <div className="flex h-[500px] border-t border-divider-light pb-[172px]">
-        <div className="w-[110px] overflow-y-auto bg-surface-elevated scrollbar-hide">
+      <div className="flex h-[500px] items-start border-t border-divider-light">
+        <div className="h-full w-[110px] overflow-y-auto bg-surface-elevated pb-[180px] scrollbar-hide">
           {REGIONS_DATA.map((city) => {
             const isActive = selectedCityId === city.id;
             return (
@@ -97,57 +88,59 @@ export const LocationBottomSheet = ({
           })}
         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 pt-3 bg-bg-white scrollbar-hide">
-          {currentCity.regions.map((region) => {
-            const isSelected = tempSelectedRegions.some(
-              (r) => r.id === region.id,
-            );
-            return (
-              <button
-                key={region.id}
-                onClick={() => handleRegionClick(region)}
-                className={cn(
-                  'flex w-full h-[42px] items-center justify-between px-3 transition-all rounded-lg mb-[9px] font-pretendard border',
-                  isSelected
-                    ? 'bg-primary-25! border-border-brand-lighter! text-text-brand! body-sm-bold'
-                    : 'bg-transparent border-transparent text-text-basic body-sm-regular hover:bg-surface-default',
-                )}
-              >
-                <span
-                  className={
-                    isSelected ? 'text-text-brand!' : 'text-text-basic'
-                  }
+        <div className="h-full flex-1 overflow-y-auto bg-bg-white px-4 pb-[180px] scrollbar-hide">
+          <div className="flex flex-col gap-1.5">
+            {currentCity.regions.map((region) => {
+              const isSelected = tempSelectedRegions.some(
+                (r) => r.id === region.id,
+              );
+              return (
+                <button
+                  key={region.id}
+                  onClick={() => handleRegionClick(region)}
+                  className={cn(
+                    'flex w-full h-[42px] items-center justify-between px-4 transition-all rounded-2xl font-pretendard border',
+                    isSelected
+                      ? 'bg-primary-25! border-border-brand-lighter! text-text-brand! body-sm-bold'
+                      : 'bg-transparent border-transparent text-text-basic body-sm-regular hover:bg-surface-default',
+                  )}
                 >
-                  {region.name}
-                </span>
-                {isSelected && (
-                  <span className="text-[11px] font-bold text-text-brand! ml-1">
-                    1
+                  <span
+                    className={
+                      isSelected ? 'text-text-brand!' : 'text-text-basic'
+                    }
+                  >
+                    {region.name}
                   </span>
-                )}
-              </button>
-            );
-          })}
+                  {isSelected && (
+                    <span className="text-[11px] font-bold text-text-brand! ml-1">
+                      <Icon icon="material-symbols:check" className="h-5 w-5" />
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 
       <div className="absolute bottom-0 left-0 w-full bg-white px-5 pt-6 pb-6 flex flex-col gap-3 shadow-[0_-12px_30px_rgba(0,0,0,0.08)]">
         <div className="flex items-center justify-between font-pretendard">
           <div className="flex items-center gap-1.5">
-            <span className="body-sm-regular text-text-subtle">선택한 곳</span>
-            <span className="body-sm-semibold text-text-subtle">
-              {tempSelectedRegions.length}/10
+            <span className="body-md-bold text-text-subtle">선택한 곳</span>
+            <span className="body-md-bold text-text-subtle">
+              {tempSelectedRegions.length}
             </span>
+            <span className="body-md-bold text-text-disabled">/ 10</span>
           </div>
           <button
             onClick={() => setTempSelectedRegions([])}
             className="flex items-center gap-1 body-md-medium text-icon-disabled hover:text-text-disabled transition-colors"
           >
             <Icon icon="solar:restart-linear" className="h-4 w-4" />
-            <span>초기화</span>
+            <span className="body-md-bold text-text-disabled">초기화</span>
           </button>
         </div>
-
         <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide min-h-[32px]">
           {tempSelectedRegions.length > 0 ? (
             tempSelectedRegions.map((region) => (
@@ -168,7 +161,6 @@ export const LocationBottomSheet = ({
             </div>
           )}
         </div>
-
         <Button
           fullWidth
           size="md"

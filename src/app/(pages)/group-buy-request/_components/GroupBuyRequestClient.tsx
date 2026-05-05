@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { type Store } from './StoreSearchStep';
 import { RequestFormStep } from './RequestFormStep';
 import { StoreSearchStep } from './StoreSearchStep';
@@ -13,6 +14,7 @@ import type { RequestFormData } from './RequestFormStep';
 type Step = 'form' | 'search' | 'map' | 'complete';
 
 export const GroupBuyRequestClient = () => {
+  const router = useRouter();
   const [step, setStep] = useState<Step>('form');
   const [selectedStore, setSelectedStore] = useState<Store | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -90,6 +92,7 @@ export const GroupBuyRequestClient = () => {
         onSearchStore={() => setStep('search')}
         onSubmit={handleSubmit}
         isLoading={isLoading}
+        onBack={() => router.back()}
       />
 
       <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 w-[calc(100%-32px)] max-w-[408px] pointer-events-none">

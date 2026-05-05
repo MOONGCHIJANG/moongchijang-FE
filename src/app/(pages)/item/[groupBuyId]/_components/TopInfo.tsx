@@ -25,7 +25,8 @@ const TopInfo = ({ data }: Props) => {
             alt="상품 이미지"
             width={400}
             height={260}
-            className="w-full h-65 rounded-3xlarge bg-gray-100"
+            className="h-65 w-auto rounded-3xlarge bg-gray-100 object-cover"
+            loading="eager"
           />
         ) : (
           <div className="w-full h-65 rounded-3xlarge bg-gray-100" />

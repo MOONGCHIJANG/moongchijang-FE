@@ -44,35 +44,31 @@ export const DatePickerBottomSheet = ({
     return { year: today.getFullYear(), month: today.getMonth() };
   };
 
-  const [viewYear, setViewYear] = useState(getInitialView().year);
-  const [viewMonth, setViewMonth] = useState(getInitialView().month);
+  const [{ year: viewYear, month: viewMonth }, setView] =
+    useState(getInitialView);
   const [tempSelected, setTempSelected] = useState(selectedDate);
 
   useEffect(() => {
     if (isOpen) {
       setTempSelected(selectedDate);
-      const init = getInitialView();
-      setViewYear(init.year);
-      setViewMonth(init.month);
+      setView(getInitialView());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   const handlePrevMonth = () => {
     if (viewMonth === 0) {
-      setViewMonth(11);
-      setViewYear((y) => y - 1);
+      setView({ year: viewYear - 1, month: 11 });
     } else {
-      setViewMonth((m) => m - 1);
+      setView((v) => ({ ...v, month: v.month - 1 }));
     }
   };
 
   const handleNextMonth = () => {
     if (viewMonth === 11) {
-      setViewMonth(0);
-      setViewYear((y) => y + 1);
+      setView({ year: viewYear + 1, month: 0 });
     } else {
-      setViewMonth((m) => m + 1);
+      setView((v) => ({ ...v, month: v.month + 1 }));
     }
   };
 

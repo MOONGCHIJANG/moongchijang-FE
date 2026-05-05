@@ -5,7 +5,7 @@ import { Icon } from '@iconify/react';
 import React, { useState } from 'react';
 
 type NumStepperProps = {
-  max: number;
+  max?: number | null;
   value?: number;
   onChange?: (value: number) => void;
 };
@@ -15,22 +15,22 @@ const NumStepper = ({ max, value, onChange }: NumStepperProps) => {
   const [showToast, setShowToast] = useState(false);
 
   const count = value ?? internalCount;
+  const isMin = count <= 1;
+  const isMax = max != null && count >= max;
 
   const update = (next: number) => {
-    if (next < 1 || next > max) return;
+    if (next < 1) return;
+    if (max != null && next > max) return;
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     onChange ? onChange(next) : setInternalCount(next);
 
-    if (next === max) {
+    if (max != null && next === max) {
       setShowToast(true);
-      setTimeout(() => setShowToast(false), 30000);
+      setTimeout(() => setShowToast(false), 2000);
     } else {
       setShowToast(false);
     }
   };
-
-  const isMin = count <= 1;
-  const isMax = count >= max;
 
   return (
     <div className="relative inline-flex flex-col items-center">

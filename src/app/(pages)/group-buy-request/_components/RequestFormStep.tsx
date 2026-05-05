@@ -18,9 +18,9 @@ export interface RequestFormData {
 
 interface RequestFormStepProps {
   selectedStore?: Store | null;
-  onSearchStore?: () => void;
-  onSubmit?: (data: RequestFormData) => void;
-  onBack?: () => void;
+  onSearchStore: () => void;
+  onSubmit: (data: RequestFormData) => void;
+  onBack: () => void;
   isLoading?: boolean;
   className?: string;
 }
@@ -55,7 +55,7 @@ export const RequestFormStep = ({
   const handleConfirm = () => {
     if (!isSubmittable || !store) return;
     setIsConfirmModalOpen(false);
-    onSubmit?.({
+    onSubmit({
       store,
       productName,
       quantity: quantityNum,

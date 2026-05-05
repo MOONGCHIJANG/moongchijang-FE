@@ -16,7 +16,7 @@ export const MapConfirmStep = ({
   onConfirm,
 }: MapConfirmStepProps) => {
   return (
-    <div className="flex flex-col min-h-screen bg-white">
+    <div className="flex flex-col min-h-full bg-white">
       <header className="flex items-center h-[57px] px-4 border-b border-border-subtle shrink-0 gap-[2px]">
         <button
           type="button"

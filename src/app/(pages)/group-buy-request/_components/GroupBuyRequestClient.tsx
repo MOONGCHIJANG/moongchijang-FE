@@ -61,32 +61,40 @@ export const GroupBuyRequestClient = () => {
 
   if (step === 'search') {
     return (
-      <StoreSearchStep
-        onSelectStore={(store) => {
-          setSelectedStore(store);
-          setStep('map');
-        }}
-        onBack={() => setStep('form')}
-      />
+      <div className="h-full">
+        <StoreSearchStep
+          onSelectStore={(store) => {
+            setSelectedStore(store);
+            setStep('map');
+          }}
+          onBack={() => setStep('form')}
+        />
+      </div>
     );
   }
 
   if (step === 'map') {
     return (
-      <MapConfirmStep
-        store={selectedStore}
-        onBack={() => setStep('search')}
-        onConfirm={() => setStep('form')}
-      />
+      <div className="h-full">
+        <MapConfirmStep
+          store={selectedStore}
+          onBack={() => setStep('search')}
+          onConfirm={() => setStep('form')}
+        />
+      </div>
     );
   }
 
   if (step === 'complete') {
-    return <SubmitCompleteStep />;
+    return (
+      <div className="h-full">
+        <SubmitCompleteStep />
+      </div>
+    );
   }
 
   return (
-    <>
+    <div className="h-full">
       <RequestFormStep
         selectedStore={selectedStore}
         onSearchStore={() => setStep('search')}
@@ -102,6 +110,6 @@ export const GroupBuyRequestClient = () => {
           message={toastMessage ?? ''}
         />
       </div>
-    </>
+    </div>
   );
 };

@@ -63,7 +63,7 @@ export const RequestFormStep = ({
   };
 
   return (
-    <div className="flex flex-col bg-white">
+    <div className="flex flex-col min-h-full bg-white">
       {/* 헤더 */}
       <header className="flex items-center h-[57px] px-4 border-b border-border-subtle shrink-0 gap-[2px]">
         <button

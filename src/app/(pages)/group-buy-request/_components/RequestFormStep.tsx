@@ -98,7 +98,7 @@ export const RequestFormStep = ({
         {/* 매장 검색 */}
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-[3px]">
-            <span className="body-md-semibold text-subtle">매장 검색</span>
+            <span className="body-md-semibold text-text-subtle">매장 검색</span>
             <span className="body-md-semibold text-text-brand">*</span>
           </div>
           <button
@@ -159,7 +159,7 @@ export const RequestFormStep = ({
             value={quantity}
             onChange={(e) => setQuantity(e.target.value)}
             placeholder="1인 픽업 수량을 입력해주세요"
-            className="w-full px-3 py-4 bg-gray-50 rounded-2xlarge body-md-regular text-text-subtle placeholder:text-icon-disabled outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            className="w-full px-3 py-4 bg-surface-default rounded-2xlarge body-md-regular text-text-subtle placeholder:text-icon-disabled outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           />
           <div className="flex items-center gap-[2px]">
             <Icon
@@ -178,7 +178,7 @@ export const RequestFormStep = ({
             <span className="body-md-semibold text-text-subtle">
               희망 픽업 날짜
             </span>
-            <span className="body-md-semibold text-primary-400">*</span>
+            <span className="body-md-semibold text-text-brand">*</span>
           </div>
           <button
             type="button"

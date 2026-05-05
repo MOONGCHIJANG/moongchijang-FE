@@ -2,7 +2,8 @@ import React from 'react';
 import TopInfo from './_components/TopInfo';
 import ItemDetail from './_components/ItemDetail';
 import BottomJoin from './_components/BottomJoin';
-import { getApiV1GroupBuysGroupBuyId } from '@/api/generated/group-buy/group-buy';
+import { serverFetch } from '@/lib/fetcher';
+import type { ApiResponseGroupBuyDetail } from '@/api/generated/api.schemas';
 import { notFound } from 'next/navigation';
 import ViewerToast from './_components/ViewerToast';
 import Footer from '@/components/Footer';
@@ -13,13 +14,11 @@ interface Props {
 
 const page = async ({ params }: Props) => {
   const { groupBuyId } = await params;
-  const response = await getApiV1GroupBuysGroupBuyId(Number(groupBuyId));
+  const responseData = await serverFetch<ApiResponseGroupBuyDetail>(
+    `/api/v1/group-buys/${groupBuyId}`,
+  ).catch(() => notFound());
 
-  if (response.status === 404) {
-    notFound();
-  }
-
-  const { data } = response.data;
+  const { data } = responseData;
 
   return (
     <div>

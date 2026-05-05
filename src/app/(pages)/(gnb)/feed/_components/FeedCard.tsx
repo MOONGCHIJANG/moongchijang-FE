@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { Icon } from '@iconify/react';
 import { cn } from '@/lib/utils';
 import type { GroupBuyFeedItem } from '@/api/generated/api.schemas';
@@ -14,6 +15,7 @@ export const FeedCard = ({
   productName,
   price,
   achievementRate,
+  thumbnailUrl,
 }: GroupBuyFeedItem) => {
   const DDAY_URGENCY_THRESHOLD = 4;
   const dDayLabel = dDay === 0 ? 'D-day' : `D-${dDay}`;
@@ -26,6 +28,14 @@ export const FeedCard = ({
   return (
     <div className="flex h-[272px] flex-col overflow-hidden rounded-2xl bg-bg-white shadow-sm">
       <div className="relative h-[140px] shrink-0 bg-gray-200">
+        {thumbnailUrl && (
+          <Image
+            src={thumbnailUrl}
+            alt={productName}
+            fill
+            className="object-cover"
+          />
+        )}
         <div
           className={cn(
             'absolute left-0 top-0 min-w-[58px] rounded-br-2xl px-2 py-1.5 text-center body-md-bold text-text-basic-inverse',

@@ -1,0 +1,30 @@
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "storeName": "오월제과",
+    "region": "강남",
+    "productName": "얼그레이 크림 스콘 4개입",
+    "productDescription": "향긋한 얼그레이 티와 진한 클로티드 크림이 어우러진 영국식 스콘입니다. 겉은 바삭하고 속은 촉촉하게 구워내며, 유기농 밀가루와 무항생제 버터만을 사용합니다. 4개입 구성으로 가족과 함께 즐기기 좋습니다.",
+    "notice": "- 픽업 당일 소비를 권장하며, 냉장 보관 시 2일 이내 섭취해주세요.\n- 포장 특성상 외형이 다소 눌릴 수 있으나 맛에는 영향이 없습니다.\n- 글루텐, 유제품, 계란이 포함되어 있습니다.\n- 취소는 마감일 24시간 전까지 가능합니다.",
+    "imageUrls": ["/images/img1.jpg"],
+    "price": 18000,
+    "achievementRate": 72,
+    "currentQuantity": 36,
+    "targetQuantity": 50,
+    "maxQuantity": 100,
+    "deadline": "2026-05-10T23:59:00",
+    "pickupDate": "2026-05-12",
+    "pickupTimeStart": "14:00",
+    "pickupTimeEnd": "18:00",
+    "pickupLocation": "서울 강남구 역삼동 오월제과 본점",
+    "pickupLatitude": 37.4979,
+    "pickupLongitude": 127.0276,
+    "dDay": 6,
+    "isWishlisted": false,
+    "isClosed": false,
+    "isParticipated": false,
+    "canParticipate": true
+  },
+  "error": null
+}

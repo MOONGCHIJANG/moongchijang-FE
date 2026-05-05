@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import Link from 'next/link';
 import { FeedTopBar } from './FeedTopBar';
 import { SearchBar } from './SearchBar';
 import { FilterBar, FilterId } from './FilterBar';
@@ -64,7 +65,11 @@ export function FeedClient() {
             진행 중인 공구가 없습니다
           </div>
         ) : (
-          feeds.map((feed) => <FeedCard key={feed.id} {...feed} />)
+          feeds.map((feed) => (
+            <Link key={feed.id} href={`/item/${feed.id}`}>
+              <FeedCard {...feed} />
+            </Link>
+          ))
         )}
       </div>
 

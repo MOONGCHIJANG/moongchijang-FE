@@ -14,16 +14,55 @@
  */
 
 import { http, HttpResponse, delay } from 'msw';
+import { faker } from '@faker-js/faker';
 import { generatedHandlers } from '@/api/generated/index.msw';
-import {
-  createGroupBuyDetailMock,
-  createGroupBuysFeedMock,
-} from './mock-helpers';
+import { koFaker } from './ko-faker';
+import { createGroupBuyDetailMock } from './mock-helpers';
+
+const MOCK_IMAGES = [
+  '/images/img1.jpg',
+  '/images/img2.jpg',
+  '/images/img3.webp',
+  '/images/img4.jpg',
+  '/images/img5.jpg',
+];
+
+function createFeedItem(id: number) {
+  const targetQuantity = koFaker.groupBuy.quantity();
+  const achievementRate = koFaker.groupBuy.achievementRate();
+  const currentQuantity = Math.floor(targetQuantity * (achievementRate / 100));
+  return {
+    id,
+    storeName: koFaker.store.name(),
+    region: koFaker.location.region(),
+    productName: koFaker.product.name(),
+    thumbnailUrl: MOCK_IMAGES[(id - 1) % MOCK_IMAGES.length],
+    price: koFaker.product.price(),
+    achievementRate,
+    currentQuantity,
+    targetQuantity,
+    maxQuantity: Math.random() > 0.5 ? targetQuantity * 2 : null,
+    deadline: koFaker.groupBuy.deadline(),
+    pickupDate: koFaker.groupBuy.pickupDate(),
+    pickupTimeStart: koFaker.groupBuy.pickupTime(),
+    pickupTimeEnd: koFaker.groupBuy.pickupTime(),
+    dDay: koFaker.groupBuy.dDay(),
+    isWishlisted: faker.datatype.boolean(),
+    isClosed: false,
+    canParticipate: true,
+  };
+}
 
 const overrideHandlers = [
   http.get('*/api/v1/group-buys', async () => {
     await delay(800);
-    return HttpResponse.json(createGroupBuysFeedMock());
+    return HttpResponse.json({
+      success: true,
+      data: {
+        content: Array.from({ length: 10 }, (_, i) => createFeedItem(i + 1)),
+      },
+      error: null,
+    });
   }),
   http.get('*/api/v1/group-buys/:groupBuyId', async () => {
     await delay(800);

@@ -25,34 +25,30 @@ const PaymentFailClient = ({ errorCode }: Props) => {
   if (!verified) return null;
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen gap-g6 p-4">
+    <div className="flex flex-col items-center justify-center min-h-svh gap-g6 px-5 text-center">
       <div className="flex flex-col items-center gap-g4">
         <Icon
-          icon="ic:baseline-cancel"
-          className="w-16 h-16 text-text-danger"
+          icon="solar:sad-circle-outline"
+          className="w-16 h-16 text-primary-400"
         />
-        <p className="heading-lg-bold">결제에 실패했어요</p>
-        <p className="body-md-regular text-text-tertiary">
-          잠시 후 다시 시도해주세요.
-        </p>
-        {errorCode && (
-          <p className="caption-sm-regular text-text-disabled">
-            오류 코드: {errorCode}
+        <div className="flex flex-col gap-g2">
+          <p className="heading-lg-bold">결제 오류가 발생했어요</p>
+          <p className="body-md-medium text-text-tertiary">
+            잠시 후 다시 시도해 주세요
           </p>
-        )}
+          {errorCode && (
+            <p className="caption-sm-regular text-text-disabled">
+              오류 코드: {errorCode}
+            </p>
+          )}
+        </div>
       </div>
-      <div className="flex flex-col gap-g3 w-full max-w-sm">
-        <button
-          onClick={() => window.history.back()}
-          className="w-full text-center py-p4 rounded-xlarge bg-button-primary text-text-basic-inverse body-md-bold"
-        >
-          다시 시도하기
-        </button>
+      <div className="flex flex-col gap-g3 w-full max-w-xs">
         <Link
           href="/feed"
-          className="w-full text-center py-p4 rounded-xlarge border border-border-subtle text-text-basic body-md-regular"
+          className="w-full py-p4 rounded-2xlarge border border-border-default text-text-secondary body-md-medium cursor-pointer"
         >
-          홈으로 돌아가기
+          홈으로
         </Link>
       </div>
     </div>

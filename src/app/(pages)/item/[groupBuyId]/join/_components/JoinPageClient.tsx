@@ -1,9 +1,11 @@
 'use client';
 import React, { useState } from 'react';
+import * as PortOne from '@portone/browser-sdk/v2';
 import ItemSummary from './ItemSummary';
 import JoinForm from './JoinForm';
 import AgreeTerms from './AgreeTerms';
 import PaymentButton from './PaymentButton';
+import PayMethodSelector, { type PayMethod } from './PayMethodSelector';
 import { ParticipationCreateAgreedTermsItem } from '@/api/generated/api.schemas';
 import type { ApiResponseGroupBuyDetailData } from '@/api/generated/api.schemas';
 import {
@@ -27,10 +29,21 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
 
   const totalAmount = groupBuy.price * quantity;
 
+  const [payMethod, setPayMethod] = useState<PayMethod | null>(null);
+  const isPayable = payMethod !== null && !isLoading;
+
   const handlePayment = async () => {
-    if (isLoading) return;
+    if (isLoading || !payMethod) return;
     setIsLoading(true);
-    console.log('[결제 시작]', { groupBuyId, quantity, totalAmount });
+
+    const safePayMethod = payMethod as PayMethod;
+
+    console.log('[결제 시작]', {
+      groupBuyId,
+      quantity,
+      totalAmount,
+      payMethod,
+    });
 
     try {
       // TODO: 개발용 console.log 제거
@@ -49,13 +62,47 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
         throw new Error('결제 요청 생성 실패');
       }
 
-      const { participationId, totalAmount: confirmedAmount } =
-        participationRes.data.data;
+      const {
+        participationId,
+        orderName,
+        totalAmount: confirmedAmount,
+      } = participationRes.data.data;
       const paymentId = crypto.randomUUID();
       console.log('[1] 완료', { participationId, confirmedAmount, paymentId });
 
-      // [2] TODO: 포트원 SDK requestPayment() 호출
-      console.log('[2] 포트원 SDK - TODO (현재 MSW 개발 모드로 스킵)');
+      // [2] 포트원 SDK requestPayment() 호출
+      console.log('[2] 포트원 SDK 호출', {
+        paymentId,
+        orderName,
+        confirmedAmount,
+        payMethod,
+      });
+      // [2] 포트원 SDK requestPayment() 호출
+      const paymentRequest = {
+        storeId: process.env.NEXT_PUBLIC_PORTONE_STORE_ID!,
+        channelKey: process.env.NEXT_PUBLIC_PORTONE_CHANNEL_KEY!,
+        paymentId,
+        orderName,
+        totalAmount: confirmedAmount,
+        currency: 'CURRENCY_KRW' as const,
+        payMethod: safePayMethod,
+        card: safePayMethod === 'CARD' ? {} : undefined,
+        transfer: safePayMethod === 'TRANSFER' ? {} : undefined,
+      };
+
+      console.log(
+        '[2] 포트원 SDK 실제 요청 데이터',
+        JSON.stringify(paymentRequest),
+      );
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const result = await PortOne.requestPayment(paymentRequest as any);
+
+      console.log('[2] 포트원 SDK 응답', result);
+
+      if (result?.code) {
+        throw new Error(result.code);
+      }
 
       // [3] confirm POST
       console.log('[3] payments/confirm POST 요청', {
@@ -75,8 +122,6 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
       }
 
       console.log('[4] 결제 완료 → 완료 페이지 이동', { participationId });
-
-      // 결제 로직 상 여기는 href 로 유지
       sessionStorage.setItem('paymentSuccess', participationId.toString());
       await new Promise((resolve) => setTimeout(resolve, 50));
       window.location.href = `/payment/complete?participationId=${participationId}`;
@@ -95,11 +140,18 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
 
       sessionStorage.setItem('paymentFail', errorCode);
       window.location.href = `/payment/fail?errorCode=${encodeURIComponent(errorCode)}`;
+    } finally {
+      setIsLoading(false);
+      console.log('[결제 종료]');
     }
   };
 
   return (
-    <div className="bg-bg-white-muted p-4 pb-24">
+    <div className="relative bg-bg-white-muted p-4 pb-24">
+      {/* 결제 진행 중 오버레이 */}
+      {isLoading && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center"></div>
+      )}
       <ItemSummary groupBuy={groupBuy} />
       <JoinForm
         quantity={quantity}
@@ -113,10 +165,11 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
         onPhoneNumberChange={setPhoneNumber}
         productImage={groupBuy.imageUrls[0] || ''}
       />
+      <PayMethodSelector value={payMethod} onChange={setPayMethod} />
       <AgreeTerms />
       <PaymentButton
         price={totalAmount}
-        disabled={isLoading}
+        disabled={!isPayable}
         onClick={handlePayment}
       />
     </div>

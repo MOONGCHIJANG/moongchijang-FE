@@ -21,8 +21,8 @@ export const LocationBottomSheet = ({
   selectedRegions: initialSelectedRegions,
   onApply,
 }: LocationBottomSheetProps) => {
-  const [selectedCityId, setSelectedCityId] = useState<string>(
-    REGIONS_DATA[1].id,
+  const [selectedRegionType, setSelectedRegionType] = useState<string>(
+    REGIONS_DATA[1].regionType,
   );
   const [tempSelectedRegions, setTempSelectedRegions] = useState<Region[]>(
     initialSelectedRegions,
@@ -34,13 +34,18 @@ export const LocationBottomSheet = ({
   }, [isOpen]);
 
   const currentCity =
-    REGIONS_DATA.find((city) => city.id === selectedCityId) || REGIONS_DATA[0];
+    REGIONS_DATA.find((city) => city.regionType === selectedRegionType) ||
+    REGIONS_DATA[0];
 
   const handleRegionClick = (region: Region) => {
-    const isSelected = tempSelectedRegions.some((r) => r.id === region.id);
+    const isSelected = tempSelectedRegions.some(
+      (r) => r.districtType === region.districtType,
+    );
     if (isSelected) {
       setTempSelectedRegions(
-        tempSelectedRegions.filter((r) => r.id !== region.id),
+        tempSelectedRegions.filter(
+          (r) => r.districtType !== region.districtType,
+        ),
       );
     } else {
       if (tempSelectedRegions.length < 10) {
@@ -70,11 +75,11 @@ export const LocationBottomSheet = ({
       <div className="flex h-[500px] items-start border-t border-divider-light">
         <div className="h-full w-[110px] overflow-y-auto bg-surface-elevated pb-[180px] scrollbar-hide">
           {REGIONS_DATA.map((city) => {
-            const isActive = selectedCityId === city.id;
+            const isActive = selectedRegionType === city.regionType;
             return (
               <button
-                key={city.id}
-                onClick={() => setSelectedCityId(city.id)}
+                key={city.regionType}
+                onClick={() => setSelectedRegionType(city.regionType)}
                 className={cn(
                   'w-full h-[52px] flex items-center justify-center body-md-regular transition-all font-pretendard',
                   isActive
@@ -89,35 +94,42 @@ export const LocationBottomSheet = ({
         </div>
 
         <div className="h-full flex-1 overflow-y-auto bg-bg-white px-4 pb-[180px] scrollbar-hide">
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col">
             {currentCity.regions.map((region) => {
               const isSelected = tempSelectedRegions.some(
-                (r) => r.id === region.id,
+                (r) => r.districtType === region.districtType,
               );
               return (
-                <button
-                  key={region.id}
-                  onClick={() => handleRegionClick(region)}
-                  className={cn(
-                    'flex w-full h-[42px] items-center justify-between px-4 transition-all rounded-2xl font-pretendard border',
-                    isSelected
-                      ? 'bg-primary-25! border-border-brand-lighter! text-text-brand! body-sm-bold'
-                      : 'bg-transparent border-transparent text-text-basic body-sm-regular hover:bg-surface-default',
-                  )}
+                <div
+                  key={region.districtType}
+                  className="h-[52px] flex items-center"
                 >
-                  <span
-                    className={
-                      isSelected ? 'text-text-brand!' : 'text-text-basic'
-                    }
+                  <button
+                    onClick={() => handleRegionClick(region)}
+                    className={cn(
+                      'flex w-full h-[42px] items-center justify-between px-4 transition-all rounded-2xl font-pretendard border',
+                      isSelected
+                        ? 'bg-primary-25! border-border-brand-lighter! text-text-brand! body-sm-bold'
+                        : 'bg-transparent border-transparent text-text-basic body-sm-regular hover:bg-surface-default',
+                    )}
                   >
-                    {region.name}
-                  </span>
-                  {isSelected && (
-                    <span className="text-[11px] font-bold text-text-brand! ml-1">
-                      <Icon icon="material-symbols:check" className="h-5 w-5" />
+                    <span
+                      className={
+                        isSelected ? 'text-text-brand!' : 'text-text-basic'
+                      }
+                    >
+                      {region.name}
                     </span>
-                  )}
-                </button>
+                    {isSelected && (
+                      <span className="text-[11px] font-bold text-text-brand! ml-1">
+                        <Icon
+                          icon="material-symbols:check"
+                          className="h-5 w-5"
+                        />
+                      </span>
+                    )}
+                  </button>
+                </div>
               );
             })}
           </div>
@@ -145,11 +157,11 @@ export const LocationBottomSheet = ({
           {tempSelectedRegions.length > 0 ? (
             tempSelectedRegions.map((region) => (
               <Badge
-                key={region.id}
+                key={region.districtType}
                 label={region.name}
                 onDelete={() =>
                   setTempSelectedRegions((prev) =>
-                    prev.filter((r) => r.id !== region.id),
+                    prev.filter((r) => r.districtType !== region.districtType),
                   )
                 }
                 className="whitespace-nowrap"

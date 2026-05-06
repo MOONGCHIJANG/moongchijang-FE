@@ -23,8 +23,6 @@ type Props = {
 
 const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
   const [quantity, setQuantity] = useState(1);
-  // TODO: 추후 사용자 실제 전화번호 정보 불러오는 로직
-  const [phoneNumber, setPhoneNumber] = useState('010-0000-0000');
   const [isLoading, setIsLoading] = useState(false);
 
   const totalAmount = groupBuy.price * quantity;
@@ -124,7 +122,9 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
       console.log('[4] 결제 완료 → 완료 페이지 이동', { participationId });
       sessionStorage.setItem('paymentSuccess', participationId.toString());
       await new Promise((resolve) => setTimeout(resolve, 50));
-      window.location.href = `/payment/complete?participationId=${participationId}`;
+      window.location.replace(
+        `/payment/complete?participationId=${participationId}&groupBuyId=${groupBuyId}`,
+      );
     } catch (error) {
       console.error('[결제 실패]', error);
 
@@ -139,7 +139,9 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
       }).catch((e) => console.error('[fail POST 실패]', e));
 
       sessionStorage.setItem('paymentFail', errorCode);
-      window.location.href = `/payment/fail?errorCode=${encodeURIComponent(errorCode)}`;
+      window.location.replace(
+        `/payment/fail?errorCode=${encodeURIComponent(errorCode)}&groupBuyId=${groupBuyId}`,
+      );
     } finally {
       setIsLoading(false);
       console.log('[결제 종료]');
@@ -161,8 +163,6 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
         productAmount={groupBuy.price * quantity}
         feeAmount={0}
         totalAmount={totalAmount}
-        phoneNumber={phoneNumber}
-        onPhoneNumberChange={setPhoneNumber}
         productImage={groupBuy.imageUrls[0] || ''}
       />
       <PayMethodSelector value={payMethod} onChange={setPayMethod} />

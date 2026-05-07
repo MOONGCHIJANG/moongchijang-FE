@@ -36,6 +36,9 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
 
     const safePayMethod = payMethod as PayMethod;
 
+    let participationId: number = 0;
+    let paymentId: string = crypto.randomUUID();
+
     console.log('[결제 시작]', {
       groupBuyId,
       quantity,
@@ -60,13 +63,11 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
         throw new Error('결제 요청 생성 실패');
       }
 
-      const {
-        participationId,
-        orderName,
-        totalAmount: confirmedAmount,
-      } = participationRes.data.data;
-      const paymentId = crypto.randomUUID();
-      console.log('[1] 완료', { participationId, confirmedAmount, paymentId });
+      // [1] 성공 시 participationId, paymentId 확정
+      const { orderName, totalAmount: confirmedAmount } =
+        participationRes.data.data;
+      participationId = participationRes.data.data.participationId;
+      paymentId = crypto.randomUUID();
 
       // [2] 포트원 SDK requestPayment() 호출
       console.log('[2] 포트원 SDK 호출', {
@@ -128,12 +129,11 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
     } catch (error) {
       console.error('[결제 실패]', error);
 
-      const paymentId = crypto.randomUUID();
       const errorCode = error instanceof Error ? error.message : 'UNKNOWN';
 
       await postApiV1PaymentsFail({
-        paymentId,
-        participationId: 0,
+        paymentId, // [1] 이후 실패면 실제 paymentId, [1] 실패면 초기 UUID
+        participationId, // [1] 이후 실패면 실제 ID, [1] 실패면 0
         errorCode,
         message: error instanceof Error ? error.message : null,
       }).catch((e) => console.error('[fail POST 실패]', e));

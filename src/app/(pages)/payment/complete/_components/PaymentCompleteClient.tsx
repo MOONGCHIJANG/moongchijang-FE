@@ -6,9 +6,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/Button';
 
-type Props = { participationId: string };
+type Props = { participationId: string; groupBuyId: string };
 
-const PaymentCompleteClient = ({ participationId }: Props) => {
+const PaymentCompleteClient = ({ participationId, groupBuyId }: Props) => {
   const router = useRouter();
   const [verified, setVerified] = useState(false);
 
@@ -26,6 +26,17 @@ const PaymentCompleteClient = ({ participationId }: Props) => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setVerified(true);
   }, [participationId, router]);
+
+  useEffect(() => {
+    window.history.pushState(null, '', window.location.href);
+
+    const handlePopState = () => {
+      window.location.replace(`/item/${groupBuyId}`);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [groupBuyId]);
 
   // 검증 전엔 아무것도 렌더링하지 않음
   if (!verified) return null;

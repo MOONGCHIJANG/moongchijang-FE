@@ -4,9 +4,9 @@ import { useRouter } from 'next/navigation';
 import { Icon } from '@iconify/react';
 import Link from 'next/link';
 
-type Props = { errorCode: string };
+type Props = { errorCode: string; groupBuyId: string };
 
-const PaymentFailClient = ({ errorCode }: Props) => {
+const PaymentFailClient = ({ errorCode, groupBuyId }: Props) => {
   const router = useRouter();
   const [verified, setVerified] = useState(false);
 
@@ -20,6 +20,19 @@ const PaymentFailClient = ({ errorCode }: Props) => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setVerified(true);
   }, [errorCode, router]);
+
+  useEffect(() => {
+    // 현재 상태를 히스토리에 추가해서 뒤로가기 시 여기로 다시 오게 함
+    window.history.pushState(null, '', window.location.href);
+
+    const handlePopState = () => {
+      // 뒤로가기 시 /item/${groupBuyId}로 강제 이동
+      window.location.replace(`/item/${groupBuyId}`);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [groupBuyId]);
 
   // 검증 전엔 아무것도 렌더링하지 않음
   if (!verified) return null;

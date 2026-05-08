@@ -37,19 +37,39 @@ export const LocationBottomSheet = ({
     REGIONS_DATA.find((city) => city.regionType === selectedRegionType) ||
     REGIONS_DATA[0];
 
+  const getAllDistrictType = (regionType: string) =>
+    regionType === 'NATIONWIDE' ? 'NATIONWIDE' : `${regionType}_ALL`;
+
   const handleRegionClick = (region: Region) => {
+    const allDistrictType = getAllDistrictType(currentCity.regionType);
+    const isAllItem = region.districtType === allDistrictType;
     const isSelected = tempSelectedRegions.some(
       (r) => r.districtType === region.districtType,
     );
-    if (isSelected) {
-      setTempSelectedRegions(
-        tempSelectedRegions.filter(
-          (r) => r.districtType !== region.districtType,
-        ),
+
+    if (isAllItem) {
+      const cityDistrictTypes = new Set(
+        currentCity.regions.map((r) => r.districtType),
       );
+      if (isSelected) {
+        setTempSelectedRegions((prev) =>
+          prev.filter((r) => !cityDistrictTypes.has(r.districtType)),
+        );
+      } else {
+        setTempSelectedRegions((prev) => [
+          ...prev.filter((r) => !cityDistrictTypes.has(r.districtType)),
+          region,
+        ]);
+      }
     } else {
-      if (tempSelectedRegions.length < 10) {
-        setTempSelectedRegions([...tempSelectedRegions, region]);
+      if (isSelected) {
+        setTempSelectedRegions((prev) =>
+          prev.filter((r) => r.districtType !== region.districtType),
+        );
+      } else {
+        if (tempSelectedRegions.length < 10) {
+          setTempSelectedRegions((prev) => [...prev, region]);
+        }
       }
     }
   };
@@ -96,9 +116,18 @@ export const LocationBottomSheet = ({
         <div className="h-full flex-1 overflow-y-auto bg-bg-white px-4 pb-[180px] scrollbar-hide">
           <div className="flex flex-col">
             {currentCity.regions.map((region) => {
+              const allDistrictType = getAllDistrictType(
+                currentCity.regionType,
+              );
+              const isAllItem = region.districtType === allDistrictType;
+              const currentCityAllSelected = tempSelectedRegions.some(
+                (r) => r.districtType === allDistrictType,
+              );
               const isSelected = tempSelectedRegions.some(
                 (r) => r.districtType === region.districtType,
               );
+              const isDisabled = !isAllItem && currentCityAllSelected;
+
               return (
                 <div
                   key={region.districtType}
@@ -106,11 +135,14 @@ export const LocationBottomSheet = ({
                 >
                   <button
                     onClick={() => handleRegionClick(region)}
+                    disabled={isDisabled}
                     className={cn(
                       'flex w-full h-[42px] items-center justify-between px-4 transition-all rounded-2xl font-pretendard border',
                       isSelected
                         ? 'bg-primary-25! border-border-brand-lighter! text-text-brand! body-sm-bold'
-                        : 'bg-transparent border-transparent text-text-basic body-sm-regular hover:bg-surface-default',
+                        : isDisabled
+                          ? 'bg-transparent border-transparent text-text-disabled body-sm-regular cursor-not-allowed'
+                          : 'bg-transparent border-transparent text-text-basic body-sm-regular hover:bg-surface-default',
                     )}
                   >
                     <span

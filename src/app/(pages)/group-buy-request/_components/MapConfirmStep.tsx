@@ -2,6 +2,7 @@
 
 import { Icon } from '@iconify/react';
 import { Button } from '@/components/Button';
+import NaverMap from '@/components/NaverMap';
 import { type Store } from './StoreSearchStep';
 
 interface MapConfirmStepProps {
@@ -32,7 +33,23 @@ export const MapConfirmStep = ({
         <span className="heading-sm-semibold text-text-basic">주소 상세</span>
       </header>
 
-      <div className="mx-4 mt-3 bg-surface-muted h-[226px]" />
+      {/* 지도 영역 */}
+      <div className="mx-4 mt-3 h-[226px]">
+        {store?.latitude && store?.longitude && (
+          <NaverMap
+            center={{ lat: store.latitude, lng: store.longitude }}
+            zoom={16}
+            markers={[
+              {
+                lat: store.latitude,
+                lng: store.longitude,
+                title: store.storeName,
+              },
+            ]}
+            height="226px"
+          />
+        )}
+      </div>
 
       <div className="flex flex-col px-4 pt-4.5 pb-8">
         <span className="heading-md-semibold text-text-basic">

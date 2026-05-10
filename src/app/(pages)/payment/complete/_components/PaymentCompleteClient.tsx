@@ -64,10 +64,7 @@ const PaymentCompleteClient = ({ participationId, groupBuyId }: Props) => {
             <Icon icon="lucide:chevron-right" className="w-4 h-4" />
           </Link>
         </div>
-      </div>
-
-      <div className="fixed left-0 right-0 bottom-4 px-5 w-full max-w-md mx-auto z-10 flex flex-col gap-10">
-        <div className="mx-4 rounded-2xlarge flex flex-col gap-g4 h-28 justify-center items-center bg-surface-secondary-lighter">
+        <div className="px-8 rounded-2xlarge flex flex-col gap-g4 h-28 justify-center items-center bg-surface-secondary-lighter mt-4">
           <div className="flex gap-g2 items-center">
             <Icon
               icon="ph:seal-question-fill"
@@ -83,6 +80,8 @@ const PaymentCompleteClient = ({ participationId, groupBuyId }: Props) => {
             {`돼요.`}
           </p>
         </div>
+      </div>
+      <div className="fixed left-0 right-0 bottom-4 px-5 w-full max-w-md mx-auto z-10">
         <Button
           className="bg-button-natural"
           size="lg"

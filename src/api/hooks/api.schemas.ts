@@ -25,22 +25,21 @@ export interface KakaoLoginRequest {
   /** 카카오 인가 코드 */
   authorizationCode: string;
   /**
-     * 카카오 인가 요청 시 사용한 redirect URI (서버 검증용)
-     * @nullable
-     */
+   * 카카오 인가 요청 시 사용한 redirect URI (서버 검증용)
+   * @nullable
+   */
   redirectUri?: string | null;
 }
 
-export type AuthUserProvider = typeof AuthUserProvider[keyof typeof AuthUserProvider];
-
+export type AuthUserProvider =
+  (typeof AuthUserProvider)[keyof typeof AuthUserProvider];
 
 export const AuthUserProvider = {
   KAKAO: 'KAKAO',
   EMAIL: 'EMAIL',
 } as const;
 
-export type AuthUserRole = typeof AuthUserRole[keyof typeof AuthUserRole];
-
+export type AuthUserRole = (typeof AuthUserRole)[keyof typeof AuthUserRole];
 
 export const AuthUserRole = {
   BUYER: 'BUYER',
@@ -52,9 +51,9 @@ export interface AuthUser {
   id: number;
   provider: AuthUserProvider;
   /**
-     * 소셜 제공자 아이디 (카카오 고유 ID 등)
-     * @nullable
-     */
+   * 소셜 제공자 아이디 (카카오 고유 ID 등)
+   * @nullable
+   */
   providerId?: string | null;
   /** @nullable */
   email?: string | null;
@@ -107,16 +106,16 @@ export interface ApiResponseUserInfo {
 
 export interface AdditionalInfoUpsertRequest {
   /**
-     * 2~10자, 한글/영문/숫자만 허용
-     * @minLength 2
-     * @maxLength 10
-     * @pattern ^[A-Za-z0-9가-힣]{2,10}$
-     */
+   * 2~10자, 한글/영문/숫자만 허용
+   * @minLength 2
+   * @maxLength 10
+   * @pattern ^[A-Za-z0-9가-힣]{2,10}$
+   */
   nickname: string;
   /**
-     * 하이픈 포함 휴대폰 번호 (01X-XXXX-XXXX)
-     * @pattern ^01[0-9]-[0-9]{3,4}-[0-9]{4}$
-     */
+   * 하이픈 포함 휴대폰 번호 (01X-XXXX-XXXX)
+   * @pattern ^01[0-9]-[0-9]{3,4}-[0-9]{4}$
+   */
   phoneNumber: string;
 }
 
@@ -192,11 +191,11 @@ export interface ApiResponseEmailVerificationVerified {
 export interface EmailSignupRequest {
   email: string;
   /**
-     * 8~20자, 영문+숫자 포함
-     * @minLength 8
-     * @maxLength 20
-     * @pattern ^(?=.*[A-Za-z])(?=.*[0-9]).{8,20}$
-     */
+   * 8~20자, 영문+숫자 포함
+   * @minLength 8
+   * @maxLength 20
+   * @pattern ^(?=.*[A-Za-z])(?=.*[0-9]).{8,20}$
+   */
   password: string;
   signupToken: string;
 }
@@ -212,10 +211,10 @@ export interface PasswordResetLinkRequest {
 
 export interface ProfileUpdateRequest {
   /**
-     * @minLength 2
-     * @maxLength 10
-     * @pattern ^[A-Za-z0-9가-힣]{2,10}$
-     */
+   * @minLength 2
+   * @maxLength 10
+   * @pattern ^[A-Za-z0-9가-힣]{2,10}$
+   */
   nickname: string;
   /** @pattern ^01[0-9]-[0-9]{3,4}-[0-9]{4}$ */
   phoneNumber: string;
@@ -270,11 +269,11 @@ export interface ApiResponsePhoneVerificationVerified {
 export interface PasswordChangeRequest {
   currentPassword: string;
   /**
-     * 8~20자, 영문+숫자 포함
-     * @minLength 8
-     * @maxLength 20
-     * @pattern ^(?=.*[A-Za-z])(?=.*[0-9]).{8,20}$
-     */
+   * 8~20자, 영문+숫자 포함
+   * @minLength 8
+   * @maxLength 20
+   * @pattern ^(?=.*[A-Za-z])(?=.*[0-9]).{8,20}$
+   */
   newPassword: string;
   newPasswordConfirm: string;
 }
@@ -283,9 +282,9 @@ export type ApiResponseMyRegionsData = {
   /** 선택한 관심 지역 목록 (등록 순, 시/도 단위) */
   regions: string[];
   /**
-     * 칩에 표시할 첫 번째 지역명. 비어있으면 null
-     * @nullable
-     */
+   * 칩에 표시할 첫 번째 지역명. 비어있으면 null
+   * @nullable
+   */
   primaryRegion: string | null;
   /** primaryRegion 외 추가 지역 수. 예: 서울 외 3곳 → additionalCount=3 */
   additionalCount: number;
@@ -299,14 +298,13 @@ export interface ApiResponseMyRegions {
 
 export interface UpdateRegionsRequest {
   /**
-     * 저장할 시/도 지역 목록. 빈 배열이면 전체 해제
-     * @maxItems 10
-     */
+   * 저장할 시/도 지역 목록. 빈 배열이면 전체 해제
+   * @maxItems 10
+   */
   regions: string[];
 }
 
-export type RegionType = typeof RegionType[keyof typeof RegionType];
-
+export type RegionType = (typeof RegionType)[keyof typeof RegionType];
 
 export const RegionType = {
   NATIONWIDE: 'NATIONWIDE',
@@ -329,8 +327,7 @@ export const RegionType = {
   JEJU: 'JEJU',
 } as const;
 
-export type DistrictType = typeof DistrictType[keyof typeof DistrictType];
-
+export type DistrictType = (typeof DistrictType)[keyof typeof DistrictType];
 
 export const DistrictType = {
   NATIONWIDE: 'NATIONWIDE',
@@ -339,7 +336,8 @@ export const DistrictType = {
   SEOUL_SINSA_APGUJEONG_CHEONGDAM: 'SEOUL_SINSA_APGUJEONG_CHEONGDAM',
   SEOUL_SEOCHO_BANGBAE_GYODAE: 'SEOUL_SEOCHO_BANGBAE_GYODAE',
   SEOUL_JAMSIL_SINCHEON_SONGPA: 'SEOUL_JAMSIL_SINCHEON_SONGPA',
-  SEOUL_JONGNO_JUNGGU_EULJIRO_MYEONGDONG: 'SEOUL_JONGNO_JUNGGU_EULJIRO_MYEONGDONG',
+  SEOUL_JONGNO_JUNGGU_EULJIRO_MYEONGDONG:
+    'SEOUL_JONGNO_JUNGGU_EULJIRO_MYEONGDONG',
   SEOUL_HONGDAE_HAPJEONG_SANGSU_MAPO: 'SEOUL_HONGDAE_HAPJEONG_SANGSU_MAPO',
   SEOUL_SEONGSU_GEONDAE_GWANGJIN: 'SEOUL_SEONGSU_GEONDAE_GWANGJIN',
   SEOUL_ITAEWON_HANNAM_YONGSAN: 'SEOUL_ITAEWON_HANNAM_YONGSAN',
@@ -429,7 +427,8 @@ export const DistrictType = {
   DAEGU_ETC: 'DAEGU_ETC',
   GWANGJU_ALL: 'GWANGJU_ALL',
   GWANGJU_SANGMU_JIGYEONG_SEOGU: 'GWANGJU_SANGMU_JIGYEONG_SEOGU',
-  GWANGJU_DONGMYEONGDONG_CHUNGJANGRO_DONGGU: 'GWANGJU_DONGMYEONGDONG_CHUNGJANGRO_DONGGU',
+  GWANGJU_DONGMYEONGDONG_CHUNGJANGRO_DONGGU:
+    'GWANGJU_DONGMYEONGDONG_CHUNGJANGRO_DONGGU',
   GWANGJU_SUWAN_CHEOMDAN_GWANGSANGU: 'GWANGJU_SUWAN_CHEOMDAN_GWANGSANGU',
   GWANGJU_BONGSEON_NAMGU: 'GWANGJU_BONGSEON_NAMGU',
   GWANGJU_BUKGU: 'GWANGJU_BUKGU',
@@ -456,9 +455,9 @@ export const DistrictType = {
 export interface GroupBuyFeedItemResponse {
   id: number;
   /**
-     * 대표 썸네일 이미지 URL
-     * @nullable
-     */
+   * 대표 썸네일 이미지 URL
+   * @nullable
+   */
   thumbnailUrl: string | null;
   /** 마감 D-day (예: D-3 -> 3) */
   dDay: number;
@@ -514,9 +513,9 @@ export type ApiResponseGroupBuyDetailResponseData = {
   productName: string;
   productDescription: string;
   /**
-     * 대표 썸네일 이미지 URL
-     * @nullable
-     */
+   * 대표 썸네일 이미지 URL
+   * @nullable
+   */
   thumbnailUrl?: string | null;
   imageUrls: string[];
   price: number;
@@ -608,10 +607,10 @@ export interface GroupBuyRequestCreate {
   /** @maxLength 100 */
   storeName: string;
   /**
-     * 외부 지도 API로 선택한 매장 도로명 주소
-     * @maxLength 200
-     * @nullable
-     */
+   * 외부 지도 API로 선택한 매장 도로명 주소
+   * @maxLength 200
+   * @nullable
+   */
   storeAddress?: string | null;
   /** @nullable */
   storeLatitude?: number | null;
@@ -624,9 +623,9 @@ export interface GroupBuyRequestCreate {
   /** 오늘 이후 날짜 */
   desiredPickupDate: string;
   /**
-     * @maxLength 500
-     * @nullable
-     */
+   * @maxLength 500
+   * @nullable
+   */
   additionalNote?: string | null;
 }
 
@@ -645,8 +644,8 @@ export interface ApiResponseRequestId {
 OPENED=공구 개설 완료 / REJECTED=개설 불가
 
  */
-export type GroupBuyRequestDetailStatus = typeof GroupBuyRequestDetailStatus[keyof typeof GroupBuyRequestDetailStatus];
-
+export type GroupBuyRequestDetailStatus =
+  (typeof GroupBuyRequestDetailStatus)[keyof typeof GroupBuyRequestDetailStatus];
 
 export const GroupBuyRequestDetailStatus = {
   SUBMITTED: 'SUBMITTED',
@@ -669,9 +668,9 @@ export interface GroupBuyRequestDetail {
    */
   status: GroupBuyRequestDetailStatus;
   /**
-     * status=REJECTED 시 노출
-     * @nullable
-     */
+   * status=REJECTED 시 노출
+   * @nullable
+   */
   rejectionReason: string | null;
   createdAt: string;
 }
@@ -704,8 +703,8 @@ export interface ApiResponseWishlistPage {
   error: unknown | null;
 }
 
-export type ParticipationCreateAgreedTermsItem = typeof ParticipationCreateAgreedTermsItem[keyof typeof ParticipationCreateAgreedTermsItem];
-
+export type ParticipationCreateAgreedTermsItem =
+  (typeof ParticipationCreateAgreedTermsItem)[keyof typeof ParticipationCreateAgreedTermsItem];
 
 export const ParticipationCreateAgreedTermsItem = {
   NO_CANCEL_AFTER_ACHIEVED: 'NO_CANCEL_AFTER_ACHIEVED',
@@ -718,9 +717,9 @@ export interface ParticipationCreate {
   /** @minimum 1 */
   quantity: number;
   /**
-     * 4개 항목 모두 포함 필수
-     * @minItems 4
-     */
+   * 4개 항목 모두 포함 필수
+   * @minItems 4
+   */
   agreedTerms: ParticipationCreateAgreedTermsItem[];
 }
 
@@ -764,17 +763,17 @@ export interface PaymentFail {
   /** 포트원/토스페이먼츠 오류 코드 */
   errorCode: string;
   /**
-     * 오류 메시지
-     * @nullable
-     */
+   * 오류 메시지
+   * @nullable
+   */
   message: string | null;
 }
 
 /**
  * PENDING=환불대기 / COMPLETED=환불완료
  */
-export type ApiResponseRefundListDataItemRefundStatus = typeof ApiResponseRefundListDataItemRefundStatus[keyof typeof ApiResponseRefundListDataItemRefundStatus];
-
+export type ApiResponseRefundListDataItemRefundStatus =
+  (typeof ApiResponseRefundListDataItemRefundStatus)[keyof typeof ApiResponseRefundListDataItemRefundStatus];
 
 export const ApiResponseRefundListDataItemRefundStatus = {
   PENDING: 'PENDING',
@@ -784,8 +783,8 @@ export const ApiResponseRefundListDataItemRefundStatus = {
 /**
  * 취소 사유
  */
-export type ApiResponseRefundListDataItemCancelReason = typeof ApiResponseRefundListDataItemCancelReason[keyof typeof ApiResponseRefundListDataItemCancelReason];
-
+export type ApiResponseRefundListDataItemCancelReason =
+  (typeof ApiResponseRefundListDataItemCancelReason)[keyof typeof ApiResponseRefundListDataItemCancelReason];
 
 export const ApiResponseRefundListDataItemCancelReason = {
   NOT_ACHIEVED: 'NOT_ACHIEVED',
@@ -828,9 +827,9 @@ export type ApiResponsePickupInfoData = {
   /** @nullable */
   longitude: number | null;
   /**
-     * 대중교통 안내 텍스트. 예) 2호선 성수역 3번 출구에서 도보 5분
-     * @nullable
-     */
+   * 대중교통 안내 텍스트. 예) 2호선 성수역 3번 출구에서 도보 5분
+   * @nullable
+   */
   transitInfo: string | null;
   pickupDate: string;
   pickupTimeStart: string;
@@ -838,9 +837,9 @@ export type ApiResponsePickupInfoData = {
   productName: string;
   quantity: number;
   /**
-     * 픽업 종료까지 남은 분 (당일만)
-     * @nullable
-     */
+   * 픽업 종료까지 남은 분 (당일만)
+   * @nullable
+   */
   remainingMinutes: number | null;
 };
 
@@ -870,8 +869,8 @@ export interface ApiResponseQrCode {
   error: unknown | null;
 }
 
-export type ApiResponsePickupVerifyDataPickupStatus = typeof ApiResponsePickupVerifyDataPickupStatus[keyof typeof ApiResponsePickupVerifyDataPickupStatus];
-
+export type ApiResponsePickupVerifyDataPickupStatus =
+  (typeof ApiResponsePickupVerifyDataPickupStatus)[keyof typeof ApiResponsePickupVerifyDataPickupStatus];
 
 export const ApiResponsePickupVerifyDataPickupStatus = {
   WAITING: 'WAITING',
@@ -895,8 +894,8 @@ export interface ApiResponsePickupVerify {
   error: unknown | null;
 }
 
-export type NotificationItemCategory = typeof NotificationItemCategory[keyof typeof NotificationItemCategory];
-
+export type NotificationItemCategory =
+  (typeof NotificationItemCategory)[keyof typeof NotificationItemCategory];
 
 export const NotificationItemCategory = {
   WISHLIST: 'WISHLIST',
@@ -905,8 +904,8 @@ export const NotificationItemCategory = {
   REQUEST: 'REQUEST',
 } as const;
 
-export type NotificationItemType = typeof NotificationItemType[keyof typeof NotificationItemType];
-
+export type NotificationItemType =
+  (typeof NotificationItemType)[keyof typeof NotificationItemType];
 
 export const NotificationItemType = {
   PICKUP_TODAY: 'PICKUP_TODAY',
@@ -928,8 +927,9 @@ export const NotificationItemType = {
 /**
  * @nullable
  */
-export type NotificationItemTargetType = typeof NotificationItemTargetType[keyof typeof NotificationItemTargetType] | null;
-
+export type NotificationItemTargetType =
+  | (typeof NotificationItemTargetType)[keyof typeof NotificationItemTargetType]
+  | null;
 
 export const NotificationItemTargetType = {
   GROUP_BUY: 'GROUP_BUY',
@@ -941,8 +941,9 @@ export const NotificationItemTargetType = {
  * 인라인 액션 버튼 유형. null이면 버튼 미노출
  * @nullable
  */
-export type NotificationItemActionType = typeof NotificationItemActionType[keyof typeof NotificationItemActionType] | null;
-
+export type NotificationItemActionType =
+  | (typeof NotificationItemActionType)[keyof typeof NotificationItemActionType]
+  | null;
 
 export const NotificationItemActionType = {
   QR_CODE: 'QR_CODE',
@@ -956,8 +957,8 @@ export const NotificationItemActionType = {
 /**
  * 알림 날짜 그룹 (오늘/어제/이전)
  */
-export type NotificationItemDateGroup = typeof NotificationItemDateGroup[keyof typeof NotificationItemDateGroup];
-
+export type NotificationItemDateGroup =
+  (typeof NotificationItemDateGroup)[keyof typeof NotificationItemDateGroup];
 
 export const NotificationItemDateGroup = {
   TODAY: 'TODAY',
@@ -979,9 +980,9 @@ export interface NotificationItem {
   /** @nullable */
   readAt: string | null;
   /**
-     * 인라인 액션 버튼 유형. null이면 버튼 미노출
-     * @nullable
-     */
+   * 인라인 액션 버튼 유형. null이면 버튼 미노출
+   * @nullable
+   */
   actionType: NotificationItemActionType;
   /** 알림 날짜 그룹 (오늘/어제/이전) */
   dateGroup: NotificationItemDateGroup;
@@ -1012,8 +1013,8 @@ export interface ApiResponseUnreadCount {
   error: unknown | null;
 }
 
-export type ApiResponseParticipationPageDataContentItemAchievementStatus = typeof ApiResponseParticipationPageDataContentItemAchievementStatus[keyof typeof ApiResponseParticipationPageDataContentItemAchievementStatus];
-
+export type ApiResponseParticipationPageDataContentItemAchievementStatus =
+  (typeof ApiResponseParticipationPageDataContentItemAchievementStatus)[keyof typeof ApiResponseParticipationPageDataContentItemAchievementStatus];
 
 export const ApiResponseParticipationPageDataContentItemAchievementStatus = {
   BEFORE_ACHIEVED: 'BEFORE_ACHIEVED',
@@ -1097,8 +1098,8 @@ export interface ApiResponsePickupScheduleList {
   error: unknown | null;
 }
 
-export type ApiResponseOwnerGroupBuyListDataItemStatus = typeof ApiResponseOwnerGroupBuyListDataItemStatus[keyof typeof ApiResponseOwnerGroupBuyListDataItemStatus];
-
+export type ApiResponseOwnerGroupBuyListDataItemStatus =
+  (typeof ApiResponseOwnerGroupBuyListDataItemStatus)[keyof typeof ApiResponseOwnerGroupBuyListDataItemStatus];
 
 export const ApiResponseOwnerGroupBuyListDataItemStatus = {
   IN_PROGRESS: 'IN_PROGRESS',
@@ -1122,8 +1123,8 @@ export interface ApiResponseOwnerGroupBuyList {
   error: unknown | null;
 }
 
-export type ApiResponseReservationPageDataContentItemStatus = typeof ApiResponseReservationPageDataContentItemStatus[keyof typeof ApiResponseReservationPageDataContentItemStatus];
-
+export type ApiResponseReservationPageDataContentItemStatus =
+  (typeof ApiResponseReservationPageDataContentItemStatus)[keyof typeof ApiResponseReservationPageDataContentItemStatus];
 
 export const ApiResponseReservationPageDataContentItemStatus = {
   WAITING: 'WAITING',
@@ -1172,8 +1173,8 @@ export interface ApiResponseAdminDashboardSummary {
   error: unknown | null;
 }
 
-export type ApiResponseAdminRequestPageDataContentItemStatus = typeof ApiResponseAdminRequestPageDataContentItemStatus[keyof typeof ApiResponseAdminRequestPageDataContentItemStatus];
-
+export type ApiResponseAdminRequestPageDataContentItemStatus =
+  (typeof ApiResponseAdminRequestPageDataContentItemStatus)[keyof typeof ApiResponseAdminRequestPageDataContentItemStatus];
 
 export const ApiResponseAdminRequestPageDataContentItemStatus = {
   IN_REVIEW: 'IN_REVIEW',
@@ -1205,8 +1206,8 @@ export interface ApiResponseAdminRequestPage {
   error: unknown | null;
 }
 
-export type ApiResponseAdminRequestDetailDataStatus = typeof ApiResponseAdminRequestDetailDataStatus[keyof typeof ApiResponseAdminRequestDetailDataStatus];
-
+export type ApiResponseAdminRequestDetailDataStatus =
+  (typeof ApiResponseAdminRequestDetailDataStatus)[keyof typeof ApiResponseAdminRequestDetailDataStatus];
 
 export const ApiResponseAdminRequestDetailDataStatus = {
   IN_REVIEW: 'IN_REVIEW',
@@ -1240,8 +1241,8 @@ export interface ApiResponseAdminRequestDetail {
   error: unknown | null;
 }
 
-export type AdminRequestStatusUpdateStatus = typeof AdminRequestStatusUpdateStatus[keyof typeof AdminRequestStatusUpdateStatus];
-
+export type AdminRequestStatusUpdateStatus =
+  (typeof AdminRequestStatusUpdateStatus)[keyof typeof AdminRequestStatusUpdateStatus];
 
 export const AdminRequestStatusUpdateStatus = {
   IN_REVIEW: 'IN_REVIEW',
@@ -1253,25 +1254,25 @@ export const AdminRequestStatusUpdateStatus = {
 export interface AdminRequestStatusUpdate {
   status: AdminRequestStatusUpdateStatus;
   /**
-     * @nullable
-     * @pattern ^\d{3}-\d{3,4}-\d{4}$
-     */
+   * @nullable
+   * @pattern ^\d{3}-\d{3,4}-\d{4}$
+   */
   contactPhone?: string | null;
   /**
-     * @nullable
-     * @pattern ^@.+
-     */
+   * @nullable
+   * @pattern ^@.+
+   */
   contactInstagram?: string | null;
   /**
-     * status=REJECTED 시 필수
-     * @maxLength 100
-     * @nullable
-     */
+   * status=REJECTED 시 필수
+   * @maxLength 100
+   * @nullable
+   */
   rejectionReason?: string | null;
 }
 
-export type ApiResponseAdminGroupBuyListDataItemStatus = typeof ApiResponseAdminGroupBuyListDataItemStatus[keyof typeof ApiResponseAdminGroupBuyListDataItemStatus];
-
+export type ApiResponseAdminGroupBuyListDataItemStatus =
+  (typeof ApiResponseAdminGroupBuyListDataItemStatus)[keyof typeof ApiResponseAdminGroupBuyListDataItemStatus];
 
 export const ApiResponseAdminGroupBuyListDataItemStatus = {
   IN_PROGRESS: 'IN_PROGRESS',
@@ -1308,19 +1309,19 @@ export interface AdminGroupBuyCreate {
   /** @minimum 1 */
   price: number;
   /**
-     * 목표 수량
-     * @minimum 1
-     */
+   * 목표 수량
+   * @minimum 1
+   */
   targetQuantity: number;
   /**
-     * 최대 수량 (선착순 마감 기준)
-     * @minimum 1
-     */
+   * 최대 수량 (선착순 마감 기준)
+   * @minimum 1
+   */
   maxQuantity: number;
   /**
-     * 유의사항
-     * @nullable
-     */
+   * 유의사항
+   * @nullable
+   */
   notice?: string | null;
   deadline: string;
   pickupDate: string;
@@ -1328,9 +1329,9 @@ export interface AdminGroupBuyCreate {
   pickupTimeEnd: string;
   pickupLocation: string;
   /**
-     * 픽업 장소 주소 (매장 주소와 다를 경우 입력)
-     * @nullable
-     */
+   * 픽업 장소 주소 (매장 주소와 다를 경우 입력)
+   * @nullable
+   */
   pickupAddress?: string | null;
 }
 
@@ -1350,8 +1351,8 @@ export interface AdminGroupBuyUpdate {
   pickupLocation?: string;
 }
 
-export type AdminGroupBuyDetailStatus = typeof AdminGroupBuyDetailStatus[keyof typeof AdminGroupBuyDetailStatus];
-
+export type AdminGroupBuyDetailStatus =
+  (typeof AdminGroupBuyDetailStatus)[keyof typeof AdminGroupBuyDetailStatus];
 
 export const AdminGroupBuyDetailStatus = {
   IN_PROGRESS: 'IN_PROGRESS',
@@ -1402,8 +1403,8 @@ export interface ApiResponseAdminGroupBuyDetail {
   error: unknown | null;
 }
 
-export type ApiResponseAdminRefundPageDataContentItemRefundStatus = typeof ApiResponseAdminRefundPageDataContentItemRefundStatus[keyof typeof ApiResponseAdminRefundPageDataContentItemRefundStatus];
-
+export type ApiResponseAdminRefundPageDataContentItemRefundStatus =
+  (typeof ApiResponseAdminRefundPageDataContentItemRefundStatus)[keyof typeof ApiResponseAdminRefundPageDataContentItemRefundStatus];
 
 export const ApiResponseAdminRefundPageDataContentItemRefundStatus = {
   WAITING: 'WAITING',
@@ -1434,8 +1435,8 @@ export interface ApiResponseAdminRefundPage {
   error: unknown | null;
 }
 
-export type AdminManualRefundRefundReason = typeof AdminManualRefundRefundReason[keyof typeof AdminManualRefundRefundReason];
-
+export type AdminManualRefundRefundReason =
+  (typeof AdminManualRefundRefundReason)[keyof typeof AdminManualRefundRefundReason];
 
 export const AdminManualRefundRefundReason = {
   NOT_ACHIEVED: 'NOT_ACHIEVED',
@@ -1447,14 +1448,14 @@ export const AdminManualRefundRefundReason = {
 export interface AdminManualRefund {
   refundReason: AdminManualRefundRefundReason;
   /**
-     * @maxLength 100
-     * @nullable
-     */
+   * @maxLength 100
+   * @nullable
+   */
   detailReason?: string | null;
 }
 
-export type ApiResponseSettlementPageDataContentItemEscrowStatus = typeof ApiResponseSettlementPageDataContentItemEscrowStatus[keyof typeof ApiResponseSettlementPageDataContentItemEscrowStatus];
-
+export type ApiResponseSettlementPageDataContentItemEscrowStatus =
+  (typeof ApiResponseSettlementPageDataContentItemEscrowStatus)[keyof typeof ApiResponseSettlementPageDataContentItemEscrowStatus];
 
 export const ApiResponseSettlementPageDataContentItemEscrowStatus = {
   HOLDING: 'HOLDING',
@@ -1488,8 +1489,8 @@ export interface ApiResponseSettlementPage {
   error: unknown | null;
 }
 
-export type AdminSettlementCreateSettlementMethod = typeof AdminSettlementCreateSettlementMethod[keyof typeof AdminSettlementCreateSettlementMethod];
-
+export type AdminSettlementCreateSettlementMethod =
+  (typeof AdminSettlementCreateSettlementMethod)[keyof typeof AdminSettlementCreateSettlementMethod];
 
 export const AdminSettlementCreateSettlementMethod = {
   BANK_TRANSFER: 'BANK_TRANSFER',
@@ -1501,9 +1502,9 @@ export interface AdminSettlementCreate {
   scheduledPaymentDate: string;
   settlementMethod: AdminSettlementCreateSettlementMethod;
   /**
-     * @maxLength 100
-     * @nullable
-     */
+   * @maxLength 100
+   * @nullable
+   */
   memo?: string | null;
 }
 
@@ -1522,8 +1523,8 @@ export interface ApiResponseSettlementId {
 3=동네+베이커리 모두 인식 / 4=모두 인식 불가
 
  */
-export type ApiResponseSearchAnalysisDataSearchCase = typeof ApiResponseSearchAnalysisDataSearchCase[keyof typeof ApiResponseSearchAnalysisDataSearchCase];
-
+export type ApiResponseSearchAnalysisDataSearchCase =
+  (typeof ApiResponseSearchAnalysisDataSearchCase)[keyof typeof ApiResponseSearchAnalysisDataSearchCase];
 
 export const ApiResponseSearchAnalysisDataSearchCase = {
   NUMBER_1: 1,
@@ -1536,14 +1537,14 @@ export type ApiResponseSearchAnalysisData = {
   /** 원본 검색어 */
   keyword?: string;
   /**
-     * AI가 감지한 동네 키워드
-     * @nullable
-     */
+   * AI가 감지한 동네 키워드
+   * @nullable
+   */
   detectedNeighborhood?: string | null;
   /**
-     * AI가 감지한 베이커리/상품 키워드
-     * @nullable
-     */
+   * AI가 감지한 베이커리/상품 키워드
+   * @nullable
+   */
   detectedBakery?: string | null;
   /** 1=베이커리 인식·동네 미인식 / 2=동네 인식·베이커리 미인식 /
   3=동네+베이커리 모두 인식 / 4=모두 인식 불가
@@ -1583,9 +1584,9 @@ export type ApiResponseStoreSearchListDataStoresItem = {
   /** 도로명 주소. 예) 서울 성북구 화랑로11길 23 */
   roadAddress?: string;
   /**
-     * 지번 주소
-     * @nullable
-     */
+   * 지번 주소
+   * @nullable
+   */
   lotAddress?: string | null;
   /** 위도 */
   latitude?: number;
@@ -1644,42 +1645,42 @@ export type PageParameter = number;
 export type SizeParameter = number;
 
 export type GetApiV1UsersNicknameAvailabilityParams = {
-/**
- * 2~10자, 한글/영문/숫자만 허용
- * @minLength 2
- * @maxLength 10
- * @pattern ^[A-Za-z0-9가-힣]{2,10}$
- */
-nickname: string;
+  /**
+   * 2~10자, 한글/영문/숫자만 허용
+   * @minLength 2
+   * @maxLength 10
+   * @pattern ^[A-Za-z0-9가-힣]{2,10}$
+   */
+  nickname: string;
 };
 
 export type GetApiV1AuthEmailAvailabilityParams = {
-email: string;
+  email: string;
 };
 
 export type GetApiV1GroupBuysParams = {
-/**
- * 전체/마감임박/달성임박 단일 선택 칩
- */
-filter?: GetApiV1GroupBuysFilter;
-/**
- * 지역/세부지역 통합 필터 (복수 선택, 최대 10개, 예: SEOUL_ALL / SEOUL_GANGNAM_YEOKSAM_SAMSEONG)
- * @maxItems 10
- */
-districts?: DistrictType[];
-/**
- * 매장명 또는 상품명 검색어
- */
-keyword?: string;
-page?: PageParameter;
-/**
- * @maximum 100
- */
-size?: SizeParameter;
+  /**
+   * 전체/마감임박/달성임박 단일 선택 칩
+   */
+  filter?: GetApiV1GroupBuysFilter;
+  /**
+   * 지역/세부지역 통합 필터 (복수 선택, 최대 10개, 예: SEOUL_ALL / SEOUL_GANGNAM_YEOKSAM_SAMSEONG)
+   * @maxItems 10
+   */
+  districts?: DistrictType[];
+  /**
+   * 매장명 또는 상품명 검색어
+   */
+  keyword?: string;
+  page?: PageParameter;
+  /**
+   * @maximum 100
+   */
+  size?: SizeParameter;
 };
 
-export type GetApiV1GroupBuysFilter = typeof GetApiV1GroupBuysFilter[keyof typeof GetApiV1GroupBuysFilter];
-
+export type GetApiV1GroupBuysFilter =
+  (typeof GetApiV1GroupBuysFilter)[keyof typeof GetApiV1GroupBuysFilter];
 
 export const GetApiV1GroupBuysFilter = {
   ALL: 'ALL',
@@ -1688,11 +1689,11 @@ export const GetApiV1GroupBuysFilter = {
 } as const;
 
 export type GetApiV1GroupBuysProgressParams = {
-/**
- * 조회할 공구 ID 목록 (최대 20개)
- * @maxItems 20
- */
-ids: number[];
+  /**
+   * 조회할 공구 ID 목록 (최대 20개)
+   * @maxItems 20
+   */
+  ids: number[];
 };
 
 export type PostApiV1SearchBody = {
@@ -1701,28 +1702,28 @@ export type PostApiV1SearchBody = {
 };
 
 export type GetApiV1StoresSearchParams = {
-/**
- * 매장명 또는 주소 검색어
- * @minLength 1
- */
-keyword: string;
+  /**
+   * 매장명 또는 주소 검색어
+   * @minLength 1
+   */
+  keyword: string;
 };
 
 export type GetApiV1WishlistsParams = {
-/**
- * ALL=전체 / CLOSING_SOON=마감임박(D-3) / OPEN=모집중 / CLOSED=마감공구
- */
-filter?: GetApiV1WishlistsFilter;
-sort?: GetApiV1WishlistsSort;
-page?: PageParameter;
-/**
- * @maximum 100
- */
-size?: SizeParameter;
+  /**
+   * ALL=전체 / CLOSING_SOON=마감임박(D-3) / OPEN=모집중 / CLOSED=마감공구
+   */
+  filter?: GetApiV1WishlistsFilter;
+  sort?: GetApiV1WishlistsSort;
+  page?: PageParameter;
+  /**
+   * @maximum 100
+   */
+  size?: SizeParameter;
 };
 
-export type GetApiV1WishlistsFilter = typeof GetApiV1WishlistsFilter[keyof typeof GetApiV1WishlistsFilter];
-
+export type GetApiV1WishlistsFilter =
+  (typeof GetApiV1WishlistsFilter)[keyof typeof GetApiV1WishlistsFilter];
 
 export const GetApiV1WishlistsFilter = {
   ALL: 'ALL',
@@ -1731,8 +1732,8 @@ export const GetApiV1WishlistsFilter = {
   CLOSED: 'CLOSED',
 } as const;
 
-export type GetApiV1WishlistsSort = typeof GetApiV1WishlistsSort[keyof typeof GetApiV1WishlistsSort];
-
+export type GetApiV1WishlistsSort =
+  (typeof GetApiV1WishlistsSort)[keyof typeof GetApiV1WishlistsSort];
 
 export const GetApiV1WishlistsSort = {
   LATEST: 'LATEST',
@@ -1740,16 +1741,16 @@ export const GetApiV1WishlistsSort = {
 } as const;
 
 export type GetApiV1NotificationsParams = {
-category?: GetApiV1NotificationsCategory;
-page?: PageParameter;
-/**
- * @maximum 100
- */
-size?: SizeParameter;
+  category?: GetApiV1NotificationsCategory;
+  page?: PageParameter;
+  /**
+   * @maximum 100
+   */
+  size?: SizeParameter;
 };
 
-export type GetApiV1NotificationsCategory = typeof GetApiV1NotificationsCategory[keyof typeof GetApiV1NotificationsCategory];
-
+export type GetApiV1NotificationsCategory =
+  (typeof GetApiV1NotificationsCategory)[keyof typeof GetApiV1NotificationsCategory];
 
 export const GetApiV1NotificationsCategory = {
   ALL: 'ALL',
@@ -1760,19 +1761,19 @@ export const GetApiV1NotificationsCategory = {
 } as const;
 
 export type GetApiV1UsersMeParticipationsParams = {
-/**
- * ACTIVE=참여중 / COMPLETED=완료 / REFUNDED=환불내역
- */
-status?: GetApiV1UsersMeParticipationsStatus;
-page?: PageParameter;
-/**
- * @maximum 100
- */
-size?: SizeParameter;
+  /**
+   * ACTIVE=참여중 / COMPLETED=완료 / REFUNDED=환불내역
+   */
+  status?: GetApiV1UsersMeParticipationsStatus;
+  page?: PageParameter;
+  /**
+   * @maximum 100
+   */
+  size?: SizeParameter;
 };
 
-export type GetApiV1UsersMeParticipationsStatus = typeof GetApiV1UsersMeParticipationsStatus[keyof typeof GetApiV1UsersMeParticipationsStatus];
-
+export type GetApiV1UsersMeParticipationsStatus =
+  (typeof GetApiV1UsersMeParticipationsStatus)[keyof typeof GetApiV1UsersMeParticipationsStatus];
 
 export const GetApiV1UsersMeParticipationsStatus = {
   ACTIVE: 'ACTIVE',
@@ -1781,16 +1782,16 @@ export const GetApiV1UsersMeParticipationsStatus = {
 } as const;
 
 export type GetApiV1OwnerReservationsParams = {
-status?: GetApiV1OwnerReservationsStatus;
-page?: PageParameter;
-/**
- * @maximum 100
- */
-size?: SizeParameter;
+  status?: GetApiV1OwnerReservationsStatus;
+  page?: PageParameter;
+  /**
+   * @maximum 100
+   */
+  size?: SizeParameter;
 };
 
-export type GetApiV1OwnerReservationsStatus = typeof GetApiV1OwnerReservationsStatus[keyof typeof GetApiV1OwnerReservationsStatus];
-
+export type GetApiV1OwnerReservationsStatus =
+  (typeof GetApiV1OwnerReservationsStatus)[keyof typeof GetApiV1OwnerReservationsStatus];
 
 export const GetApiV1OwnerReservationsStatus = {
   ALL: 'ALL',
@@ -1799,16 +1800,16 @@ export const GetApiV1OwnerReservationsStatus = {
 } as const;
 
 export type GetApiV1AdminGroupBuyRequestsParams = {
-status?: GetApiV1AdminGroupBuyRequestsStatus;
-page?: PageParameter;
-/**
- * @maximum 100
- */
-size?: SizeParameter;
+  status?: GetApiV1AdminGroupBuyRequestsStatus;
+  page?: PageParameter;
+  /**
+   * @maximum 100
+   */
+  size?: SizeParameter;
 };
 
-export type GetApiV1AdminGroupBuyRequestsStatus = typeof GetApiV1AdminGroupBuyRequestsStatus[keyof typeof GetApiV1AdminGroupBuyRequestsStatus];
-
+export type GetApiV1AdminGroupBuyRequestsStatus =
+  (typeof GetApiV1AdminGroupBuyRequestsStatus)[keyof typeof GetApiV1AdminGroupBuyRequestsStatus];
 
 export const GetApiV1AdminGroupBuyRequestsStatus = {
   ALL: 'ALL',
@@ -1819,11 +1820,11 @@ export const GetApiV1AdminGroupBuyRequestsStatus = {
 } as const;
 
 export type GetApiV1AdminGroupBuysParams = {
-status?: GetApiV1AdminGroupBuysStatus;
+  status?: GetApiV1AdminGroupBuysStatus;
 };
 
-export type GetApiV1AdminGroupBuysStatus = typeof GetApiV1AdminGroupBuysStatus[keyof typeof GetApiV1AdminGroupBuysStatus];
-
+export type GetApiV1AdminGroupBuysStatus =
+  (typeof GetApiV1AdminGroupBuysStatus)[keyof typeof GetApiV1AdminGroupBuysStatus];
 
 export const GetApiV1AdminGroupBuysStatus = {
   ALL: 'ALL',
@@ -1832,16 +1833,16 @@ export const GetApiV1AdminGroupBuysStatus = {
 } as const;
 
 export type GetApiV1AdminRefundsParams = {
-status?: GetApiV1AdminRefundsStatus;
-page?: PageParameter;
-/**
- * @maximum 100
- */
-size?: SizeParameter;
+  status?: GetApiV1AdminRefundsStatus;
+  page?: PageParameter;
+  /**
+   * @maximum 100
+   */
+  size?: SizeParameter;
 };
 
-export type GetApiV1AdminRefundsStatus = typeof GetApiV1AdminRefundsStatus[keyof typeof GetApiV1AdminRefundsStatus];
-
+export type GetApiV1AdminRefundsStatus =
+  (typeof GetApiV1AdminRefundsStatus)[keyof typeof GetApiV1AdminRefundsStatus];
 
 export const GetApiV1AdminRefundsStatus = {
   ALL: 'ALL',
@@ -1850,20 +1851,19 @@ export const GetApiV1AdminRefundsStatus = {
 } as const;
 
 export type GetApiV1AdminSettlementsParams = {
-escrowStatus?: GetApiV1AdminSettlementsEscrowStatus;
-page?: PageParameter;
-/**
- * @maximum 100
- */
-size?: SizeParameter;
+  escrowStatus?: GetApiV1AdminSettlementsEscrowStatus;
+  page?: PageParameter;
+  /**
+   * @maximum 100
+   */
+  size?: SizeParameter;
 };
 
-export type GetApiV1AdminSettlementsEscrowStatus = typeof GetApiV1AdminSettlementsEscrowStatus[keyof typeof GetApiV1AdminSettlementsEscrowStatus];
-
+export type GetApiV1AdminSettlementsEscrowStatus =
+  (typeof GetApiV1AdminSettlementsEscrowStatus)[keyof typeof GetApiV1AdminSettlementsEscrowStatus];
 
 export const GetApiV1AdminSettlementsEscrowStatus = {
   ALL: 'ALL',
   HOLDING: 'HOLDING',
   RELEASED: 'RELEASED',
 } as const;
-

@@ -228,6 +228,54 @@ export const PostApiV1AuthEmailVerificationCodesVerifyResponse = zod.object({
 });
 
 /**
+ * 6자리 숫자 인증코드를 전화번호로 발송한다.
+ * @summary 전화번호 인증코드 발송
+ */
+export const postApiV1AuthPhoneVerificationCodesBodyPhoneNumberRegExp =
+  new RegExp('^01[0-9]-[0-9]{3,4}-[0-9]{4}$');
+
+export const PostApiV1AuthPhoneVerificationCodesBody = zod.object({
+  phoneNumber: zod
+    .string()
+    .regex(postApiV1AuthPhoneVerificationCodesBodyPhoneNumberRegExp),
+});
+
+export const PostApiV1AuthPhoneVerificationCodesResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    expiresInSeconds: zod.number(),
+    resendAvailableInSeconds: zod.number(),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * 인증코드가 일치하면 전화번호 인증 완료 상태로 처리한다.
+ * @summary 전화번호 인증코드 확인
+ */
+export const postApiV1AuthPhoneVerificationCodesVerifyBodyPhoneNumberRegExp =
+  new RegExp('^01[0-9]-[0-9]{3,4}-[0-9]{4}$');
+export const postApiV1AuthPhoneVerificationCodesVerifyBodyCodeRegExp =
+  new RegExp('^[0-9]{6}$');
+
+export const PostApiV1AuthPhoneVerificationCodesVerifyBody = zod.object({
+  phoneNumber: zod
+    .string()
+    .regex(postApiV1AuthPhoneVerificationCodesVerifyBodyPhoneNumberRegExp),
+  code: zod
+    .string()
+    .regex(postApiV1AuthPhoneVerificationCodesVerifyBodyCodeRegExp),
+});
+
+export const PostApiV1AuthPhoneVerificationCodesVerifyResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    verified: zod.boolean(),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
  * 이메일 인증 완료 후 비밀번호를 설정해 계정을 생성하고 로그인 처리한다.
  * @summary 이메일 회원가입
  */
@@ -433,6 +481,47 @@ export const PostApiV1AuthPasswordChangeBody = zod.object({
 });
 
 export const PostApiV1AuthPasswordChangeResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.unknown().nullable(),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * @summary 내 관심 지역 조회
+ */
+export const GetApiV1UsersMeRegionsResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    regions: zod
+      .array(zod.string())
+      .describe('선택한 관심 지역 목록 (등록 순, 시\/도 단위)'),
+    primaryRegion: zod
+      .string()
+      .nullable()
+      .describe('칩에 표시할 첫 번째 지역명. 비어있으면 null'),
+    additionalCount: zod
+      .number()
+      .describe(
+        'primaryRegion 외 추가 지역 수. 예: 서울 외 3곳 → additionalCount=3',
+      ),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * 기존 관심 지역을 모두 삭제하고 요청 목록으로 새로 저장한다. 빈 배열이면 전체 해제.
+ * @summary 관심 지역 저장/수정 (전체 교체)
+ */
+export const putApiV1UsersMeRegionsBodyRegionsMax = 10;
+
+export const PutApiV1UsersMeRegionsBody = zod.object({
+  regions: zod
+    .array(zod.string())
+    .max(putApiV1UsersMeRegionsBodyRegionsMax)
+    .describe('저장할 시\/도 지역 목록. 빈 배열이면 전체 해제'),
+});
+
+export const PutApiV1UsersMeRegionsResponse = zod.object({
   success: zod.boolean(),
   data: zod.unknown().nullable(),
   error: zod.unknown().nullable(),

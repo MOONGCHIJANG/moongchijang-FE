@@ -3,27 +3,23 @@
 import Image from 'next/image';
 import { Icon } from '@iconify/react';
 import { cn } from '@/lib/utils';
-import type { GroupBuyFeedItem } from '@/api/generated/api.schemas';
+import type { GroupBuyFeedItemResponse } from '@/api/generated/api.schemas';
 
 export const FeedCard = ({
   dDay,
-  pickupDate,
+  dDayLabel,
   storeName,
-  region,
+  regionLabel,
   currentQuantity,
   targetQuantity,
   productName,
   price,
   achievementRate,
   thumbnailUrl,
-}: GroupBuyFeedItem) => {
+  pickupDateLabel,
+}: GroupBuyFeedItemResponse) => {
   const DDAY_URGENCY_THRESHOLD = 4;
-  const dDayLabel = dDay === 0 ? 'D-day' : `D-${dDay}`;
   const isUrgent = dDay < DDAY_URGENCY_THRESHOLD;
-
-  const parts = pickupDate?.split('-');
-  const formattedPickupDate =
-    parts?.length === 3 ? `${parts[1]}월 ${parts[2]}일` : pickupDate;
 
   return (
     <div className="flex h-[272px] flex-col overflow-hidden rounded-xl bg-bg-white shadow-sm">
@@ -54,7 +50,7 @@ export const FeedCard = ({
               className="h-[18px] w-4 text-icon-primary"
             />
             <span className="caption-sm-bold">
-              {storeName} | {region}
+              {storeName} | {regionLabel}
             </span>
           </div>
           <div className="flex items-center gap-1 rounded-lg bg-surface-brand-lighter px-2 py-0.5 body-sm-bold text-text-brand">
@@ -70,7 +66,7 @@ export const FeedCard = ({
             {productName}
           </div>
           <span className="shrink-0 caption-sm-medium text-text-disabled">
-            • 픽업 {formattedPickupDate}
+            • 픽업 {pickupDateLabel}
           </span>
         </div>
 

@@ -40,11 +40,14 @@ export const SearchBar = ({
   return (
     <div
       className={cn(
-        'flex h-11 w-full items-center gap-2 rounded-full border border-border-brand bg-bg-white px-4 shadow-sm',
+        'flex h-10 w-full items-center gap-2 rounded-full border border-border-brand bg-bg-white px-4 shadow-sm',
         className,
       )}
     >
-      <Icon icon="solar:magnifer-linear" className="h-5 w-5 text-icon-primary" />
+      <Icon
+        icon="solar:magnifer-linear"
+        className="h-5 w-5 text-icon-primary"
+      />
       <input
         type="text"
         value={inputValue}

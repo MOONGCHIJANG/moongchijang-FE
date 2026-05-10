@@ -87,6 +87,11 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
         payMethod: safePayMethod,
         card: safePayMethod === 'CARD' ? {} : undefined,
         transfer: safePayMethod === 'TRANSFER' ? {} : undefined,
+        windowType: {
+          pc: 'IFRAME' as const,
+          mobile: 'REDIRECTION' as const,
+        },
+        redirectUrl: `${window.location.origin}/payment/redirect?participationId=${participationId}&amount=${confirmedAmount}&groupBuyId=${groupBuyId}`,
       };
 
       console.log(

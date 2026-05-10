@@ -14,7 +14,6 @@
  */
 
 import { http, HttpResponse, delay } from 'msw';
-import { faker } from '@faker-js/faker';
 import { generatedHandlers } from '@/api/generated/index.msw';
 import { koFaker } from './ko-faker';
 import { createGroupBuyDetailMock } from './mock-helpers';
@@ -31,35 +30,54 @@ function createFeedItem(id: number) {
   const targetQuantity = koFaker.groupBuy.quantity();
   const achievementRate = koFaker.groupBuy.achievementRate();
   const currentQuantity = Math.floor(targetQuantity * (achievementRate / 100));
+  const dDay = koFaker.groupBuy.dDay();
+  const district = koFaker.location.district();
+  const pickupDateRaw = koFaker.groupBuy.pickupDate();
+  const [, month, day] = pickupDateRaw.split('-');
+  const pickupDateLabel = `${parseInt(month)}월 ${parseInt(day)}일`;
+
   return {
     id,
     storeName: koFaker.store.name(),
-    region: koFaker.location.region(),
+    ...district,
     productName: koFaker.product.name(),
     thumbnailUrl: MOCK_IMAGES[(id - 1) % MOCK_IMAGES.length],
     price: koFaker.product.price(),
     achievementRate,
     currentQuantity,
     targetQuantity,
-    maxQuantity: Math.random() > 0.5 ? targetQuantity * 2 : null,
     deadline: koFaker.groupBuy.deadline(),
-    pickupDate: koFaker.groupBuy.pickupDate(),
-    pickupTimeStart: koFaker.groupBuy.pickupTime(),
-    pickupTimeEnd: koFaker.groupBuy.pickupTime(),
-    dDay: koFaker.groupBuy.dDay(),
-    isWishlisted: faker.datatype.boolean(),
-    isClosed: false,
-    canParticipate: true,
+    pickupDateLabel,
+    dDay,
+    dDayLabel: dDay === 0 ? 'D-day' : `D-${dDay}`,
   };
 }
 
+const TOTAL_ITEMS = 35;
+
 const overrideHandlers = [
-  http.get('*/api/v1/group-buys', async () => {
+  http.get('*/api/v1/group-buys', async ({ request }) => {
     await delay(800);
+    const url = new URL(request.url);
+    const page = parseInt(url.searchParams.get('page') ?? '1', 10);
+    const size = parseInt(url.searchParams.get('size') ?? '10', 10);
+    const districts = url.searchParams.getAll('districts');
+    // 경기 지역 선택 시 hasSearchResult: false + 인기 공구(백엔드 정렬) content 반환
+    const hasSearchResult = !districts.some((d) => d.startsWith('GYEONGGI'));
+    const startId = (page - 1) * size + 1;
+    const itemCount = Math.min(size, Math.max(0, TOTAL_ITEMS - (page - 1) * size));
+    const content = Array.from({ length: itemCount }, (_, i) => createFeedItem(startId + i));
+    const totalPages = Math.ceil(TOTAL_ITEMS / size);
     return HttpResponse.json({
       success: true,
       data: {
-        content: Array.from({ length: 10 }, (_, i) => createFeedItem(i + 1)),
+        content,
+        page,
+        size,
+        totalPages,
+        totalElements: TOTAL_ITEMS,
+        hasNext: page < totalPages,
+        hasSearchResult,
       },
       error: null,
     });

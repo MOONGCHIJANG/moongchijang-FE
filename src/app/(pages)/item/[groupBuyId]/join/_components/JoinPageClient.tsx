@@ -25,11 +25,16 @@ type Props = {
   groupBuy: ApiResponseGroupBuyDetailData;
 };
 
+// 수수료 변경 시 해당 값 수정 → 30% 라면 30
+const FEE_RATE = 0;
+
 const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
 
-  const totalAmount = groupBuy.price * quantity;
+  const productAmount = groupBuy.price * quantity;
+  const feeAmount = Math.floor((productAmount * FEE_RATE) / 100);
+  const totalAmount = productAmount + feeAmount;
 
   const [payMethod, setPayMethod] = useState<PayMethod | null>(null);
   const isPayable = payMethod !== null && !isLoading;
@@ -186,8 +191,8 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
         onQuantityChange={setQuantity}
         maxQuantity={groupBuy.maxQuantity}
         productName={groupBuy.productName}
-        productAmount={groupBuy.price * quantity}
-        feeAmount={0}
+        productAmount={productAmount}
+        feeAmount={feeAmount}
         totalAmount={totalAmount}
         productImage={groupBuy.imageUrls[0] || ''}
       />

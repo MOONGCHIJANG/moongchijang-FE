@@ -4,11 +4,11 @@ import ItemSummary from './ItemSummary';
 import JoinForm from './JoinForm';
 import AgreeTerms from './AgreeTerms';
 import PaymentButton from './PaymentButton';
-import type { ApiResponseGroupBuyDetailData } from '@/api/generated/api.schemas';
+import type { ApiResponseGroupBuyDetailResponseData } from '@/api/generated/api.schemas';
 
 type Props = {
   groupBuyId: string;
-  groupBuy: ApiResponseGroupBuyDetailData;
+  groupBuy: ApiResponseGroupBuyDetailResponseData;
 };
 
 const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
@@ -30,7 +30,7 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
       <JoinForm
         quantity={quantity}
         onQuantityChange={setQuantity}
-        maxQuantity={groupBuy.maxQuantity}
+        maxQuantity={groupBuy.maxQuantity ?? null}
         productName={groupBuy.productName}
         productAmount={groupBuy.price * quantity}
         feeAmount={0}

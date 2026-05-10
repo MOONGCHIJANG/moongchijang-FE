@@ -1,10 +1,12 @@
+import { DistrictType, RegionType } from '@/api/generated/api.schemas';
+
 export interface Region {
-  districtType: string;
+  districtType: DistrictType;
   name: string;
 }
 
 export interface City {
-  regionType: string;
+  regionType: RegionType;
   name: string;
   regions: Region[];
 }

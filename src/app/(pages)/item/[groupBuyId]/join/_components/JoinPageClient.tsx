@@ -13,6 +13,10 @@ import {
   postApiV1PaymentsConfirm,
   postApiV1PaymentsFail,
 } from '@/api/generated/participation/participation';
+import {
+  ParticipationCreatedResponse,
+  PaymentConfirmResponse,
+} from '@/api/schemas/participation';
 
 const ALL_AGREED_TERMS = Object.values(ParticipationCreateAgreedTermsItem);
 
@@ -38,6 +42,7 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
 
     let participationId: number = 0;
     let paymentId: string = crypto.randomUUID();
+    let confirmedAmount: number = 0;
 
     console.log('[결제 시작]', {
       groupBuyId,
@@ -53,21 +58,32 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
         quantity,
         agreedTerms: ALL_AGREED_TERMS,
       });
+
       const participationRes = await postApiV1GroupBuysGroupBuyIdParticipations(
         Number(groupBuyId),
         { quantity, agreedTerms: ALL_AGREED_TERMS },
       );
       console.log('[1] participations 응답', participationRes);
 
-      if (participationRes.status !== 201 || !participationRes.data.success) {
+      if (participationRes.status !== 201) {
         throw new Error('결제 요청 생성 실패');
       }
 
-      // [1] 성공 시 participationId, paymentId 확정
-      const { orderName, totalAmount: confirmedAmount } =
-        participationRes.data.data;
-      participationId = participationRes.data.data.participationId;
+      const parsed = ParticipationCreatedResponse.safeParse(
+        participationRes.data,
+      );
+      if (!parsed.success) {
+        console.error('[1] 응답 파싱 실패', parsed.error);
+        throw new Error('결제 응답 형식 오류');
+      }
+
+      // 외부 변수에 직접 할당 — catch에서 재사용
+      participationId = parsed.data.data.participationId;
+      confirmedAmount = parsed.data.data.totalAmount;
+      const orderName = parsed.data.data.orderName;
       paymentId = crypto.randomUUID();
+
+      console.log('[1] 완료', { participationId, confirmedAmount, paymentId });
 
       // [2] 포트원 SDK requestPayment() 호출
       console.log('[2] 포트원 SDK 호출', {
@@ -114,6 +130,7 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
         participationId,
         amount: confirmedAmount,
       });
+
       const confirmRes = await postApiV1PaymentsConfirm({
         paymentId,
         participationId,
@@ -121,10 +138,14 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
       });
       console.log('[3] confirm 응답', confirmRes);
 
-      if (confirmRes.status !== 200 || !confirmRes.data.success) {
+      const confirmedParsed = PaymentConfirmResponse.safeParse(confirmRes.data);
+      if (!confirmedParsed.success || confirmRes.status !== 200) {
         throw new Error('결제 확인 실패');
       }
 
+      console.log('[3] confirm 응답', confirmRes);
+
+      // [4] 완료 페이지 이동
       console.log('[4] 결제 완료 → 완료 페이지 이동', { participationId });
       sessionStorage.setItem('paymentSuccess', participationId.toString());
       await new Promise((resolve) => setTimeout(resolve, 50));
@@ -137,8 +158,8 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
       const errorCode = error instanceof Error ? error.message : 'UNKNOWN';
 
       await postApiV1PaymentsFail({
-        paymentId, // [1] 이후 실패면 실제 paymentId, [1] 실패면 초기 UUID
-        participationId, // [1] 이후 실패면 실제 ID, [1] 실패면 0
+        paymentId, // [1] 전이면 초기 UUID, 후면 실제 값
+        participationId, // [1] 전이면 0, 후면 실제 값
         errorCode,
         message: error instanceof Error ? error.message : null,
       }).catch((e) => console.error('[fail POST 실패]', e));

@@ -4,6 +4,7 @@ import {
   postApiV1PaymentsConfirm,
   postApiV1PaymentsFail,
 } from '@/api/generated/participation/participation';
+import { PaymentConfirmResponse } from '@/api/schemas/participation';
 
 type Props = {
   paymentId?: string;
@@ -47,7 +48,8 @@ const PaymentRedirectClient = ({
           amount: Number(amount),
         });
 
-        if (confirmRes.status !== 200 || !confirmRes.data.success) {
+        const parsed = PaymentConfirmResponse.safeParse(confirmRes.data);
+        if (!parsed.success || confirmRes.status !== 200) {
           throw new Error('결제 확인 실패');
         }
 

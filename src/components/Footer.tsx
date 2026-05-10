@@ -1,13 +1,25 @@
+'use client';
+
 const Footer = () => {
+  const handleCSClick = () => {
+    window.open('https://pf.kakao.com/_MdICX', '_blank');
+  };
+  const handleDocClick = () => {
+    window.open(
+      'https://extreme-moonstone-8ae.notion.site/357b0b17e91680a5b347ec201facc3e8',
+      '_blank',
+    );
+  };
+
   return (
     <footer className="px-g6 pt-g6 pb-32 flex flex-col gap-g4 text-text-subtle caption-sm-medium">
       <div className="flex gap-p6 items-center">
-        <button>고객센터</button>
-        <div className="w-px h-4 bg-text-subtle" />
-        <button>이용약관</button>
-        <div className="w-px h-4 bg-text-subtle" />
-        <button>개인정보처리방침</button>
-        <div className="w-px h-4 bg-text-subtle" />
+        <button onClick={handleCSClick}>고객센터</button>
+        <div className="border-l border-text-subtle h-4" />
+        <button onClick={handleDocClick}>이용약관</button>
+        <div className="border-l border-text-subtle h-4" />
+        <button onClick={handleDocClick}>개인정보처리방침</button>
+        <div className="border-l border-text-subtle h-4" />
         <button>안전거래센터</button>
       </div>
       <div className="whitespace-pre-line">

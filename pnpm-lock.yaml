@@ -11,6 +11,9 @@ importers:
       '@iconify/react':
         specifier: ^6.0.2
         version: 6.0.2(react@19.2.4)
+      '@portone/browser-sdk':
+        specifier: ^0.1.6
+        version: 0.1.6
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -847,6 +850,9 @@ packages:
 
   '@polka/url@1.0.0-next.29':
     resolution: {integrity: sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww==}
+
+  '@portone/browser-sdk@0.1.6':
+    resolution: {integrity: sha512-sTkIGP9ezYebXdA0eDvwL7lUsDpBoEydDeMBj1Kg+0PY52ZhgpRz55rykNcgw55luXAyUgRNEicZkNy/0F877A==}
 
   '@rolldown/binding-android-arm64@1.0.0-rc.15':
     resolution: {integrity: sha512-YYe6aWruPZDtHNpwu7+qAHEMbQ/yRl6atqb/AhznLTnD3UY99Q1jE7ihLSahNWkF4EqRPVC4SiR4O0UkLK02tA==}
@@ -4721,6 +4727,8 @@ snapshots:
   '@oxc-project/types@0.124.0': {}
 
   '@polka/url@1.0.0-next.29': {}
+
+  '@portone/browser-sdk@0.1.6': {}
 
   '@rolldown/binding-android-arm64@1.0.0-rc.15':
     optional: true

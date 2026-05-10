@@ -48,7 +48,29 @@ const NumStepper = ({ max, value, onChange }: NumStepperProps) => {
             className={`w-3 h-3 ${isMin ? 'text-icon-disabled' : 'text-icon-basic'}`}
           />
         </button>
-        <p className="body-md-bold text-center min-w-7.5">{count}</p>
+        <input
+          type="number"
+          className="body-md-bold text-center min-w-7.5 bg-transparent outline-none w-12 hide-arrows"
+          value={count}
+          min={1}
+          max={max ?? undefined}
+          onChange={(e) => {
+            let val = Number(e.target.value);
+            if (isNaN(val) || val < 1) val = 1;
+            if (max != null && val > max) {
+              val = max;
+              setShowToast(true);
+              setTimeout(() => setShowToast(false), 2000);
+            } else {
+              setShowToast(false);
+            }
+            if (onChange) {
+              onChange(val);
+            } else {
+              setInternalCount(val);
+            }
+          }}
+        />
         <button
           onClick={() => update(count + 1)}
           disabled={isMax}

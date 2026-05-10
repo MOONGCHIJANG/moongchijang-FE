@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import Toast from '@/components/Toast';
+import Toast from './Toast';
 
 const ViewerToast = ({ count = 0 }: { count?: number }) => {
   // TODO: 실시간 인원 관련 정보 불러오기

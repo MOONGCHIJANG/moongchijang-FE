@@ -294,14 +294,32 @@ export function FeedClient() {
                 ApiResponseSearchAnalysisDataSearchCase.NUMBER_1 && (
                 <GroupBuyRequestCard
                   icon="/icons/search.svg"
-                  title={'찾으시는 공구가\n없나요?'}
-                  description={'지역을 설정하면 더 가까운\n공구를 찾아드릴게요'}
-                  buttonLabel="지역 설정하기"
-                  onRequest={() => {
-                    setRequestSheetKey((k) => k + 1);
-                    setIsRequestSheetOpen(true);
-                  }}
+                  title={`찾으시는 ${searchAnalysis.detectedBakery ?? searchKeyword} 공구가\n없나요?`}
+                  onRequest={handleOpenRequestSheet}
                 />
+              )}
+            {searchKeyword &&
+              searchAnalysis?.searchCase ===
+                ApiResponseSearchAnalysisDataSearchCase.NUMBER_2 && (
+                <GroupBuyRequestCard
+                  icon="/icons/search.svg"
+                  title={`찾으시는 ${searchAnalysis.detectedNeighborhood ?? searchKeyword} 공구가\n없나요?`}
+                  onRequest={handleOpenRequestSheet}
+                />
+              )}
+            {searchKeyword &&
+              searchAnalysis?.searchCase ===
+                ApiResponseSearchAnalysisDataSearchCase.NUMBER_3 && (
+                <GroupBuyRequestCard
+                  icon="/icons/search.svg"
+                  title={`찾으시는 ${searchAnalysis.detectedBakery ?? searchKeyword} 공구가\n없나요?`}
+                  onRequest={handleOpenRequestSheet}
+                />
+              )}
+            {searchKeyword &&
+              searchAnalysis?.searchCase ===
+                ApiResponseSearchAnalysisDataSearchCase.NUMBER_4 && (
+                <GroupBuyRequestCard onRequest={handleOpenRequestSheet} />
               )}
           </>
         )}

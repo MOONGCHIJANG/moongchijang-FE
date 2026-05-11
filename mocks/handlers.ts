@@ -64,7 +64,7 @@ function createFeedItem(id: number) {
   };
 }
 
-const TOTAL_ITEMS = 35;
+const TOTAL_ITEMS = 2;
 
 const overrideHandlers = [
   http.get('*/api/v1/group-buys', async ({ request }) => {
@@ -73,20 +73,16 @@ const overrideHandlers = [
     const page = parseInt(url.searchParams.get('page') ?? '1', 10);
     const size = parseInt(url.searchParams.get('size') ?? '10', 10);
     const districts = url.searchParams.getAll('districts');
-    const keyword = url.searchParams.get('keyword');
     // 경기 지역 선택 시 hasSearchResult: false + 인기 공구(백엔드 정렬) content 반환
     const hasSearchResult = !districts.some((d) => d.startsWith('GYEONGGI'));
-    // TODO: 검색어 empty UI 확인용 — 검색 시 항상 빈 결과 반환 (확인 후 제거)
-    if (keyword) {
-      return HttpResponse.json({
-        success: true,
-        data: { content: [], page, size, totalPages: 0, totalElements: 0, hasNext: false, hasSearchResult: true },
-        error: null,
-      });
-    }
     const startId = (page - 1) * size + 1;
-    const itemCount = Math.min(size, Math.max(0, TOTAL_ITEMS - (page - 1) * size));
-    const content = Array.from({ length: itemCount }, (_, i) => createFeedItem(startId + i));
+    const itemCount = Math.min(
+      size,
+      Math.max(0, TOTAL_ITEMS - (page - 1) * size),
+    );
+    const content = Array.from({ length: itemCount }, (_, i) =>
+      createFeedItem(startId + i),
+    );
     const totalPages = Math.ceil(TOTAL_ITEMS / size);
     return HttpResponse.json({
       success: true,
@@ -114,12 +110,16 @@ const overrideHandlers = [
     });
   }),
   http.post('*/api/v1/search', async ({ request }) => {
-    const body = await request.json() as { keyword?: string };
+    const body = (await request.json()) as { keyword?: string };
     if (body.keyword) addToRecent(body.keyword);
     return HttpResponse.json({
       success: true,
-      // TODO: dev용 고정값 — 분기별 UI 확인 후 분기 조건 추가 필요
-      data: { searchCase: 1, detectedBakery: body.keyword ?? null },
+      // TODO: dev용 고정값 — 분기별 UI 확인 후 분기 조건 추가 필요 (현재: NUMBER_4)
+      data: {
+        searchCase: 4,
+        detectedBakery: body.keyword ?? null,
+        detectedNeighborhood: '성수',
+      },
       error: null,
     });
   }),

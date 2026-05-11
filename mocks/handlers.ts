@@ -116,7 +116,7 @@ const overrideHandlers = [
       success: true,
       // TODO: dev용 고정값 — 분기별 UI 확인 후 분기 조건 추가 필요 (현재: NUMBER_4)
       data: {
-        searchCase: 4,
+        searchCase: 3,
         detectedBakery: body.keyword ?? null,
         detectedNeighborhood: '성수',
       },

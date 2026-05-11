@@ -4,7 +4,7 @@ import { useRef, useEffect } from 'react';
 import { Icon } from '@iconify/react';
 import { SearchBar } from './SearchBar';
 
-const RECOMMENDED_SEARCHES = ['두쫀쿠', '버타떡', '모모양과', '두바이모피빵'];
+const RECOMMENDED_SEARCHES = ['두쫀쿠', '버터떡', '모모양과', '밤티말빵'];
 
 interface SearchOverlayProps {
   isOpen: boolean;
@@ -50,7 +50,7 @@ export const SearchOverlay = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-y-0 left-1/2 -translate-x-1/2 w-full max-w-[440px] z-50 bg-bg-white flex flex-col">
+    <div className="fixed inset-y-0 left-1/2 -translate-x-1/2 w-full max-w-[440px] z-50 bg-bg-white-muted flex flex-col">
       <div className="flex items-center gap-3 px-4 pt-4 pb-3">
         <button onClick={onClose} className="flex-shrink-0 p-1">
           <Icon icon="mingcute:left-line" className="h-6 w-6 text-icon-basic" />
@@ -69,7 +69,7 @@ export const SearchOverlay = ({
       <div className="flex flex-col gap-6 px-5 pt-2 overflow-y-auto">
         <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between">
-            <span className="body-md-bold text-text-basic font-pretendard">
+            <span className="body-md-semibold text-text-basic font-pretendard">
               최근 검색어
             </span>
             {recentSearches.length > 0 && (
@@ -90,7 +90,7 @@ export const SearchOverlay = ({
               {recentSearches.map((keyword) => (
                 <div
                   key={keyword}
-                  className="flex items-center gap-1 rounded-full border border-border-default px-3 py-1.5"
+                  className="flex items-center gap-1 rounded-full outline outline-1 outline-offset-[-1px] outline-border-natural bg-bg-white px-3 py-1.5"
                 >
                   <button
                     onClick={() => handleChipClick(keyword)}
@@ -104,8 +104,8 @@ export const SearchOverlay = ({
                     type="button"
                   >
                     <Icon
-                      icon="solar:close-linear"
-                      className="h-3.5 w-3.5 text-icon-disabled"
+                      icon="material-symbols:close-rounded"
+                      className="h-3.5 w-3.5 text-basic"
                     />
                   </button>
                 </div>
@@ -115,7 +115,7 @@ export const SearchOverlay = ({
         </div>
 
         <div className="flex flex-col gap-3">
-          <span className="body-md-bold text-text-basic font-pretendard">
+          <span className="body-md-semibold text-text-basic font-pretendard">
             뭉치장 추천 검색어
           </span>
           <div className="flex flex-wrap gap-2">
@@ -123,7 +123,7 @@ export const SearchOverlay = ({
               <button
                 key={keyword}
                 onClick={() => handleChipClick(keyword)}
-                className="rounded-full bg-primary-50 px-3 py-1.5 body-sm-regular text-text-brand font-pretendard"
+                className="rounded-full outline outline-1 outline-offset-[-1px] outline-border-natural bg-surface-brand-lighter px-3 py-1.5 body-sm-regular text-text-brand font-pretendard"
                 type="button"
               >
                 {keyword}

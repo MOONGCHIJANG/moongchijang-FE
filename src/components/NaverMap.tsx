@@ -41,10 +41,7 @@ export default function NaverMap({
       const mapOptions = {
         center: new window.naver.maps.LatLng(center.lat, center.lng),
         zoom,
-        zoomControl: true,
-        zoomControlOptions: {
-          position: window.naver.maps.Position.TOP_RIGHT,
-        },
+        zoomControl: false,
       };
 
       const map = new window.naver.maps.Map(mapRef.current, mapOptions);

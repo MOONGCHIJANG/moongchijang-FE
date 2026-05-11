@@ -1,6 +1,13 @@
 'use client';
 
-import { useState, useCallback, useMemo, useEffect, useLayoutEffect, useRef } from 'react';
+import {
+  useState,
+  useCallback,
+  useMemo,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+} from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
@@ -33,7 +40,9 @@ const VALID_FILTERS: FilterId[] = ['all', 'due', 'target'];
 const DEFAULT_REGION = REGIONS_DATA[0].regions[0];
 
 function filterFromParam(param: string | null): FilterId {
-  return VALID_FILTERS.includes(param as FilterId) ? (param as FilterId) : 'all';
+  return VALID_FILTERS.includes(param as FilterId)
+    ? (param as FilterId)
+    : 'all';
 }
 
 function regionsFromParams(districtParams: string[]): Region[] {
@@ -58,19 +67,29 @@ export function FeedClient() {
   );
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchInput, setSearchInput] = useState(() => searchParams.get('search') ?? '');
-  const [searchKeyword, setSearchKeyword] = useState(() => searchParams.get('search') ?? '');
-  const [searchAnalysis, setSearchAnalysis] = useState<ApiResponseSearchAnalysisData | null>(null);
+  const [searchInput, setSearchInput] = useState(
+    () => searchParams.get('search') ?? '',
+  );
+  const [searchKeyword, setSearchKeyword] = useState(
+    () => searchParams.get('search') ?? '',
+  );
+  const [searchAnalysis, setSearchAnalysis] =
+    useState<ApiResponseSearchAnalysisData | null>(null);
   const [isRequestSheetOpen, setIsRequestSheetOpen] = useState(false);
   const [requestSheetKey, setRequestSheetKey] = useState(0);
 
   const queryClient = useQueryClient();
-  const { recentSearches, removeRecentSearch, clearRecentSearches } = useRecentSearches();
+  const { recentSearches, removeRecentSearch, clearRecentSearches } =
+    useRecentSearches();
   const { mutate: executeSearch } = usePostApiV1Search({
     mutation: {
       onSuccess: (data) => {
-        queryClient.invalidateQueries({ queryKey: getGetApiV1SearchRecentQueryKey() });
-        setSearchAnalysis(data.status === 200 ? (data.data?.data ?? null) : null);
+        queryClient.invalidateQueries({
+          queryKey: getGetApiV1SearchRecentQueryKey(),
+        });
+        setSearchAnalysis(
+          data.status === 200 ? (data.data?.data ?? null) : null,
+        );
       },
     },
   });
@@ -102,13 +121,27 @@ export function FeedClient() {
     [selectedRegions],
   );
 
-  const { feeds, hasSearchResult, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useFeedList(activeFilter, districts, searchKeyword);
+  const {
+    feeds,
+    hasSearchResult,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useFeedList(activeFilter, districts, searchKeyword);
 
   // ref로 최신 scroll 상태 유지 → observer는 fetchNextPage가 바뀔 때만 재생성
-  const scrollStateRef = useRef({ hasNextPage, isFetchingNextPage, hasSearchResult });
+  const scrollStateRef = useRef({
+    hasNextPage,
+    isFetchingNextPage,
+    hasSearchResult,
+  });
   useLayoutEffect(() => {
-    scrollStateRef.current = { hasNextPage, isFetchingNextPage, hasSearchResult };
+    scrollStateRef.current = {
+      hasNextPage,
+      isFetchingNextPage,
+      hasSearchResult,
+    };
   });
 
   useEffect(() => {
@@ -116,8 +149,14 @@ export function FeedClient() {
     if (!sentinel) return;
     const observer = new IntersectionObserver(
       (entries) => {
-        const { hasNextPage, isFetchingNextPage, hasSearchResult } = scrollStateRef.current;
-        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage && hasSearchResult) {
+        const { hasNextPage, isFetchingNextPage, hasSearchResult } =
+          scrollStateRef.current;
+        if (
+          entries[0].isIntersecting &&
+          hasNextPage &&
+          !isFetchingNextPage &&
+          hasSearchResult
+        ) {
           fetchNextPage();
         }
       },
@@ -162,11 +201,17 @@ export function FeedClient() {
     const districtValues = resolved.map((r) => r.districtType);
     updateUrl({
       districts:
-        districtValues.length === 1 && districtValues[0] === DEFAULT_REGION.districtType
+        districtValues.length === 1 &&
+        districtValues[0] === DEFAULT_REGION.districtType
           ? null
           : districtValues,
     });
   };
+
+  const handleOpenRequestSheet = useCallback(() => {
+    setRequestSheetKey((k) => k + 1);
+    setIsRequestSheetOpen(true);
+  }, []);
 
   const handleShake = useCallback(() => {
     setIsQrModalOpen(true);
@@ -196,7 +241,10 @@ export function FeedClient() {
             }}
           />
         </div>
-        <FilterBar activeFilter={activeFilter} onFilterChange={handleFilterChange} />
+        <FilterBar
+          activeFilter={activeFilter}
+          onFilterChange={handleFilterChange}
+        />
       </header>
 
       <div className="flex flex-col gap-4 px-5 pb-5">
@@ -227,10 +275,12 @@ export function FeedClient() {
         ) : feeds.length === 0 ? (
           <div className="flex flex-col gap-4">
             <EmptyState
-              title={"원하시는 공구가\n아직 없어요"}
-              description={"다른 검색어를 입력하거나\n공구 개설을 요청해보세요."}
+              title={'원하시는 공구가\n아직 없어요'}
+              description={
+                '다른 검색어를 입력하거나\n공구 개설을 요청해보세요.'
+              }
             />
-            <GroupBuyRequestCard onRequest={() => { setRequestSheetKey((k) => k + 1); setIsRequestSheetOpen(true); }} />
+            <GroupBuyRequestCard onRequest={handleOpenRequestSheet} />
           </div>
         ) : (
           <>
@@ -244,10 +294,13 @@ export function FeedClient() {
                 ApiResponseSearchAnalysisDataSearchCase.NUMBER_1 && (
                 <GroupBuyRequestCard
                   icon="/icons/search.svg"
-                  title={"찾으시는 공구가\n없나요?"}
-                  description={"지역을 설정하면 더 가까운\n공구를 찾아드릴게요"}
+                  title={'찾으시는 공구가\n없나요?'}
+                  description={'지역을 설정하면 더 가까운\n공구를 찾아드릴게요'}
                   buttonLabel="지역 설정하기"
-                  onRequest={() => { setRequestSheetKey((k) => k + 1); setIsRequestSheetOpen(true); }}
+                  onRequest={() => {
+                    setRequestSheetKey((k) => k + 1);
+                    setIsRequestSheetOpen(true);
+                  }}
                 />
               )}
           </>

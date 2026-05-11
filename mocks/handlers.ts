@@ -80,6 +80,32 @@ const overrideHandlers = [
     await delay(800);
     return HttpResponse.json(createGroupBuyRequestMock(), { status: 201 });
   }),
+
+  // 참여 페이지 — success 고정
+  http.post('*/api/v1/group-buys/:groupBuyId/participations', async () => {
+    await delay(500);
+    return HttpResponse.json(
+      {
+        success: true,
+        data: {
+          participationId: faker.number.int({ min: 1, max: 999 }),
+          orderName: `${koFaker.product.name()} 1개`,
+          totalAmount: 18000,
+          productAmount: 18000,
+          feeAmount: 0,
+        },
+        error: null,
+      },
+      { status: 201 },
+    );
+  }),
+  http.post('*/api/v1/payments/confirm', async () => {
+    await delay(300);
+    return HttpResponse.json({ success: true, data: {}, error: null });
+  }),
+  http.post('*/api/v1/payments/fail', async () => {
+    return HttpResponse.json({ success: true, data: {}, error: null });
+  }),
 ];
 
 export const handlers = [...overrideHandlers, ...generatedHandlers];

@@ -7,6 +7,7 @@ import {
   deleteApiV1GroupBuysGroupBuyIdWishlist,
 } from '@/api/generated/wishlist/wishlist';
 import { ApiResponseGroupBuyDetailData } from '@/api/generated/api.schemas';
+import { useRouter } from 'next/navigation';
 
 interface Props {
   data: ApiResponseGroupBuyDetailData;
@@ -53,6 +54,14 @@ const BottomJoin = ({ data }: Props) => {
     }
   };
 
+  const router = useRouter();
+
+  const handleJoin = () => {
+    // TODO: 로그인한 사용자만 참여 가능하도록 수정 필요
+    if (isExpired) return;
+    router.push(`/item/${data.id}/join`);
+  };
+
   return (
     <div className="fixed bottom-0 left-0 right-0 z-10 mx-auto w-full max-w-110 px-7 py-p6 flex flex-col gap-g3 rounded-t-3xlarge shadow-[0px_-2px_20px_0px_rgba(0,0,0,0.10)] bg-white">
       <p className="text-center text-brand-primary body-md-bold">
@@ -69,6 +78,7 @@ const BottomJoin = ({ data }: Props) => {
           size="md"
           className="w-full text-white cursor-pointer"
           disabled={isExpired}
+          onClick={handleJoin}
         >
           공구 참여하기
         </Button>

@@ -12,12 +12,19 @@ import { FeedSkeletonList } from './FeedSkeleton';
 import { LocationBottomSheet } from './LocationBottomSheet';
 import { SearchOverlay } from './SearchOverlay';
 import { QrModal } from './QrModal';
+import { EmptyState } from './EmptyState';
+import { GroupBuyRequestCard } from './GroupBuyRequestCard';
+import { GroupBuyRequestSheet } from './GroupBuyRequestSheet';
 import { REGIONS_DATA, Region } from '@/constants/regions';
 import { useShake } from '@/hooks/useShake';
 import {
   usePostApiV1Search,
   getGetApiV1SearchRecentQueryKey,
 } from '@/api/hooks/group-buy/group-buy';
+import {
+  type ApiResponseSearchAnalysisData,
+  ApiResponseSearchAnalysisDataSearchCase,
+} from '@/api/generated/api.schemas';
 import { useFeedList } from '../_hooks/useFeedList';
 import { useRecentSearches } from '../_hooks/useRecentSearches';
 
@@ -53,13 +60,18 @@ export function FeedClient() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchInput, setSearchInput] = useState(() => searchParams.get('search') ?? '');
   const [searchKeyword, setSearchKeyword] = useState(() => searchParams.get('search') ?? '');
+  const [searchAnalysis, setSearchAnalysis] = useState<ApiResponseSearchAnalysisData | null>(null);
+  const [isRequestSheetOpen, setIsRequestSheetOpen] = useState(false);
+  const [requestSheetKey, setRequestSheetKey] = useState(0);
 
   const queryClient = useQueryClient();
   const { recentSearches, removeRecentSearch, clearRecentSearches } = useRecentSearches();
   const { mutate: executeSearch } = usePostApiV1Search({
     mutation: {
-      onSuccess: () =>
-        queryClient.invalidateQueries({ queryKey: getGetApiV1SearchRecentQueryKey() }),
+      onSuccess: (data) => {
+        queryClient.invalidateQueries({ queryKey: getGetApiV1SearchRecentQueryKey() });
+        setSearchAnalysis(data.status === 200 ? (data.data?.data ?? null) : null);
+      },
     },
   });
 
@@ -120,12 +132,17 @@ export function FeedClient() {
     setSearchInput(keyword);
     setIsSearchOpen(false);
     updateUrl({ search: keyword || null, q: null });
-    executeSearch({ data: { keyword } });
+    if (keyword) {
+      executeSearch({ data: { keyword } });
+    } else {
+      setSearchAnalysis(null);
+    }
   };
 
   const handleCloseSearch = () => {
     if (searchInput === '') {
       setSearchKeyword('');
+      setSearchAnalysis(null);
       updateUrl({ search: null });
     } else {
       setSearchInput(searchKeyword);
@@ -208,15 +225,32 @@ export function FeedClient() {
             </div>
           </>
         ) : feeds.length === 0 ? (
-          <div className="flex flex-1 items-center justify-center text-text-disabled">
-            진행 중인 공구가 없습니다
+          <div className="flex flex-col gap-4">
+            <EmptyState
+              title={"원하시는 공구가\n아직 없어요"}
+              description={"다른 검색어를 입력하거나\n공구 개설을 요청해보세요."}
+            />
+            <GroupBuyRequestCard onRequest={() => { setRequestSheetKey((k) => k + 1); setIsRequestSheetOpen(true); }} />
           </div>
         ) : (
-          feeds.map((feed) => (
-            <Link key={feed.id} href={`/item/${feed.id}`}>
-              <FeedCard {...feed} />
-            </Link>
-          ))
+          <>
+            {feeds.map((feed) => (
+              <Link key={feed.id} href={`/item/${feed.id}`}>
+                <FeedCard {...feed} />
+              </Link>
+            ))}
+            {searchKeyword &&
+              searchAnalysis?.searchCase ===
+                ApiResponseSearchAnalysisDataSearchCase.NUMBER_1 && (
+                <GroupBuyRequestCard
+                  icon="/icons/search.svg"
+                  title={"찾으시는 공구가\n없나요?"}
+                  description={"지역을 설정하면 더 가까운\n공구를 찾아드릴게요"}
+                  buttonLabel="지역 설정하기"
+                  onRequest={() => { setRequestSheetKey((k) => k + 1); setIsRequestSheetOpen(true); }}
+                />
+              )}
+          </>
         )}
 
         <div ref={sentinelRef} className="h-1" />
@@ -239,6 +273,13 @@ export function FeedClient() {
         recentSearches={recentSearches}
         onRemoveRecent={removeRecentSearch}
         onClearRecent={clearRecentSearches}
+      />
+
+      <GroupBuyRequestSheet
+        key={requestSheetKey}
+        isOpen={isRequestSheetOpen}
+        onClose={() => setIsRequestSheetOpen(false)}
+        detectedBakery={searchAnalysis?.detectedBakery}
       />
 
       <QrModal

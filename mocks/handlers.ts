@@ -17,6 +17,18 @@ import { http, HttpResponse, delay } from 'msw';
 import { generatedHandlers } from '@/api/generated/index.msw';
 import { koFaker } from './ko-faker';
 import { createGroupBuyDetailMock } from './mock-helpers';
+import { formatDeadline } from '@/lib/date';
+
+// 최근 검색어 인메모리 저장소
+let recentKeywords: { keyword: string; searchedAt: string }[] = [];
+
+function addToRecent(keyword: string) {
+  const now = new Date().toISOString().slice(0, 19) + 'Z';
+  recentKeywords = [
+    { keyword, searchedAt: now },
+    ...recentKeywords.filter((k) => k.keyword !== keyword),
+  ].slice(0, 10);
+}
 
 const MOCK_IMAGES = [
   '/images/img1.jpg',
@@ -33,8 +45,7 @@ function createFeedItem(id: number) {
   const dDay = koFaker.groupBuy.dDay();
   const district = koFaker.location.district();
   const pickupDateRaw = koFaker.groupBuy.pickupDate();
-  const [, month, day] = pickupDateRaw.split('-');
-  const pickupDateLabel = `${parseInt(month)}월 ${parseInt(day)}일`;
+  const pickupDateLabel = formatDeadline(pickupDateRaw);
 
   return {
     id,
@@ -85,6 +96,31 @@ const overrideHandlers = [
   http.get('*/api/v1/group-buys/:groupBuyId', async () => {
     await delay(800);
     return HttpResponse.json(createGroupBuyDetailMock());
+  }),
+  http.get('*/api/v1/search/recent', async () => {
+    return HttpResponse.json({
+      success: true,
+      data: { keywords: recentKeywords },
+      error: null,
+    });
+  }),
+  http.post('*/api/v1/search', async ({ request }) => {
+    const body = await request.json() as { keyword?: string };
+    if (body.keyword) addToRecent(body.keyword);
+    return HttpResponse.json({
+      success: true,
+      data: { keyword: body.keyword },
+      error: null,
+    });
+  }),
+  http.delete('*/api/v1/search/recent', async () => {
+    recentKeywords = [];
+    return HttpResponse.json({ success: true, data: {}, error: null });
+  }),
+  http.delete('*/api/v1/search/recent/:keyword', async ({ params }) => {
+    const keyword = decodeURIComponent(params.keyword as string);
+    recentKeywords = recentKeywords.filter((k) => k.keyword !== keyword);
+    return HttpResponse.json({ success: true, data: {}, error: null });
   }),
 ];
 

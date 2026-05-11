@@ -1,7 +1,8 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect } from 'react';
 import { Icon } from '@iconify/react';
+import { SearchBar } from './SearchBar';
 
 const RECOMMENDED_SEARCHES = ['두쫀쿠', '버타떡', '모모양과', '두바이모피빵'];
 
@@ -9,6 +10,8 @@ interface SearchOverlayProps {
   isOpen: boolean;
   onClose: () => void;
   onSearch: (keyword: string) => void;
+  inputValue: string;
+  onInputChange: (value: string) => void;
   recentSearches: string[];
   onRemoveRecent: (keyword: string) => void;
   onClearRecent: () => void;
@@ -18,18 +21,18 @@ export const SearchOverlay = ({
   isOpen,
   onClose,
   onSearch,
+  inputValue,
+  onInputChange,
   recentSearches,
   onRemoveRecent,
   onClearRecent,
 }: SearchOverlayProps) => {
-  const [inputValue, setInputValue] = useState('');
-  const inputRef = useRef<HTMLInputElement>(null);
+  const searchBarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!isOpen) return;
     const timer = setTimeout(() => {
-      setInputValue('');
-      inputRef.current?.focus();
+      searchBarRef.current?.querySelector('input')?.focus();
     }, 0);
     return () => clearTimeout(timer);
   }, [isOpen]);
@@ -37,11 +40,10 @@ export const SearchOverlay = ({
   const handleSearch = (keyword: string) => {
     if (!keyword.trim()) return;
     onSearch(keyword.trim());
-    onClose();
   };
 
   const handleChipClick = (keyword: string) => {
-    setInputValue(keyword);
+    onInputChange(keyword);
     handleSearch(keyword);
   };
 
@@ -53,30 +55,14 @@ export const SearchOverlay = ({
         <button onClick={onClose} className="flex-shrink-0 p-1">
           <Icon icon="mingcute:left-line" className="h-6 w-6 text-icon-basic" />
         </button>
-        <div className="flex flex-1 h-11 items-center gap-2 rounded-full border border-border-brand bg-bg-white px-4">
-          <input
-            ref={inputRef}
-            type="text"
-            value={inputValue}
+        <div ref={searchBarRef} className="flex-1">
+          <SearchBar
             placeholder="먹고 싶은 메뉴나 가게를 찾아보세요"
-            className="w-full bg-transparent body-sm-regular text-text-basic outline-none placeholder:text-text-disabled font-pretendard"
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') handleSearch(inputValue);
-            }}
+            value={inputValue}
+            onChange={onInputChange}
+            onEnter={handleSearch}
+            className="h-11 shadow-none"
           />
-          {inputValue && (
-            <button
-              onClick={() => setInputValue('')}
-              className="flex-shrink-0"
-              type="button"
-            >
-              <Icon
-                icon="solar:close-circle-bold"
-                className="h-5 w-5 text-icon-tertiary"
-              />
-            </button>
-          )}
         </div>
       </div>
 

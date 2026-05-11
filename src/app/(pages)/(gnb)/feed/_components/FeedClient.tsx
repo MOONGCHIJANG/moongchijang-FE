@@ -351,6 +351,7 @@ export function FeedClient() {
         isOpen={isRequestSheetOpen}
         onClose={() => setIsRequestSheetOpen(false)}
         detectedBakery={searchAnalysis?.detectedBakery}
+        detectedNeighborhood={searchAnalysis?.detectedNeighborhood}
       />
 
       <QrModal

@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Icon } from '@iconify/react';
 import { BottomSheet } from '@/components/BottomSheet';
 import { Button } from '@/components/Button';
+import { Chip } from '@/components/Chip';
 import { LocationBottomSheet } from './LocationBottomSheet';
 import { cn } from '@/lib/utils';
 import { type Region } from '@/constants/regions';
@@ -15,30 +17,71 @@ import type { ApiResponseStoreSearchListDataStoresItem } from '@/api/generated/a
 
 type Step = 'form' | 'stores';
 
+const POPULAR_NEIGHBORHOODS = ['성수', '홍대', '망원', '연남', '이태원'];
+const POPULAR_BAKERIES = [
+  '두쫀쿠',
+  '소금빵',
+  '크루아상',
+  '버터떡',
+  '마들렌',
+  '앙버터',
+];
+
 interface GroupBuyRequestSheetProps {
   isOpen: boolean;
   onClose: () => void;
   detectedBakery?: string | null;
+  detectedNeighborhood?: string | null;
 }
 
 export const GroupBuyRequestSheet = ({
   isOpen,
   onClose,
   detectedBakery,
+  detectedNeighborhood,
 }: GroupBuyRequestSheetProps) => {
   const [step, setStep] = useState<Step>('form');
-  const [productName, setProductName] = useState(detectedBakery ?? '');
+
+  // TODO: NUMBER_3에서 detectedNeighborhood가 POPULAR_NEIGHBORHOODS에 없으면
+  // 칩이 비활성화 상태지만 effectiveNeighborhood 폴백으로 버튼은 활성화됨
+  // → 동적 칩 추가 또는 REGIONS_DATA 매칭으로 시각적 피드백 개선 필요
+  const [selectedNeighborhoodLabel, setSelectedNeighborhoodLabel] = useState<
+    string | null
+  >(
+    POPULAR_NEIGHBORHOODS.includes(detectedNeighborhood ?? '')
+      ? (detectedNeighborhood ?? null)
+      : null,
+  );
   const [selectedRegion, setSelectedRegion] = useState<Region | null>(null);
   const [isLocationSheetOpen, setIsLocationSheetOpen] = useState(false);
+
+  const [selectedBakeryLabel, setSelectedBakeryLabel] = useState<string | null>(
+    null,
+  );
+  const [bakeryInput, setBakeryInput] = useState('');
+  const [showBakeryInput, setShowBakeryInput] = useState(false);
+
   const [selectedStore, setSelectedStore] =
     useState<ApiResponseStoreSearchListDataStoresItem | null>(null);
   const [desiredQuantity, setDesiredQuantity] = useState(1);
   const [desiredPickupDate, setDesiredPickupDate] = useState('');
   const [minPickupDate, setMinPickupDate] = useState('');
 
-  const storeSearchKeyword = selectedRegion
-    ? `${selectedRegion.name} ${productName}`.trim()
-    : productName.trim();
+  const hasDetectedBakery = !!detectedBakery;
+  const hasDetectedNeighborhood = !!detectedNeighborhood;
+
+  const effectiveNeighborhood =
+    selectedNeighborhoodLabel ??
+    selectedRegion?.name ??
+    detectedNeighborhood ??
+    null;
+  const effectiveBakery =
+    selectedBakeryLabel || bakeryInput.trim() || detectedBakery || null;
+
+  const storeSearchKeyword = [effectiveNeighborhood, effectiveBakery]
+    .filter(Boolean)
+    .join(' ')
+    .trim();
 
   const { data: storesData, isLoading: isSearchingStores } =
     useGetApiV1StoresSearch(
@@ -53,9 +96,15 @@ export const GroupBuyRequestSheet = ({
     mutation: { onSuccess: onClose },
   });
 
-  const canFindStores = !!selectedRegion && !!productName.trim();
-  const canSubmit =
-    !!selectedStore?.storeName && desiredQuantity >= 1 && !!desiredPickupDate;
+  const canFindStores = !!effectiveNeighborhood && !!effectiveBakery;
+  const canSubmit = !!selectedStore?.storeName && !!desiredPickupDate;
+
+  const getDisabledButtonLabel = () => {
+    if (!effectiveNeighborhood && !effectiveBakery)
+      return '동네와 베이커리를 선택해주세요';
+    if (!effectiveBakery) return '베이커리를 선택해주세요';
+    return '동네를 선택해주세요';
+  };
 
   const handleFindStores = () => {
     if (!canFindStores) return;
@@ -74,18 +123,189 @@ export const GroupBuyRequestSheet = ({
         storeAddress: selectedStore!.roadAddress ?? null,
         storeLatitude: selectedStore!.latitude ?? null,
         storeLongitude: selectedStore!.longitude ?? null,
-        productName,
+        productName: effectiveBakery ?? '',
         desiredQuantity,
         desiredPickupDate,
       },
     });
   };
 
+  const handleNeighborhoodChipClick = (label: string) => {
+    setSelectedNeighborhoodLabel((prev) => (prev === label ? null : label));
+    setSelectedRegion(null);
+  };
+
+  const handleBakeryChipClick = (label: string) => {
+    setSelectedBakeryLabel((prev) => (prev === label ? null : label));
+    setBakeryInput('');
+    setShowBakeryInput(false);
+  };
+
+  const renderNeighborhoodSection = () => (
+    <div className="flex flex-col gap-3">
+      <div className="flex items-center gap-1.5">
+        <Image src="/icons/icon.svg" alt="" width={20} height={20} />
+        <span className="body-sm-bold text-text-tertiary font-pretendard">
+          어느 동네인가요?
+        </span>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {POPULAR_NEIGHBORHOODS.map((label) => (
+          <Chip
+            key={label}
+            label={label}
+            active={selectedNeighborhoodLabel === label}
+            onClick={() => handleNeighborhoodChipClick(label)}
+          />
+        ))}
+        <button
+          type="button"
+          onClick={() => setIsLocationSheetOpen(true)}
+          className={cn(
+            'inline-flex h-[26px] items-center gap-1 px-3 py-1 rounded-2xl font-pretendard caption-sm-bold transition-colors',
+            selectedRegion
+              ? 'bg-surface-brand text-text-basic-inverse'
+              : 'bg-surface-elevated outline outline-1 outline-offset-[-1px] outline-border-subtle text-text-tertiary',
+          )}
+        >
+          {!selectedRegion && <span className="text-xs leading-4">+</span>}
+          <span className="text-12 leading-4">
+            {selectedRegion ? selectedRegion.name : '직접 입력'}
+          </span>
+        </button>
+      </div>
+    </div>
+  );
+
+  const renderBakerySection = (sectionLabel: string) => (
+    <div className="flex flex-col gap-3">
+      <div className="flex items-center gap-1.5">
+        <Image src="/icons/icon.svg" alt="" width={20} height={20} />
+        <span className="body-sm-bold text-text-tertiary font-pretendard">
+          {sectionLabel}
+        </span>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {POPULAR_BAKERIES.map((label) => (
+          <Chip
+            key={label}
+            label={label}
+            active={selectedBakeryLabel === label}
+            onClick={() => handleBakeryChipClick(label)}
+          />
+        ))}
+        <button
+          type="button"
+          onClick={() => {
+            setSelectedBakeryLabel(null);
+            setShowBakeryInput(true);
+          }}
+          className={cn(
+            'inline-flex h-[26px] items-center gap-1 px-3 py-1 rounded-2xl font-pretendard caption-sm-bold transition-colors',
+            showBakeryInput
+              ? 'bg-surface-brand text-text-basic-inverse'
+              : 'bg-surface-elevated outline outline-1 outline-offset-[-1px] outline-border-subtle text-text-tertiary',
+          )}
+        >
+          {!showBakeryInput && <span className="text-xs leading-4">+</span>}
+          <span className="text-12 leading-4">직접 입력</span>
+        </button>
+      </div>
+      {showBakeryInput && (
+        <input
+          autoFocus
+          value={bakeryInput}
+          onChange={(e) => setBakeryInput(e.target.value)}
+          placeholder="베이커리 또는 상품명 입력"
+          className="h-11 w-full rounded-xl border border-border-brand px-4 body-sm-regular text-text-basic font-pretendard outline-none"
+        />
+      )}
+    </div>
+  );
+
+  const renderFormContent = () => {
+    // NUMBER_1 (베이커리 인식, 동네 미인식) / NUMBER_3 (둘 다 인식)
+    if (hasDetectedBakery) {
+      return (
+        <div className="flex flex-col gap-5">
+          <div className="flex items-start gap-2 rounded-xl bg-amber-50 px-3 py-4">
+            <span className="text-xl leading-none mt-0.5">🤖</span>
+            <p className="body-sm-regular text-amber-700 font-pretendard whitespace-pre-line">
+              {`[${detectedBakery}]는 파악했어요.\n동네만 알려주시면 바로 찾아드릴게요.`}
+            </p>
+          </div>
+          {renderNeighborhoodSection()}
+          <Button
+            size="md"
+            fullWidth
+            disabled={!canFindStores}
+            onClick={handleFindStores}
+          >
+            {canFindStores ? '매장 찾기' : getDisabledButtonLabel()}
+          </Button>
+        </div>
+      );
+    }
+
+    // NUMBER_2 (동네 인식, 베이커리 미인식)
+    if (hasDetectedNeighborhood) {
+      return (
+        <div className="flex flex-col gap-5">
+          <div className="flex items-start gap-2 rounded-xl bg-amber-50 px-3 py-4">
+            <Image
+              src="/icons/icon.svg"
+              alt=""
+              width={20}
+              height={20}
+              className="mt-0.5 shrink-0"
+            />
+            <p className="body-sm-regular text-amber-700 font-pretendard whitespace-pre-line">
+              {`요즘 ${detectedNeighborhood}에서 가장 인기 있는\n베이커리예요. 탭해서 바로 찾아드릴게요.`}
+            </p>
+          </div>
+          {renderBakerySection('무슨 상품 찾으시나요?')}
+          <Button
+            size="md"
+            fullWidth
+            disabled={!canFindStores}
+            onClick={handleFindStores}
+          >
+            {canFindStores ? '매장 찾기' : getDisabledButtonLabel()}
+          </Button>
+        </div>
+      );
+    }
+
+    // NUMBER_4 (둘 다 미인식)
+    return (
+      <div className="flex flex-col gap-5">
+        <div className="flex items-start gap-2 rounded-xl bg-amber-50 px-3 py-4">
+          <span className="text-xl leading-none mt-0.5">😵</span>
+          <p className="body-sm-regular text-amber-700 font-pretendard whitespace-pre-line">
+            {
+              '검색어를 잘 못 알아들었어요!\n아래에서 골라주시면 바로 찾아드릴게요.'
+            }
+          </p>
+        </div>
+        {renderNeighborhoodSection()}
+        <div className="border-t border-border-subtle" />
+        {renderBakerySection('어떤 베이커리 찾으시나요?')}
+        <Button
+          size="md"
+          fullWidth
+          disabled={!canFindStores}
+          onClick={handleFindStores}
+        >
+          {canFindStores ? '매장 찾기' : getDisabledButtonLabel()}
+        </Button>
+      </div>
+    );
+  };
+
   return (
     <>
       <BottomSheet isOpen={isOpen} onClose={onClose}>
         <div className="px-5 pb-8 flex flex-col gap-6">
-          {/* 헤더 */}
           <div className="flex items-center gap-2">
             {step === 'stores' && (
               <button type="button" onClick={() => setStep('form')}>
@@ -96,62 +316,14 @@ export const GroupBuyRequestSheet = ({
               </button>
             )}
             <span className="heading-md-bold text-text-basic font-pretendard">
-              공구 요청
+              ✨ 공구 개설 요청
             </span>
           </div>
 
           {step === 'form' ? (
-            <div className="flex flex-col gap-4">
-              {/* 상품명 */}
-              <div className="flex flex-col gap-1.5">
-                <span className="body-sm-bold text-text-tertiary font-pretendard">
-                  원하는 상품
-                </span>
-                <input
-                  value={productName}
-                  onChange={(e) => setProductName(e.target.value)}
-                  placeholder="상품명을 입력해주세요"
-                  className="h-11 w-full rounded-xl border border-border-default px-4 body-sm-regular text-text-basic font-pretendard outline-none focus:border-border-brand"
-                />
-              </div>
-
-              {/* 동네 선택 */}
-              <div className="flex flex-col gap-1.5">
-                <span className="body-sm-bold text-text-tertiary font-pretendard">
-                  동네
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setIsLocationSheetOpen(true)}
-                  className="h-11 w-full rounded-xl border border-border-default px-4 flex items-center justify-between"
-                >
-                  <span
-                    className={cn(
-                      'body-sm-regular font-pretendard',
-                      selectedRegion ? 'text-text-basic' : 'text-text-disabled',
-                    )}
-                  >
-                    {selectedRegion?.name ?? '동네를 선택해주세요'}
-                  </span>
-                  <Icon
-                    icon="mingcute:right-line"
-                    className="h-5 w-5 text-icon-tertiary"
-                  />
-                </button>
-              </div>
-
-              <Button
-                size="md"
-                fullWidth
-                disabled={!canFindStores}
-                onClick={handleFindStores}
-              >
-                매장 찾기
-              </Button>
-            </div>
+            renderFormContent()
           ) : (
             <div className="flex flex-col gap-4">
-              {/* 매장 목록 */}
               <div className="flex flex-col gap-2 max-h-52 overflow-y-auto">
                 {isSearchingStores ? (
                   <p className="py-6 text-center body-sm-regular text-text-disabled font-pretendard">
@@ -184,8 +356,6 @@ export const GroupBuyRequestSheet = ({
                   ))
                 )}
               </div>
-
-              {/* 수량 / 픽업일 */}
               <div className="flex flex-col gap-3">
                 <div className="flex flex-col gap-1.5">
                   <span className="body-sm-bold text-text-tertiary font-pretendard">
@@ -214,7 +384,6 @@ export const GroupBuyRequestSheet = ({
                   />
                 </div>
               </div>
-
               <Button
                 size="md"
                 fullWidth
@@ -228,13 +397,13 @@ export const GroupBuyRequestSheet = ({
         </div>
       </BottomSheet>
 
-      {/* LocationBottomSheet는 DOM 순서상 뒤에 렌더링해 GroupBuyRequestSheet 위에 표시 */}
       <LocationBottomSheet
         isOpen={isLocationSheetOpen}
         onClose={() => setIsLocationSheetOpen(false)}
         selectedRegions={selectedRegion ? [selectedRegion] : []}
         onApply={(regions) => {
           setSelectedRegion(regions[0] ?? null);
+          setSelectedNeighborhoodLabel(null);
           setIsLocationSheetOpen(false);
         }}
       />

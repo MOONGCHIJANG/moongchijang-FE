@@ -1,7 +1,9 @@
 'use client';
 
-import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
+import { useState, useCallback, useMemo, useEffect, useLayoutEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { FeedTopBar } from './FeedTopBar';
 import { SearchBar } from './SearchBar';
 import { FilterBar, FilterId } from './FilterBar';
@@ -12,69 +14,141 @@ import { SearchOverlay } from './SearchOverlay';
 import { QrModal } from './QrModal';
 import { REGIONS_DATA, Region } from '@/constants/regions';
 import { useShake } from '@/hooks/useShake';
+import {
+  usePostApiV1Search,
+  getGetApiV1SearchRecentQueryKey,
+} from '@/api/hooks/group-buy/group-buy';
 import { useFeedList } from '../_hooks/useFeedList';
 import { useRecentSearches } from '../_hooks/useRecentSearches';
 
+const ALL_REGIONS = REGIONS_DATA.flatMap((city) => city.regions);
+const VALID_FILTERS: FilterId[] = ['all', 'due', 'target'];
+const DEFAULT_REGION = REGIONS_DATA[0].regions[0];
+
+function filterFromParam(param: string | null): FilterId {
+  return VALID_FILTERS.includes(param as FilterId) ? (param as FilterId) : 'all';
+}
+
+function regionsFromParams(districtParams: string[]): Region[] {
+  if (districtParams.length === 0) return [DEFAULT_REGION];
+  const found = districtParams
+    .map((d) => ALL_REGIONS.find((r) => r.districtType === d))
+    .filter((r): r is Region => !!r);
+  return found.length > 0 ? found : [DEFAULT_REGION];
+}
+
 export function FeedClient() {
-  const [activeFilter, setActiveFilter] = useState<FilterId>('all');
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const [activeFilter, setActiveFilter] = useState<FilterId>(() =>
+    filterFromParam(searchParams.get('filter')),
+  );
   const [isLocationSheetOpen, setIsLocationSheetOpen] = useState(false);
-  const [selectedRegions, setSelectedRegions] = useState<Region[]>([
-    REGIONS_DATA[0].regions[0],
-  ]);
+  const [selectedRegions, setSelectedRegions] = useState<Region[]>(() =>
+    regionsFromParams(searchParams.getAll('districts')),
+  );
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchKeyword, setSearchKeyword] = useState('');
-  const {
-    recentSearches,
-    addRecentSearch,
-    removeRecentSearch,
-    clearRecentSearches,
-  } = useRecentSearches();
-  const isPickupDay = false;
+  const [searchInput, setSearchInput] = useState(() => searchParams.get('search') ?? '');
+  const [searchKeyword, setSearchKeyword] = useState(() => searchParams.get('search') ?? '');
 
+  const queryClient = useQueryClient();
+  const { recentSearches, removeRecentSearch, clearRecentSearches } = useRecentSearches();
+  const { mutate: executeSearch } = usePostApiV1Search({
+    mutation: {
+      onSuccess: () =>
+        queryClient.invalidateQueries({ queryKey: getGetApiV1SearchRecentQueryKey() }),
+    },
+  });
+
+  const isPickupDay = false;
   const sentinelRef = useRef<HTMLDivElement>(null);
+
+  const updateUrl = useCallback(
+    (updates: Record<string, string | string[] | null>) => {
+      const params = new URLSearchParams(searchParams.toString());
+      Object.entries(updates).forEach(([key, value]) => {
+        params.delete(key);
+        if (value !== null) {
+          if (Array.isArray(value)) {
+            value.forEach((v) => params.append(key, v));
+          } else {
+            params.set(key, value);
+          }
+        }
+      });
+      const qs = params.toString();
+      router.replace(`${pathname}${qs ? `?${qs}` : ''}`, { scroll: false });
+    },
+    [router, pathname, searchParams],
+  );
 
   const districts = useMemo(
     () => selectedRegions.map((r) => r.districtType),
     [selectedRegions],
   );
-  const {
-    feeds,
-    hasSearchResult,
-    isLoading,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useFeedList(activeFilter, districts, searchKeyword);
+
+  const { feeds, hasSearchResult, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useFeedList(activeFilter, districts, searchKeyword);
+
+  // ref로 최신 scroll 상태 유지 → observer는 fetchNextPage가 바뀔 때만 재생성
+  const scrollStateRef = useRef({ hasNextPage, isFetchingNextPage, hasSearchResult });
+  useLayoutEffect(() => {
+    scrollStateRef.current = { hasNextPage, isFetchingNextPage, hasSearchResult };
+  });
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
     if (!sentinel) return;
-
     const observer = new IntersectionObserver(
       (entries) => {
+        const { hasNextPage, isFetchingNextPage, hasSearchResult } = scrollStateRef.current;
         if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage && hasSearchResult) {
           fetchNextPage();
         }
       },
       { threshold: 0.1 },
     );
-
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage, hasSearchResult]);
+  }, [fetchNextPage]);
 
   const handleSearch = (keyword: string) => {
     setSearchKeyword(keyword);
-    addRecentSearch(keyword);
+    setSearchInput(keyword);
+    setIsSearchOpen(false);
+    updateUrl({ search: keyword || null, q: null });
+    executeSearch({ data: { keyword } });
   };
 
-  const handleRemoveRecent = (keyword: string) => {
-    removeRecentSearch(keyword);
+  const handleCloseSearch = () => {
+    if (searchInput === '') {
+      setSearchKeyword('');
+      updateUrl({ search: null });
+    } else {
+      setSearchInput(searchKeyword);
+    }
+    setIsSearchOpen(false);
   };
 
-  const handleClearRecent = () => {
-    clearRecentSearches();
+  const handleFilterChange = (filter: FilterId) => {
+    setActiveFilter(filter);
+    updateUrl({ filter: filter === 'all' ? null : filter });
+  };
+
+  const handleApplyLocation = (newRegions: Region[]) => {
+    const resolved = newRegions.length > 0 ? newRegions : [DEFAULT_REGION];
+    setSelectedRegions(resolved);
+    setIsLocationSheetOpen(false);
+    const districtValues = resolved.map((r) => r.districtType);
+    updateUrl({
+      districts:
+        districtValues.length === 1 && districtValues[0] === DEFAULT_REGION.districtType
+          ? null
+          : districtValues,
+    });
   };
 
   const handleShake = useCallback(() => {
@@ -82,13 +156,6 @@ export function FeedClient() {
   }, []);
 
   const { isEnabled, toggleShake } = useShake(handleShake);
-
-  const handleApplyLocation = (newRegions: Region[]) => {
-    setSelectedRegions(
-      newRegions.length > 0 ? newRegions : [REGIONS_DATA[0].regions[0]],
-    );
-    setIsLocationSheetOpen(false);
-  };
 
   const locationDisplayText =
     selectedRegions.length === 1
@@ -103,17 +170,16 @@ export function FeedClient() {
           onLocationClick={() => setIsLocationSheetOpen(true)}
           onQrClick={() => setIsQrModalOpen(true)}
         />
-        <div
-          className="relative cursor-pointer"
-          onClick={() => setIsSearchOpen(true)}
-        >
-          <SearchBar />
-          <div className="absolute inset-0" />
+        <div className="cursor-pointer" onClick={() => setIsSearchOpen(true)}>
+          <SearchBar
+            value={searchInput}
+            onClear={() => {
+              setSearchInput('');
+              setIsSearchOpen(true);
+            }}
+          />
         </div>
-        <FilterBar
-          activeFilter={activeFilter}
-          onFilterChange={setActiveFilter}
-        />
+        <FilterBar activeFilter={activeFilter} onFilterChange={handleFilterChange} />
       </header>
 
       <div className="flex flex-col gap-4 px-5 pb-5">
@@ -154,7 +220,6 @@ export function FeedClient() {
         )}
 
         <div ref={sentinelRef} className="h-1" />
-
         {isFetchingNextPage && <FeedSkeletonList />}
       </div>
 
@@ -167,11 +232,13 @@ export function FeedClient() {
 
       <SearchOverlay
         isOpen={isSearchOpen}
-        onClose={() => setIsSearchOpen(false)}
+        onClose={handleCloseSearch}
         onSearch={handleSearch}
+        inputValue={searchInput}
+        onInputChange={setSearchInput}
         recentSearches={recentSearches}
-        onRemoveRecent={handleRemoveRecent}
-        onClearRecent={handleClearRecent}
+        onRemoveRecent={removeRecentSearch}
+        onClearRecent={clearRecentSearches}
       />
 
       <QrModal

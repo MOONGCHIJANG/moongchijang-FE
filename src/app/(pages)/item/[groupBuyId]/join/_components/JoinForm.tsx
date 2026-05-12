@@ -1,8 +1,5 @@
 'use client';
-import React, { useState } from 'react';
 import NumStepper from './NumStepper';
-import { Icon } from '@iconify/react';
-import EditNumber from './EditNumber';
 import Image from 'next/image';
 
 type Props = {
@@ -13,8 +10,6 @@ type Props = {
   productAmount: number;
   feeAmount: number;
   totalAmount: number;
-  phoneNumber: string;
-  onPhoneNumberChange: (value: string) => void;
   productImage: string;
 };
 
@@ -26,12 +21,8 @@ const JoinForm = ({
   productAmount,
   feeAmount,
   totalAmount,
-  phoneNumber,
-  onPhoneNumberChange,
   productImage,
 }: Props) => {
-  const [open, setOpen] = useState(false);
-
   return (
     <div className="flex flex-col gap-3 pt-3">
       {/* 상품 카드 */}
@@ -57,29 +48,6 @@ const JoinForm = ({
           onChange={onQuantityChange}
         />
       </div>
-      {/* 전화번호 */}
-      <div className="rounded-2xlarge bg-surface-white border border-border-subtle p-p5 flex flex-col gap-g4">
-        <p className="heading-md-bold">전화번호</p>
-        <div className="flex justify-between items-center">
-          <p className="body-md-regular">{phoneNumber}</p>
-          <button type="button" onClick={() => setOpen(true)}>
-            <Icon
-              icon="lucide:chevron-right"
-              className="w-6 h-6 text-icon-subtle"
-            />
-          </button>
-        </div>
-        <EditNumber
-          open={open}
-          initialValue={phoneNumber}
-          onClose={() => setOpen(false)}
-          onConfirm={(value) => {
-            onPhoneNumberChange(value);
-            setOpen(false);
-          }}
-        />
-      </div>
-
       {/* 결제 금액 */}
       <div className="rounded-2xlarge bg-surface-white border border-border-subtle p-p5 flex flex-col gap-g4">
         <p className="heading-md-bold">결제 금액</p>

@@ -14,9 +14,14 @@
  */
 
 import { http, HttpResponse, delay } from 'msw';
+import { faker } from '@faker-js/faker';
 import { generatedHandlers } from '@/api/generated/index.msw';
 import { koFaker } from './ko-faker';
-import { createGroupBuyDetailMock } from './mock-helpers';
+import {
+  createGroupBuyDetailMock,
+  createStoreSearchMock,
+  createGroupBuyRequestMock,
+} from './mock-helpers';
 import { formatDeadline } from '@/lib/date';
 
 // 최근 검색어 인메모리 저장소
@@ -101,6 +106,40 @@ const overrideHandlers = [
   http.get('*/api/v1/group-buys/:groupBuyId', async () => {
     await delay(800);
     return HttpResponse.json(createGroupBuyDetailMock());
+  }),
+  http.get('*/api/v1/stores/search', async () => {
+    await delay(800);
+    return HttpResponse.json(createStoreSearchMock());
+  }),
+  http.post('*/api/v1/group-buy-requests', async () => {
+    await delay(800);
+    return HttpResponse.json(createGroupBuyRequestMock(), { status: 201 });
+  }),
+
+  // 참여 페이지 — success 고정
+  http.post('*/api/v1/group-buys/:groupBuyId/participations', async () => {
+    await delay(500);
+    return HttpResponse.json(
+      {
+        success: true,
+        data: {
+          participationId: faker.number.int({ min: 1, max: 999 }),
+          orderName: `${koFaker.product.name()} 1개`,
+          totalAmount: 18000,
+          productAmount: 18000,
+          feeAmount: 0,
+        },
+        error: null,
+      },
+      { status: 201 },
+    );
+  }),
+  http.post('*/api/v1/payments/confirm', async () => {
+    await delay(300);
+    return HttpResponse.json({ success: true, data: {}, error: null });
+  }),
+  http.post('*/api/v1/payments/fail', async () => {
+    return HttpResponse.json({ success: true, data: {}, error: null });
   }),
   http.get('*/api/v1/search/recent', async () => {
     return HttpResponse.json({

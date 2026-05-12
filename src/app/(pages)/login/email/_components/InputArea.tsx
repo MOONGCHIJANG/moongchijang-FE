@@ -38,7 +38,7 @@ const InputArea = () => {
         >
           로그인
         </Button>
-        <div className="w-full flex items-center justify-center text-text-teritary body-md-regular">
+        <div className="w-full flex items-center justify-center text-text-tertiary body-md-regular">
           <button>아이디/비밀번호 찾기</button>
           <span className="mx-g5 text-border-subtle">|</span>
           <button>회원가입</button>

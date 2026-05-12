@@ -8,6 +8,8 @@ interface InputProps {
   isPassword?: boolean;
   helperText?: string;
   placeholder?: string;
+  value?: string;
+  onChange?: (value: string) => void;
 }
 
 const Input = ({
@@ -15,10 +17,23 @@ const Input = ({
   isPassword = false,
   helperText,
   placeholder,
+  value: externalValue,
+  onChange,
 }: InputProps) => {
-  const [value, setValue] = useState('');
+  const [internalValue, setInternalValue] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  const value = externalValue !== undefined ? externalValue : internalValue;
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    if (externalValue !== undefined) {
+      onChange?.(newValue);
+    } else {
+      setInternalValue(newValue);
+    }
+  };
 
   const showClear = (isFocused || value.length > 0) && value.length > 0;
   const inputType = isPassword ? (showPassword ? 'text' : 'password') : 'text';
@@ -30,7 +45,7 @@ const Input = ({
         <input
           type={inputType}
           value={value}
-          onChange={(e) => setValue(e.target.value)}
+          onChange={handleChange}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           placeholder={placeholder}
@@ -41,7 +56,13 @@ const Input = ({
             <button
               type="button"
               onMouseDown={(e) => e.preventDefault()}
-              onClick={() => setValue('')}
+              onClick={() => {
+                if (externalValue !== undefined) {
+                  onChange?.('');
+                } else {
+                  setInternalValue('');
+                }
+              }}
             >
               <Icon
                 icon="lucide:x"

@@ -6,7 +6,10 @@ import { Icon } from '@iconify/react';
 import { BottomSheet } from '@/components/BottomSheet';
 import { Button } from '@/components/Button';
 import { Chip } from '@/components/Chip';
-import { LocationBottomSheet } from './LocationBottomSheet';
+import Link from 'next/link';
+import { NeighborhoodPickerBottomSheet } from './NeighborhoodPickerBottomSheet';
+import { DatePickerBottomSheet } from '../../../request/_components/DatePickerBottomSheet';
+import { StoreSearchCard } from './StoreSearchCard';
 import { cn } from '@/lib/utils';
 import { type Region } from '@/constants/regions';
 import {
@@ -54,6 +57,7 @@ export const GroupBuyRequestSheet = ({
   );
   const [selectedRegion, setSelectedRegion] = useState<Region | null>(null);
   const [isLocationSheetOpen, setIsLocationSheetOpen] = useState(false);
+  const [neighborhoodSheetKey, setNeighborhoodSheetKey] = useState(0);
 
   const [selectedBakeryLabel, setSelectedBakeryLabel] = useState<string | null>(
     null,
@@ -65,7 +69,7 @@ export const GroupBuyRequestSheet = ({
     useState<ApiResponseStoreSearchListDataStoresItem | null>(null);
   const [desiredQuantity, setDesiredQuantity] = useState(1);
   const [desiredPickupDate, setDesiredPickupDate] = useState('');
-  const [minPickupDate, setMinPickupDate] = useState('');
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
 
   const hasDetectedBakery = !!detectedBakery;
   const hasDetectedNeighborhood = !!detectedNeighborhood;
@@ -109,9 +113,6 @@ export const GroupBuyRequestSheet = ({
   const handleFindStores = () => {
     if (!canFindStores) return;
     setSelectedStore(null);
-    setMinPickupDate(
-      new Date(Date.now() + 86400000).toISOString().split('T')[0],
-    );
     setStep('stores');
   };
 
@@ -160,7 +161,10 @@ export const GroupBuyRequestSheet = ({
         ))}
         <button
           type="button"
-          onClick={() => setIsLocationSheetOpen(true)}
+          onClick={() => {
+            setNeighborhoodSheetKey((k) => k + 1);
+            setIsLocationSheetOpen(true);
+          }}
           className={cn(
             'inline-flex h-[26px] items-center gap-1 px-3 py-1 rounded-2xl font-pretendard caption-sm-bold transition-colors',
             selectedRegion
@@ -216,7 +220,7 @@ export const GroupBuyRequestSheet = ({
           autoFocus
           value={bakeryInput}
           onChange={(e) => setBakeryInput(e.target.value)}
-          placeholder="베이커리 또는 상품명 입력"
+          placeholder="베이커리 또는 상품명을 정확히 작성해주세요"
           className="h-11 w-full rounded-xl border border-border-brand px-4 body-sm-regular text-text-basic font-pretendard outline-none"
         />
       )}
@@ -323,39 +327,50 @@ export const GroupBuyRequestSheet = ({
           {step === 'form' ? (
             renderFormContent()
           ) : (
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-2 max-h-52 overflow-y-auto">
-                {isSearchingStores ? (
-                  <p className="py-6 text-center body-sm-regular text-text-disabled font-pretendard">
-                    매장을 검색 중이에요
-                  </p>
-                ) : stores.length === 0 ? (
-                  <p className="py-6 text-center body-sm-regular text-text-disabled font-pretendard">
-                    검색된 매장이 없어요
-                  </p>
-                ) : (
-                  stores.map((store) => (
-                    <button
-                      key={store.placeId}
-                      type="button"
-                      onClick={() => setSelectedStore(store)}
-                      className={cn(
-                        'w-full rounded-xl border px-4 py-3 text-left flex flex-col gap-0.5 transition-colors',
-                        selectedStore?.placeId === store.placeId
-                          ? 'border-border-brand bg-surface-brand-lighter'
-                          : 'border-border-default bg-bg-white',
-                      )}
-                    >
-                      <span className="body-sm-bold text-text-basic font-pretendard">
-                        {store.storeName}
-                      </span>
-                      <span className="caption-xs-regular text-text-tertiary font-pretendard">
-                        {store.roadAddress}
-                      </span>
-                    </button>
-                  ))
-                )}
-              </div>
+            <div className="flex flex-col gap-5">
+              <p className="caption-sm-bold text-text-tertiary font-pretendard">
+                {'입력데이터와 자사 공구 이력을 분석해  '}
+                <span className="caption-sm-bold text-text-brand">{`[${effectiveNeighborhood} ${effectiveBakery}]`}</span>
+                {'과 가장 관련된 매장을 추천해드려요'}
+              </p>
+              {isSearchingStores ? (
+                <p className="py-10 text-center body-sm-regular text-text-disabled font-pretendard">
+                  매장을 검색 중이에요
+                </p>
+              ) : stores.length === 0 ? (
+                <p className="py-10 text-center body-sm-regular text-text-disabled font-pretendard">
+                  검색된 매장이 없어요
+                </p>
+              ) : (
+                <div className="flex flex-col gap-4">
+                  <span className="body-sm-bold text-text-basic font-pretendard flex items-center gap-1.5">
+                    <Image
+                      src="/icons/icon.svg"
+                      alt=""
+                      width={20}
+                      height={20}
+                    />
+                    추천 매장 {stores.length}곳
+                  </span>
+                  <div className="flex flex-col gap-2">
+                    {stores.map((store) => (
+                      <StoreSearchCard
+                        key={store.placeId}
+                        store={store}
+                        isSelected={selectedStore?.placeId === store.placeId}
+                        onClick={() => setSelectedStore(store)}
+                      />
+                    ))}
+                  </div>
+                  <Link
+                    href={`/request?bakery=${encodeURIComponent(effectiveBakery ?? '')}`}
+                    onClick={onClose}
+                    className="text-center caption-sm-regular text-text-tertiary font-pretendard underline underline-offset-2"
+                  >
+                    직접 매장 검색하기
+                  </Link>
+                </div>
+              )}
               <div className="flex flex-col gap-3">
                 <div className="flex flex-col gap-1.5">
                   <span className="body-sm-bold text-text-tertiary font-pretendard">
@@ -375,13 +390,18 @@ export const GroupBuyRequestSheet = ({
                   <span className="body-sm-bold text-text-tertiary font-pretendard">
                     희망 픽업일
                   </span>
-                  <input
-                    type="date"
-                    value={desiredPickupDate}
-                    min={minPickupDate}
-                    onChange={(e) => setDesiredPickupDate(e.target.value)}
-                    className="h-11 w-full rounded-xl border border-border-default px-4 body-sm-regular text-text-basic font-pretendard outline-none focus:border-border-brand"
-                  />
+                  <button
+                    type="button"
+                    onClick={() => setIsDatePickerOpen(true)}
+                    className={cn(
+                      'h-11 w-full rounded-xl border border-border-default px-4 flex items-center body-sm-regular font-pretendard',
+                      desiredPickupDate
+                        ? 'text-text-basic'
+                        : 'text-text-disabled',
+                    )}
+                  >
+                    {desiredPickupDate || '날짜를 선택해주세요'}
+                  </button>
                 </div>
               </div>
               <Button
@@ -390,21 +410,28 @@ export const GroupBuyRequestSheet = ({
                 disabled={!canSubmit || isPending}
                 onClick={handleSubmit}
               >
-                {isPending ? '요청 중...' : '이 매장 공구요청하기'}
+                {isPending ? '요청 중...' : '선택한 매장으로 공구 개설하기'}
               </Button>
             </div>
           )}
         </div>
       </BottomSheet>
 
-      <LocationBottomSheet
+      <DatePickerBottomSheet
+        isOpen={isDatePickerOpen}
+        onClose={() => setIsDatePickerOpen(false)}
+        selectedDate={desiredPickupDate}
+        onSelect={(date: string) => setDesiredPickupDate(date)}
+      />
+
+      <NeighborhoodPickerBottomSheet
+        key={neighborhoodSheetKey}
         isOpen={isLocationSheetOpen}
         onClose={() => setIsLocationSheetOpen(false)}
-        selectedRegions={selectedRegion ? [selectedRegion] : []}
-        onApply={(regions) => {
-          setSelectedRegion(regions[0] ?? null);
+        selectedRegion={selectedRegion}
+        onSelect={(region) => {
+          setSelectedRegion(region);
           setSelectedNeighborhoodLabel(null);
-          setIsLocationSheetOpen(false);
         }}
       />
     </>

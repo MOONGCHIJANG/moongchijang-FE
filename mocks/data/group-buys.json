@@ -15,10 +15,10 @@
         "achievementRate": 72,
         "currentQuantity": 36,
         "targetQuantity": 50,
-        "deadline": "2026-05-10T23:59:00Z",
-        "pickupDateLabel": "5월 12일",
-        "dDay": 6,
-        "dDayLabel": "D-6"
+        "deadline": "2026-05-15T23:59:00Z",
+        "pickupDateLabel": "5월 17일",
+        "dDay": 3,
+        "dDayLabel": "D-3"
       },
       {
         "id": 2,
@@ -33,10 +33,10 @@
         "achievementRate": 45,
         "currentQuantity": 18,
         "targetQuantity": 40,
-        "deadline": "2026-05-15T23:59:00Z",
-        "pickupDateLabel": "5월 17일",
-        "dDay": 11,
-        "dDayLabel": "D-11"
+        "deadline": "2026-05-19T23:59:00Z",
+        "pickupDateLabel": "5월 21일",
+        "dDay": 7,
+        "dDayLabel": "D-7"
       },
       {
         "id": 3,
@@ -51,10 +51,10 @@
         "achievementRate": 90,
         "currentQuantity": 27,
         "targetQuantity": 30,
-        "deadline": "2026-05-07T23:59:00Z",
-        "pickupDateLabel": "5월 9일",
-        "dDay": 3,
-        "dDayLabel": "D-3"
+        "deadline": "2026-05-14T23:59:00Z",
+        "pickupDateLabel": "5월 16일",
+        "dDay": 2,
+        "dDayLabel": "D-2"
       },
       {
         "id": 4,
@@ -69,10 +69,10 @@
         "achievementRate": 33,
         "currentQuantity": 20,
         "targetQuantity": 60,
-        "deadline": "2026-05-20T23:59:00Z",
-        "pickupDateLabel": "5월 22일",
-        "dDay": 16,
-        "dDayLabel": "D-16"
+        "deadline": "2026-05-26T23:59:00Z",
+        "pickupDateLabel": "5월 28일",
+        "dDay": 14,
+        "dDayLabel": "D-14"
       },
       {
         "id": 5,
@@ -87,10 +87,10 @@
         "achievementRate": 60,
         "currentQuantity": 30,
         "targetQuantity": 50,
-        "deadline": "2026-05-13T23:59:00Z",
-        "pickupDateLabel": "5월 15일",
-        "dDay": 9,
-        "dDayLabel": "D-9"
+        "deadline": "2026-05-22T23:59:00Z",
+        "pickupDateLabel": "5월 24일",
+        "dDay": 10,
+        "dDayLabel": "D-10"
       }
     ],
     "page": 1,

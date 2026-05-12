@@ -57,7 +57,6 @@ export const GroupBuyRequestSheet = ({
   );
   const [selectedRegion, setSelectedRegion] = useState<Region | null>(null);
   const [isLocationSheetOpen, setIsLocationSheetOpen] = useState(false);
-  const [neighborhoodSheetKey, setNeighborhoodSheetKey] = useState(0);
 
   const [selectedBakeryLabel, setSelectedBakeryLabel] = useState<string | null>(
     null,
@@ -70,6 +69,28 @@ export const GroupBuyRequestSheet = ({
   const [desiredQuantity, setDesiredQuantity] = useState(1);
   const [desiredPickupDate, setDesiredPickupDate] = useState('');
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+  if (prevIsOpen !== isOpen) {
+    setPrevIsOpen(isOpen);
+    if (isOpen) {
+      setStep('form');
+      setSelectedNeighborhoodLabel(
+        POPULAR_NEIGHBORHOODS.includes(detectedNeighborhood ?? '')
+          ? (detectedNeighborhood ?? null)
+          : null,
+      );
+      setSelectedRegion(null);
+      setIsLocationSheetOpen(false);
+      setSelectedBakeryLabel(null);
+      setBakeryInput('');
+      setShowBakeryInput(false);
+      setSelectedStore(null);
+      setDesiredQuantity(1);
+      setDesiredPickupDate('');
+      setIsDatePickerOpen(false);
+    }
+  }
 
   const hasDetectedBakery = !!detectedBakery;
   const hasDetectedNeighborhood = !!detectedNeighborhood;
@@ -162,7 +183,6 @@ export const GroupBuyRequestSheet = ({
         <button
           type="button"
           onClick={() => {
-            setNeighborhoodSheetKey((k) => k + 1);
             setIsLocationSheetOpen(true);
           }}
           className={cn(
@@ -425,7 +445,6 @@ export const GroupBuyRequestSheet = ({
       />
 
       <NeighborhoodPickerBottomSheet
-        key={neighborhoodSheetKey}
         isOpen={isLocationSheetOpen}
         onClose={() => setIsLocationSheetOpen(false)}
         selectedRegion={selectedRegion}

@@ -76,7 +76,6 @@ export function FeedClient() {
   const [searchAnalysis, setSearchAnalysis] =
     useState<ApiResponseSearchAnalysisData | null>(null);
   const [isRequestSheetOpen, setIsRequestSheetOpen] = useState(false);
-  const [requestSheetKey, setRequestSheetKey] = useState(0);
 
   const queryClient = useQueryClient();
   const { recentSearches, removeRecentSearch, clearRecentSearches } =
@@ -209,7 +208,6 @@ export function FeedClient() {
   };
 
   const handleOpenRequestSheet = useCallback(() => {
-    setRequestSheetKey((k) => k + 1);
     setIsRequestSheetOpen(true);
   }, []);
 
@@ -347,7 +345,6 @@ export function FeedClient() {
       />
 
       <GroupBuyRequestSheet
-        key={requestSheetKey}
         isOpen={isRequestSheetOpen}
         onClose={() => setIsRequestSheetOpen(false)}
         detectedBakery={searchAnalysis?.detectedBakery}

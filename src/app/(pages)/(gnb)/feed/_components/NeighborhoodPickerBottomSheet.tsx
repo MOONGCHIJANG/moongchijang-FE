@@ -29,6 +29,15 @@ export const NeighborhoodPickerBottomSheet = ({
   );
   const [searchQuery, setSearchQuery] = useState('');
 
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+  if (prevIsOpen !== isOpen) {
+    setPrevIsOpen(isOpen);
+    if (isOpen) {
+      setSelectedCityType(NEIGHBORHOOD_REGIONS_DATA[0].regionType);
+      setSearchQuery('');
+    }
+  }
+
   const isSearching = searchQuery.trim().length > 0;
 
   const filteredNeighborhoods = isSearching

@@ -78,8 +78,19 @@ const overrideHandlers = [
     const page = parseInt(url.searchParams.get('page') ?? '1', 10);
     const size = parseInt(url.searchParams.get('size') ?? '10', 10);
     const districts = url.searchParams.getAll('districts');
-    // 경기 지역 선택 시 hasSearchResult: false + 인기 공구(백엔드 정렬) content 반환
+
+    // ── 분기 확인용: 하나만 주석 해제해서 확인 ───────────────────────
+    // 검색 결과 있음 (현재 활성)
+    // const hasSearchResult = true;
+
+    // 검색 결과 없음 — 찾는 지역에 공구 없고 인기 공구 표시
+    // const hasSearchResult = false;
+
+    // 경기 지역 선택 시 자동 분기 (districts 기반)
     const hasSearchResult = !districts.some((d) => d.startsWith('GYEONGGI'));
+    // ─────────────────────────────────────────────────────────────────
+
+    void districts;
     const startId = (page - 1) * size + 1;
     const itemCount = Math.min(
       size,

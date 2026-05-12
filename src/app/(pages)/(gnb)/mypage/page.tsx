@@ -1,7 +1,11 @@
+import Header from '@/components/Header';
+import MyPageClient from './_components/MyPageClient';
+
 export default function MyPage() {
   return (
-    <div className="flex flex-1 items-center justify-center text-text-disabled">
-      마이페이지 준비 중
-    </div>
+    <>
+      <Header text="마이페이지" showBackButton={false} />
+      <MyPageClient />
+    </>
   );
 }

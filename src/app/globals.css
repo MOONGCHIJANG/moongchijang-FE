@@ -25,3 +25,13 @@
 .hide-arrows[type='number'] {
   -moz-appearance: textfield;
 }
+
+.no-scroll {
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+.no-scroll::-webkit-scrollbar {
+  display: none !important;
+}

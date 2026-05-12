@@ -3,6 +3,7 @@
 import { Button } from '@/components/Button';
 import Input from '@/components/Input';
 import { loginSchema } from '@/lib/validation';
+import Link from 'next/link';
 import React, { useState } from 'react';
 
 const InputArea = () => {
@@ -39,7 +40,9 @@ const InputArea = () => {
           로그인
         </Button>
         <div className="w-full flex items-center justify-center text-text-tertiary body-md-regular">
-          <button>아이디/비밀번호 찾기</button>
+          <Link href="/login/email/find" className="text-text-tertiary">
+            아이디/비밀번호 찾기
+          </Link>
           <span className="mx-g5 text-border-subtle">|</span>
           <button>회원가입</button>
         </div>

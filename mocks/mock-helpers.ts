@@ -74,7 +74,7 @@ export { koFaker } from './ko-faker';
 
 export function createStoreSearchMock() {
   const base = getGetApiV1StoresSearchResponseMock();
-  const count = faker.number.int({ min: 3, max: 5 });
+  const count = 3;
   return {
     ...base,
     success: true,
@@ -94,6 +94,7 @@ export function createStoreSearchMock() {
           max: 127.2,
           fractionDigits: 6,
         }),
+        thumbnailUrl: faker.helpers.arrayElement(MOCK_IMAGES),
       })),
     },
     error: null,

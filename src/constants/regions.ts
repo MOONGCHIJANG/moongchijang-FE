@@ -328,3 +328,19 @@ export const REGIONS_DATA: City[] = [
     ],
   },
 ];
+
+export const NEIGHBORHOOD_REGIONS_DATA: City[] = REGIONS_DATA.filter(
+  (city) => city.regionType !== 'NATIONWIDE',
+).map((city) => ({
+  ...city,
+  regions: city.regions
+    .filter(
+      (r) =>
+        !r.districtType.endsWith('_ALL') && !r.districtType.endsWith('_ETC'),
+    )
+    .flatMap((r) =>
+      r.name
+        .split(' | ')
+        .map((name) => ({ districtType: r.districtType, name: name.trim() })),
+    ),
+}));

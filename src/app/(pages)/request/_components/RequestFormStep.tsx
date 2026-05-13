@@ -22,6 +22,7 @@ interface RequestFormStepProps {
   onSubmit: (data: RequestFormData) => void;
   onBack: () => void;
   isLoading?: boolean;
+  initialProductName?: string;
 }
 
 const formatPickupDate = (dateStr: string) => {
@@ -35,9 +36,10 @@ export const RequestFormStep = ({
   onSubmit,
   onBack,
   isLoading = false,
+  initialProductName = '',
 }: RequestFormStepProps) => {
   const store = selectedStore ?? null;
-  const [productName, setProductName] = useState('');
+  const [productName, setProductName] = useState(initialProductName);
   const [quantity, setQuantity] = useState('');
   const [pickupDate, setPickupDate] = useState('');
   const [additionalNote, setAdditionalNote] = useState('');

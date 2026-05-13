@@ -6,11 +6,11 @@ import {
   postApiV1GroupBuysGroupBuyIdWishlist,
   deleteApiV1GroupBuysGroupBuyIdWishlist,
 } from '@/api/generated/wishlist/wishlist';
-import { ApiResponseGroupBuyDetailData } from '@/api/generated/api.schemas';
+import { ApiResponseGroupBuyDetailResponseData } from '@/api/generated/api.schemas';
 import { useRouter } from 'next/navigation';
 
 interface Props {
-  data: ApiResponseGroupBuyDetailData;
+  data: ApiResponseGroupBuyDetailResponseData;
 }
 
 const BottomJoin = ({ data }: Props) => {

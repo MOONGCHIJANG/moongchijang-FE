@@ -279,77 +279,280 @@ export interface PasswordChangeRequest {
   newPasswordConfirm: string;
 }
 
-export interface GroupBuyFeedItem {
-  id: number;
-  storeName: string;
-  region: string;
-  productName: string;
-  thumbnailUrl: string;
-  price: number;
-  /** 달성률 % */
-  achievementRate: number;
-  currentQuantity: number;
-  targetQuantity: number;
-  /** @nullable */
-  maxQuantity: number | null;
-  deadline: string;
-  pickupDate: string;
-  pickupTimeStart: string;
-  pickupTimeEnd: string;
-  dDay: number;
-  isWishlisted: boolean;
-  isClosed: boolean;
-  canParticipate: boolean;
-}
-
-export type ApiResponseGroupBuyFeedPageData = {
-  content: GroupBuyFeedItem[];
-  totalElements: number;
-  totalPages: number;
-  number: number;
-  size: number;
+export type ApiResponseMyRegionsData = {
+  /** 선택한 관심 지역 목록 (등록 순, 시/도 단위) */
+  regions: string[];
+  /**
+     * 칩에 표시할 첫 번째 지역명. 비어있으면 null
+     * @nullable
+     */
+  primaryRegion: string | null;
+  /** primaryRegion 외 추가 지역 수. 예: 서울 외 3곳 → additionalCount=3 */
+  additionalCount: number;
 };
 
-export interface ApiResponseGroupBuyFeedPage {
+export interface ApiResponseMyRegions {
   success: boolean;
-  data: ApiResponseGroupBuyFeedPageData;
+  data: ApiResponseMyRegionsData;
   error: unknown | null;
 }
 
-export type ApiResponseGroupBuyDetailData = {
+export interface UpdateRegionsRequest {
+  /**
+     * 저장할 시/도 지역 목록. 빈 배열이면 전체 해제
+     * @maxItems 10
+     */
+  regions: string[];
+}
+
+export type RegionType = typeof RegionType[keyof typeof RegionType];
+
+
+export const RegionType = {
+  NATIONWIDE: 'NATIONWIDE',
+  SEOUL: 'SEOUL',
+  GYEONGGI: 'GYEONGGI',
+  INCHEON: 'INCHEON',
+  GANGWON: 'GANGWON',
+  DAEJEON: 'DAEJEON',
+  SEJONG: 'SEJONG',
+  CHUNGNAM: 'CHUNGNAM',
+  CHUNGBUK: 'CHUNGBUK',
+  BUSAN: 'BUSAN',
+  ULSAN: 'ULSAN',
+  GYEONGNAM: 'GYEONGNAM',
+  GYEONGBUK: 'GYEONGBUK',
+  DAEGU: 'DAEGU',
+  GWANGJU: 'GWANGJU',
+  JEONNAM: 'JEONNAM',
+  JEONBUK: 'JEONBUK',
+  JEJU: 'JEJU',
+} as const;
+
+export type DistrictType = typeof DistrictType[keyof typeof DistrictType];
+
+
+export const DistrictType = {
+  NATIONWIDE: 'NATIONWIDE',
+  SEOUL_ALL: 'SEOUL_ALL',
+  SEOUL_GANGNAM_YEOKSAM_SAMSEONG: 'SEOUL_GANGNAM_YEOKSAM_SAMSEONG',
+  SEOUL_SINSA_APGUJEONG_CHEONGDAM: 'SEOUL_SINSA_APGUJEONG_CHEONGDAM',
+  SEOUL_SEOCHO_BANGBAE_GYODAE: 'SEOUL_SEOCHO_BANGBAE_GYODAE',
+  SEOUL_JAMSIL_SINCHEON_SONGPA: 'SEOUL_JAMSIL_SINCHEON_SONGPA',
+  SEOUL_JONGNO_JUNGGU_EULJIRO_MYEONGDONG: 'SEOUL_JONGNO_JUNGGU_EULJIRO_MYEONGDONG',
+  SEOUL_HONGDAE_HAPJEONG_SANGSU_MAPO: 'SEOUL_HONGDAE_HAPJEONG_SANGSU_MAPO',
+  SEOUL_SEONGSU_GEONDAE_GWANGJIN: 'SEOUL_SEONGSU_GEONDAE_GWANGJIN',
+  SEOUL_ITAEWON_HANNAM_YONGSAN: 'SEOUL_ITAEWON_HANNAM_YONGSAN',
+  SEOUL_YEONGDEUNGPO_YEOUIDO: 'SEOUL_YEONGDEUNGPO_YEOUIDO',
+  SEOUL_NOWON_DOBONG_GANGBUK: 'SEOUL_NOWON_DOBONG_GANGBUK',
+  SEOUL_ETC: 'SEOUL_ETC',
+  GYEONGGI_ALL: 'GYEONGGI_ALL',
+  GYEONGGI_SUWON_YEONGTONG_PALDAL: 'GYEONGGI_SUWON_YEONGTONG_PALDAL',
+  GYEONGGI_SEONGNAM_BUNDANG_PANGYO: 'GYEONGGI_SEONGNAM_BUNDANG_PANGYO',
+  GYEONGGI_GOYANG_ILSAN: 'GYEONGGI_GOYANG_ILSAN',
+  GYEONGGI_YONGIN_SUJI_GIHEUNG: 'GYEONGGI_YONGIN_SUJI_GIHEUNG',
+  GYEONGGI_BUCHEON_JUNGDONG_SANGDONG: 'GYEONGGI_BUCHEON_JUNGDONG_SANGDONG',
+  GYEONGGI_ANSAN_DANWON_SANGROK: 'GYEONGGI_ANSAN_DANWON_SANGROK',
+  GYEONGGI_NAMYANGJU_DASAN_BYEOLNAE: 'GYEONGGI_NAMYANGJU_DASAN_BYEOLNAE',
+  GYEONGGI_ANYANG_PYEONGCHON_BEOMGYE: 'GYEONGGI_ANYANG_PYEONGCHON_BEOMGYE',
+  GYEONGGI_HWASEONG_DONGTAN: 'GYEONGGI_HWASEONG_DONGTAN',
+  GYEONGGI_PAJU_UNJEONG: 'GYEONGGI_PAJU_UNJEONG',
+  GYEONGGI_ETC: 'GYEONGGI_ETC',
+  INCHEON_ALL: 'INCHEON_ALL',
+  INCHEON_SONGDO_YEONSU: 'INCHEON_SONGDO_YEONSU',
+  INCHEON_GUWOL_NAMDONG: 'INCHEON_GUWOL_NAMDONG',
+  INCHEON_BUPYEONG_GYEYANG: 'INCHEON_BUPYEONG_GYEYANG',
+  INCHEON_CHEONGNA_SEOGU: 'INCHEON_CHEONGNA_SEOGU',
+  INCHEON_JUAN_MICHUHOL: 'INCHEON_JUAN_MICHUHOL',
+  INCHEON_YEONGJONGDO_JUNGGU: 'INCHEON_YEONGJONGDO_JUNGGU',
+  GANGWON_ALL: 'GANGWON_ALL',
+  GANGWON_CHUNCHEON: 'GANGWON_CHUNCHEON',
+  GANGWON_WONJU: 'GANGWON_WONJU',
+  GANGWON_GANGNEUNG: 'GANGWON_GANGNEUNG',
+  GANGWON_SOKCHO_YANGYANG: 'GANGWON_SOKCHO_YANGYANG',
+  GANGWON_DONGHAE_SAMCHEOK: 'GANGWON_DONGHAE_SAMCHEOK',
+  GANGWON_ETC: 'GANGWON_ETC',
+  DAEJEON_ALL: 'DAEJEON_ALL',
+  DAEJEON_DUNSAN_SEOGU: 'DAEJEON_DUNSAN_SEOGU',
+  DAEJEON_EUNHAENG_DAEHEUNG_JUNGGU: 'DAEJEON_EUNHAENG_DAEHEUNG_JUNGGU',
+  DAEJEON_YUSEONG_DOAN: 'DAEJEON_YUSEONG_DOAN',
+  DAEJEON_DONGGU: 'DAEJEON_DONGGU',
+  DAEJEON_DAEDEOK: 'DAEJEON_DAEDEOK',
+  SEJONG_ALL: 'SEJONG_ALL',
+  CHUNGNAM_ALL: 'CHUNGNAM_ALL',
+  CHUNGNAM_CHEONAN_SINBU_DUJEONG: 'CHUNGNAM_CHEONAN_SINBU_DUJEONG',
+  CHUNGNAM_ASAN_TANGJEONG: 'CHUNGNAM_ASAN_TANGJEONG',
+  CHUNGNAM_DANGJIN: 'CHUNGNAM_DANGJIN',
+  CHUNGNAM_SEOSAN: 'CHUNGNAM_SEOSAN',
+  CHUNGNAM_GYERYONG_NONSAN: 'CHUNGNAM_GYERYONG_NONSAN',
+  CHUNGNAM_ETC: 'CHUNGNAM_ETC',
+  CHUNGBUK_ALL: 'CHUNGBUK_ALL',
+  CHUNGBUK_CHEONGJU_SANGDANG_HEUNGDEOK: 'CHUNGBUK_CHEONGJU_SANGDANG_HEUNGDEOK',
+  CHUNGBUK_CHUNGJU: 'CHUNGBUK_CHUNGJU',
+  CHUNGBUK_JECHEON: 'CHUNGBUK_JECHEON',
+  CHUNGBUK_EUMSEONG_JINCHEON: 'CHUNGBUK_EUMSEONG_JINCHEON',
+  CHUNGBUK_ETC: 'CHUNGBUK_ETC',
+  BUSAN_ALL: 'BUSAN_ALL',
+  BUSAN_SEOMYEON_JEONPO_JINGU: 'BUSAN_SEOMYEON_JEONPO_JINGU',
+  BUSAN_HAEUNDAE_CENTUM_MARINE_CITY: 'BUSAN_HAEUNDAE_CENTUM_MARINE_CITY',
+  BUSAN_GWANGALLI_SUYEONG_NAMCHEON: 'BUSAN_GWANGALLI_SUYEONG_NAMCHEON',
+  BUSAN_NAMPO_JUNGGU_YEONGDO: 'BUSAN_NAMPO_JUNGGU_YEONGDO',
+  BUSAN_DONGRAE_YEONSAN_BUSANDAE: 'BUSAN_DONGRAE_YEONSAN_BUSANDAE',
+  BUSAN_SAHA_HADAN: 'BUSAN_SAHA_HADAN',
+  BUSAN_ETC: 'BUSAN_ETC',
+  ULSAN_ALL: 'ULSAN_ALL',
+  ULSAN_SAMSAN_DALDONG_NAMGU: 'ULSAN_SAMSAN_DALDONG_NAMGU',
+  ULSAN_SEONGNAM_JUNGGU: 'ULSAN_SEONGNAM_JUNGGU',
+  ULSAN_DONGGU: 'ULSAN_DONGGU',
+  ULSAN_BUKGU: 'ULSAN_BUKGU',
+  ULSAN_ULJU: 'ULSAN_ULJU',
+  GYEONGNAM_ALL: 'GYEONGNAM_ALL',
+  GYEONGNAM_CHANGWON_SANGNAM_UICHANG: 'GYEONGNAM_CHANGWON_SANGNAM_UICHANG',
+  GYEONGNAM_GIMHAE: 'GYEONGNAM_GIMHAE',
+  GYEONGNAM_YANGSAN: 'GYEONGNAM_YANGSAN',
+  GYEONGNAM_JINJU: 'GYEONGNAM_JINJU',
+  GYEONGNAM_GEOJE_TONGYEONG: 'GYEONGNAM_GEOJE_TONGYEONG',
+  GYEONGNAM_ETC: 'GYEONGNAM_ETC',
+  GYEONGBUK_ALL: 'GYEONGBUK_ALL',
+  GYEONGBUK_POHANG: 'GYEONGBUK_POHANG',
+  GYEONGBUK_GYEONGJU_HWANGRIDAN_GIL: 'GYEONGBUK_GYEONGJU_HWANGRIDAN_GIL',
+  GYEONGBUK_GUMI: 'GYEONGBUK_GUMI',
+  GYEONGBUK_GYEONGSAN: 'GYEONGBUK_GYEONGSAN',
+  GYEONGBUK_ANDONG: 'GYEONGBUK_ANDONG',
+  GYEONGBUK_ETC: 'GYEONGBUK_ETC',
+  DAEGU_ALL: 'DAEGU_ALL',
+  DAEGU_DONGSEONGNO_JUNGGU: 'DAEGU_DONGSEONGNO_JUNGGU',
+  DAEGU_SUSEONGGU_BEOMEO: 'DAEGU_SUSEONGGU_BEOMEO',
+  DAEGU_SANGIN_DALSEO: 'DAEGU_SANGIN_DALSEO',
+  DAEGU_CHILGOK_BUKGU: 'DAEGU_CHILGOK_BUKGU',
+  DAEGU_DONGGU: 'DAEGU_DONGGU',
+  DAEGU_ETC: 'DAEGU_ETC',
+  GWANGJU_ALL: 'GWANGJU_ALL',
+  GWANGJU_SANGMU_JIGYEONG_SEOGU: 'GWANGJU_SANGMU_JIGYEONG_SEOGU',
+  GWANGJU_DONGMYEONGDONG_CHUNGJANGRO_DONGGU: 'GWANGJU_DONGMYEONGDONG_CHUNGJANGRO_DONGGU',
+  GWANGJU_SUWAN_CHEOMDAN_GWANGSANGU: 'GWANGJU_SUWAN_CHEOMDAN_GWANGSANGU',
+  GWANGJU_BONGSEON_NAMGU: 'GWANGJU_BONGSEON_NAMGU',
+  GWANGJU_BUKGU: 'GWANGJU_BUKGU',
+  JEONNAM_ALL: 'JEONNAM_ALL',
+  JEONNAM_YEOSU: 'JEONNAM_YEOSU',
+  JEONNAM_SUNCHEON: 'JEONNAM_SUNCHEON',
+  JEONNAM_MOKPO_NAMAK: 'JEONNAM_MOKPO_NAMAK',
+  JEONNAM_NAJU: 'JEONNAM_NAJU',
+  JEONNAM_ETC: 'JEONNAM_ETC',
+  JEONBUK_ALL: 'JEONBUK_ALL',
+  JEONBUK_JEONJU_GAEKRIDANGIL_WANSAN: 'JEONBUK_JEONJU_GAEKRIDANGIL_WANSAN',
+  JEONBUK_IKSAN: 'JEONBUK_IKSAN',
+  JEONBUK_GUNSAN: 'JEONBUK_GUNSAN',
+  JEONBUK_ETC: 'JEONBUK_ETC',
+  JEJU_ALL: 'JEJU_ALL',
+  JEJU_JEJU_SI: 'JEJU_JEJU_SI',
+  JEJU_AEWOL_HALLIM: 'JEJU_AEWOL_HALLIM',
+  JEJU_JOCHEON_GUJWA: 'JEJU_JOCHEON_GUJWA',
+  JEJU_SEOGWIPO_SI: 'JEJU_SEOGWIPO_SI',
+  JEJU_JUNGMUN_ANDEOK: 'JEJU_JUNGMUN_ANDEOK',
+  JEJU_SEONGSAN_PYOSEON: 'JEJU_SEONGSAN_PYOSEON',
+} as const;
+
+export interface GroupBuyFeedItemResponse {
+  id: number;
+  /**
+     * 대표 썸네일 이미지 URL
+     * @nullable
+     */
+  thumbnailUrl: string | null;
+  /** 마감 D-day (예: D-3 -> 3) */
+  dDay: number;
+  /** 마감 뱃지 문자열 (예: D-3) */
+  dDayLabel: string;
+  storeName: string;
+  regionType: RegionType;
+  /** 시/도 한글 라벨 */
+  regionLabel: string;
+  districtType: DistrictType;
+  /** 세부지역 한글 라벨 */
+  districtLabel: string;
+  productName: string;
+  price: number;
+  /** 달성률 % (0~100) */
+  achievementRate: number;
+  currentQuantity: number;
+  targetQuantity: number;
+  /** 픽업 날짜 표시 문자열 */
+  pickupDateLabel: string;
+  /** 마감 일시 원본 값 */
+  deadline: string;
+}
+
+export type ApiResponseGroupBuyFeedPageResponseData = {
+  content: GroupBuyFeedItemResponse[];
+  /** 현재 페이지(1-base) */
+  page: number;
+  /** 페이지 크기 */
+  size: number;
+  /** 전체 페이지 수 */
+  totalPages: number;
+  totalElements: number;
+  /** 다음 페이지 존재 여부 */
+  hasNext: boolean;
+};
+
+export interface ApiResponseGroupBuyFeedPageResponse {
+  success: boolean;
+  data: ApiResponseGroupBuyFeedPageResponseData;
+  error: unknown | null;
+}
+
+export type ApiResponseGroupBuyDetailResponseData = {
   id: number;
   storeName: string;
-  region: string;
+  regionType: RegionType;
+  /** 시/도 한글 라벨 */
+  regionLabel: string;
+  districtType: DistrictType;
+  /** 세부지역 한글 라벨 */
+  districtLabel: string;
   productName: string;
   productDescription: string;
-  /** 유의사항 */
-  notice: string;
+  /**
+     * 대표 썸네일 이미지 URL
+     * @nullable
+     */
+  thumbnailUrl?: string | null;
   imageUrls: string[];
   price: number;
+  /** 달성률 % (0~100) */
   achievementRate: number;
   currentQuantity: number;
   targetQuantity: number;
   /** @nullable */
-  maxQuantity: number | null;
+  maxQuantity?: number | null;
   deadline: string;
   pickupDate: string;
   pickupTimeStart: string;
   pickupTimeEnd: string;
+  /** 픽업 날짜 표시 문자열 */
+  pickupDateLabel: string;
+  /** 픽업일시 표시용 문자열 */
+  pickupDateTimeLabel: string;
+  /** 마감일시 표시용 문자열 */
+  deadlineDateTimeLabel: string;
   pickupLocation: string;
   /** @nullable */
-  pickupLatitude: number | null;
+  pickupLatitude?: number | null;
   /** @nullable */
-  pickupLongitude: number | null;
+  pickupLongitude?: number | null;
   dDay: number;
+  /** 마감 뱃지 문자열 (예: D-3) */
+  dDayLabel: string;
   isWishlisted: boolean;
   isClosed: boolean;
   isParticipated: boolean;
   canParticipate: boolean;
 };
 
-export interface ApiResponseGroupBuyDetail {
+export interface ApiResponseGroupBuyDetailResponse {
   success: boolean;
-  data: ApiResponseGroupBuyDetailData;
+  data: ApiResponseGroupBuyDetailResponseData;
   error: unknown | null;
 }
 
@@ -486,7 +689,7 @@ export interface ApiResponseGroupBuyRequestDetail {
 }
 
 export type ApiResponseWishlistPageData = {
-  content: GroupBuyFeedItem[];
+  content: GroupBuyFeedItemResponse[];
   totalElements: number;
   totalPages: number;
   number: number;
@@ -1347,7 +1550,7 @@ export type ApiResponseSearchAnalysisData = {
    */
   searchCase?: ApiResponseSearchAnalysisDataSearchCase;
   /** case 3 또는 검색 결과가 있을 때 반환되는 공구 목록 */
-  groupBuys?: GroupBuyFeedItem[];
+  groupBuys?: GroupBuyFeedItemResponse[];
 };
 
 export interface ApiResponseSearchAnalysis {
@@ -1455,7 +1658,15 @@ email: string;
 };
 
 export type GetApiV1GroupBuysParams = {
+/**
+ * 전체/마감임박/달성임박 단일 선택 칩
+ */
 filter?: GetApiV1GroupBuysFilter;
+/**
+ * 지역/세부지역 통합 필터 (복수 선택, 최대 10개, 예: SEOUL_ALL / SEOUL_GANGNAM_YEOKSAM_SAMSEONG)
+ * @maxItems 10
+ */
+districts?: DistrictType[];
 /**
  * 매장명 또는 상품명 검색어
  */
@@ -1474,8 +1685,6 @@ export const GetApiV1GroupBuysFilter = {
   ALL: 'ALL',
   CLOSING_SOON: 'CLOSING_SOON',
   ALMOST_ACHIEVED: 'ALMOST_ACHIEVED',
-  SEOUL: 'SEOUL',
-  GYEONGGI: 'GYEONGGI',
 } as const;
 
 export type GetApiV1GroupBuysProgressParams = {

@@ -29,6 +29,29 @@ export default defineConfig({
       },
     },
   },
+  'react-query-api': {
+    input: {
+      target: process.env.SWAGGER_URL || 'http://localhost:8080/openapi.yaml',
+    },
+    output: {
+      mode: 'tags-split',
+      target: './src/api/hooks',
+      client: 'react-query',
+      clean: true,
+      override: {
+        header: () => generatedFileHeader,
+        mutator: {
+          path: './src/lib/custom-fetch.ts',
+          name: 'customFetch',
+        },
+        query: {
+          useQuery: true,
+          useMutation: true,
+          signal: true,
+        },
+      },
+    },
+  },
   'zod-api': {
     input: {
       target: process.env.SWAGGER_URL || 'http://localhost:8080/openapi.yaml',

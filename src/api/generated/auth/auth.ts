@@ -10,6 +10,7 @@ import type {
   ApiResponseEmailAvailability,
   ApiResponseEmailVerificationCodeSent,
   ApiResponseEmailVerificationVerified,
+  ApiResponseMyRegions,
   ApiResponseNicknameAvailability,
   ApiResponsePhoneVerificationCodeSent,
   ApiResponsePhoneVerificationVerified,
@@ -33,7 +34,8 @@ import type {
   ProfileUpdateRequest,
   SuccessNoDataResponse,
   TooManyRequestsResponse,
-  UnauthorizedResponse
+  UnauthorizedResponse,
+  UpdateRegionsRequest
 } from '../api.schemas';
 
 import { customFetch } from '../../../lib/custom-fetch';
@@ -479,6 +481,99 @@ export const postApiV1AuthEmailVerificationCodesVerify = async (emailVerificatio
 
 
 /**
+ * 6자리 숫자 인증코드를 전화번호로 발송한다.
+ * @summary 전화번호 인증코드 발송
+ */
+export type postApiV1AuthPhoneVerificationCodesResponse200 = {
+  data: ApiResponsePhoneVerificationCodeSent
+  status: 200
+}
+
+export type postApiV1AuthPhoneVerificationCodesResponse400 = {
+  data: BadRequestResponse
+  status: 400
+}
+
+export type postApiV1AuthPhoneVerificationCodesResponse429 = {
+  data: TooManyRequestsResponse
+  status: 429
+}
+
+export type postApiV1AuthPhoneVerificationCodesResponseSuccess = (postApiV1AuthPhoneVerificationCodesResponse200) & {
+  headers: Headers;
+};
+export type postApiV1AuthPhoneVerificationCodesResponseError = (postApiV1AuthPhoneVerificationCodesResponse400 | postApiV1AuthPhoneVerificationCodesResponse429) & {
+  headers: Headers;
+};
+
+export type postApiV1AuthPhoneVerificationCodesResponse = (postApiV1AuthPhoneVerificationCodesResponseSuccess | postApiV1AuthPhoneVerificationCodesResponseError)
+
+export const getPostApiV1AuthPhoneVerificationCodesUrl = () => {
+
+
+
+
+  return `/api/v1/auth/phone/verification-codes`
+}
+
+export const postApiV1AuthPhoneVerificationCodes = async (phoneVerificationCodeSendRequest: PhoneVerificationCodeSendRequest, options?: RequestInit): Promise<postApiV1AuthPhoneVerificationCodesResponse> => {
+
+  return customFetch<postApiV1AuthPhoneVerificationCodesResponse>(getPostApiV1AuthPhoneVerificationCodesUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      phoneVerificationCodeSendRequest,)
+  }
+);}
+
+
+/**
+ * 인증코드가 일치하면 전화번호 인증 완료 상태로 처리한다.
+ * @summary 전화번호 인증코드 확인
+ */
+export type postApiV1AuthPhoneVerificationCodesVerifyResponse200 = {
+  data: ApiResponsePhoneVerificationVerified
+  status: 200
+}
+
+export type postApiV1AuthPhoneVerificationCodesVerifyResponse400 = {
+  data: BadRequestResponse
+  status: 400
+}
+
+export type postApiV1AuthPhoneVerificationCodesVerifyResponseSuccess = (postApiV1AuthPhoneVerificationCodesVerifyResponse200) & {
+  headers: Headers;
+};
+export type postApiV1AuthPhoneVerificationCodesVerifyResponseError = (postApiV1AuthPhoneVerificationCodesVerifyResponse400) & {
+  headers: Headers;
+};
+
+export type postApiV1AuthPhoneVerificationCodesVerifyResponse = (postApiV1AuthPhoneVerificationCodesVerifyResponseSuccess | postApiV1AuthPhoneVerificationCodesVerifyResponseError)
+
+export const getPostApiV1AuthPhoneVerificationCodesVerifyUrl = () => {
+
+
+
+
+  return `/api/v1/auth/phone/verification-codes/verify`
+}
+
+export const postApiV1AuthPhoneVerificationCodesVerify = async (phoneVerificationCodeVerifyRequest: PhoneVerificationCodeVerifyRequest, options?: RequestInit): Promise<postApiV1AuthPhoneVerificationCodesVerifyResponse> => {
+
+  return customFetch<postApiV1AuthPhoneVerificationCodesVerifyResponse>(getPostApiV1AuthPhoneVerificationCodesVerifyUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      phoneVerificationCodeVerifyRequest,)
+  }
+);}
+
+
+/**
  * 이메일 인증 완료 후 비밀번호를 설정해 계정을 생성하고 로그인 처리한다.
  * @summary 이메일 회원가입
  */
@@ -817,6 +912,97 @@ export const postApiV1AuthPasswordChange = async (passwordChangeRequest: Passwor
     headers: { 'Content-Type': 'application/json', ...options?.headers },
     body: JSON.stringify(
       passwordChangeRequest,)
+  }
+);}
+
+
+/**
+ * @summary 내 관심 지역 조회
+ */
+export type getApiV1UsersMeRegionsResponse200 = {
+  data: ApiResponseMyRegions
+  status: 200
+}
+
+export type getApiV1UsersMeRegionsResponse401 = {
+  data: UnauthorizedResponse
+  status: 401
+}
+
+export type getApiV1UsersMeRegionsResponseSuccess = (getApiV1UsersMeRegionsResponse200) & {
+  headers: Headers;
+};
+export type getApiV1UsersMeRegionsResponseError = (getApiV1UsersMeRegionsResponse401) & {
+  headers: Headers;
+};
+
+export type getApiV1UsersMeRegionsResponse = (getApiV1UsersMeRegionsResponseSuccess | getApiV1UsersMeRegionsResponseError)
+
+export const getGetApiV1UsersMeRegionsUrl = () => {
+
+
+
+
+  return `/api/v1/users/me/regions`
+}
+
+export const getApiV1UsersMeRegions = async ( options?: RequestInit): Promise<getApiV1UsersMeRegionsResponse> => {
+
+  return customFetch<getApiV1UsersMeRegionsResponse>(getGetApiV1UsersMeRegionsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+/**
+ * 기존 관심 지역을 모두 삭제하고 요청 목록으로 새로 저장한다. 빈 배열이면 전체 해제.
+ * @summary 관심 지역 저장/수정 (전체 교체)
+ */
+export type putApiV1UsersMeRegionsResponse200 = {
+  data: SuccessNoDataResponse
+  status: 200
+}
+
+export type putApiV1UsersMeRegionsResponse400 = {
+  data: BadRequestResponse
+  status: 400
+}
+
+export type putApiV1UsersMeRegionsResponse401 = {
+  data: UnauthorizedResponse
+  status: 401
+}
+
+export type putApiV1UsersMeRegionsResponseSuccess = (putApiV1UsersMeRegionsResponse200) & {
+  headers: Headers;
+};
+export type putApiV1UsersMeRegionsResponseError = (putApiV1UsersMeRegionsResponse400 | putApiV1UsersMeRegionsResponse401) & {
+  headers: Headers;
+};
+
+export type putApiV1UsersMeRegionsResponse = (putApiV1UsersMeRegionsResponseSuccess | putApiV1UsersMeRegionsResponseError)
+
+export const getPutApiV1UsersMeRegionsUrl = () => {
+
+
+
+
+  return `/api/v1/users/me/regions`
+}
+
+export const putApiV1UsersMeRegions = async (updateRegionsRequest: UpdateRegionsRequest, options?: RequestInit): Promise<putApiV1UsersMeRegionsResponse> => {
+
+  return customFetch<putApiV1UsersMeRegionsResponse>(getPutApiV1UsersMeRegionsUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateRegionsRequest,)
   }
 );}
 

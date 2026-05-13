@@ -22,6 +22,18 @@ import {
   createStoreSearchMock,
   createGroupBuyRequestMock,
 } from './mock-helpers';
+import { formatDeadline } from '@/lib/date';
+
+// 최근 검색어 인메모리 저장소
+let recentKeywords: { keyword: string; searchedAt: string }[] = [];
+
+function addToRecent(keyword: string) {
+  const now = new Date().toISOString().slice(0, 19) + 'Z';
+  recentKeywords = [
+    { keyword, searchedAt: now },
+    ...recentKeywords.filter((k) => k.keyword !== keyword),
+  ].slice(0, 10);
+}
 
 const MOCK_IMAGES = [
   '/images/img1.jpg',
@@ -35,35 +47,69 @@ function createFeedItem(id: number) {
   const targetQuantity = koFaker.groupBuy.quantity();
   const achievementRate = koFaker.groupBuy.achievementRate();
   const currentQuantity = Math.floor(targetQuantity * (achievementRate / 100));
+  const dDay = koFaker.groupBuy.dDay();
+  const district = koFaker.location.district();
+  const pickupDateRaw = koFaker.groupBuy.pickupDate();
+  const pickupDateLabel = formatDeadline(pickupDateRaw);
+
   return {
     id,
     storeName: koFaker.store.name(),
-    region: koFaker.location.region(),
+    ...district,
     productName: koFaker.product.name(),
     thumbnailUrl: MOCK_IMAGES[(id - 1) % MOCK_IMAGES.length],
     price: koFaker.product.price(),
     achievementRate,
     currentQuantity,
     targetQuantity,
-    maxQuantity: Math.random() > 0.5 ? targetQuantity * 2 : null,
     deadline: koFaker.groupBuy.deadline(),
-    pickupDate: koFaker.groupBuy.pickupDate(),
-    pickupTimeStart: koFaker.groupBuy.pickupTime(),
-    pickupTimeEnd: koFaker.groupBuy.pickupTime(),
-    dDay: koFaker.groupBuy.dDay(),
-    isWishlisted: faker.datatype.boolean(),
-    isClosed: false,
-    canParticipate: true,
+    pickupDateLabel,
+    dDay,
+    dDayLabel: dDay === 0 ? 'D-day' : `D-${dDay}`,
   };
 }
 
+const TOTAL_ITEMS = 2;
+
 const overrideHandlers = [
-  http.get('*/api/v1/group-buys', async () => {
+  http.get('*/api/v1/group-buys', async ({ request }) => {
     await delay(800);
+    const url = new URL(request.url);
+    const page = parseInt(url.searchParams.get('page') ?? '1', 10);
+    const size = parseInt(url.searchParams.get('size') ?? '10', 10);
+    const districts = url.searchParams.getAll('districts');
+
+    // ── 분기 확인용: 하나만 주석 해제해서 확인 ───────────────────────
+    // 검색 결과 있음 (현재 활성)
+    // const hasSearchResult = true;
+
+    // 검색 결과 없음 — 찾는 지역에 공구 없고 인기 공구 표시
+    // const hasSearchResult = false;
+
+    // 경기 지역 선택 시 자동 분기 (districts 기반)
+    const hasSearchResult = !districts.some((d) => d.startsWith('GYEONGGI'));
+    // ─────────────────────────────────────────────────────────────────
+
+    void districts;
+    const startId = (page - 1) * size + 1;
+    const itemCount = Math.min(
+      size,
+      Math.max(0, TOTAL_ITEMS - (page - 1) * size),
+    );
+    const content = Array.from({ length: itemCount }, (_, i) =>
+      createFeedItem(startId + i),
+    );
+    const totalPages = Math.ceil(TOTAL_ITEMS / size);
     return HttpResponse.json({
       success: true,
       data: {
-        content: Array.from({ length: 10 }, (_, i) => createFeedItem(i + 1)),
+        content,
+        page,
+        size,
+        totalPages,
+        totalElements: TOTAL_ITEMS,
+        hasNext: page < totalPages,
+        hasSearchResult,
       },
       error: null,
     });
@@ -104,6 +150,53 @@ const overrideHandlers = [
     return HttpResponse.json({ success: true, data: {}, error: null });
   }),
   http.post('*/api/v1/payments/fail', async () => {
+    return HttpResponse.json({ success: true, data: {}, error: null });
+  }),
+  http.get('*/api/v1/search/recent', async () => {
+    return HttpResponse.json({
+      success: true,
+      data: { keywords: recentKeywords },
+      error: null,
+    });
+  }),
+  http.post('*/api/v1/search', async ({ request }) => {
+    const body = (await request.json()) as { keyword?: string };
+    if (body.keyword) addToRecent(body.keyword);
+    return HttpResponse.json({
+      success: true,
+      data: {
+        // ── 분기 확인용: 하나만 주석 해제해서 확인 ───────────────────────
+
+        // case 1: 베이커리 인식, 동네 미인식
+        // searchCase: 1,
+        // detectedBakery: '두쫀쿠',
+        // detectedNeighborhood: null,
+
+        // case 2: 동네 인식, 베이커리 미인식
+        // searchCase: 2,
+        // detectedBakery: null,
+        // detectedNeighborhood: '성수',
+
+        // case 3: 동네 + 베이커리 모두 인식
+        // searchCase: 3, detectedBakery: '두쫀쿠', detectedNeighborhood: '성수',
+
+        // case 4: 모두 인식 불가 (현재 활성)
+        searchCase: 4,
+        detectedBakery: null,
+        detectedNeighborhood: null,
+
+        // ─────────────────────────────────────────────────────────────────
+      },
+      error: null,
+    });
+  }),
+  http.delete('*/api/v1/search/recent', async () => {
+    recentKeywords = [];
+    return HttpResponse.json({ success: true, data: {}, error: null });
+  }),
+  http.delete('*/api/v1/search/recent/:keyword', async ({ params }) => {
+    const keyword = decodeURIComponent(params.keyword as string);
+    recentKeywords = recentKeywords.filter((k) => k.keyword !== keyword);
     return HttpResponse.json({ success: true, data: {}, error: null });
   }),
 ];

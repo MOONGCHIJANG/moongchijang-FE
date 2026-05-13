@@ -1,11 +1,12 @@
+'use client';
+import { tokenStorage } from '@/lib/token';
 import { Icon } from '@iconify/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 
 const MyPageClient = () => {
-  // TODO: 추후 실제 로그인 상태로 적용
-  const isLoggedIn = false;
+  const isLoggedIn = !!tokenStorage.get();
 
   return (
     <>

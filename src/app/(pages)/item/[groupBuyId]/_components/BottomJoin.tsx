@@ -8,6 +8,8 @@ import {
 } from '@/api/generated/wishlist/wishlist';
 import { ApiResponseGroupBuyDetailResponseData } from '@/api/generated/api.schemas';
 import { useRouter } from 'next/navigation';
+import { tokenStorage } from '@/lib/token';
+import { redirectStorage } from '@/lib/redirect';
 
 interface Props {
   data: ApiResponseGroupBuyDetailResponseData;
@@ -57,8 +59,15 @@ const BottomJoin = ({ data }: Props) => {
   const router = useRouter();
 
   const handleJoin = () => {
-    // TODO: 로그인한 사용자만 참여 가능하도록 수정 필요
     if (isExpired) return;
+
+    const token = tokenStorage.get();
+    if (!token) {
+      redirectStorage.set(`/item/${data.id}/join`);
+      router.push('/login');
+      return;
+    }
+
     router.push(`/item/${data.id}/join`);
   };
 

@@ -9,6 +9,7 @@ import React, { useState } from 'react';
 import { usePostApiV1AuthEmailLogin } from '@/api/hooks/auth/auth';
 import Link from 'next/link';
 import Toast from '@/app/(pages)/item/[groupBuyId]/_components/Toast';
+import { redirectStorage } from '@/lib/redirect';
 
 const InputArea = () => {
   const [email, setEmail] = useState('');
@@ -35,7 +36,8 @@ const InputArea = () => {
           if (response.status === 200) {
             const { accessToken, expiresIn } = response.data.data;
             tokenStorage.set(accessToken, expiresIn);
-            router.push('/feed');
+            const redirect = redirectStorage.consume();
+            router.push(redirect ?? '/feed');
           } else {
             setErrorMessage('이메일 또는 비밀번호를 확인해주세요.1');
           }

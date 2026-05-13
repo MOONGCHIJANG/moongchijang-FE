@@ -252,10 +252,15 @@ export const GroupBuyRequestSheet = ({
     if (hasDetectedBakery) {
       return (
         <div className="flex flex-col gap-5">
-          <div className="flex items-start gap-2 rounded-xl bg-amber-50 px-3 py-4">
-            <span className="text-xl leading-none mt-0.5">🤖</span>
-            <p className="body-sm-regular text-amber-700 font-pretendard whitespace-pre-line">
-              {`[${detectedBakery}]는 파악했어요.\n동네만 알려주시면 바로 찾아드릴게요.`}
+          <div className="flex items-center gap-2 rounded-xl bg-amber-50 px-3 py-4">
+            <span className="text-xl leading-8 shrink-0">🤖</span>
+            <p className="body-sm-regular text-amber-700 font-pretendard">
+              <span className="body-sm-bold text-amber-700 font-pretendard">
+                [{detectedBakery}]
+              </span>
+              는 파악했어요.
+              <br />
+              동네만 알려주시면 바로 찾아드릴게요.
             </p>
           </div>
           {renderNeighborhoodSection()}
@@ -275,16 +280,16 @@ export const GroupBuyRequestSheet = ({
     if (hasDetectedNeighborhood) {
       return (
         <div className="flex flex-col gap-5">
-          <div className="flex items-start gap-2 rounded-xl bg-amber-50 px-3 py-4">
-            <Image
-              src="/icons/icon.svg"
-              alt=""
-              width={20}
-              height={20}
-              className="mt-0.5 shrink-0"
-            />
-            <p className="body-sm-regular text-amber-700 font-pretendard whitespace-pre-line">
-              {`요즘 ${detectedNeighborhood}에서 가장 인기 있는\n베이커리예요. 탭해서 바로 찾아드릴게요.`}
+          <div className="flex items-center gap-2 rounded-xl bg-amber-50 px-3 py-4">
+            <div className="text-xl leading-8 shrink-0">🔥</div>
+            <p className="body-sm-regular text-amber-700 font-pretendard">
+              요즘{' '}
+              <span className="body-sm-bold text-amber-700 font-pretendard">
+                {detectedNeighborhood}
+              </span>
+              에서 가장 인기 있는
+              <br />
+              베이커리예요. 탭해서 바로 찾아드릴게요.
             </p>
           </div>
           {renderBakerySection('무슨 상품 찾으시나요?')}
@@ -303,12 +308,12 @@ export const GroupBuyRequestSheet = ({
     // NUMBER_4 (둘 다 미인식)
     return (
       <div className="flex flex-col gap-5">
-        <div className="flex items-start gap-2 rounded-xl bg-amber-50 px-3 py-4">
-          <span className="text-xl leading-none mt-0.5">😵</span>
-          <p className="body-sm-regular text-amber-700 font-pretendard whitespace-pre-line">
-            {
-              '검색어를 잘 못 알아들었어요!\n아래에서 골라주시면 바로 찾아드릴게요.'
-            }
+        <div className="flex items-center gap-2 rounded-xl bg-amber-50 px-3 py-4">
+          <span className="text-xl leading-8 shrink-0">😵</span>
+          <p className="body-sm-regular text-amber-700 font-pretendard">
+            검색어를 잘 못 알아들었어요!
+            <br />
+            아래에서 골라주시면 바로 찾아드릴게요.
           </p>
         </div>
         {renderNeighborhoodSection()}

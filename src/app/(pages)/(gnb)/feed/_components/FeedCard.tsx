@@ -61,10 +61,10 @@ export const FeedCard = ({
           </div>
         </div>
 
-        <div className="flex items-center justify-between gap-2">
-          <div className="line-clamp-1 flex-1 heading-md-bold text-text-basic">
+        <div className="flex items-center gap-1.5">
+          <span className="truncate heading-md-bold text-text-basic min-w-0">
             {productName}
-          </div>
+          </span>
           <span className="shrink-0 caption-sm-medium text-text-disabled">
             • 픽업 {pickupDateLabel}
           </span>

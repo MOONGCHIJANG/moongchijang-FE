@@ -30,6 +30,52 @@ const POPULAR_BAKERIES = [
   '앙버터',
 ];
 
+const InfoBanner = ({
+  icon,
+  children,
+}: {
+  icon: string;
+  children: React.ReactNode;
+}) => (
+  <div className="flex items-center gap-2 rounded-xl bg-amber-50 px-3 py-4">
+    <span className="text-xl leading-8 shrink-0">{icon}</span>
+    <p className="body-sm-regular text-amber-700 font-pretendard">{children}</p>
+  </div>
+);
+
+const SectionLabel = ({ label }: { label: string }) => (
+  <div className="flex items-center gap-1.5">
+    <Image src="/icons/icon.svg" alt="" width={20} height={20} />
+    <span className="body-sm-bold text-text-tertiary font-pretendard">
+      {label}
+    </span>
+  </div>
+);
+
+const DirectInputChip = ({
+  active,
+  label,
+  onClick,
+}: {
+  active: boolean;
+  label: string;
+  onClick: () => void;
+}) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className={cn(
+      'inline-flex h-[26px] items-center gap-1 px-3 py-1 rounded-2xl font-pretendard caption-sm-bold transition-colors',
+      active
+        ? 'bg-surface-brand text-text-basic-inverse'
+        : 'bg-surface-elevated outline outline-1 outline-offset-[-1px] outline-border-subtle text-text-tertiary',
+    )}
+  >
+    {!active && <span className="text-xs leading-4">+</span>}
+    <span className="text-12 leading-4">{label}</span>
+  </button>
+);
+
 interface GroupBuyRequestSheetProps {
   isOpen: boolean;
   onClose: () => void;
@@ -165,12 +211,7 @@ export const GroupBuyRequestSheet = ({
 
   const renderNeighborhoodSection = () => (
     <div className="flex flex-col gap-3">
-      <div className="flex items-center gap-1.5">
-        <Image src="/icons/icon.svg" alt="" width={20} height={20} />
-        <span className="body-sm-bold text-text-tertiary font-pretendard">
-          어느 동네인가요?
-        </span>
-      </div>
+      <SectionLabel label="어느 동네인가요?" />
       <div className="flex flex-wrap gap-2">
         {POPULAR_NEIGHBORHOODS.map((label) => (
           <Chip
@@ -180,35 +221,18 @@ export const GroupBuyRequestSheet = ({
             onClick={() => handleNeighborhoodChipClick(label)}
           />
         ))}
-        <button
-          type="button"
-          onClick={() => {
-            setIsLocationSheetOpen(true);
-          }}
-          className={cn(
-            'inline-flex h-[26px] items-center gap-1 px-3 py-1 rounded-2xl font-pretendard caption-sm-bold transition-colors',
-            selectedRegion
-              ? 'bg-surface-brand text-text-basic-inverse'
-              : 'bg-surface-elevated outline outline-1 outline-offset-[-1px] outline-border-subtle text-text-tertiary',
-          )}
-        >
-          {!selectedRegion && <span className="text-xs leading-4">+</span>}
-          <span className="text-12 leading-4">
-            {selectedRegion ? selectedRegion.name : '직접 입력'}
-          </span>
-        </button>
+        <DirectInputChip
+          active={!!selectedRegion}
+          label={selectedRegion ? selectedRegion.name : '직접 입력'}
+          onClick={() => setIsLocationSheetOpen(true)}
+        />
       </div>
     </div>
   );
 
   const renderBakerySection = (sectionLabel: string) => (
     <div className="flex flex-col gap-3">
-      <div className="flex items-center gap-1.5">
-        <Image src="/icons/icon.svg" alt="" width={20} height={20} />
-        <span className="body-sm-bold text-text-tertiary font-pretendard">
-          {sectionLabel}
-        </span>
-      </div>
+      <SectionLabel label={sectionLabel} />
       <div className="flex flex-wrap gap-2">
         {POPULAR_BAKERIES.map((label) => (
           <Chip
@@ -218,22 +242,14 @@ export const GroupBuyRequestSheet = ({
             onClick={() => handleBakeryChipClick(label)}
           />
         ))}
-        <button
-          type="button"
+        <DirectInputChip
+          active={showBakeryInput}
+          label="직접 입력"
           onClick={() => {
             setSelectedBakeryLabel(null);
             setShowBakeryInput(true);
           }}
-          className={cn(
-            'inline-flex h-[26px] items-center gap-1 px-3 py-1 rounded-2xl font-pretendard caption-sm-bold transition-colors',
-            showBakeryInput
-              ? 'bg-surface-brand text-text-basic-inverse'
-              : 'bg-surface-elevated outline outline-1 outline-offset-[-1px] outline-border-subtle text-text-tertiary',
-          )}
-        >
-          {!showBakeryInput && <span className="text-xs leading-4">+</span>}
-          <span className="text-12 leading-4">직접 입력</span>
-        </button>
+        />
       </div>
       {showBakeryInput && (
         <input
@@ -252,17 +268,14 @@ export const GroupBuyRequestSheet = ({
     if (hasDetectedBakery) {
       return (
         <div className="flex flex-col gap-5">
-          <div className="flex items-center gap-2 rounded-xl bg-amber-50 px-3 py-4">
-            <span className="text-xl leading-8 shrink-0">🤖</span>
-            <p className="body-sm-regular text-amber-700 font-pretendard">
-              <span className="body-sm-bold text-amber-700 font-pretendard">
-                [{detectedBakery}]
-              </span>
-              는 파악했어요.
-              <br />
-              동네만 알려주시면 바로 찾아드릴게요.
-            </p>
-          </div>
+          <InfoBanner icon="🤖">
+            <span className="body-sm-bold text-amber-700 font-pretendard">
+              [{detectedBakery}]
+            </span>
+            는 파악했어요.
+            <br />
+            동네만 알려주시면 바로 찾아드릴게요.
+          </InfoBanner>
           {renderNeighborhoodSection()}
           <Button
             size="md"
@@ -280,18 +293,15 @@ export const GroupBuyRequestSheet = ({
     if (hasDetectedNeighborhood) {
       return (
         <div className="flex flex-col gap-5">
-          <div className="flex items-center gap-2 rounded-xl bg-amber-50 px-3 py-4">
-            <div className="text-xl leading-8 shrink-0">🔥</div>
-            <p className="body-sm-regular text-amber-700 font-pretendard">
-              요즘{' '}
-              <span className="body-sm-bold text-amber-700 font-pretendard">
-                {detectedNeighborhood}
-              </span>
-              에서 가장 인기 있는
-              <br />
-              베이커리예요. 탭해서 바로 찾아드릴게요.
-            </p>
-          </div>
+          <InfoBanner icon="🔥">
+            요즘
+            <span className="body-sm-bold text-amber-700 font-pretendard">
+              {detectedNeighborhood}
+            </span>
+            에서 가장 인기 있는
+            <br />
+            베이커리예요. 탭해서 바로 찾아드릴게요.
+          </InfoBanner>
           {renderBakerySection('무슨 상품 찾으시나요?')}
           <Button
             size="md"
@@ -308,14 +318,11 @@ export const GroupBuyRequestSheet = ({
     // NUMBER_4 (둘 다 미인식)
     return (
       <div className="flex flex-col gap-5">
-        <div className="flex items-center gap-2 rounded-xl bg-amber-50 px-3 py-4">
-          <span className="text-xl leading-8 shrink-0">😵</span>
-          <p className="body-sm-regular text-amber-700 font-pretendard">
-            검색어를 잘 못 알아들었어요!
-            <br />
-            아래에서 골라주시면 바로 찾아드릴게요.
-          </p>
-        </div>
+        <InfoBanner icon="🥺">
+          검색어를 잘 못 알아들었어요!
+          <br />
+          아래에서 골라주시면 바로 찾아드릴게요.
+        </InfoBanner>
         {renderNeighborhoodSection()}
         <div className="border-t border-border-subtle" />
         {renderBakerySection('어떤 베이커리 찾으시나요?')}

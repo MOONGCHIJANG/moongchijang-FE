@@ -4,7 +4,7 @@
  */
 
 import { getGetApiV1AdminSummaryResponseMock, getGetApiV1AdminGroupBuyRequestsResponseMock, getGetApiV1AdminGroupBuyRequestsRequestIdResponseMock, getGetApiV1AdminGroupBuysResponseMock, getGetApiV1AdminGroupBuysGroupBuyIdResponseMock, getGetApiV1AdminRefundsResponseMock, getGetApiV1AdminSettlementsResponseMock } from './admin/admin.msw';
-import { getGetApiV1UsersMeResponseMock, getGetApiV1UsersNicknameAvailabilityResponseMock, getGetApiV1AuthEmailAvailabilityResponseMock } from './auth/auth.msw';
+import { getGetApiV1UsersMeResponseMock, getGetApiV1UsersNicknameAvailabilityResponseMock, getGetApiV1AuthEmailAvailabilityResponseMock, getGetApiV1UsersMeRegionsResponseMock } from './auth/auth.msw';
 import { getGetApiV1GroupBuysResponseMock, getGetApiV1GroupBuysGroupBuyIdResponseMock, getGetApiV1GroupBuysGroupBuyIdProgressResponseMock, getGetApiV1GroupBuysProgressResponseMock, getGetApiV1GroupBuysGroupBuyIdShareResponseMock, getGetApiV1SearchRecentResponseMock } from './group-buy/group-buy.msw';
 import { getGetApiV1StoresSearchResponseMock, getGetApiV1GroupBuyRequestsResponseMock, getGetApiV1GroupBuyRequestsRequestIdResponseMock } from './group-buy-request/group-buy-request.msw';
 import { getGetApiV1UsersMeParticipationsResponseMock, getGetApiV1UsersMeGroupBuyRequestsResponseMock, getGetApiV1UsersMeTabsCountsResponseMock } from './my-page/my-page.msw';
@@ -30,6 +30,7 @@ export const generatedStaticMockEntries: StaticMockEntry[] = [
   { urlPattern: '/api/v1/users/me', getResponseData: getGetApiV1UsersMeResponseMock },
   { urlPattern: '/api/v1/users/nickname/availability', getResponseData: getGetApiV1UsersNicknameAvailabilityResponseMock },
   { urlPattern: '/api/v1/auth/email/availability', getResponseData: getGetApiV1AuthEmailAvailabilityResponseMock },
+  { urlPattern: '/api/v1/users/me/regions', getResponseData: getGetApiV1UsersMeRegionsResponseMock },
   { urlPattern: '/api/v1/group-buys', getResponseData: getGetApiV1GroupBuysResponseMock },
   { urlPattern: '/api/v1/group-buys/:groupBuyId', getResponseData: getGetApiV1GroupBuysGroupBuyIdResponseMock },
   { urlPattern: '/api/v1/group-buys/:groupBuyId/progress', getResponseData: getGetApiV1GroupBuysGroupBuyIdProgressResponseMock },

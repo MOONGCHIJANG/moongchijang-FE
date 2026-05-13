@@ -21,6 +21,7 @@ import type {
   ApiResponseEmailAvailability,
   ApiResponseEmailVerificationCodeSent,
   ApiResponseEmailVerificationVerified,
+  ApiResponseMyRegions,
   ApiResponseNicknameAvailability,
   ApiResponsePhoneVerificationCodeSent,
   ApiResponsePhoneVerificationVerified,
@@ -50,6 +51,10 @@ export const getPostApiV1AuthEmailVerificationCodesResponseMock = (overrideRespo
 
 export const getPostApiV1AuthEmailVerificationCodesVerifyResponseMock = (overrideResponse: Partial<Extract<ApiResponseEmailVerificationVerified, object>> = {}): ApiResponseEmailVerificationVerified => ({success: faker.datatype.boolean(), data: {verified: faker.datatype.boolean(), signupToken: faker.string.alpha({length: {min: 10, max: 20}})}, error: {}, ...overrideResponse})
 
+export const getPostApiV1AuthPhoneVerificationCodesResponseMock = (overrideResponse: Partial<Extract<ApiResponsePhoneVerificationCodeSent, object>> = {}): ApiResponsePhoneVerificationCodeSent => ({success: faker.datatype.boolean(), data: {expiresInSeconds: faker.number.int(), resendAvailableInSeconds: faker.number.int()}, error: {}, ...overrideResponse})
+
+export const getPostApiV1AuthPhoneVerificationCodesVerifyResponseMock = (overrideResponse: Partial<Extract<ApiResponsePhoneVerificationVerified, object>> = {}): ApiResponsePhoneVerificationVerified => ({success: faker.datatype.boolean(), data: {verified: faker.datatype.boolean()}, error: {}, ...overrideResponse})
+
 export const getPostApiV1AuthEmailSignupResponseMock = (overrideResponse: Partial<Extract<ApiResponseAuthLogin, object>> = {}): ApiResponseAuthLogin => ({success: faker.datatype.boolean(), data: {accessToken: faker.string.alpha({length: {min: 10, max: 20}}), tokenType: faker.string.alpha({length: {min: 10, max: 20}}), expiresIn: faker.number.int(), isNewUser: faker.datatype.boolean(), user: {id: faker.number.int(), provider: faker.helpers.arrayElement(['KAKAO','EMAIL'] as const), providerId: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined]), email: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.internet.email(), null]), undefined]), nickname: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined]), phoneNumber: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined]), role: faker.helpers.arrayElement(['BUYER','SELLER','ADMIN'] as const), signupCompleted: faker.datatype.boolean(), deletedAt: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), undefined]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}}, error: {}, ...overrideResponse})
 
 export const getPostApiV1AuthEmailLoginResponseMock = (overrideResponse: Partial<Extract<ApiResponseAuthLogin, object>> = {}): ApiResponseAuthLogin => ({success: faker.datatype.boolean(), data: {accessToken: faker.string.alpha({length: {min: 10, max: 20}}), tokenType: faker.string.alpha({length: {min: 10, max: 20}}), expiresIn: faker.number.int(), isNewUser: faker.datatype.boolean(), user: {id: faker.number.int(), provider: faker.helpers.arrayElement(['KAKAO','EMAIL'] as const), providerId: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined]), email: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.internet.email(), null]), undefined]), nickname: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined]), phoneNumber: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined]), role: faker.helpers.arrayElement(['BUYER','SELLER','ADMIN'] as const), signupCompleted: faker.datatype.boolean(), deletedAt: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), undefined]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'}}, error: {}, ...overrideResponse})
@@ -63,6 +68,10 @@ export const getPostApiV1UsersMePhoneVerificationCodesResponseMock = (overrideRe
 export const getPostApiV1UsersMePhoneVerificationCodesVerifyResponseMock = (overrideResponse: Partial<Extract<ApiResponsePhoneVerificationVerified, object>> = {}): ApiResponsePhoneVerificationVerified => ({success: faker.datatype.boolean(), data: {verified: faker.datatype.boolean()}, error: {}, ...overrideResponse})
 
 export const getPostApiV1AuthPasswordChangeResponseMock = (overrideResponse: Partial<Extract<SuccessNoDataResponse, object>> = {}): SuccessNoDataResponse => ({success: faker.datatype.boolean(), data: {}, error: {}, ...overrideResponse})
+
+export const getGetApiV1UsersMeRegionsResponseMock = (overrideResponse: Partial<Extract<ApiResponseMyRegions, object>> = {}): ApiResponseMyRegions => ({success: faker.datatype.boolean(), data: {regions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), primaryRegion: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), null]), additionalCount: faker.number.int()}, error: {}, ...overrideResponse})
+
+export const getPutApiV1UsersMeRegionsResponseMock = (overrideResponse: Partial<Extract<SuccessNoDataResponse, object>> = {}): SuccessNoDataResponse => ({success: faker.datatype.boolean(), data: {}, error: {}, ...overrideResponse})
 
 
 export const getPostApiV1AuthKakaoMockHandler = (overrideResponse?: ApiResponseAuthLogin | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<ApiResponseAuthLogin> | ApiResponseAuthLogin), options?: RequestHandlerOptions) => {
@@ -185,6 +194,30 @@ export const getPostApiV1AuthEmailVerificationCodesVerifyMockHandler = (override
   }, options)
 }
 
+export const getPostApiV1AuthPhoneVerificationCodesMockHandler = (overrideResponse?: ApiResponsePhoneVerificationCodeSent | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<ApiResponsePhoneVerificationCodeSent> | ApiResponsePhoneVerificationCodeSent), options?: RequestHandlerOptions) => {
+  return http.post('*/api/v1/auth/phone/verification-codes', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getPostApiV1AuthPhoneVerificationCodesResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getPostApiV1AuthPhoneVerificationCodesVerifyMockHandler = (overrideResponse?: ApiResponsePhoneVerificationVerified | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<ApiResponsePhoneVerificationVerified> | ApiResponsePhoneVerificationVerified), options?: RequestHandlerOptions) => {
+  return http.post('*/api/v1/auth/phone/verification-codes/verify', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getPostApiV1AuthPhoneVerificationCodesVerifyResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
 export const getPostApiV1AuthEmailSignupMockHandler = (overrideResponse?: ApiResponseAuthLogin | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<ApiResponseAuthLogin> | ApiResponseAuthLogin), options?: RequestHandlerOptions) => {
   return http.post('*/api/v1/auth/email/signup', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
@@ -268,6 +301,30 @@ export const getPostApiV1AuthPasswordChangeMockHandler = (overrideResponse?: Suc
       })
   }, options)
 }
+
+export const getGetApiV1UsersMeRegionsMockHandler = (overrideResponse?: ApiResponseMyRegions | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ApiResponseMyRegions> | ApiResponseMyRegions), options?: RequestHandlerOptions) => {
+  return http.get('*/api/v1/users/me/regions', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getGetApiV1UsersMeRegionsResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getPutApiV1UsersMeRegionsMockHandler = (overrideResponse?: SuccessNoDataResponse | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<SuccessNoDataResponse> | SuccessNoDataResponse), options?: RequestHandlerOptions) => {
+  return http.put('*/api/v1/users/me/regions', async (info: Parameters<Parameters<typeof http.put>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getPutApiV1UsersMeRegionsResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
 export const getAuthMock = () => [
   getPostApiV1AuthKakaoMockHandler(),
   getPostApiV1AuthRefreshMockHandler(),
@@ -279,11 +336,15 @@ export const getAuthMock = () => [
   getGetApiV1AuthEmailAvailabilityMockHandler(),
   getPostApiV1AuthEmailVerificationCodesMockHandler(),
   getPostApiV1AuthEmailVerificationCodesVerifyMockHandler(),
+  getPostApiV1AuthPhoneVerificationCodesMockHandler(),
+  getPostApiV1AuthPhoneVerificationCodesVerifyMockHandler(),
   getPostApiV1AuthEmailSignupMockHandler(),
   getPostApiV1AuthEmailLoginMockHandler(),
   getPostApiV1AuthPasswordResetLinkMockHandler(),
   getPatchApiV1UsersMeProfileMockHandler(),
   getPostApiV1UsersMePhoneVerificationCodesMockHandler(),
   getPostApiV1UsersMePhoneVerificationCodesVerifyMockHandler(),
-  getPostApiV1AuthPasswordChangeMockHandler()
+  getPostApiV1AuthPasswordChangeMockHandler(),
+  getGetApiV1UsersMeRegionsMockHandler(),
+  getPutApiV1UsersMeRegionsMockHandler()
 ]

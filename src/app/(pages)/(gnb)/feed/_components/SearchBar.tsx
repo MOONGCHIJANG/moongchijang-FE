@@ -1,64 +1,61 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
 import { Icon } from '@iconify/react';
 import { cn } from '@/lib/utils';
 
 interface SearchBarProps {
   placeholder?: string;
-  onSearch?: (value: string) => void;
-  debounceDelay?: number;
+  value?: string;
+  onChange?: (value: string) => void;
+  onClear?: () => void;
+  onEnter?: (value: string) => void;
   className?: string;
 }
 
 export const SearchBar = ({
   placeholder = '매장명 또는 상품명 검색',
-  onSearch,
-  debounceDelay = 300,
+  value = '',
+  onChange,
+  onClear,
+  onEnter,
   className,
 }: SearchBarProps) => {
-  const [inputValue, setInputValue] = useState('');
-  const onSearchRef = useRef(onSearch);
-
-  useEffect(() => {
-    onSearchRef.current = onSearch;
-  }, [onSearch]);
-
-  const isMounted = useRef(false);
-
-  useEffect(() => {
-    if (!isMounted.current) {
-      isMounted.current = true;
-      return;
-    }
-    const timer = setTimeout(() => {
-      onSearchRef.current?.(inputValue);
-    }, debounceDelay);
-    return () => clearTimeout(timer);
-  }, [inputValue, debounceDelay]);
-
   return (
     <div
       className={cn(
-        'flex h-11 w-full items-center gap-2 rounded-full border border-border-brand bg-bg-white px-4 shadow-sm',
+        'flex h-10 w-full items-center gap-2 rounded-full border border-border-brand bg-bg-white px-4 shadow-sm',
         className,
       )}
     >
-      <Icon icon="solar:magnifer-linear" className="h-5 w-5 text-icon-primary" />
+      <Icon
+        icon="solar:magnifer-linear"
+        className="h-5 w-5 text-icon-primary"
+      />
       <input
         type="text"
-        value={inputValue}
+        value={value}
         placeholder={placeholder}
-        className="w-full bg-transparent body-sm-regular text-text-basic outline-none placeholder:text-text-disabled"
-        onChange={(e) => setInputValue(e.target.value)}
+        className="w-full bg-transparent body-sm-regular text-text-basic outline-none placeholder:text-text-disabled font-pretendard"
+        onChange={(e) => onChange?.(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') onEnter?.(value);
+        }}
+        readOnly={!onChange}
       />
-      {inputValue && (
+      {value && (onChange || onClear) && (
         <button
-          onClick={() => setInputValue('')}
-          className="flex h-5 w-5 items-center justify-center text-icon-disabled hover:text-icon-subtle"
+          onClick={(e) => {
+            e.stopPropagation();
+            onChange?.('');
+            onClear?.();
+          }}
+          className="flex-shrink-0"
           type="button"
         >
-          <Icon icon="solar:close-circle-bold" className="h-4 w-4" />
+          <Icon
+            icon="solar:close-circle-bold"
+            className="h-5 w-5 text-icon-tertiary"
+          />
         </button>
       )}
     </div>

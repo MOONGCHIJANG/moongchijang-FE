@@ -7,7 +7,7 @@ import AgreeTerms from './AgreeTerms';
 import PaymentButton from './PaymentButton';
 import PayMethodSelector, { type PayMethod } from './PayMethodSelector';
 import { ParticipationCreateAgreedTermsItem } from '@/api/generated/api.schemas';
-import type { ApiResponseGroupBuyDetailData } from '@/api/generated/api.schemas';
+import type { ApiResponseGroupBuyDetailResponseData } from '@/api/generated/api.schemas';
 import {
   postApiV1GroupBuysGroupBuyIdParticipations,
   postApiV1PaymentsConfirm,
@@ -22,7 +22,7 @@ const ALL_AGREED_TERMS = Object.values(ParticipationCreateAgreedTermsItem);
 
 type Props = {
   groupBuyId: string;
-  groupBuy: ApiResponseGroupBuyDetailData;
+  groupBuy: ApiResponseGroupBuyDetailResponseData;
 };
 
 // 수수료 변경 시 해당 값 수정 → 30% 라면 30
@@ -189,7 +189,7 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
       <JoinForm
         quantity={quantity}
         onQuantityChange={setQuantity}
-        maxQuantity={groupBuy.maxQuantity}
+        maxQuantity={groupBuy.maxQuantity ?? null}
         productName={groupBuy.productName}
         productAmount={productAmount}
         feeAmount={feeAmount}

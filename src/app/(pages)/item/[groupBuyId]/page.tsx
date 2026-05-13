@@ -3,7 +3,7 @@ import TopInfo from './_components/TopInfo';
 import ItemDetail from './_components/ItemDetail';
 import BottomJoin from './_components/BottomJoin';
 import { serverFetch } from '@/lib/fetcher';
-import type { ApiResponseGroupBuyDetail } from '@/api/generated/api.schemas';
+import type { ApiResponseGroupBuyDetailResponse } from '@/api/generated/api.schemas';
 import { notFound } from 'next/navigation';
 import ViewerToast from './_components/ViewerToast';
 import Footer from '@/components/Footer';
@@ -14,7 +14,7 @@ interface Props {
 
 const page = async ({ params }: Props) => {
   const { groupBuyId } = await params;
-  const responseData = await serverFetch<ApiResponseGroupBuyDetail>(
+  const responseData = await serverFetch<ApiResponseGroupBuyDetailResponse>(
     `/api/v1/group-buys/${groupBuyId}`,
   ).catch(() => notFound());
 

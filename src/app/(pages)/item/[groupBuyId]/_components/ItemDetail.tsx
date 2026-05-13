@@ -2,11 +2,11 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import DetailTab from './DetailTab';
 import GuideLine from './GuideLine';
-import { ApiResponseGroupBuyDetailData } from '@/api/generated/api.schemas';
+import { ApiResponseGroupBuyDetailResponseData } from '@/api/generated/api.schemas';
 import { formatPickupDate, formatPickupTime } from '@/lib/date';
 
 interface Props {
-  data: ApiResponseGroupBuyDetailData;
+  data: ApiResponseGroupBuyDetailResponseData;
 }
 
 const ItemDetail = ({ data }: Props) => {

@@ -24,10 +24,10 @@ export const Chip = ({
       disabled={disabled}
       onClick={onClick}
       className={cn(
-        'inline-flex h-6 items-center justify-center gap-0.5 px-3 py-1 rounded-2xl transition-colors shrink-0 font-pretendard select-none disabled:cursor-not-allowed disabled:opacity-50',
+        'inline-flex h-[26px] items-center justify-center gap-0.5 px-3 py-1 rounded-2xl transition-colors shrink-0 font-pretendard select-none disabled:cursor-not-allowed disabled:opacity-50 caption-sm-bold',
         active
           ? 'bg-surface-brand text-text-basic-inverse'
-          : 'bg-surface-elevated outline outline-1 outline-offset-[-1px] outline-border-subtle text-text-basic',
+          : 'bg-bg-white outline outline-1 outline-offset-[-1px] outline-border-subtle text-text-basic',
         className,
       )}
     >

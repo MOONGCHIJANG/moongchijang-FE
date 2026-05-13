@@ -11,7 +11,7 @@ const page = () => {
           alt="뭉치장 로고"
           width={183}
           height={76}
-          className="w-45.8 h-19"
+          className="w-55.5 h-23"
         />
         <p className="heading-lg-bold">
           줄서지 말고

@@ -39,11 +39,11 @@ const InputArea = () => {
             const redirect = redirectStorage.consume();
             router.push(redirect ?? '/feed');
           } else {
-            setErrorMessage('이메일 또는 비밀번호를 확인해주세요.1');
+            setErrorMessage('이메일 또는 비밀번호를 확인해주세요.');
           }
         },
         onError: () => {
-          setErrorMessage('이메일 또는 비밀번호를 확인해주세요.2');
+          setErrorMessage('이메일 또는 비밀번호를 확인해주세요.');
         },
       },
     );

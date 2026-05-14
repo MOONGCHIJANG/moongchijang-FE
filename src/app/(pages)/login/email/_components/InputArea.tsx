@@ -3,10 +3,8 @@
 import { Button } from '@/components/Button';
 import Input from '@/components/Input';
 import { loginSchema } from '@/lib/validation';
-import { tokenStorage } from '@/lib/token';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
-import { usePostApiV1AuthEmailLogin } from '@/api/hooks/auth/auth';
 import Link from 'next/link';
 import Toast from '@/app/(pages)/item/[groupBuyId]/_components/Toast';
 import { redirectStorage } from '@/lib/redirect';
@@ -15,11 +13,10 @@ const InputArea = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isPending, setIsPending] = useState(false);
   const router = useRouter();
 
-  const { mutate: login, isPending } = usePostApiV1AuthEmailLogin();
-
-  const handleLogin = () => {
+  const handleLogin = async () => {
     setErrorMessage(null);
 
     // 정합성 검사 유지
@@ -29,24 +26,25 @@ const InputArea = () => {
       return;
     }
 
-    login(
-      { data: { email, password } },
-      {
-        onSuccess: (response) => {
-          if (response.status === 200) {
-            const { accessToken, expiresIn } = response.data.data;
-            tokenStorage.set(accessToken, expiresIn);
-            const redirect = redirectStorage.consume();
-            router.push(redirect ?? '/feed');
-          } else {
-            setErrorMessage('이메일 또는 비밀번호를 확인해주세요.');
-          }
-        },
-        onError: () => {
-          setErrorMessage('이메일 또는 비밀번호를 확인해주세요.');
-        },
-      },
-    );
+    setIsPending(true);
+    try {
+      const res = await fetch('/api/v1/auth/email/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (res.ok) {
+        const redirect = redirectStorage.consume();
+        router.push(redirect ?? '/feed');
+      } else {
+        setErrorMessage('이메일 또는 비밀번호를 확인해주세요.');
+      }
+    } catch {
+      setErrorMessage('네트워크 오류가 발생했습니다.');
+    } finally {
+      setIsPending(false);
+    }
   };
 
   return (

@@ -88,7 +88,14 @@ const InputArea = () => {
             아이디/비밀번호 찾기
           </Link>
           <span className="mx-g5 text-border-subtle">|</span>
-          <button>회원가입</button>
+          <button
+            type="button"
+            onClick={() => {
+              /* 회원가입 페이지 이동 로직 */
+            }}
+          >
+            회원가입
+          </button>
         </div>
       </div>
       {errorMessage && (

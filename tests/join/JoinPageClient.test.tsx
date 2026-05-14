@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import JoinPageClient from './JoinPageClient';
+import JoinPageClient from '@/app/(pages)/item/[groupBuyId]/join/_components/JoinPageClient';
 import type { ApiResponseGroupBuyDetailResponseData } from '@/api/generated/api.schemas';
 import * as PortOne from '@portone/browser-sdk/v2';
 import { http, HttpResponse } from 'msw';

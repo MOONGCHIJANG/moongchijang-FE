@@ -34,7 +34,6 @@ export const customFetch = async <T>(
     };
 
     let response = await fetchWithToken(token);
-    console.log('[customFetch] status:', response.status, 'url:', url);
 
     if (
       response.status === 401 &&
@@ -90,7 +89,6 @@ export const customFetch = async <T>(
     if (e instanceof DOMException && e.name === 'AbortError') {
       throw e;
     }
-    console.error('[customFetch] error:', e);
     throw e;
   }
 };

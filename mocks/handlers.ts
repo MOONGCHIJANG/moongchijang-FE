@@ -199,6 +199,45 @@ const overrideHandlers = [
     recentKeywords = recentKeywords.filter((k) => k.keyword !== keyword);
     return HttpResponse.json({ success: true, data: {}, error: null });
   }),
+  http.post('*/api/v1/auth/email/login', async ({ request }) => {
+    await delay(500);
+    const body = (await request.json()) as { email: string; password: string };
+
+    if (body.email !== 'test@test.com' || body.password !== 'Test1234!') {
+      return HttpResponse.json(
+        {
+          success: false,
+          data: null,
+          error: { message: '이메일 또는 비밀번호가 올바르지 않습니다.' },
+        },
+        { status: 401 },
+      );
+    }
+    return HttpResponse.json(
+      {
+        success: true,
+        data: {
+          accessToken: 'mock-access-token',
+          tokenType: 'Bearer',
+          expiresIn: 3600,
+          isNewUser: false,
+          user: {
+            id: 1,
+            provider: 'EMAIL',
+            email: 'test@test.com',
+            nickname: '테스트유저',
+            role: 'BUYER',
+            signupCompleted: true,
+            deletedAt: null,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+        },
+        error: null,
+      },
+      { status: 200 },
+    );
+  }),
 ];
 
 export const handlers = [...overrideHandlers, ...generatedHandlers];

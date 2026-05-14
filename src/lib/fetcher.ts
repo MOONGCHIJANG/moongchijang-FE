@@ -58,6 +58,7 @@ function matchesUrlPattern(urlPattern: string, requestPath: string): boolean {
 async function resolveStaticResponse(
   path: string,
   method: string,
+  init?: RequestInit,
 ): Promise<{ status: number; data: unknown } | null> {
   if (MODE !== 'static') return null;
 
@@ -93,7 +94,52 @@ async function resolveStaticResponse(
   }
 
   // mutation 은 매핑이 없어도 성공한 척 빈 객체
+  // fetcher.ts - resolveStaticResponse 안 mutation 분기
   if (method !== 'GET') {
+    if (pathWithoutQuery === '/api/v1/auth/email/login') {
+      const body = JSON.parse((init?.body as string) ?? '{}') as {
+        email?: string;
+        password?: string;
+      };
+
+      // 특정 값만 로그인 허용
+      if (body.email === 'test@test.com' && body.password === 'Test1234!') {
+        return {
+          status: 200,
+          data: {
+            success: true,
+            data: {
+              accessToken: 'demo-token',
+              tokenType: 'Bearer',
+              expiresIn: 3600,
+              isNewUser: false,
+              user: {
+                id: 1,
+                provider: 'EMAIL',
+                email: 'test@test.com',
+                nickname: '데모유저',
+                role: 'BUYER',
+                signupCompleted: true,
+                deletedAt: null,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+              },
+            },
+            error: null,
+          },
+        };
+      }
+
+      return {
+        status: 401,
+        data: {
+          success: false,
+          data: null,
+          error: { message: '이메일 또는 비밀번호가 올바르지 않습니다.' },
+        },
+      };
+    }
+
     return { status: 200, data: {} };
   }
 
@@ -126,7 +172,7 @@ export async function serverFetch<T = unknown>(
 ): Promise<T> {
   const method = (init?.method ?? 'GET').toUpperCase();
 
-  const staticResult = await resolveStaticResponse(path, method);
+  const staticResult = await resolveStaticResponse(path, method, init);
   if (staticResult) {
     if (staticResult.status === 503) throw new PendingApiError(path);
     if (staticResult.status >= 400) {
@@ -169,7 +215,7 @@ export async function serverFetchRaw(
 ): Promise<{ status: number; data: unknown }> {
   const method = (init?.method ?? 'GET').toUpperCase();
 
-  const staticResult = await resolveStaticResponse(path, method);
+  const staticResult = await resolveStaticResponse(path, method, init);
   if (staticResult) return staticResult;
 
   if (!BASE) {

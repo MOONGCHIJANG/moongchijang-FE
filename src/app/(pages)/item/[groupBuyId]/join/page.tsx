@@ -1,9 +1,9 @@
 import React from 'react';
-import BackHeader from './_components/BackHeader';
 import JoinPageClient from './_components/JoinPageClient';
 import { serverFetch } from '@/lib/fetcher';
 import type { ApiResponseGroupBuyDetailResponse } from '@/api/generated/api.schemas';
 import { notFound } from 'next/navigation';
+import Header from '@/components/Header';
 
 interface Props {
   params: Promise<{ groupBuyId: string }>;
@@ -19,7 +19,7 @@ const page = async ({ params }: Props) => {
 
   return (
     <>
-      <BackHeader text="참여하기" />
+      <Header text="참여하기" />
       <JoinPageClient groupBuyId={groupBuyId} groupBuy={data} />
     </>
   );

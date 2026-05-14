@@ -1,13 +1,14 @@
 'use client';
 import { Button } from '@/components/Button';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import React from 'react';
 
 const LoginButton = () => {
+  const router = useRouter();
   const handleKakaoLogin = () => {};
   const handleEmailLogin = () => {
-    // /login/email로 이동
-    window.location.href = '/login/email';
+    router.push('/login/email');
   };
 
   return (

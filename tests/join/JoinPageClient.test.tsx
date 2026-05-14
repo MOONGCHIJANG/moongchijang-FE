@@ -3,6 +3,7 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import JoinPageClient from '@/app/(pages)/item/[groupBuyId]/join/_components/JoinPageClient';
 import type { ApiResponseGroupBuyDetailResponseData } from '@/api/generated/api.schemas';
 import * as PortOne from '@portone/browser-sdk/v2';
+import type { PaymentResponse } from '@portone/browser-sdk/v2';
 import { http, HttpResponse } from 'msw';
 import { server } from 'tests/setup';
 
@@ -59,9 +60,7 @@ describe('JoinPageClient 결제 로직 테스트', () => {
     );
 
     // B. SDK 모킹 응답 설정
-    vi.mocked(PortOne.requestPayment).mockResolvedValue({
-      // 성공 시 보통 undefined나 에러 코드가 없는 객체 반환 (스펙에 따라 다름)
-    });
+    vi.mocked(PortOne.requestPayment).mockResolvedValue(undefined);
 
     render(
       <JoinPageClient
@@ -128,10 +127,9 @@ describe('JoinPageClient 결제 로직 테스트', () => {
     );
 
     // B. SDK 에러 응답
-    vi.mocked(PortOne.requestPayment).mockResolvedValue({
-      code: 'USER_CANCEL',
-      message: '사용자가 결제창을 닫았습니다',
-    });
+    vi.mocked(PortOne.requestPayment).mockResolvedValue(
+      { code: 'USER_CANCEL', message: '사용자가 결제창을 닫았습니다' } as unknown as PaymentResponse,
+    );
 
     render(
       <JoinPageClient

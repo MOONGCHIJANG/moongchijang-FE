@@ -10,13 +10,10 @@ describe('PaymentRedirectClient', () => {
   it('code 파라미터가 있을 때 fail API를 올바른 파라미터로 호출하고 sessionStorage에 저장 후 /payment/fail로 리다이렉트한다', async () => {
     const failSpy = vi.fn();
     server.use(
-      http.post(
-        'http://localhost:9090/api/v1/payments/fail',
-        async ({ request }) => {
-          failSpy(await request.json());
-          return HttpResponse.json({ success: true, data: {}, error: null });
-        },
-      ),
+      http.post('*/api/v1/payments/fail', async ({ request }) => {
+        failSpy(await request.json());
+        return HttpResponse.json({ success: true, data: {}, error: null });
+      }),
     );
 
     render(
@@ -48,13 +45,10 @@ describe('PaymentRedirectClient', () => {
   it('code 없을 때(성공): confirm API를 올바른 파라미터로 호출하고 sessionStorage에 저장 후 /payment/complete로 리다이렉트한다', async () => {
     const confirmSpy = vi.fn();
     server.use(
-      http.post(
-        'http://localhost:9090/api/v1/payments/confirm',
-        async ({ request }) => {
-          confirmSpy(await request.json());
-          return HttpResponse.json({ success: true, data: {}, error: null });
-        },
-      ),
+      http.post('*/api/v1/payments/confirm', async ({ request }) => {
+        confirmSpy(await request.json());
+        return HttpResponse.json({ success: true, data: {}, error: null });
+      }),
     );
 
     render(
@@ -88,16 +82,13 @@ describe('PaymentRedirectClient', () => {
   it('confirm 네트워크 에러 시 fail API 호출, sessionStorage paymentFail 저장, /payment/fail 리다이렉트', async () => {
     const failSpy = vi.fn();
     server.use(
-      http.post('http://localhost:9090/api/v1/payments/confirm', () => {
+      http.post('*/api/v1/payments/confirm', () => {
         return HttpResponse.error();
       }),
-      http.post(
-        'http://localhost:9090/api/v1/payments/fail',
-        async ({ request }) => {
-          failSpy(await request.json());
-          return HttpResponse.json({ success: true, data: {}, error: null });
-        },
-      ),
+      http.post('*/api/v1/payments/fail', async ({ request }) => {
+        failSpy(await request.json());
+        return HttpResponse.json({ success: true, data: {}, error: null });
+      }),
     );
 
     render(
@@ -126,14 +117,14 @@ describe('PaymentRedirectClient', () => {
   // 검증: 파싱 실패를 에러로 처리 → fail API 호출 → /payment/fail로 이동
   it('confirm 응답 Zod 파싱 실패(success: false) 시 /payment/fail로 리다이렉트한다', async () => {
     server.use(
-      http.post('http://localhost:9090/api/v1/payments/confirm', () => {
+      http.post('*/api/v1/payments/confirm', () => {
         return HttpResponse.json({
           success: false,
           data: null,
           error: 'invalid',
         });
       }),
-      http.post('http://localhost:9090/api/v1/payments/fail', () => {
+      http.post('*/api/v1/payments/fail', () => {
         return HttpResponse.json({ success: true, data: {}, error: null });
       }),
     );
@@ -158,13 +149,13 @@ describe('PaymentRedirectClient', () => {
   // 검증: status !== 200 조건으로 에러 처리 → fail API 호출 → /payment/fail로 이동
   it('confirm 응답 status 500 시 /payment/fail로 리다이렉트한다', async () => {
     server.use(
-      http.post('http://localhost:9090/api/v1/payments/confirm', () => {
+      http.post('*/api/v1/payments/confirm', () => {
         return HttpResponse.json(
           { success: true, data: {}, error: null },
           { status: 500 },
         );
       }),
-      http.post('http://localhost:9090/api/v1/payments/fail', () => {
+      http.post('*/api/v1/payments/fail', () => {
         return HttpResponse.json({ success: true, data: {}, error: null });
       }),
     );

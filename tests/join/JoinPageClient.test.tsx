@@ -1,4 +1,5 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import JoinPageClient from '@/app/(pages)/item/[groupBuyId]/join/_components/JoinPageClient';
 import type { ApiResponseGroupBuyDetailResponseData } from '@/api/generated/api.schemas';
@@ -6,11 +7,6 @@ import * as PortOne from '@portone/browser-sdk/v2';
 import type { PaymentResponse } from '@portone/browser-sdk/v2';
 import { http, HttpResponse } from 'msw';
 import { server } from 'tests/setup';
-
-// 1. SDK 모킹 (이미 tests/setup.ts에서 했지만 명시적으로 확인)
-vi.mock('@portone/browser-sdk/v2', () => ({
-  requestPayment: vi.fn(),
-}));
 
 const mockGroupBuy = {
   id: 1,
@@ -27,6 +23,8 @@ describe('JoinPageClient 결제 로직 테스트', () => {
   });
 
   it('결제 버튼 클릭 시 결제 요청 생성 -> SDK 호출 -> 서버 컨펌 -> 성공 페이지 이동이 순차적으로 일어나야 한다', async () => {
+    const user = userEvent.setup();
+
     // A. MSW API 모킹
     server.use(
       // [1] 결제 요청 생성
@@ -73,11 +71,11 @@ describe('JoinPageClient 결제 로직 테스트', () => {
 
     // 1. 수단 선택 (결제 가능 상태로 만들기)
     const cardMethod = screen.getByText(/신용카드/i);
-    fireEvent.click(cardMethod);
+    await user.click(cardMethod);
 
     // 2. 결제 버튼 클릭
     const payButton = screen.getByRole('button', { name: /결제하기/i });
-    fireEvent.click(payButton);
+    await user.click(payButton);
 
     // 3. 검증: 결제 중 로딩 및 비활성화 체크
     expect(payButton).toBeDisabled();
@@ -101,6 +99,8 @@ describe('JoinPageClient 결제 로직 테스트', () => {
   });
 
   it('SDK 결제 실패 시 payments/fail API를 호출하고 실패 페이지로 이동해야 한다', async () => {
+    const user = userEvent.setup();
+
     // A. MSW 실패 핸들러
     const failApiSpy = vi.fn();
     server.use(
@@ -127,9 +127,10 @@ describe('JoinPageClient 결제 로직 테스트', () => {
     );
 
     // B. SDK 에러 응답
-    vi.mocked(PortOne.requestPayment).mockResolvedValue(
-      { code: 'USER_CANCEL', message: '사용자가 결제창을 닫았습니다' } as unknown as PaymentResponse,
-    );
+    vi.mocked(PortOne.requestPayment).mockResolvedValue({
+      code: 'USER_CANCEL',
+      message: '사용자가 결제창을 닫았습니다',
+    } as unknown as PaymentResponse);
 
     render(
       <JoinPageClient
@@ -140,8 +141,8 @@ describe('JoinPageClient 결제 로직 테스트', () => {
       />,
     );
 
-    fireEvent.click(screen.getByText(/신용카드/i));
-    fireEvent.click(screen.getByRole('button', { name: /결제하기/i }));
+    await user.click(screen.getByText(/신용카드/i));
+    await user.click(screen.getByRole('button', { name: /결제하기/i }));
 
     // 검증: fail API 호출 및 페이지 이동
     await waitFor(() => {

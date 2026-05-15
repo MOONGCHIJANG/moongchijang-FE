@@ -58,7 +58,7 @@ function createFeedItem(id: number) {
     ...district,
     productName: koFaker.product.name(),
     thumbnailUrl: MOCK_IMAGES[(id - 1) % MOCK_IMAGES.length],
-    price: koFaker.product.price(),
+    price: 18000, // koFaker.product.price(),
     achievementRate,
     currentQuantity,
     targetQuantity,

@@ -12,7 +12,7 @@
     "achievementRate": 72,
     "currentQuantity": 36,
     "targetQuantity": 50,
-    "maxQuantity": 100,
+    "maxQuantity": 1,
     "deadline": "2026-05-15T23:59:00",
     "pickupDate": "2026-05-17",
     "pickupTimeStart": "14:00",

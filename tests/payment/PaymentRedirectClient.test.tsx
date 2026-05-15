@@ -116,6 +116,7 @@ describe('PaymentRedirectClient', () => {
   // 조건: confirm API가 200을 반환했지만 응답 본문이 { success: false }로 Zod 스키마 검증 실패
   // 검증: 파싱 실패를 에러로 처리 → fail API 호출 → /payment/fail로 이동
   it('confirm 응답 Zod 파싱 실패(success: false) 시 /payment/fail로 리다이렉트한다', async () => {
+    const failSpy = vi.fn();
     server.use(
       http.post('*/api/v1/payments/confirm', () => {
         return HttpResponse.json({
@@ -124,7 +125,8 @@ describe('PaymentRedirectClient', () => {
           error: 'invalid',
         });
       }),
-      http.post('*/api/v1/payments/fail', () => {
+      http.post('*/api/v1/payments/fail', async ({ request }) => {
+        failSpy(await request.json());
         return HttpResponse.json({ success: true, data: {}, error: null });
       }),
     );
@@ -139,15 +141,18 @@ describe('PaymentRedirectClient', () => {
     );
 
     await waitFor(() => {
+      expect(failSpy).toHaveBeenCalled();
       expect(window.location.replace).toHaveBeenCalledWith(
         expect.stringContaining('/payment/fail'),
       );
     });
+    expect(sessionStorage.getItem('paymentFail')).toBe('결제 확인 실패');
   });
 
   // 조건: confirm API가 status 500을 반환한 경우 (서버 내부 에러)
   // 검증: status !== 200 조건으로 에러 처리 → fail API 호출 → /payment/fail로 이동
   it('confirm 응답 status 500 시 /payment/fail로 리다이렉트한다', async () => {
+    const failSpy = vi.fn();
     server.use(
       http.post('*/api/v1/payments/confirm', () => {
         return HttpResponse.json(
@@ -155,7 +160,8 @@ describe('PaymentRedirectClient', () => {
           { status: 500 },
         );
       }),
-      http.post('*/api/v1/payments/fail', () => {
+      http.post('*/api/v1/payments/fail', async ({ request }) => {
+        failSpy(await request.json());
         return HttpResponse.json({ success: true, data: {}, error: null });
       }),
     );
@@ -170,9 +176,11 @@ describe('PaymentRedirectClient', () => {
     );
 
     await waitFor(() => {
+      expect(failSpy).toHaveBeenCalled();
       expect(window.location.replace).toHaveBeenCalledWith(
         expect.stringContaining('/payment/fail'),
       );
     });
+    expect(sessionStorage.getItem('paymentFail')).toBe('결제 확인 실패');
   });
 });

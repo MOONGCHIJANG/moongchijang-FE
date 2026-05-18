@@ -2,35 +2,9 @@
 
 import { useEffect, useRef } from 'react';
 
-interface NaverOverlayInstance {
-  setMap: (map: unknown) => void;
-  draw: () => void;
-  getPanes: () => { overlayLayer: HTMLElement };
-  getProjection: () => {
-    fromCoordToOffset: (coord: unknown) => { x: number; y: number };
-  };
-  onAdd?: () => void;
-  onRemove?: () => void;
-}
-
 declare global {
   interface Window {
-    naver: {
-      maps: {
-        LatLng: new (lat: number, lng: number) => unknown;
-        Map: new (
-          element: HTMLElement,
-          options: unknown,
-        ) => { destroy: () => void };
-        Marker: new (options: unknown) => unknown;
-        OverlayView: new () => NaverOverlayInstance;
-        Size: new (width: number, height: number) => unknown;
-        Point: new (x: number, y: number) => unknown;
-        Position: {
-          TOP_RIGHT: unknown;
-        };
-      };
-    };
+    naver?: { maps: typeof naver.maps };
   }
 }
 
@@ -50,8 +24,8 @@ export default function NaverMap({
   markers = [],
 }: NaverMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<{ destroy: () => void } | null>(null);
-  const overlaysRef = useRef<NaverOverlayInstance[]>([]);
+  const mapInstanceRef = useRef<naver.maps.Map | null>(null);
+  const overlaysRef = useRef<naver.maps.OverlayView[]>([]);
 
   useEffect(() => {
     const cleanup = () => {
@@ -66,20 +40,17 @@ export default function NaverMap({
 
       cleanup();
 
-      const mapOptions = {
-        center: new window.naver.maps.LatLng(center.lat, center.lng),
+      const map = new naver.maps.Map(mapRef.current, {
+        center: new naver.maps.LatLng(center.lat, center.lng),
         zoom,
         zoomControl: false,
-      };
-
-      const map = new window.naver.maps.Map(mapRef.current, mapOptions);
+      });
       mapInstanceRef.current = map;
 
       // 뭉치장 커스텀 마커 + 레이블 생성
       markers.forEach((marker) => {
-        const position = new window.naver.maps.LatLng(marker.lat, marker.lng);
+        const position = new naver.maps.LatLng(marker.lat, marker.lng);
 
-        // HTML 오버레이 생성
         const overlayDiv = document.createElement('div');
         overlayDiv.style.position = 'absolute';
         overlayDiv.style.transform = 'translate(-50%, -100%)';
@@ -97,25 +68,21 @@ export default function NaverMap({
           </div>
         `;
 
-        // 오버레이 객체 생성
-        const overlay = new window.naver.maps.OverlayView();
+        const overlay = new naver.maps.OverlayView();
 
         overlay.onAdd = function () {
-          const panes = this.getPanes();
-          panes.overlayLayer.appendChild(overlayDiv);
+          this.getPanes().overlayLayer.appendChild(overlayDiv);
         };
 
         overlay.draw = function () {
-          const projection = this.getProjection();
-          const pixelPosition = projection.fromCoordToOffset(position);
+          const pixelPosition =
+            this.getProjection().fromCoordToOffset(position);
           overlayDiv.style.left = `${pixelPosition.x}px`;
           overlayDiv.style.top = `${pixelPosition.y}px`;
         };
 
         overlay.onRemove = function () {
-          if (overlayDiv.parentNode) {
-            overlayDiv.parentNode.removeChild(overlayDiv);
-          }
+          overlayDiv.parentNode?.removeChild(overlayDiv);
         };
 
         overlay.setMap(map);
@@ -129,7 +96,7 @@ export default function NaverMap({
       return cleanup;
     }
 
-    // 스크립트가 이미 로드되어 있는지 확인
+    // 스크립트가 이미 있는지 확인
     const existingScript = document.querySelector(
       'script[src*="openapi.map.naver.com"]',
     );
@@ -155,7 +122,7 @@ export default function NaverMap({
         document.head.removeChild(script);
       }
     };
-  }, [center, zoom, markers]);
+  }, [center.lat, center.lng, zoom, markers]);
 
   return <div ref={mapRef} style={{ width, height }} />;
 }

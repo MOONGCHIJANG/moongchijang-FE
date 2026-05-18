@@ -1,5 +1,11 @@
 'use client';
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, {
+  useRef,
+  useEffect,
+  useState,
+  useCallback,
+  useMemo,
+} from 'react';
 import DetailTab from './DetailTab';
 import GuideLine from './GuideLine';
 import { ApiResponseGroupBuyDetailData } from '@/api/generated/api.schemas';
@@ -32,6 +38,20 @@ const ItemDetail = ({ data }: Props) => {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const markers = useMemo(
+    () =>
+      data.pickupLatitude && data.pickupLongitude
+        ? [
+            {
+              lat: data.pickupLatitude,
+              lng: data.pickupLongitude,
+              title: data.storeName,
+            },
+          ]
+        : [],
+    [data],
+  );
 
   // 탭 클릭 시 해당 섹션으로 스크롤
   const handleTabClick = useCallback((tab: 'description' | 'guidelines') => {
@@ -69,14 +89,8 @@ const ItemDetail = ({ data }: Props) => {
                     lng: data.pickupLongitude,
                   }}
                   zoom={16}
-                  markers={[
-                    {
-                      lat: data.pickupLatitude,
-                      lng: data.pickupLongitude,
-                      title: data.storeName,
-                    },
-                  ]}
-                  height="224px"
+                  markers={markers}
+                  height="226px"
                 />
               )}
             </div>

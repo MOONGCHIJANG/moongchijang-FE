@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { Icon } from '@iconify/react';
 import { Button } from '@/components/Button';
 import NaverMap from '@/components/NaverMap';
@@ -16,6 +17,20 @@ export const MapConfirmStep = ({
   onBack,
   onConfirm,
 }: MapConfirmStepProps) => {
+  const markers = useMemo(
+    () =>
+      store
+        ? [
+            {
+              lat: store.latitude,
+              lng: store.longitude,
+              title: store.storeName,
+            },
+          ]
+        : [],
+    [store],
+  );
+
   return (
     <div className="flex flex-col min-h-full bg-white">
       <header className="flex items-center h-[57px] px-4 border-b border-border-subtle shrink-0 gap-[2px]">
@@ -39,13 +54,7 @@ export const MapConfirmStep = ({
           <NaverMap
             center={{ lat: store.latitude, lng: store.longitude }}
             zoom={16}
-            markers={[
-              {
-                lat: store.latitude,
-                lng: store.longitude,
-                title: store.storeName,
-              },
-            ]}
+            markers={markers}
             height="226px"
           />
         )}

@@ -7,6 +7,7 @@ import PaymentRedirectClient from '@/app/(pages)/payment/redirect/_components/Pa
 describe('PaymentRedirectClient', () => {
   describe('code 파라미터 있음 — 결제 실패·취소 경로', () => {
     it('fail API를 올바른 파라미터로 호출하고 sessionStorage에 저장 후 /payment/fail로 리다이렉트한다', async () => {
+      // A. MSW API 모킹 — spy로 요청 바디 캡처
       const failSpy = vi.fn();
       server.use(
         http.post('*/api/v1/payments/fail', async ({ request }) => {
@@ -25,6 +26,7 @@ describe('PaymentRedirectClient', () => {
         />,
       );
 
+      // 검증: fail API 요청 바디, sessionStorage 저장, 리다이렉트 URL
       await waitFor(() => {
         expect(failSpy).toHaveBeenCalledWith({
           paymentId: 'pay-123',
@@ -41,6 +43,7 @@ describe('PaymentRedirectClient', () => {
 
     // fail API 자체가 실패해도 sessionStorage 저장과 리다이렉트는 .catch(() => {})로 보장됨
     it('fail API가 네트워크 에러를 반환해도 sessionStorage 저장 및 /payment/fail 리다이렉트는 실행된다', async () => {
+      // A. MSW API 모킹 — fail API 네트워크 에러 유발
       server.use(
         http.post('*/api/v1/payments/fail', () => HttpResponse.error()),
       );
@@ -55,6 +58,7 @@ describe('PaymentRedirectClient', () => {
         />,
       );
 
+      // 검증: fail API 실패와 무관하게 sessionStorage 저장 및 리다이렉트 보장
       await waitFor(() => {
         expect(sessionStorage.getItem('paymentFail')).toBe('USER_CANCEL');
         expect(window.location.replace).toHaveBeenCalledWith(
@@ -64,6 +68,7 @@ describe('PaymentRedirectClient', () => {
     });
 
     it('code에 특수문자가 포함되면 encodeURIComponent가 적용된 URL로 리다이렉트한다', async () => {
+      // A. MSW API 모킹
       server.use(
         http.post('*/api/v1/payments/fail', () =>
           HttpResponse.json({ success: true, data: {}, error: null }),
@@ -80,6 +85,7 @@ describe('PaymentRedirectClient', () => {
         />,
       );
 
+      // 검증: 특수문자가 encodeURIComponent로 인코딩된 URL로 리다이렉트
       await waitFor(() => {
         expect(window.location.replace).toHaveBeenCalledWith(
           `/payment/fail?errorCode=${encodeURIComponent('PAY/CANCEL+ERROR')}&groupBuyId=1`,
@@ -88,12 +94,14 @@ describe('PaymentRedirectClient', () => {
     });
 
     it('groupBuyId가 없으면 groupBuyId가 빈 문자열인 URL로 리다이렉트한다', async () => {
+      // A. MSW API 모킹
       server.use(
         http.post('*/api/v1/payments/fail', () =>
           HttpResponse.json({ success: true, data: {}, error: null }),
         ),
       );
 
+      // groupBuyId prop 미전달
       render(
         <PaymentRedirectClient
           paymentId="pay-123"
@@ -103,6 +111,7 @@ describe('PaymentRedirectClient', () => {
         />,
       );
 
+      // 검증: groupBuyId가 빈 문자열로 처리된 URL로 리다이렉트
       await waitFor(() => {
         expect(window.location.replace).toHaveBeenCalledWith(
           '/payment/fail?errorCode=USER_CANCEL&groupBuyId=',
@@ -113,6 +122,7 @@ describe('PaymentRedirectClient', () => {
 
   describe('code 파라미터 없음 — 결제 성공 경로', () => {
     it('confirm API를 올바른 파라미터로 호출하고 sessionStorage에 저장 후 /payment/complete로 리다이렉트한다', async () => {
+      // A. MSW API 모킹 — spy로 요청 바디 캡처
       const confirmSpy = vi.fn();
       server.use(
         http.post('*/api/v1/payments/confirm', async ({ request }) => {
@@ -130,6 +140,7 @@ describe('PaymentRedirectClient', () => {
         />,
       );
 
+      // 검증: confirm API 요청 바디, sessionStorage 저장, 리다이렉트 URL
       await waitFor(() => {
         expect(confirmSpy).toHaveBeenCalledWith({
           paymentId: 'pay-123',
@@ -148,6 +159,7 @@ describe('PaymentRedirectClient', () => {
     });
 
     it('confirm 네트워크 에러 시 fail API 호출, sessionStorage paymentFail 저장, /payment/fail 리다이렉트', async () => {
+      // A. MSW API 모킹 — confirm 네트워크 에러, fail spy
       const failSpy = vi.fn();
       server.use(
         http.post('*/api/v1/payments/confirm', () => {
@@ -168,6 +180,7 @@ describe('PaymentRedirectClient', () => {
         />,
       );
 
+      // 검증: confirm 실패 → catch에서 fail API 호출 및 실패 페이지 이동
       await waitFor(() => {
         expect(failSpy).toHaveBeenCalled();
       });
@@ -182,6 +195,7 @@ describe('PaymentRedirectClient', () => {
     });
 
     it('confirm 응답 Zod 파싱 실패(success: false) 시 /payment/fail로 리다이렉트한다', async () => {
+      // A. MSW API 모킹 — confirm success: false로 Zod 파싱 실패 유발
       const failSpy = vi.fn();
       server.use(
         http.post('*/api/v1/payments/confirm', () => {
@@ -206,6 +220,7 @@ describe('PaymentRedirectClient', () => {
         />,
       );
 
+      // 검증: 파싱 실패 → '결제 확인 실패'로 fail 처리
       await waitFor(() => {
         expect(failSpy).toHaveBeenCalled();
         expect(window.location.replace).toHaveBeenCalledWith(
@@ -216,6 +231,7 @@ describe('PaymentRedirectClient', () => {
     });
 
     it('confirm 응답 status 500 시 /payment/fail로 리다이렉트한다', async () => {
+      // A. MSW API 모킹 — confirm status 500 반환
       const failSpy = vi.fn();
       server.use(
         http.post('*/api/v1/payments/confirm', () => {
@@ -239,6 +255,7 @@ describe('PaymentRedirectClient', () => {
         />,
       );
 
+      // 검증: status 500 → '결제 확인 실패'로 fail 처리
       await waitFor(() => {
         expect(failSpy).toHaveBeenCalled();
         expect(window.location.replace).toHaveBeenCalledWith(
@@ -251,6 +268,7 @@ describe('PaymentRedirectClient', () => {
     // confirm + fail 둘 다 실패해도 .catch(() => {})로 fail API 에러를 삼키고,
     // sessionStorage 저장 및 리다이렉트는 반드시 실행됨
     it('confirm과 fail API 모두 실패해도 sessionStorage에 errorCode를 저장하고 /payment/fail로 리다이렉트한다', async () => {
+      // A. MSW API 모킹 — confirm, fail 모두 네트워크 에러
       server.use(
         http.post('*/api/v1/payments/confirm', () => HttpResponse.error()),
         http.post('*/api/v1/payments/fail', () => HttpResponse.error()),
@@ -265,6 +283,7 @@ describe('PaymentRedirectClient', () => {
         />,
       );
 
+      // 검증: 이중 장애에서도 sessionStorage 저장 및 리다이렉트 보장
       await waitFor(() => {
         expect(sessionStorage.getItem('paymentFail')).not.toBeNull();
         expect(window.location.replace).toHaveBeenCalledWith(
@@ -274,6 +293,7 @@ describe('PaymentRedirectClient', () => {
     });
 
     it('amount가 숫자로 변환되지 않는 문자열이면 confirm API에 null로 전달되고 실패 처리된다', async () => {
+      // A. MSW API 모킹 — confirm 파싱 실패 응답, fail spy
       const confirmSpy = vi.fn();
       const failSpy = vi.fn();
 
@@ -292,6 +312,7 @@ describe('PaymentRedirectClient', () => {
         }),
       );
 
+      // amount="abc" → Number('abc') = NaN → JSON 직렬화 시 null
       render(
         <PaymentRedirectClient
           paymentId="pay-123"
@@ -301,8 +322,8 @@ describe('PaymentRedirectClient', () => {
         />,
       );
 
+      // 검증: confirm API에 amount: null로 전달, 파싱 실패 → fail 처리
       await waitFor(() => {
-        // NaN은 JSON 직렬화 시 null이 된다
         expect(confirmSpy).toHaveBeenCalledWith(
           expect.objectContaining({ amount: null }),
         );

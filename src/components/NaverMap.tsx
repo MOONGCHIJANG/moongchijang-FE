@@ -2,23 +2,28 @@
 
 import { useEffect, useRef } from 'react';
 
+interface NaverOverlayInstance {
+  setMap: (map: unknown) => void;
+  draw: () => void;
+  getPanes: () => { overlayLayer: HTMLElement };
+  getProjection: () => {
+    fromCoordToOffset: (coord: unknown) => { x: number; y: number };
+  };
+  onAdd?: () => void;
+  onRemove?: () => void;
+}
+
 declare global {
   interface Window {
     naver: {
       maps: {
         LatLng: new (lat: number, lng: number) => unknown;
-        Map: new (element: HTMLElement, options: unknown) => unknown;
+        Map: new (
+          element: HTMLElement,
+          options: unknown,
+        ) => { destroy: () => void };
         Marker: new (options: unknown) => unknown;
-        OverlayView: new () => {
-          setMap: (map: unknown) => void;
-          draw: () => void;
-          getPanes: () => { overlayLayer: HTMLElement };
-          getProjection: () => {
-            fromCoordToOffset: (coord: unknown) => { x: number; y: number };
-          };
-          onAdd?: () => void;
-          onRemove?: () => void;
-        };
+        OverlayView: new () => NaverOverlayInstance;
         Size: new (width: number, height: number) => unknown;
         Point: new (x: number, y: number) => unknown;
         Position: {
@@ -45,10 +50,21 @@ export default function NaverMap({
   markers = [],
 }: NaverMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<{ destroy: () => void } | null>(null);
+  const overlaysRef = useRef<NaverOverlayInstance[]>([]);
 
   useEffect(() => {
+    const cleanup = () => {
+      overlaysRef.current.forEach((o) => o.setMap(null));
+      overlaysRef.current = [];
+      mapInstanceRef.current?.destroy();
+      mapInstanceRef.current = null;
+    };
+
     const initializeMap = () => {
       if (!window.naver || !mapRef.current) return;
+
+      cleanup();
 
       const mapOptions = {
         center: new window.naver.maps.LatLng(center.lat, center.lng),
@@ -57,6 +73,7 @@ export default function NaverMap({
       };
 
       const map = new window.naver.maps.Map(mapRef.current, mapOptions);
+      mapInstanceRef.current = map;
 
       // 뭉치장 커스텀 마커 + 레이블 생성
       markers.forEach((marker) => {
@@ -102,13 +119,14 @@ export default function NaverMap({
         };
 
         overlay.setMap(map);
+        overlaysRef.current.push(overlay);
       });
     };
 
     // 이미 로드되어 있으면 바로 초기화
-    if (window.naver && window.naver.maps) {
+    if (window.naver?.maps) {
       initializeMap();
-      return;
+      return cleanup;
     }
 
     // 스크립트가 이미 로드되어 있는지 확인
@@ -120,6 +138,7 @@ export default function NaverMap({
       existingScript.addEventListener('load', initializeMap);
       return () => {
         existingScript.removeEventListener('load', initializeMap);
+        cleanup();
       };
     }
 
@@ -131,7 +150,10 @@ export default function NaverMap({
     document.head.appendChild(script);
 
     return () => {
-      document.head.removeChild(script);
+      cleanup();
+      if (script.parentNode) {
+        document.head.removeChild(script);
+      }
     };
   }, [center, zoom, markers]);
 

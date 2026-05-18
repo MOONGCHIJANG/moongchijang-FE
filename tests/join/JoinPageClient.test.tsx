@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import JoinPageClient from '@/app/(pages)/item/[groupBuyId]/join/_components/JoinPageClient';
@@ -246,5 +246,176 @@ describe('JoinPageClient 결제 로직 테스트', () => {
       );
     });
     expect(sessionStorage.getItem('paymentFail')).toBe('결제 확인 실패');
+  });
+
+  it('결제 버튼을 연속으로 두 번 클릭해도 결제 요청은 한 번만 발생해야 한다', async () => {
+    const user = userEvent.setup();
+
+    server.use(
+      http.post('*/api/v1/group-buys/:id/participations', () => {
+        return HttpResponse.json(
+          {
+            success: true,
+            data: {
+              participationId: 123,
+              orderName: '맛있는 쿠키 외 0건',
+              totalAmount: 10000,
+              productAmount: 10000,
+              feeAmount: 0,
+            },
+            error: null,
+          },
+          { status: 201 },
+        );
+      }),
+      http.post('*/api/v1/payments/confirm', () => {
+        return HttpResponse.json(
+          { success: true, data: {}, error: null },
+          { status: 200 },
+        );
+      }),
+    );
+
+    vi.mocked(PortOne.requestPayment).mockResolvedValue(undefined);
+
+    render(<JoinPageClient groupBuyId="1" groupBuy={mockGroupBuy} />);
+
+    await user.click(screen.getByText(/신용카드/i));
+    const payButton = screen.getByRole('button', { name: /결제하기/i });
+
+    await user.click(payButton);
+    await user.click(payButton);
+
+    await waitFor(() => {
+      expect(PortOne.requestPayment).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it('수량을 변경한 후 결제하면 변경된 수량이 API에 전달되어야 한다', async () => {
+    const user = userEvent.setup();
+    const participationsSpy = vi.fn();
+
+    server.use(
+      http.post(
+        '*/api/v1/group-buys/:id/participations',
+        async ({ request }) => {
+          participationsSpy(await request.json());
+          return HttpResponse.json(
+            {
+              success: true,
+              data: {
+                participationId: 123,
+                orderName: '맛있는 쿠키 외 2건',
+                totalAmount: 30000,
+                productAmount: 30000,
+                feeAmount: 0,
+              },
+              error: null,
+            },
+            { status: 201 },
+          );
+        },
+      ),
+      http.post('*/api/v1/payments/confirm', () => {
+        return HttpResponse.json(
+          { success: true, data: {}, error: null },
+          { status: 200 },
+        );
+      }),
+    );
+
+    vi.mocked(PortOne.requestPayment).mockResolvedValue(undefined);
+
+    render(<JoinPageClient groupBuyId="1" groupBuy={mockGroupBuy} />);
+
+    const quantityInput = screen.getByRole('spinbutton');
+    fireEvent.change(quantityInput, { target: { value: '3' } });
+
+    await user.click(screen.getByText(/신용카드/i));
+    await user.click(screen.getByRole('button', { name: /결제하기/i }));
+
+    await waitFor(() => {
+      expect(participationsSpy).toHaveBeenCalledWith(
+        expect.objectContaining({ quantity: 3 }),
+      );
+    });
+  });
+
+  it('participations 응답이 status 201이지만 예상과 다른 형식이면 실패 처리해야 한다', async () => {
+    const user = userEvent.setup();
+    const failApiSpy = vi.fn();
+
+    server.use(
+      http.post('*/api/v1/group-buys/:id/participations', () => {
+        return HttpResponse.json(
+          { success: true, data: null, error: null },
+          { status: 201 },
+        );
+      }),
+      http.post('*/api/v1/payments/fail', async ({ request }) => {
+        failApiSpy(await request.json());
+        return HttpResponse.json({ success: true });
+      }),
+    );
+
+    render(<JoinPageClient groupBuyId="1" groupBuy={mockGroupBuy} />);
+
+    await user.click(screen.getByText(/신용카드/i));
+    await user.click(screen.getByRole('button', { name: /결제하기/i }));
+
+    await waitFor(() => {
+      expect(failApiSpy).toHaveBeenCalled();
+      expect(window.location.replace).toHaveBeenCalledWith(
+        expect.stringContaining('/payment/fail'),
+      );
+    });
+    expect(sessionStorage.getItem('paymentFail')).toBe('결제 응답 형식 오류');
+  });
+
+  it('SDK가 예외를 throw하면(네트워크 단절 등) fail API를 호출하고 실패 페이지로 이동해야 한다', async () => {
+    const user = userEvent.setup();
+    const failApiSpy = vi.fn();
+
+    server.use(
+      http.post('*/api/v1/group-buys/:id/participations', () => {
+        return HttpResponse.json(
+          {
+            success: true,
+            data: {
+              participationId: 123,
+              orderName: '맛있는 쿠키 외 0건',
+              totalAmount: 10000,
+              productAmount: 10000,
+              feeAmount: 0,
+            },
+            error: null,
+          },
+          { status: 201 },
+        );
+      }),
+      http.post('*/api/v1/payments/fail', async ({ request }) => {
+        failApiSpy(await request.json());
+        return HttpResponse.json({ success: true });
+      }),
+    );
+
+    vi.mocked(PortOne.requestPayment).mockRejectedValue(
+      new Error('네트워크 오류'),
+    );
+
+    render(<JoinPageClient groupBuyId="1" groupBuy={mockGroupBuy} />);
+
+    await user.click(screen.getByText(/신용카드/i));
+    await user.click(screen.getByRole('button', { name: /결제하기/i }));
+
+    await waitFor(() => {
+      expect(failApiSpy).toHaveBeenCalledWith(
+        expect.objectContaining({ errorCode: '네트워크 오류' }),
+      );
+      expect(window.location.replace).toHaveBeenCalledWith(
+        expect.stringContaining('/payment/fail'),
+      );
+    });
+    expect(sessionStorage.getItem('paymentFail')).toBe('네트워크 오류');
   });
 });

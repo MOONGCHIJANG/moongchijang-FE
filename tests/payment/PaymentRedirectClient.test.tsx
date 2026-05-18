@@ -273,5 +273,43 @@ describe('PaymentRedirectClient', () => {
       });
     });
 
+    it('amount가 숫자로 변환되지 않는 문자열이면 confirm API에 null로 전달되고 실패 처리된다', async () => {
+      const confirmSpy = vi.fn();
+      const failSpy = vi.fn();
+
+      server.use(
+        http.post('*/api/v1/payments/confirm', async ({ request }) => {
+          confirmSpy(await request.json());
+          return HttpResponse.json({
+            success: false,
+            data: null,
+            error: 'invalid amount',
+          });
+        }),
+        http.post('*/api/v1/payments/fail', async ({ request }) => {
+          failSpy(await request.json());
+          return HttpResponse.json({ success: true, data: {}, error: null });
+        }),
+      );
+
+      render(
+        <PaymentRedirectClient
+          paymentId="pay-123"
+          participationId="456"
+          amount="abc"
+          groupBuyId="1"
+        />,
+      );
+
+      await waitFor(() => {
+        // NaN은 JSON 직렬화 시 null이 된다
+        expect(confirmSpy).toHaveBeenCalledWith(
+          expect.objectContaining({ amount: null }),
+        );
+        expect(window.location.replace).toHaveBeenCalledWith(
+          expect.stringContaining('/payment/fail'),
+        );
+      });
+    });
   });
 });

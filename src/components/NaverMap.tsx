@@ -16,12 +16,14 @@ interface NaverMapProps {
   markers?: Array<{ lat: number; lng: number; title?: string }>;
 }
 
+const EMPTY_MARKERS: NonNullable<NaverMapProps['markers']> = [];
+
 export default function NaverMap({
   width = '100%',
   height = '400px',
   center,
   zoom = 15,
-  markers = [],
+  markers = EMPTY_MARKERS,
 }: NaverMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<naver.maps.Map | null>(null);
@@ -123,12 +125,7 @@ export default function NaverMap({
     script.onload = initializeMap;
     document.head.appendChild(script);
 
-    return () => {
-      cleanup();
-      if (script.parentNode) {
-        document.head.removeChild(script);
-      }
-    };
+    return cleanup;
   }, [center.lat, center.lng, zoom, markers]);
 
   return (

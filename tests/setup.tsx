@@ -50,7 +50,7 @@ vi.mock('next/image', () => ({
   },
 }));
 
-// next/navigation 모킹
+// next/navigation 모킹 (router 호출 검증이 필요한 테스트는 파일 내에서 vi.hoisted로 직접 정의)
 vi.mock('next/navigation', () => ({
   usePathname: () => '/test-path',
   useRouter: () => ({

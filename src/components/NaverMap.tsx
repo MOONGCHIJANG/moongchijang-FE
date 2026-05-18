@@ -49,6 +49,7 @@ export default function NaverMap({
         center: new naver.maps.LatLng(center.lat, center.lng),
         zoom,
         zoomControl: false,
+        scaleControl: false,
       });
       mapInstanceRef.current = map;
 

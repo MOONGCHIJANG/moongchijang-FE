@@ -5,182 +5,273 @@ import { server } from 'tests/setup';
 import PaymentRedirectClient from '@/app/(pages)/payment/redirect/_components/PaymentRedirectClient';
 
 describe('PaymentRedirectClient', () => {
-  // 조건: PG사(포트원)가 결제 실패/취소 시 code 쿼리 파라미터를 붙여 리다이렉트한 경우
-  // 검증: fail API 호출 → sessionStorage에 errorCode 저장 → /payment/fail로 이동
-  it('code 파라미터가 있을 때 fail API를 올바른 파라미터로 호출하고 sessionStorage에 저장 후 /payment/fail로 리다이렉트한다', async () => {
-    const failSpy = vi.fn();
-    server.use(
-      http.post('*/api/v1/payments/fail', async ({ request }) => {
-        failSpy(await request.json());
-        return HttpResponse.json({ success: true, data: {}, error: null });
-      }),
-    );
-
-    render(
-      <PaymentRedirectClient
-        paymentId="pay-123"
-        participationId="456"
-        groupBuyId="1"
-        code="USER_CANCEL"
-        message="사용자 취소"
-      />,
-    );
-
-    await waitFor(() => {
-      expect(failSpy).toHaveBeenCalledWith({
-        paymentId: 'pay-123',
-        participationId: 456,
-        errorCode: 'USER_CANCEL',
-        message: '사용자 취소',
-      });
-    });
-    expect(sessionStorage.getItem('paymentFail')).toBe('USER_CANCEL');
-    expect(window.location.replace).toHaveBeenCalledWith(
-      '/payment/fail?errorCode=USER_CANCEL&groupBuyId=1',
-    );
-  });
-
-  // 조건: PG사 결제 성공 후 code 없이 리다이렉트된 경우 (정상 결제 완료)
-  // 검증: confirm API 호출 → sessionStorage에 participationId 저장 → /payment/complete로 이동
-  it('code 없을 때(성공): confirm API를 올바른 파라미터로 호출하고 sessionStorage에 저장 후 /payment/complete로 리다이렉트한다', async () => {
-    const confirmSpy = vi.fn();
-    server.use(
-      http.post('*/api/v1/payments/confirm', async ({ request }) => {
-        confirmSpy(await request.json());
-        return HttpResponse.json({ success: true, data: {}, error: null });
-      }),
-    );
-
-    render(
-      <PaymentRedirectClient
-        paymentId="pay-123"
-        participationId="456"
-        amount="10000"
-        groupBuyId="1"
-      />,
-    );
-
-    await waitFor(() => {
-      expect(confirmSpy).toHaveBeenCalledWith({
-        paymentId: 'pay-123',
-        participationId: 456,
-        amount: 10000,
-      });
-    });
-    await waitFor(() => {
-      expect(sessionStorage.getItem('paymentSuccess')).toBe('456');
-    });
-    await waitFor(() => {
-      expect(window.location.replace).toHaveBeenCalledWith(
-        '/payment/complete?participationId=456&groupBuyId=1',
+  describe('code 파라미터 있음 — 결제 실패·취소 경로', () => {
+    it('fail API를 올바른 파라미터로 호출하고 sessionStorage에 저장 후 /payment/fail로 리다이렉트한다', async () => {
+      const failSpy = vi.fn();
+      server.use(
+        http.post('*/api/v1/payments/fail', async ({ request }) => {
+          failSpy(await request.json());
+          return HttpResponse.json({ success: true, data: {}, error: null });
+        }),
       );
-    });
-  });
 
-  // 조건: confirm API 호출 중 인터넷 연결 끊김 등 네트워크 에러 발생 (HttpResponse.error() 시뮬레이션)
-  // 검증: catch에서 fail API 호출 → sessionStorage에 errorCode 저장 → /payment/fail로 이동
-  it('confirm 네트워크 에러 시 fail API 호출, sessionStorage paymentFail 저장, /payment/fail 리다이렉트', async () => {
-    const failSpy = vi.fn();
-    server.use(
-      http.post('*/api/v1/payments/confirm', () => {
-        return HttpResponse.error();
-      }),
-      http.post('*/api/v1/payments/fail', async ({ request }) => {
-        failSpy(await request.json());
-        return HttpResponse.json({ success: true, data: {}, error: null });
-      }),
-    );
-
-    render(
-      <PaymentRedirectClient
-        paymentId="pay-123"
-        participationId="456"
-        amount="10000"
-        groupBuyId="1"
-      />,
-    );
-
-    await waitFor(() => {
-      expect(failSpy).toHaveBeenCalled();
-    });
-    await waitFor(() => {
-      expect(sessionStorage.getItem('paymentFail')).not.toBeNull();
-    });
-    await waitFor(() => {
-      expect(window.location.replace).toHaveBeenCalledWith(
-        expect.stringContaining('/payment/fail'),
+      render(
+        <PaymentRedirectClient
+          paymentId="pay-123"
+          participationId="456"
+          groupBuyId="1"
+          code="USER_CANCEL"
+          message="사용자 취소"
+        />,
       );
-    });
-  });
 
-  // 조건: confirm API가 200을 반환했지만 응답 본문이 { success: false }로 Zod 스키마 검증 실패
-  // 검증: 파싱 실패를 에러로 처리 → fail API 호출 → /payment/fail로 이동
-  it('confirm 응답 Zod 파싱 실패(success: false) 시 /payment/fail로 리다이렉트한다', async () => {
-    const failSpy = vi.fn();
-    server.use(
-      http.post('*/api/v1/payments/confirm', () => {
-        return HttpResponse.json({
-          success: false,
-          data: null,
-          error: 'invalid',
+      await waitFor(() => {
+        expect(failSpy).toHaveBeenCalledWith({
+          paymentId: 'pay-123',
+          participationId: 456,
+          errorCode: 'USER_CANCEL',
+          message: '사용자 취소',
         });
-      }),
-      http.post('*/api/v1/payments/fail', async ({ request }) => {
-        failSpy(await request.json());
-        return HttpResponse.json({ success: true, data: {}, error: null });
-      }),
-    );
-
-    render(
-      <PaymentRedirectClient
-        paymentId="pay-123"
-        participationId="456"
-        amount="10000"
-        groupBuyId="1"
-      />,
-    );
-
-    await waitFor(() => {
-      expect(failSpy).toHaveBeenCalled();
+      });
+      expect(sessionStorage.getItem('paymentFail')).toBe('USER_CANCEL');
       expect(window.location.replace).toHaveBeenCalledWith(
-        expect.stringContaining('/payment/fail'),
+        '/payment/fail?errorCode=USER_CANCEL&groupBuyId=1',
       );
     });
-    expect(sessionStorage.getItem('paymentFail')).toBe('결제 확인 실패');
+
+    // fail API 자체가 실패해도 sessionStorage 저장과 리다이렉트는 .catch(() => {})로 보장됨
+    it('fail API가 네트워크 에러를 반환해도 sessionStorage 저장 및 /payment/fail 리다이렉트는 실행된다', async () => {
+      server.use(
+        http.post('*/api/v1/payments/fail', () => HttpResponse.error()),
+      );
+
+      render(
+        <PaymentRedirectClient
+          paymentId="pay-123"
+          participationId="456"
+          groupBuyId="1"
+          code="USER_CANCEL"
+          message="사용자 취소"
+        />,
+      );
+
+      await waitFor(() => {
+        expect(sessionStorage.getItem('paymentFail')).toBe('USER_CANCEL');
+        expect(window.location.replace).toHaveBeenCalledWith(
+          '/payment/fail?errorCode=USER_CANCEL&groupBuyId=1',
+        );
+      });
+    });
+
+    it('code에 특수문자가 포함되면 encodeURIComponent가 적용된 URL로 리다이렉트한다', async () => {
+      server.use(
+        http.post('*/api/v1/payments/fail', () =>
+          HttpResponse.json({ success: true, data: {}, error: null }),
+        ),
+      );
+
+      render(
+        <PaymentRedirectClient
+          paymentId="pay-123"
+          participationId="456"
+          groupBuyId="1"
+          code="PAY/CANCEL+ERROR"
+          message="특수문자 에러"
+        />,
+      );
+
+      await waitFor(() => {
+        expect(window.location.replace).toHaveBeenCalledWith(
+          `/payment/fail?errorCode=${encodeURIComponent('PAY/CANCEL+ERROR')}&groupBuyId=1`,
+        );
+      });
+    });
+
+    it('groupBuyId가 없으면 groupBuyId가 빈 문자열인 URL로 리다이렉트한다', async () => {
+      server.use(
+        http.post('*/api/v1/payments/fail', () =>
+          HttpResponse.json({ success: true, data: {}, error: null }),
+        ),
+      );
+
+      render(
+        <PaymentRedirectClient
+          paymentId="pay-123"
+          participationId="456"
+          code="USER_CANCEL"
+          message="사용자 취소"
+        />,
+      );
+
+      await waitFor(() => {
+        expect(window.location.replace).toHaveBeenCalledWith(
+          '/payment/fail?errorCode=USER_CANCEL&groupBuyId=',
+        );
+      });
+    });
   });
 
-  // 조건: confirm API가 status 500을 반환한 경우 (서버 내부 에러)
-  // 검증: status !== 200 조건으로 에러 처리 → fail API 호출 → /payment/fail로 이동
-  it('confirm 응답 status 500 시 /payment/fail로 리다이렉트한다', async () => {
-    const failSpy = vi.fn();
-    server.use(
-      http.post('*/api/v1/payments/confirm', () => {
-        return HttpResponse.json(
-          { success: true, data: {}, error: null },
-          { status: 500 },
-        );
-      }),
-      http.post('*/api/v1/payments/fail', async ({ request }) => {
-        failSpy(await request.json());
-        return HttpResponse.json({ success: true, data: {}, error: null });
-      }),
-    );
-
-    render(
-      <PaymentRedirectClient
-        paymentId="pay-123"
-        participationId="456"
-        amount="10000"
-        groupBuyId="1"
-      />,
-    );
-
-    await waitFor(() => {
-      expect(failSpy).toHaveBeenCalled();
-      expect(window.location.replace).toHaveBeenCalledWith(
-        expect.stringContaining('/payment/fail'),
+  describe('code 파라미터 없음 — 결제 성공 경로', () => {
+    it('confirm API를 올바른 파라미터로 호출하고 sessionStorage에 저장 후 /payment/complete로 리다이렉트한다', async () => {
+      const confirmSpy = vi.fn();
+      server.use(
+        http.post('*/api/v1/payments/confirm', async ({ request }) => {
+          confirmSpy(await request.json());
+          return HttpResponse.json({ success: true, data: {}, error: null });
+        }),
       );
+
+      render(
+        <PaymentRedirectClient
+          paymentId="pay-123"
+          participationId="456"
+          amount="10000"
+          groupBuyId="1"
+        />,
+      );
+
+      await waitFor(() => {
+        expect(confirmSpy).toHaveBeenCalledWith({
+          paymentId: 'pay-123',
+          participationId: 456,
+          amount: 10000,
+        });
+      });
+      await waitFor(() => {
+        expect(sessionStorage.getItem('paymentSuccess')).toBe('456');
+      });
+      await waitFor(() => {
+        expect(window.location.replace).toHaveBeenCalledWith(
+          '/payment/complete?participationId=456&groupBuyId=1',
+        );
+      });
     });
-    expect(sessionStorage.getItem('paymentFail')).toBe('결제 확인 실패');
+
+    it('confirm 네트워크 에러 시 fail API 호출, sessionStorage paymentFail 저장, /payment/fail 리다이렉트', async () => {
+      const failSpy = vi.fn();
+      server.use(
+        http.post('*/api/v1/payments/confirm', () => {
+          return HttpResponse.error();
+        }),
+        http.post('*/api/v1/payments/fail', async ({ request }) => {
+          failSpy(await request.json());
+          return HttpResponse.json({ success: true, data: {}, error: null });
+        }),
+      );
+
+      render(
+        <PaymentRedirectClient
+          paymentId="pay-123"
+          participationId="456"
+          amount="10000"
+          groupBuyId="1"
+        />,
+      );
+
+      await waitFor(() => {
+        expect(failSpy).toHaveBeenCalled();
+      });
+      await waitFor(() => {
+        expect(sessionStorage.getItem('paymentFail')).not.toBeNull();
+      });
+      await waitFor(() => {
+        expect(window.location.replace).toHaveBeenCalledWith(
+          expect.stringContaining('/payment/fail'),
+        );
+      });
+    });
+
+    it('confirm 응답 Zod 파싱 실패(success: false) 시 /payment/fail로 리다이렉트한다', async () => {
+      const failSpy = vi.fn();
+      server.use(
+        http.post('*/api/v1/payments/confirm', () => {
+          return HttpResponse.json({
+            success: false,
+            data: null,
+            error: 'invalid',
+          });
+        }),
+        http.post('*/api/v1/payments/fail', async ({ request }) => {
+          failSpy(await request.json());
+          return HttpResponse.json({ success: true, data: {}, error: null });
+        }),
+      );
+
+      render(
+        <PaymentRedirectClient
+          paymentId="pay-123"
+          participationId="456"
+          amount="10000"
+          groupBuyId="1"
+        />,
+      );
+
+      await waitFor(() => {
+        expect(failSpy).toHaveBeenCalled();
+        expect(window.location.replace).toHaveBeenCalledWith(
+          expect.stringContaining('/payment/fail'),
+        );
+      });
+      expect(sessionStorage.getItem('paymentFail')).toBe('결제 확인 실패');
+    });
+
+    it('confirm 응답 status 500 시 /payment/fail로 리다이렉트한다', async () => {
+      const failSpy = vi.fn();
+      server.use(
+        http.post('*/api/v1/payments/confirm', () => {
+          return HttpResponse.json(
+            { success: true, data: {}, error: null },
+            { status: 500 },
+          );
+        }),
+        http.post('*/api/v1/payments/fail', async ({ request }) => {
+          failSpy(await request.json());
+          return HttpResponse.json({ success: true, data: {}, error: null });
+        }),
+      );
+
+      render(
+        <PaymentRedirectClient
+          paymentId="pay-123"
+          participationId="456"
+          amount="10000"
+          groupBuyId="1"
+        />,
+      );
+
+      await waitFor(() => {
+        expect(failSpy).toHaveBeenCalled();
+        expect(window.location.replace).toHaveBeenCalledWith(
+          expect.stringContaining('/payment/fail'),
+        );
+      });
+      expect(sessionStorage.getItem('paymentFail')).toBe('결제 확인 실패');
+    });
+
+    // confirm + fail 둘 다 실패해도 .catch(() => {})로 fail API 에러를 삼키고,
+    // sessionStorage 저장 및 리다이렉트는 반드시 실행됨
+    it('confirm과 fail API 모두 실패해도 sessionStorage에 errorCode를 저장하고 /payment/fail로 리다이렉트한다', async () => {
+      server.use(
+        http.post('*/api/v1/payments/confirm', () => HttpResponse.error()),
+        http.post('*/api/v1/payments/fail', () => HttpResponse.error()),
+      );
+
+      render(
+        <PaymentRedirectClient
+          paymentId="pay-123"
+          participationId="456"
+          amount="10000"
+          groupBuyId="1"
+        />,
+      );
+
+      await waitFor(() => {
+        expect(sessionStorage.getItem('paymentFail')).not.toBeNull();
+        expect(window.location.replace).toHaveBeenCalledWith(
+          expect.stringContaining('/payment/fail'),
+        );
+      });
+    });
+
   });
 });

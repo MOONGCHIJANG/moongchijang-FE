@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 declare global {
   interface Window {
@@ -26,8 +26,11 @@ export default function NaverMap({
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<naver.maps.Map | null>(null);
   const overlaysRef = useRef<naver.maps.OverlayView[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    setIsLoading(true);
+
     const cleanup = () => {
       overlaysRef.current.forEach((o) => o.setMap(null));
       overlaysRef.current = [];
@@ -88,6 +91,8 @@ export default function NaverMap({
         overlay.setMap(map);
         overlaysRef.current.push(overlay);
       });
+
+      setIsLoading(false);
     };
 
     // 이미 로드되어 있으면 바로 초기화
@@ -124,5 +129,14 @@ export default function NaverMap({
     };
   }, [center.lat, center.lng, zoom, markers]);
 
-  return <div ref={mapRef} style={{ width, height }} />;
+  return (
+    <div style={{ width, height }} className="relative">
+      <div ref={mapRef} className="w-full h-full" />
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-8 h-8 border-4 border-border-brand border-t-transparent rounded-full animate-spin" />
+        </div>
+      )}
+    </div>
+  );
 }

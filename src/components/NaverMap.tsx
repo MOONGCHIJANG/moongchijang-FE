@@ -60,16 +60,18 @@ export default function NaverMap({
         overlayDiv.innerHTML = `
           <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
             <img src="/icons/map-marker.svg" alt="marker" style="width: 40px; height: 40px;" />
-            <div style="
+            <div class="marker-label" style="
               background: transparent;
               font-size: 14px;
               font-weight: 700;
               white-space: nowrap;
               color: #111114;
               -webkit-text-stroke: 0.2px #ffffff;
-            ">${marker.title || ''}</div>
+            "></div>
           </div>
         `;
+        const label = overlayDiv.querySelector('.marker-label') as HTMLElement;
+        if (label) label.textContent = marker.title || '';
 
         const overlay = new naver.maps.OverlayView();
 

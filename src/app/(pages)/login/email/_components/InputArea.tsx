@@ -6,8 +6,8 @@ import { loginSchema } from '@/lib/validation';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import Link from 'next/link';
-import Toast from '@/app/(pages)/item/[groupBuyId]/_components/Toast';
 import { redirectStorage } from '@/lib/redirect';
+import { ToastBlack } from '@/components/ToastBlack';
 
 const InputArea = () => {
   const [email, setEmail] = useState('');
@@ -98,7 +98,11 @@ const InputArea = () => {
       </div>
       {errorMessage && (
         <div className="fixed bottom-7 left-4 right-4 z-50 flex justify-center">
-          <Toast>{errorMessage}</Toast>
+          <ToastBlack
+            message={errorMessage}
+            isVisible
+            icon="cuida:alert-outline"
+          />
         </div>
       )}
     </>

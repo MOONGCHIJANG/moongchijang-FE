@@ -120,7 +120,7 @@ describe('JoinPageClient 결제 로직 테스트', () => {
   it('SDK 결제 실패 시 payments/fail API를 호출하고 실패 페이지로 이동해야 한다', async () => {
     const user = userEvent.setup();
 
-    // A. MSW 실패 핸들러
+    // A. MSW API 모킹 (participations 성공 / fail API spy 등록)
     const failApiSpy = vi.fn();
     server.use(
       http.post('*/api/v1/group-buys/:id/participations', () => {
@@ -145,7 +145,7 @@ describe('JoinPageClient 결제 로직 테스트', () => {
       }),
     );
 
-    // B. SDK 에러 응답
+    // B. SDK 에러 응답 — code 필드 반환 시 throw로 처리됨
     vi.mocked(PortOne.requestPayment).mockResolvedValue({
       code: 'USER_CANCEL',
       message: '사용자가 결제창을 닫았습니다',
@@ -170,8 +170,9 @@ describe('JoinPageClient 결제 로직 테스트', () => {
 
   it('결제 요청 생성(participations) API 실패 시 fail API를 호출하고 실패 페이지로 이동해야 한다', async () => {
     const user = userEvent.setup();
-    const failApiSpy = vi.fn();
 
+    // A. MSW API 모킹 — participations 400 실패, fail API spy 등록
+    const failApiSpy = vi.fn();
     server.use(
       http.post('*/api/v1/group-buys/:id/participations', () => {
         return HttpResponse.json(
@@ -187,9 +188,11 @@ describe('JoinPageClient 결제 로직 테스트', () => {
 
     render(<JoinPageClient groupBuyId="1" groupBuy={mockGroupBuy} />);
 
+    // 1. 결제 수단 선택 후 버튼 클릭
     await user.click(screen.getByText(/신용카드/i));
     await user.click(screen.getByRole('button', { name: /결제하기/i }));
 
+    // 검증: participations 실패 → SDK 미호출, '결제 요청 생성 실패'로 fail 처리
     await waitFor(() => {
       expect(failApiSpy).toHaveBeenCalled();
       expect(window.location.replace).toHaveBeenCalledWith(
@@ -201,8 +204,9 @@ describe('JoinPageClient 결제 로직 테스트', () => {
 
   it('결제 컨펌(confirm) API 실패 시 fail API를 호출하고 실패 페이지로 이동해야 한다', async () => {
     const user = userEvent.setup();
-    const failApiSpy = vi.fn();
 
+    // A. MSW API 모킹 — participations·SDK 성공, confirm status 500 실패
+    const failApiSpy = vi.fn();
     server.use(
       http.post('*/api/v1/group-buys/:id/participations', () => {
         return HttpResponse.json(
@@ -232,13 +236,16 @@ describe('JoinPageClient 결제 로직 테스트', () => {
       }),
     );
 
+    // B. SDK 모킹 — 정상 반환
     vi.mocked(PortOne.requestPayment).mockResolvedValue(undefined);
 
     render(<JoinPageClient groupBuyId="1" groupBuy={mockGroupBuy} />);
 
+    // 1. 결제 수단 선택 후 버튼 클릭
     await user.click(screen.getByText(/신용카드/i));
     await user.click(screen.getByRole('button', { name: /결제하기/i }));
 
+    // 검증: confirm 실패 → '결제 확인 실패'로 fail 처리
     await waitFor(() => {
       expect(failApiSpy).toHaveBeenCalled();
       expect(window.location.replace).toHaveBeenCalledWith(

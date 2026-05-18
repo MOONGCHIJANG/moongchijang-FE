@@ -82,18 +82,9 @@ const InputArea = () => {
           로그인
         </Button>
         <div className="w-full flex items-center justify-center text-text-tertiary body-md-regular">
-          <Link href="/login/email/find" className="text-text-tertiary">
-            아이디/비밀번호 찾기
-          </Link>
+          <Link href="/login/email/find">아이디/비밀번호 찾기</Link>
           <span className="mx-g5 text-border-subtle">|</span>
-          <button
-            type="button"
-            onClick={() => {
-              /* 회원가입 페이지 이동 로직 */
-            }}
-          >
-            회원가입
-          </button>
+          <Link href="/signup/email">회원가입</Link>
         </div>
       </div>
       {errorMessage && (

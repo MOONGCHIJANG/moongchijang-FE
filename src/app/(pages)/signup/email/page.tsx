@@ -1,7 +1,14 @@
+import Header from '@/components/Header';
 import React from 'react';
+import SignUpClient from './_components/SignUpClient';
 
 const page = () => {
-  return <div>회원가입 페이지입니다.</div>;
+  return (
+    <>
+      <Header text="회원가입" />
+      <SignUpClient />
+    </>
+  );
 };
 
 export default page;

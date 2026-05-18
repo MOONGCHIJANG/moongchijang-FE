@@ -1,8 +1,8 @@
 import { Icon } from '@iconify/react';
-import type { ApiResponseGroupBuyDetailData } from '@/api/generated/api.schemas';
+import type { ApiResponseGroupBuyDetailResponseData } from '@/api/generated/api.schemas';
 
 type Props = {
-  groupBuy: ApiResponseGroupBuyDetailData;
+  groupBuy: ApiResponseGroupBuyDetailResponseData;
 };
 
 const ItemSummary = ({ groupBuy }: Props) => {

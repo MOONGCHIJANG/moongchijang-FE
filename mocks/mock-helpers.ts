@@ -74,7 +74,7 @@ export { koFaker } from './ko-faker';
 
 export function createStoreSearchMock() {
   const base = getGetApiV1StoresSearchResponseMock();
-  const count = faker.number.int({ min: 3, max: 5 });
+  const count = 3;
   return {
     ...base,
     success: true,
@@ -94,6 +94,7 @@ export function createStoreSearchMock() {
           max: 127.2,
           fractionDigits: 6,
         }),
+        thumbnailUrl: faker.helpers.arrayElement(MOCK_IMAGES),
       })),
     },
     error: null,
@@ -130,11 +131,11 @@ export function createGroupBuyDetailMock() {
       pickupLocation: koFaker.location.address(),
       pickupLatitude: koFaker.location.lat(),
       pickupLongitude: koFaker.location.lng(),
-      price: koFaker.product.price(),
+      price: 18000, // koFaker.product.price(),
       achievementRate,
       currentQuantity,
       targetQuantity,
-      maxQuantity: Math.random() > 0.5 ? targetQuantity * 2 : null,
+      maxQuantity: 1, // Math.random() > 0.5 ? targetQuantity * 2 : null,
       deadline: koFaker.groupBuy.deadline(),
       pickupDate: koFaker.groupBuy.pickupDate(),
       pickupTimeStart: koFaker.groupBuy.pickupTime(),
@@ -157,14 +158,14 @@ export function createGroupBuysFeedMock() {
         storeName: faker.string.alpha({ length: { min: 4, max: 15 } }),
         productName: faker.string.alpha({ length: { min: 6, max: 22 } }),
         region: faker.string.alpha({ length: { min: 3, max: 12 } }),
-        price: faker.number.int({ min: 1_000, max: 1_000_000_000 }),
+        price: 18000, // faker.number.int({ min: 1_000, max: 1_000_000_000 }),
         achievementRate: faker.number.int({ min: 0, max: 100 }),
         currentQuantity: faker.number.int({ min: 1, max: 999 }),
         targetQuantity: faker.number.int({ min: 1, max: 999 }),
-        maxQuantity:
-          faker.helpers.maybe(() => faker.number.int({ min: 1, max: 999 }), {
-            probability: 0.5,
-          }) ?? null,
+        maxQuantity: 1,
+        // faker.helpers.maybe(() => faker.number.int({ min: 1, max: 999 }), {
+        //   probability: 0.5,
+        // }) ?? null,
         dDay: faker.number.int({ min: 0, max: 30 }),
       })),
     },

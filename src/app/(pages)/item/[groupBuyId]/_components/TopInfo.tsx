@@ -4,11 +4,11 @@ import ShareBtn from '@/components/ShareBtn';
 import { Icon } from '@iconify/react';
 import React from 'react';
 import BottomShare from './BottomShare';
-import { ApiResponseGroupBuyDetailData } from '@/api/generated/api.schemas';
+import { ApiResponseGroupBuyDetailResponseData } from '@/api/generated/api.schemas';
 import { formatDeadline, formatPickupDate, formatPickupTime } from '@/lib/date';
 
 interface Props {
-  data: ApiResponseGroupBuyDetailData;
+  data: ApiResponseGroupBuyDetailResponseData;
 }
 
 const TopInfo = ({ data }: Props) => {
@@ -38,7 +38,7 @@ const TopInfo = ({ data }: Props) => {
                 icon="teenyicons:pin-alt-solid"
                 className="h-3 w-3 text-primary-400"
               />
-              <p>{data.region}</p>
+              <p>{data.regionLabel}</p>
               <p>・</p>
               <p>{pickupText}</p>
             </div>

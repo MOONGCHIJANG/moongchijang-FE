@@ -21,7 +21,7 @@ export const Badge = ({ label, onDelete, className }: BadgeProps) => {
         className,
       )}
     >
-      <span className="text-center body-sm-regular text-text-tertiary">
+      <span className="text-center body-md-regular text-text-tertiary">
         {label}
       </span>
       {onDelete && (
@@ -32,10 +32,9 @@ export const Badge = ({ label, onDelete, className }: BadgeProps) => {
           }}
           className="flex h-5 w-5 items-center justify-center hover:opacity-70 transition-opacity"
         >
-          {/* 아이콘 영역 20px */}
           <Icon
             icon="material-symbols-light:close"
-            className="h-4 w-4 text-icon-subtle"
+            className="h-5 w-5 text-icon-subtle"
           />
         </button>
       )}

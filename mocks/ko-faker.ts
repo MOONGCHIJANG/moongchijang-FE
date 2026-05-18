@@ -108,6 +108,51 @@ const notificationMessages = [
   '위시리스트에 담은 공구가 곧 마감됩니다.',
 ];
 
+const districts = [
+  {
+    regionType: 'SEOUL',
+    regionLabel: '서울',
+    districtType: 'SEOUL_GANGNAM_YEOKSAM_SAMSEONG',
+    districtLabel: '강남/역삼/삼성',
+  },
+  {
+    regionType: 'SEOUL',
+    regionLabel: '서울',
+    districtType: 'SEOUL_HONGDAE_HAPJEONG_SANGSU_MAPO',
+    districtLabel: '홍대/합정/상수',
+  },
+  {
+    regionType: 'SEOUL',
+    regionLabel: '서울',
+    districtType: 'SEOUL_SEONGSU_GEONDAE_GWANGJIN',
+    districtLabel: '성수/건대/광진',
+  },
+  {
+    regionType: 'SEOUL',
+    regionLabel: '서울',
+    districtType: 'SEOUL_SINSA_APGUJEONG_CHEONGDAM',
+    districtLabel: '신사/압구정/청담',
+  },
+  {
+    regionType: 'SEOUL',
+    regionLabel: '서울',
+    districtType: 'SEOUL_SEOCHO_BANGBAE_GYODAE',
+    districtLabel: '서초/방배/교대',
+  },
+  {
+    regionType: 'SEOUL',
+    regionLabel: '서울',
+    districtType: 'SEOUL_JAMSIL_SINCHEON_SONGPA',
+    districtLabel: '잠실/신천/송파',
+  },
+  {
+    regionType: 'SEOUL',
+    regionLabel: '서울',
+    districtType: 'SEOUL_ITAEWON_HANNAM_YONGSAN',
+    districtLabel: '이태원/한남/용산',
+  },
+];
+
 const pick = <T>(arr: T[]): T => faker.helpers.arrayElement(arr);
 
 const koreanPrice = () =>
@@ -138,6 +183,7 @@ export const koFaker = {
   },
   location: {
     region: () => pick(regions),
+    district: () => pick(districts),
     address: () => pick(addresses),
     lat: () =>
       faker.number.float({ min: 37.45, max: 37.65, fractionDigits: 4 }),

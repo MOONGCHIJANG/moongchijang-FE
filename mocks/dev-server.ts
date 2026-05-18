@@ -13,7 +13,12 @@ import { handlers } from './handlers';
 const app = express();
 const PORT = 9090;
 
-app.use(cors({ origin: /^http:\/\/localhost:\d+$/ }));
+app.use(
+  cors({
+    origin: /^http:\/\/localhost:\d+$/,
+    credentials: true,
+  }),
+);
 app.use(express.json());
 app.use((req, _res, next) => {
   console.log(`[Mock] ${req.method} ${req.path}`);

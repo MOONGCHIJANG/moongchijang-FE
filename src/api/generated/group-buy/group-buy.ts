@@ -3,8 +3,9 @@
  * // 이 파일은 Orval이 자동 생성합니다. 직접 수정하지 마세요.
  */
 import type {
-  ApiResponseGroupBuyDetail,
-  ApiResponseGroupBuyFeedPage,
+  ApiResponseError,
+  ApiResponseGroupBuyDetailResponse,
+  ApiResponseGroupBuyFeedPageResponse,
   ApiResponseGroupBuyProgress,
   ApiResponseGroupBuyProgressList,
   ApiResponseRecentSearchList,
@@ -22,25 +23,49 @@ import type {
 import { customFetch } from '../../../lib/custom-fetch';
 
 /**
- * 진행 중인 공구 목록을 페이지네이션으로 조회한다. 비로그인 허용.
+ * 진행 중인 공구 목록(2열 카드 피드)을 페이지네이션으로 조회한다. 비로그인 허용.
+- `filter=ALL`: 전체
+- `filter=CLOSING_SOON`: 마감임박 (마감일 D-3 이하)
+- `filter=ALMOST_ACHIEVED`: 달성임박 (달성률 80% 이상)
+- 지역 필터는 `districts`로 복수 선택(최대 10개) 가능
+- 클라이언트 표시는 한글 라벨, 요청 전송값은 영문 코드(enum) 사용
+- 선택 규칙:
+  - 같은 시/도 내 `*_ALL`과 하위 세부지역 동시 선택 불가
+  - 전체 선택 개수(지역/세부지역 통합) 최대 10개
+
  * @summary 공구 피드 목록 조회
  */
 export type getApiV1GroupBuysResponse200 = {
-  data: ApiResponseGroupBuyFeedPage
+  data: ApiResponseGroupBuyFeedPageResponse
   status: 200
+}
+
+export type getApiV1GroupBuysResponse400 = {
+  data: ApiResponseError
+  status: 400
 }
 
 export type getApiV1GroupBuysResponseSuccess = (getApiV1GroupBuysResponse200) & {
   headers: Headers;
 };
-;
+export type getApiV1GroupBuysResponseError = (getApiV1GroupBuysResponse400) & {
+  headers: Headers;
+};
 
-export type getApiV1GroupBuysResponse = (getApiV1GroupBuysResponseSuccess)
+export type getApiV1GroupBuysResponse = (getApiV1GroupBuysResponseSuccess | getApiV1GroupBuysResponseError)
 
 export const getGetApiV1GroupBuysUrl = (params?: GetApiV1GroupBuysParams,) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
+    const explodeParameters = ["districts"];
+
+    if (Array.isArray(value) && explodeParameters.includes(key)) {
+      value.forEach((v) => {
+        normalizedParams.append(key, v === null ? 'null' : v.toString());
+      });
+      return;
+    }
 
     if (value !== undefined) {
       normalizedParams.append(key, value === null ? 'null' : value.toString())
@@ -65,11 +90,11 @@ export const getApiV1GroupBuys = async (params?: GetApiV1GroupBuysParams, option
 
 
 /**
- * 공구의 매장·상품·달성률·픽업 정보를 조회한다. 비로그인 허용.
+ * 공구의 상품·매장·픽업·이미지 정보를 조회한다. 비로그인 허용.
  * @summary 공구 상세 조회
  */
 export type getApiV1GroupBuysGroupBuyIdResponse200 = {
-  data: ApiResponseGroupBuyDetail
+  data: ApiResponseGroupBuyDetailResponse
   status: 200
 }
 

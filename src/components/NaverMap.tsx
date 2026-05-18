@@ -105,6 +105,25 @@ export default function NaverMap({
       });
     };
 
+    // 이미 로드되어 있으면 바로 초기화
+    if (window.naver && window.naver.maps) {
+      initializeMap();
+      return;
+    }
+
+    // 스크립트가 이미 로드되어 있는지 확인
+    const existingScript = document.querySelector(
+      'script[src*="openapi.map.naver.com"]',
+    );
+
+    if (existingScript) {
+      existingScript.addEventListener('load', initializeMap);
+      return () => {
+        existingScript.removeEventListener('load', initializeMap);
+      };
+    }
+
+    // 새로 스크립트 추가
     const script = document.createElement('script');
     script.src = `https://openapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID}`;
     script.async = true;

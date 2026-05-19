@@ -1,14 +1,9 @@
 'use client';
 import { useEffect } from 'react';
-import {
-  postApiV1PaymentsConfirm,
-  postApiV1PaymentsFail,
-} from '@/api/generated/participation/participation';
-import { PaymentConfirmResponse } from '@/api/schemas/participation';
+import { postApiV1PaymentsPortoneComplete } from '@/api/generated/participation/participation';
 
 type Props = {
   paymentId?: string;
-  participationId?: string;
   amount?: string;
   groupBuyId?: string;
   code?: string;
@@ -17,7 +12,6 @@ type Props = {
 
 const PaymentRedirectClient = ({
   paymentId,
-  participationId,
   amount,
   groupBuyId,
   code,
@@ -25,14 +19,8 @@ const PaymentRedirectClient = ({
 }: Props) => {
   useEffect(() => {
     const process = async () => {
+      // 포트원 실패 콜백 (code 있음)
       if (code) {
-        await postApiV1PaymentsFail({
-          paymentId: paymentId!,
-          participationId: Number(participationId ?? 0),
-          errorCode: code,
-          message: message ?? null,
-        }).catch(() => {});
-
         sessionStorage.setItem('paymentFail', code);
         window.location.replace(
           `/payment/fail?errorCode=${encodeURIComponent(code)}&groupBuyId=${groupBuyId ?? ''}`,
@@ -40,34 +28,23 @@ const PaymentRedirectClient = ({
         return;
       }
 
-      // 결제 성공
       try {
-        const confirmRes = await postApiV1PaymentsConfirm({
+        const completeRes = await postApiV1PaymentsPortoneComplete({
           paymentId: paymentId!,
-          participationId: Number(participationId),
           amount: Number(amount),
         });
 
-        const parsed = PaymentConfirmResponse.safeParse(confirmRes.data);
-        if (!parsed.success || confirmRes.status !== 200) {
-          throw new Error('결제 확인 실패');
-        }
+        if (completeRes.status !== 200) throw new Error('결제 확인 실패');
 
-        sessionStorage.setItem('paymentSuccess', participationId!);
+        const { participationId } = completeRes.data.data;
+
+        sessionStorage.setItem('paymentSuccess', participationId.toString());
         await new Promise((resolve) => setTimeout(resolve, 50));
         window.location.replace(
           `/payment/complete?participationId=${participationId}&groupBuyId=${groupBuyId}`,
         );
       } catch (error) {
         const errorCode = error instanceof Error ? error.message : 'UNKNOWN';
-
-        await postApiV1PaymentsFail({
-          paymentId: paymentId!,
-          participationId: Number(participationId ?? 0),
-          errorCode,
-          message: errorCode,
-        }).catch(() => {});
-
         sessionStorage.setItem('paymentFail', errorCode);
         window.location.replace(
           `/payment/fail?errorCode=${encodeURIComponent(errorCode)}&groupBuyId=${groupBuyId ?? ''}`,
@@ -76,7 +53,7 @@ const PaymentRedirectClient = ({
     };
 
     process();
-  }, [amount, code, groupBuyId, message, participationId, paymentId]);
+  }, [amount, code, groupBuyId, message, paymentId]);
 
   return (
     <div className="flex items-center justify-center min-h-screen">

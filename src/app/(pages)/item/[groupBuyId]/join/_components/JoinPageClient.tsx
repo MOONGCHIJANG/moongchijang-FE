@@ -40,9 +40,9 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
         { quantity },
       );
       if (checkoutRes.status !== 200) throw new Error('checkout 조회 실패');
-      const { totalAmount } = checkoutRes.data.data;
 
       // [2] payment-orders 생성 — PortOne SDK 파라미터 받아옴
+      // TODO: 추후 동의 관련 로직 추가
       const orderRes = await postApiV1GroupBuysGroupBuyIdPaymentOrders(
         Number(groupBuyId),
         {
@@ -82,7 +82,7 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
           pc: 'IFRAME' as const,
           mobile: 'REDIRECTION' as const,
         },
-        redirectUrl: `${window.location.origin}/payment/redirect?paymentId=${paymentId}&amount=${totalAmount}&groupBuyId=${groupBuyId}`,
+        redirectUrl: `${window.location.origin}/payment/redirect?paymentId=${paymentId}&amount=${amount}&groupBuyId=${groupBuyId}`,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any);
 
@@ -117,8 +117,8 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
 
   // 표시용 금액은 groupBuy.price 기반으로 유지 (checkout 응답 전)
   const productAmount = groupBuy.price * quantity;
-  const totalAmount = productAmount;
-  const feeAmount = Math.floor((totalAmount * FEE_RATE) / 100);
+  const feeAmount = Math.floor((productAmount * FEE_RATE) / 100);
+  const totalAmount = productAmount + feeAmount;
 
   return (
     <div className="relative bg-bg-white-muted p-4 pb-24">

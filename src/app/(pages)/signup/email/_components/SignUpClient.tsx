@@ -19,12 +19,12 @@ export default function SignUpClient() {
   };
 
   return (
-    <>
+    <div className="p-4">
       {step === 1 && <StepEmail onNext={handleNextStep} />}
       {step === 2 && (
         <StepProfile onNext={handleNextStep} onBack={handlePrevStep} />
       )}
       {step === 3 && <StepRole onBack={handlePrevStep} />}
-    </>
+    </div>
   );
 }

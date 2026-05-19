@@ -56,8 +56,6 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
       );
       if (orderRes.status !== 200) throw new Error('결제 주문 생성 실패');
 
-      console.log('[payment-orders 응답]', orderRes.data.data);
-
       const {
         paymentId: serverPaymentId,
         storeId,
@@ -93,17 +91,10 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
       if (result?.code) throw new Error(result.code);
 
       // [4] 결제 완료 검증
-      const completePayload = { paymentId, amount };
-      console.log('[portone/complete 요청 body]', completePayload);
-
       const completeRes = await postApiV1PaymentsPortoneComplete({
         paymentId,
         amount,
       });
-
-      console.log('[portone/complete 응답 status]', completeRes.status);
-      console.log('[portone/complete 응답 data]', completeRes.data);
-      console.log('[portone/complete 응답 error]', completeRes.data.error);
 
       if (completeRes.status !== 200) throw new Error('결제 확인 실패');
 

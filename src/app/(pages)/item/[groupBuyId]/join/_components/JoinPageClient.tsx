@@ -5,7 +5,6 @@ import ItemSummary from './ItemSummary';
 import JoinForm from './JoinForm';
 import AgreeTerms from './AgreeTerms';
 import PaymentButton from './PaymentButton';
-import PayMethodSelector, { type PayMethod } from './PayMethodSelector';
 import type { ApiResponseGroupBuyDetailResponseData } from '@/api/generated/api.schemas';
 import {
   getApiV1GroupBuysGroupBuyIdCheckout,
@@ -24,11 +23,11 @@ const FEE_RATE = 0;
 const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const [payMethod, setPayMethod] = useState<PayMethod | null>(null);
-  const isPayable = payMethod !== null && !isLoading;
+  const payMethod = 'CARD' as const;
+  const isPayable = !isLoading;
 
   const handlePayment = async () => {
-    if (isLoading || !payMethod) return;
+    if (isLoading) return;
     setIsLoading(true);
 
     let paymentId: string = '';
@@ -76,9 +75,8 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
         orderName,
         totalAmount: amount,
         currency: 'CURRENCY_KRW' as const,
-        payMethod: payMethod as PayMethod,
-        card: payMethod === 'CARD' ? {} : undefined,
-        transfer: payMethod === 'TRANSFER' ? {} : undefined,
+        payMethod,
+        card: {},
         customer: customerName ? { fullName: customerName } : undefined,
         windowType: {
           pc: 'IFRAME' as const,
@@ -138,7 +136,6 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
         totalAmount={totalAmount}
         productImage={groupBuy.imageUrls[0] || ''}
       />
-      <PayMethodSelector value={payMethod} onChange={setPayMethod} />
       <AgreeTerms />
       <PaymentButton
         price={totalAmount}

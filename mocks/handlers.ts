@@ -238,6 +238,74 @@ const overrideHandlers = [
       { status: 200 },
     );
   }),
+  // checkout
+  http.get('*/api/v1/group-buys/:groupBuyId/checkout', async ({ request }) => {
+    await delay(300);
+    const url = new URL(request.url);
+    const quantity = parseInt(url.searchParams.get('quantity') ?? '1', 10);
+    const unitPrice = 18000;
+    const productAmount = unitPrice * quantity;
+    return HttpResponse.json({
+      success: true,
+      data: {
+        groupBuyId: 1,
+        storeName: koFaker.store.name(),
+        productName: koFaker.product.name(),
+        thumbnailUrl: '/images/img1.jpg',
+        pickupDate: '2026-05-30',
+        pickupTimeStart: '14:00',
+        pickupTimeEnd: '18:00',
+        unitPrice,
+        quantity,
+        productAmount,
+        feeAmount: 0,
+        totalAmount: productAmount,
+        remainingQuantity: 10,
+      },
+      error: null,
+    });
+  }),
+
+  // payment-orders
+  http.post(
+    '*/api/v1/group-buys/:groupBuyId/payment-orders',
+    async ({ request }) => {
+      await delay(500);
+      const body = (await request.json()) as { quantity?: number };
+      const quantity = body.quantity ?? 1;
+      return HttpResponse.json({
+        success: true,
+        data: {
+          paymentId: `MOCK-${crypto.randomUUID()}`,
+          storeId: process.env.NEXT_PUBLIC_PORTONE_STORE_ID ?? 'mock-store-id',
+          channelKey:
+            process.env.NEXT_PUBLIC_PORTONE_CHANNEL_KEY ?? 'mock-channel-key',
+          orderName: `${koFaker.product.name()} ${quantity}개`,
+          amount: 18000 * quantity,
+          customerName: null,
+        },
+        error: null,
+      });
+    },
+  ),
+
+  // portone/complete
+  http.post('*/api/v1/payments/portone/complete', async () => {
+    await delay(300);
+    return HttpResponse.json({
+      success: true,
+      data: {
+        paymentId: `MOCK-${crypto.randomUUID()}`,
+        participationId: faker.number.int({ min: 1, max: 999 }),
+        participationStatus: 'PAID_WAITING_GOAL',
+        displayStatus: '참여중',
+        amount: 18000,
+        method: 'card',
+        approvedAt: new Date().toISOString(),
+      },
+      error: null,
+    });
+  }),
 ];
 
 export const handlers = [...overrideHandlers, ...generatedHandlers];

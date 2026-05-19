@@ -97,7 +97,7 @@ const Input = ({
             type="button"
             onClick={rightButton.onClick}
             disabled={rightButton.disabled}
-            className="shrink-0 px-g4 py-g5 rounded-2xlarge border border-border-subtle caption-sm-medium text-text-tertiary disabled:opacity-40"
+            className="shrink-0 px-g3 h-10 rounded-large caption-sm-bold text-text-basic-inverse bg-button-primary-fill disabled:bg-button-tertiary-fill-pressed"
           >
             {rightButton.label}
           </button>

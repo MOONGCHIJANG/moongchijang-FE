@@ -24,14 +24,32 @@ const StepEmail = ({ onNext }: StepEmailProps) => {
           height={28.8}
         />
       </div>
-      <div className="flex flex-col gap-g4">
+      <div className="flex flex-col gap-g4 pb-18">
         <Input
           label="이메일 주소"
           placeholder="이메일 주소를 입력해주세요."
-          helperText="" // 이메일 정합성 체크
+          helperText="이미 가입된 이메일이에요" // 이메일 정합성 체크
           rightButton={{
             label: '중복확인',
           }}
+        />
+        <Input
+          label="인증 코드"
+          placeholder="메일로 전송된 코드를 입력해주세요."
+          helperText="코드가 일치하지 않아요"
+          rightButton={{
+            label: '코드확인',
+          }}
+        />
+        <Input
+          label="비밀번호"
+          isPassword
+          helperText="영문, 숫자, 특수문자가 모두 들어간 8자 이상"
+        />
+        <Input
+          label="비밀번호 확인"
+          isPassword
+          helperText="비밀번호가 일치하지 않아요"
         />
       </div>
 

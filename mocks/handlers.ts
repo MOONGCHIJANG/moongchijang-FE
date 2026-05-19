@@ -166,25 +166,22 @@ const overrideHandlers = [
       success: true,
       data: {
         // ── 분기 확인용: 하나만 주석 해제해서 확인 ───────────────────────
-
         // case 1: 베이커리 인식, 동네 미인식
         // searchCase: 1,
         // detectedBakery: '두쫀쿠',
         // detectedNeighborhood: null,
-
         // case 2: 동네 인식, 베이커리 미인식
         // searchCase: 2,
         // detectedBakery: null,
         // detectedNeighborhood: '성수',
-
         // case 3: 동네 + 베이커리 모두 인식
-        // searchCase: 3, detectedBakery: '두쫀쿠', detectedNeighborhood: '성수',
-
+        // searchCase: 3,
+        // detectedBakery: '두쫀쿠',
+        // detectedNeighborhood: '분당',
         // case 4: 모두 인식 불가 (현재 활성)
         searchCase: 4,
         detectedBakery: null,
         detectedNeighborhood: null,
-
         // ─────────────────────────────────────────────────────────────────
       },
       error: null,

@@ -20,8 +20,9 @@ const StepEmail = ({ onNext }: StepEmailProps) => {
         <Image
           src="/icons/progress-1.png"
           alt="progress"
-          width={131}
-          height={28.8}
+          width={512}
+          height={113}
+          className="w-32.75 h-7.2"
         />
       </div>
       <div className="flex flex-col gap-g4 pb-18">

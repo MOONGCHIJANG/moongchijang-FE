@@ -54,8 +54,8 @@ const InputArea = () => {
           label="이메일 주소"
           placeholder="이메일 주소를 입력해주세요."
           value={email}
-          onChange={(v) => {
-            setEmail(v);
+          onChange={(e) => {
+            setEmail(e.target.value);
             setErrorMessage(null);
           }}
         />
@@ -65,8 +65,8 @@ const InputArea = () => {
           placeholder="비밀번호를 입력해주세요."
           helperText="영문, 숫자, 특수문자가 모두 들어간 8자 이상"
           value={password}
-          onChange={(v) => {
-            setPassword(v);
+          onChange={(e) => {
+            setPassword(e.target.value);
             setErrorMessage(null);
           }}
         />

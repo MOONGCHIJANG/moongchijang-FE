@@ -21,7 +21,6 @@ import { SearchOverlay } from './SearchOverlay';
 import { QrModal } from './QrModal';
 import { EmptyState } from './EmptyState';
 import { GroupBuyRequestCard } from './GroupBuyRequestCard';
-import { GroupBuyRequestSheet } from './GroupBuyRequestSheet';
 import { REGIONS_DATA, Region } from '@/constants/regions';
 import { useShake } from '@/hooks/useShake';
 import {
@@ -75,7 +74,7 @@ export function FeedClient() {
   );
   const [searchAnalysis, setSearchAnalysis] =
     useState<ApiResponseSearchAnalysisData | null>(null);
-  const [isRequestSheetOpen, setIsRequestSheetOpen] = useState(false);
+
 
   const queryClient = useQueryClient();
   const { recentSearches, removeRecentSearch, clearRecentSearches } =
@@ -208,8 +207,14 @@ export function FeedClient() {
   };
 
   const handleOpenRequestSheet = useCallback(() => {
-    setIsRequestSheetOpen(true);
-  }, []);
+    const params = new URLSearchParams();
+    if (searchAnalysis?.detectedBakery)
+      params.set('bakery', searchAnalysis.detectedBakery);
+    if (searchAnalysis?.detectedNeighborhood)
+      params.set('neighborhood', searchAnalysis.detectedNeighborhood);
+    const qs = params.toString();
+    router.push(`/feed/request${qs ? `?${qs}` : ''}`);
+  }, [router, searchAnalysis]);
 
   const handleShake = useCallback(() => {
     setIsQrModalOpen(true);
@@ -342,13 +347,6 @@ export function FeedClient() {
         recentSearches={recentSearches}
         onRemoveRecent={removeRecentSearch}
         onClearRecent={clearRecentSearches}
-      />
-
-      <GroupBuyRequestSheet
-        isOpen={isRequestSheetOpen}
-        onClose={() => setIsRequestSheetOpen(false)}
-        detectedBakery={searchAnalysis?.detectedBakery}
-        detectedNeighborhood={searchAnalysis?.detectedNeighborhood}
       />
 
       <QrModal

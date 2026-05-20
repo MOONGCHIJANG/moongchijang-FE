@@ -102,10 +102,13 @@ function useSuccessHandlers(participationId = 123) {
       );
       return checkoutResponse(qty);
     }),
-    http.post('*/api/v1/group-buys/:groupBuyId/payment-orders', ({ request }) => {
-      void request;
-      return ordersResponse();
-    }),
+    http.post(
+      '*/api/v1/group-buys/:groupBuyId/payment-orders',
+      ({ request }) => {
+        void request;
+        return ordersResponse();
+      },
+    ),
     http.post('*/api/v1/payments/portone/complete', () =>
       completeResponse(participationId),
     ),
@@ -120,12 +123,14 @@ describe('JoinPageClient 결제 로직 테스트', () => {
   it('결제 버튼 클릭 시 checkout → payment-orders → SDK → portone/complete → 성공 페이지 이동이 순차적으로 일어나야 한다', async () => {
     const user = userEvent.setup();
 
+    // 3단계 API 핸들러 + SDK 성공 응답으로 정상 플로우 전체 시뮬레이션
     useSuccessHandlers(123);
     vi.mocked(PortOne.requestPayment).mockResolvedValue(undefined);
 
     render(<JoinPageClient groupBuyId="1" groupBuy={mockGroupBuy} />);
     await user.click(screen.getByRole('button', { name: /결제하기/i }));
 
+    // 검증: SDK 호출 파라미터(totalAmount, orderName), 완료 페이지 리다이렉트, sessionStorage 저장
     await waitFor(() => {
       expect(PortOne.requestPayment).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -145,6 +150,7 @@ describe('JoinPageClient 결제 로직 테스트', () => {
   it('SDK 결제 실패 시 실패 페이지로 이동해야 한다', async () => {
     const user = userEvent.setup();
 
+    // code 필드가 있는 응답 → SDK 실패로 간주, portone/complete API 호출 없음
     useSuccessHandlers();
     vi.mocked(PortOne.requestPayment).mockResolvedValue({
       code: 'USER_CANCEL',
@@ -154,6 +160,7 @@ describe('JoinPageClient 결제 로직 테스트', () => {
     render(<JoinPageClient groupBuyId="1" groupBuy={mockGroupBuy} />);
     await user.click(screen.getByRole('button', { name: /결제하기/i }));
 
+    // 검증: SDK 반환 code 값이 errorCode로 전달되고 sessionStorage에도 동일하게 저장
     await waitFor(() => {
       expect(window.location.replace).toHaveBeenCalledWith(
         expect.stringContaining('/payment/fail?errorCode=USER_CANCEL'),
@@ -165,6 +172,7 @@ describe('JoinPageClient 결제 로직 테스트', () => {
   it('checkout API 실패 시 실패 페이지로 이동해야 한다', async () => {
     const user = userEvent.setup();
 
+    // checkout 400 → 결제 플로우 첫 단계 실패, 이후 단계(payment-orders, SDK) 실행 없음
     server.use(
       http.get('*/api/v1/group-buys/:groupBuyId/checkout', () =>
         HttpResponse.json(
@@ -177,6 +185,7 @@ describe('JoinPageClient 결제 로직 테스트', () => {
     render(<JoinPageClient groupBuyId="1" groupBuy={mockGroupBuy} />);
     await user.click(screen.getByRole('button', { name: /결제하기/i }));
 
+    // 검증: 'checkout 조회 실패' 고정 메시지 저장 및 /payment/fail 리다이렉트
     await waitFor(() => {
       expect(window.location.replace).toHaveBeenCalledWith(
         expect.stringContaining('/payment/fail'),
@@ -188,6 +197,7 @@ describe('JoinPageClient 결제 로직 테스트', () => {
   it('payment-orders API 실패 시 실패 페이지로 이동해야 한다', async () => {
     const user = userEvent.setup();
 
+    // checkout 성공 후 payment-orders 500 → paymentId 없이 SDK 호출 불가
     server.use(
       http.get('*/api/v1/group-buys/:groupBuyId/checkout', () =>
         checkoutResponse(),
@@ -203,6 +213,7 @@ describe('JoinPageClient 결제 로직 테스트', () => {
     render(<JoinPageClient groupBuyId="1" groupBuy={mockGroupBuy} />);
     await user.click(screen.getByRole('button', { name: /결제하기/i }));
 
+    // 검증: '결제 주문 생성 실패' 메시지 저장 및 /payment/fail 리다이렉트
     await waitFor(() => {
       expect(window.location.replace).toHaveBeenCalledWith(
         expect.stringContaining('/payment/fail'),
@@ -214,15 +225,18 @@ describe('JoinPageClient 결제 로직 테스트', () => {
   it('결제 버튼을 연속으로 두 번 클릭해도 결제 요청은 한 번만 발생해야 한다', async () => {
     const user = userEvent.setup();
 
+    // 결제 진행 중 버튼 비활성화 여부 검증 — 중복 결제 방지 핵심 케이스
     useSuccessHandlers();
     vi.mocked(PortOne.requestPayment).mockResolvedValue(undefined);
 
     render(<JoinPageClient groupBuyId="1" groupBuy={mockGroupBuy} />);
     const payButton = screen.getByRole('button', { name: /결제하기/i });
 
+    // 연속 두 번 클릭
     await user.click(payButton);
     await user.click(payButton);
 
+    // 검증: SDK requestPayment 호출 횟수 정확히 1회
     await waitFor(() => {
       expect(PortOne.requestPayment).toHaveBeenCalledTimes(1);
     });
@@ -231,6 +245,7 @@ describe('JoinPageClient 결제 로직 테스트', () => {
   it('수량을 변경한 후 결제하면 변경된 수량이 payment-orders API에 전달되어야 한다', async () => {
     const user = userEvent.setup();
 
+    // ordersSpy로 payment-orders 요청 바디의 quantity 필드 캡처
     const ordersSpy = vi.fn();
     server.use(
       http.get('*/api/v1/group-buys/:groupBuyId/checkout', ({ request }) => {
@@ -246,19 +261,19 @@ describe('JoinPageClient 결제 로직 테스트', () => {
           return ordersResponse(3);
         },
       ),
-      http.post('*/api/v1/payments/portone/complete', () =>
-        completeResponse(),
-      ),
+      http.post('*/api/v1/payments/portone/complete', () => completeResponse()),
     );
     vi.mocked(PortOne.requestPayment).mockResolvedValue(undefined);
 
     render(<JoinPageClient groupBuyId="1" groupBuy={mockGroupBuy} />);
 
+    // spinbutton(수량 입력) 값을 3으로 직접 변경 후 결제
     const quantityInput = screen.getByRole('spinbutton');
     fireEvent.change(quantityInput, { target: { value: '3' } });
 
     await user.click(screen.getByRole('button', { name: /결제하기/i }));
 
+    // 검증: payment-orders 요청 바디에 quantity: 3 포함
     await waitFor(() => {
       expect(ordersSpy).toHaveBeenCalledWith(
         expect.objectContaining({ quantity: 3 }),
@@ -269,6 +284,7 @@ describe('JoinPageClient 결제 로직 테스트', () => {
   it('portone/complete API 실패 시 실패 페이지로 이동해야 한다', async () => {
     const user = userEvent.setup();
 
+    // 성공 핸들러 이후 portone/complete만 500으로 덮어쓰기 — 마지막 단계 실패 케이스
     useSuccessHandlers();
     server.use(
       http.post('*/api/v1/payments/portone/complete', () =>
@@ -283,6 +299,7 @@ describe('JoinPageClient 결제 로직 테스트', () => {
     render(<JoinPageClient groupBuyId="1" groupBuy={mockGroupBuy} />);
     await user.click(screen.getByRole('button', { name: /결제하기/i }));
 
+    // 검증: '결제 확인 실패' 메시지 저장 및 /payment/fail 리다이렉트
     await waitFor(() => {
       expect(window.location.replace).toHaveBeenCalledWith(
         expect.stringContaining('/payment/fail'),
@@ -294,12 +311,16 @@ describe('JoinPageClient 결제 로직 테스트', () => {
   it('SDK가 예외를 throw하면(네트워크 단절 등) 실패 페이지로 이동해야 한다', async () => {
     const user = userEvent.setup();
 
+    // mockRejectedValue → SDK가 Promise를 reject하는 상황 (결제창 자체 오류, code 없음)
     useSuccessHandlers();
-    vi.mocked(PortOne.requestPayment).mockRejectedValue(new Error('네트워크 오류'));
+    vi.mocked(PortOne.requestPayment).mockRejectedValue(
+      new Error('네트워크 오류'),
+    );
 
     render(<JoinPageClient groupBuyId="1" groupBuy={mockGroupBuy} />);
     await user.click(screen.getByRole('button', { name: /결제하기/i }));
 
+    // 검증: Error.message가 그대로 paymentFail에 저장되고 /payment/fail 리다이렉트
     await waitFor(() => {
       expect(window.location.replace).toHaveBeenCalledWith(
         expect.stringContaining('/payment/fail'),
@@ -311,6 +332,7 @@ describe('JoinPageClient 결제 로직 테스트', () => {
   it('checkout 응답이 예상과 다른 형식이면 실패 처리해야 한다', async () => {
     const user = userEvent.setup();
 
+    // data: null로 Zod 필수 필드 부재 → 파싱 실패 경로 재현
     server.use(
       http.get('*/api/v1/group-buys/:groupBuyId/checkout', () =>
         // totalAmount 누락 → Zod 파싱 실패
@@ -321,17 +343,21 @@ describe('JoinPageClient 결제 로직 테스트', () => {
     render(<JoinPageClient groupBuyId="1" groupBuy={mockGroupBuy} />);
     await user.click(screen.getByRole('button', { name: /결제하기/i }));
 
+    // 검증: 'checkout 응답 형식 오류' 저장 및 /payment/fail 리다이렉트
     await waitFor(() => {
       expect(window.location.replace).toHaveBeenCalledWith(
         expect.stringContaining('/payment/fail'),
       );
     });
-    expect(sessionStorage.getItem('paymentFail')).toBe('checkout 응답 형식 오류');
+    expect(sessionStorage.getItem('paymentFail')).toBe(
+      'checkout 응답 형식 오류',
+    );
   });
 
   it('payment-orders 응답이 예상과 다른 형식이면 실패 처리해야 한다', async () => {
     const user = userEvent.setup();
 
+    // checkout 성공 후 payment-orders에서 data: null → paymentId 누락으로 파싱 실패
     server.use(
       http.get('*/api/v1/group-buys/:groupBuyId/checkout', () =>
         checkoutResponse(),
@@ -345,11 +371,14 @@ describe('JoinPageClient 결제 로직 테스트', () => {
     render(<JoinPageClient groupBuyId="1" groupBuy={mockGroupBuy} />);
     await user.click(screen.getByRole('button', { name: /결제하기/i }));
 
+    // 검증: '결제 주문 응답 형식 오류' 저장 및 /payment/fail 리다이렉트
     await waitFor(() => {
       expect(window.location.replace).toHaveBeenCalledWith(
         expect.stringContaining('/payment/fail'),
       );
     });
-    expect(sessionStorage.getItem('paymentFail')).toBe('결제 주문 응답 형식 오류');
+    expect(sessionStorage.getItem('paymentFail')).toBe(
+      '결제 주문 응답 형식 오류',
+    );
   });
 });

@@ -105,9 +105,6 @@ export const GroupBuyRequestPage = ({
 
   const [step, setStep] = useState<Step>(initialStep);
 
-  // TODO: NUMBER_3에서 detectedNeighborhood가 POPULAR_NEIGHBORHOODS에 없으면
-  // 칩이 비활성화 상태지만 effectiveNeighborhood 폴백으로 버튼은 활성화됨
-  // → 동적 칩 추가 또는 REGIONS_DATA 매칭으로 시각적 피드백 개선 필요
   const [selectedNeighborhoodLabel, setSelectedNeighborhoodLabel] = useState<
     string | null
   >(detectedNeighborhood ?? null);

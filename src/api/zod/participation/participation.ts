@@ -5,40 +5,76 @@
 import * as zod from 'zod';
 
 /**
- * @summary 공구 참여 (결제 요청 생성)
+ * @summary 참여하기 화면 결제 정보 조회
  */
-export const PostApiV1GroupBuysGroupBuyIdParticipationsParams = zod.object({
+export const GetApiV1GroupBuysGroupBuyIdCheckoutParams = zod.object({
   groupBuyId: zod.number(),
 });
 
-export const postApiV1GroupBuysGroupBuyIdParticipationsBodyAgreedTermsMin = 4;
+export const GetApiV1GroupBuysGroupBuyIdCheckoutQueryParams = zod.object({
+  quantity: zod.number().min(1).describe('참여 수량'),
+});
 
-export const PostApiV1GroupBuysGroupBuyIdParticipationsBody = zod.object({
-  quantity: zod.number().min(1),
-  agreedTerms: zod
-    .array(
-      zod.enum([
-        'NO_CANCEL_AFTER_ACHIEVED',
-        'FULL_REFUND_BEFORE_ACHIEVED',
-        'NO_REFUND_IF_NOT_PICKED_UP',
-        'NO_WITHDRAWAL_RIGHT',
-      ]),
-    )
-    .min(postApiV1GroupBuysGroupBuyIdParticipationsBodyAgreedTermsMin)
-    .describe('4개 항목 모두 포함 필수'),
+export const GetApiV1GroupBuysGroupBuyIdCheckoutResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    groupBuyId: zod.number(),
+    storeName: zod.string(),
+    productName: zod.string(),
+    thumbnailUrl: zod.string().nullable(),
+    pickupDate: zod.iso.date(),
+    pickupTimeStart: zod.string(),
+    pickupTimeEnd: zod.string(),
+    unitPrice: zod.number(),
+    quantity: zod.number(),
+    productAmount: zod.number(),
+    feeAmount: zod.number(),
+    totalAmount: zod.number(),
+    remainingQuantity: zod.number(),
+  }),
+  error: zod.unknown().nullable(),
 });
 
 /**
- * @summary PG 결제 성공 콜백 처리
+ * @summary PortOne 결제 주문 생성
  */
-export const PostApiV1PaymentsConfirmBody = zod
+export const PostApiV1GroupBuysGroupBuyIdPaymentOrdersParams = zod.object({
+  groupBuyId: zod.number(),
+});
+
+export const PostApiV1GroupBuysGroupBuyIdPaymentOrdersBody = zod.object({
+  quantity: zod.number().min(1),
+  agreedNoCancelAfterGoal: zod.boolean().describe('달성 후 취소 불가 동의'),
+  agreedRefundBeforeGoal: zod
+    .boolean()
+    .describe('달성 전 이탈 시 전액 환불 동의'),
+  agreedNoRefundAfterNoShow: zod.boolean().describe('미수령 환불 불가 동의'),
+  agreedNoWithdrawal: zod.boolean().describe('청약철회 불가 동의'),
+});
+
+export const PostApiV1GroupBuysGroupBuyIdPaymentOrdersResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    paymentId: zod
+      .string()
+      .describe('PortOne SDK requestPayment에 전달할 paymentId'),
+    storeId: zod.string(),
+    channelKey: zod.string(),
+    orderName: zod.string(),
+    amount: zod.number(),
+    customerName: zod.string().nullable(),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * @summary PortOne 결제 완료 서버 검증
+ */
+export const PostApiV1PaymentsPortoneCompleteBody = zod
   .object({
     paymentId: zod
-      .uuid()
-      .describe(
-        '포트원 결제 ID (클라이언트가 UUID로 생성하여 SDK 호출 시 사용한 값)',
-      ),
-    participationId: zod.number(),
+      .string()
+      .describe('서버가 결제 주문 생성 시 반환한 PortOne paymentId'),
     amount: zod
       .number()
       .describe('결제 요청 금액 — 서버 저장값과 불일치 시 위변조로 처리'),
@@ -47,27 +83,35 @@ export const PostApiV1PaymentsConfirmBody = zod
     '포트원 v2 + 토스페이먼츠 결제 성공 후 서버 검증 요청.\n클라이언트가 PortOne.requestPayment() 완료 시 반환된 paymentId를 전달한다.\n서버는 포트원 API(GET \/payments\/{paymentId})로 위변조 검증 후 확정 처리한다.\n',
   );
 
-export const PostApiV1PaymentsConfirmResponse = zod.object({
+export const PostApiV1PaymentsPortoneCompleteResponse = zod.object({
   success: zod.boolean(),
-  data: zod.unknown().nullable(),
+  data: zod.object({
+    paymentId: zod.string(),
+    participationId: zod.number(),
+    participationStatus: zod.enum(['PAID_WAITING_GOAL', 'CONFIRMED']),
+    displayStatus: zod.string(),
+    amount: zod.number(),
+    method: zod.string().nullish(),
+    approvedAt: zod.iso.datetime({ offset: true }),
+  }),
   error: zod.unknown().nullable(),
 });
 
 /**
- * @summary PG 결제 실패 콜백 처리
+ * 웹훅 본문만 신뢰하지 않고 서버에서 PortOne 결제 단건 조회 후 상태를 동기화한다.
+ * @summary PortOne 결제 웹훅 수신
  */
-export const PostApiV1PaymentsFailBody = zod
-  .object({
-    paymentId: zod.uuid().describe('포트원 결제 ID'),
-    participationId: zod.number(),
-    errorCode: zod.string().describe('포트원\/토스페이먼츠 오류 코드'),
-    message: zod.string().nullable().describe('오류 메시지'),
-  })
-  .describe('포트원 v2 결제 실패\/취소 콜백 처리');
+export const PostApiV1PaymentsPortoneWebhookBody = zod.object({
+  type: zod.string().nullish(),
+  storeId: zod.string().nullish(),
+  paymentId: zod.string().nullish(),
+});
 
-export const PostApiV1PaymentsFailResponse = zod.object({
+export const PostApiV1PaymentsPortoneWebhookResponse = zod.object({
   success: zod.boolean(),
-  data: zod.unknown().nullable(),
+  data: zod.object({
+    received: zod.boolean(),
+  }),
   error: zod.unknown().nullable(),
 });
 

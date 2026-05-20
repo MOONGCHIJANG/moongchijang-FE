@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import StepEmail from './StepEmail';
+import StepEmail from './StepEmail/StepEmail';
 import StepProfile from './StepProfile';
 import StepRole from './StepRole';
 

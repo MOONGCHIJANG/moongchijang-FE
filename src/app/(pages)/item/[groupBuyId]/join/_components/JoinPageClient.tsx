@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as PortOne from '@portone/browser-sdk/v2';
 import ItemSummary from './ItemSummary';
 import JoinForm from './JoinForm';
@@ -11,6 +11,9 @@ import {
   postApiV1GroupBuysGroupBuyIdPaymentOrders,
   postApiV1PaymentsPortoneComplete,
 } from '@/api/generated/participation/participation';
+import { useRouter } from 'next/navigation';
+import { tokenStorage } from '@/lib/token';
+import { redirectStorage } from '@/lib/redirect';
 
 type Props = {
   groupBuyId: string;
@@ -21,6 +24,17 @@ type Props = {
 const FEE_RATE = 0;
 
 const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
+  // TODO: 마감됨 페이지 접근 시 처리
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = tokenStorage.get();
+    if (!token) {
+      redirectStorage.set(`/item/${groupBuyId}/join`);
+      router.push('/login');
+    }
+  }, [groupBuyId, router]);
+
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const payMethod = 'CARD' as const;

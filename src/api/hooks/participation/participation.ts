@@ -19,14 +19,18 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  ApiResponseParticipationCreated,
+  ApiResponseCheckoutInfo,
+  ApiResponsePaymentConfirmed,
+  ApiResponsePaymentOrderCreated,
+  ApiResponsePortOneWebhook,
   ApiResponseRefundList,
   BadRequestResponse,
   ConflictResponse,
   ForbiddenResponse,
-  ParticipationCreate,
+  GetApiV1GroupBuysGroupBuyIdCheckoutParams,
   PaymentConfirm,
-  PaymentFail,
+  PaymentOrderCreate,
+  PortOneWebhook,
   SuccessNoDataResponse,
   UnauthorizedResponse,
 } from '../api.schemas';
@@ -36,84 +40,324 @@ import { customFetch } from '../../../lib/custom-fetch';
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 /**
- * @summary 공구 참여 (결제 요청 생성)
+ * @summary 참여하기 화면 결제 정보 조회
  */
-export type postApiV1GroupBuysGroupBuyIdParticipationsResponse201 = {
-  data: ApiResponseParticipationCreated;
-  status: 201;
+export type getApiV1GroupBuysGroupBuyIdCheckoutResponse200 = {
+  data: ApiResponseCheckoutInfo;
+  status: 200;
 };
 
-export type postApiV1GroupBuysGroupBuyIdParticipationsResponse400 = {
+export type getApiV1GroupBuysGroupBuyIdCheckoutResponse400 = {
   data: BadRequestResponse;
   status: 400;
 };
 
-export type postApiV1GroupBuysGroupBuyIdParticipationsResponse401 = {
-  data: UnauthorizedResponse;
-  status: 401;
-};
-
-export type postApiV1GroupBuysGroupBuyIdParticipationsResponse409 = {
+export type getApiV1GroupBuysGroupBuyIdCheckoutResponse409 = {
   data: ConflictResponse;
   status: 409;
 };
 
-export type postApiV1GroupBuysGroupBuyIdParticipationsResponseSuccess =
-  postApiV1GroupBuysGroupBuyIdParticipationsResponse201 & {
+export type getApiV1GroupBuysGroupBuyIdCheckoutResponseSuccess =
+  getApiV1GroupBuysGroupBuyIdCheckoutResponse200 & {
     headers: Headers;
   };
-export type postApiV1GroupBuysGroupBuyIdParticipationsResponseError = (
-  | postApiV1GroupBuysGroupBuyIdParticipationsResponse400
-  | postApiV1GroupBuysGroupBuyIdParticipationsResponse401
-  | postApiV1GroupBuysGroupBuyIdParticipationsResponse409
+export type getApiV1GroupBuysGroupBuyIdCheckoutResponseError = (
+  | getApiV1GroupBuysGroupBuyIdCheckoutResponse400
+  | getApiV1GroupBuysGroupBuyIdCheckoutResponse409
 ) & {
   headers: Headers;
 };
 
-export type postApiV1GroupBuysGroupBuyIdParticipationsResponse =
-  | postApiV1GroupBuysGroupBuyIdParticipationsResponseSuccess
-  | postApiV1GroupBuysGroupBuyIdParticipationsResponseError;
+export type getApiV1GroupBuysGroupBuyIdCheckoutResponse =
+  | getApiV1GroupBuysGroupBuyIdCheckoutResponseSuccess
+  | getApiV1GroupBuysGroupBuyIdCheckoutResponseError;
 
-export const getPostApiV1GroupBuysGroupBuyIdParticipationsUrl = (
+export const getGetApiV1GroupBuysGroupBuyIdCheckoutUrl = (
   groupBuyId: number,
+  params: GetApiV1GroupBuysGroupBuyIdCheckoutParams,
 ) => {
-  return `/api/v1/group-buys/${groupBuyId}/participations`;
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/group-buys/${groupBuyId}/checkout?${stringifiedParams}`
+    : `/api/v1/group-buys/${groupBuyId}/checkout`;
 };
 
-export const postApiV1GroupBuysGroupBuyIdParticipations = async (
+export const getApiV1GroupBuysGroupBuyIdCheckout = async (
   groupBuyId: number,
-  participationCreate: ParticipationCreate,
+  params: GetApiV1GroupBuysGroupBuyIdCheckoutParams,
   options?: RequestInit,
-): Promise<postApiV1GroupBuysGroupBuyIdParticipationsResponse> => {
-  return customFetch<postApiV1GroupBuysGroupBuyIdParticipationsResponse>(
-    getPostApiV1GroupBuysGroupBuyIdParticipationsUrl(groupBuyId),
+): Promise<getApiV1GroupBuysGroupBuyIdCheckoutResponse> => {
+  return customFetch<getApiV1GroupBuysGroupBuyIdCheckoutResponse>(
+    getGetApiV1GroupBuysGroupBuyIdCheckoutUrl(groupBuyId, params),
     {
       ...options,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...options?.headers },
-      body: JSON.stringify(participationCreate),
+      method: 'GET',
     },
   );
 };
 
-export const getPostApiV1GroupBuysGroupBuyIdParticipationsMutationOptions = <
+export const getGetApiV1GroupBuysGroupBuyIdCheckoutQueryKey = (
+  groupBuyId: number,
+  params?: GetApiV1GroupBuysGroupBuyIdCheckoutParams,
+) => {
+  return [
+    `/api/v1/group-buys/${groupBuyId}/checkout`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetApiV1GroupBuysGroupBuyIdCheckoutQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiV1GroupBuysGroupBuyIdCheckout>>,
+  TError = BadRequestResponse | ConflictResponse,
+>(
+  groupBuyId: number,
+  params: GetApiV1GroupBuysGroupBuyIdCheckoutParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1GroupBuysGroupBuyIdCheckout>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetApiV1GroupBuysGroupBuyIdCheckoutQueryKey(groupBuyId, params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiV1GroupBuysGroupBuyIdCheckout>>
+  > = ({ signal }) =>
+    getApiV1GroupBuysGroupBuyIdCheckout(groupBuyId, params, {
+      signal,
+      ...requestOptions,
+    });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!groupBuyId,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiV1GroupBuysGroupBuyIdCheckout>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiV1GroupBuysGroupBuyIdCheckoutQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiV1GroupBuysGroupBuyIdCheckout>>
+>;
+export type GetApiV1GroupBuysGroupBuyIdCheckoutQueryError =
+  | BadRequestResponse
+  | ConflictResponse;
+
+export function useGetApiV1GroupBuysGroupBuyIdCheckout<
+  TData = Awaited<ReturnType<typeof getApiV1GroupBuysGroupBuyIdCheckout>>,
+  TError = BadRequestResponse | ConflictResponse,
+>(
+  groupBuyId: number,
+  params: GetApiV1GroupBuysGroupBuyIdCheckoutParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1GroupBuysGroupBuyIdCheckout>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1GroupBuysGroupBuyIdCheckout>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1GroupBuysGroupBuyIdCheckout>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1GroupBuysGroupBuyIdCheckout<
+  TData = Awaited<ReturnType<typeof getApiV1GroupBuysGroupBuyIdCheckout>>,
+  TError = BadRequestResponse | ConflictResponse,
+>(
+  groupBuyId: number,
+  params: GetApiV1GroupBuysGroupBuyIdCheckoutParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1GroupBuysGroupBuyIdCheckout>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1GroupBuysGroupBuyIdCheckout>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1GroupBuysGroupBuyIdCheckout>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1GroupBuysGroupBuyIdCheckout<
+  TData = Awaited<ReturnType<typeof getApiV1GroupBuysGroupBuyIdCheckout>>,
+  TError = BadRequestResponse | ConflictResponse,
+>(
+  groupBuyId: number,
+  params: GetApiV1GroupBuysGroupBuyIdCheckoutParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1GroupBuysGroupBuyIdCheckout>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary 참여하기 화면 결제 정보 조회
+ */
+
+export function useGetApiV1GroupBuysGroupBuyIdCheckout<
+  TData = Awaited<ReturnType<typeof getApiV1GroupBuysGroupBuyIdCheckout>>,
+  TError = BadRequestResponse | ConflictResponse,
+>(
+  groupBuyId: number,
+  params: GetApiV1GroupBuysGroupBuyIdCheckoutParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1GroupBuysGroupBuyIdCheckout>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiV1GroupBuysGroupBuyIdCheckoutQueryOptions(
+    groupBuyId,
+    params,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary PortOne 결제 주문 생성
+ */
+export type postApiV1GroupBuysGroupBuyIdPaymentOrdersResponse200 = {
+  data: ApiResponsePaymentOrderCreated;
+  status: 200;
+};
+
+export type postApiV1GroupBuysGroupBuyIdPaymentOrdersResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type postApiV1GroupBuysGroupBuyIdPaymentOrdersResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type postApiV1GroupBuysGroupBuyIdPaymentOrdersResponse409 = {
+  data: ConflictResponse;
+  status: 409;
+};
+
+export type postApiV1GroupBuysGroupBuyIdPaymentOrdersResponseSuccess =
+  postApiV1GroupBuysGroupBuyIdPaymentOrdersResponse200 & {
+    headers: Headers;
+  };
+export type postApiV1GroupBuysGroupBuyIdPaymentOrdersResponseError = (
+  | postApiV1GroupBuysGroupBuyIdPaymentOrdersResponse400
+  | postApiV1GroupBuysGroupBuyIdPaymentOrdersResponse401
+  | postApiV1GroupBuysGroupBuyIdPaymentOrdersResponse409
+) & {
+  headers: Headers;
+};
+
+export type postApiV1GroupBuysGroupBuyIdPaymentOrdersResponse =
+  | postApiV1GroupBuysGroupBuyIdPaymentOrdersResponseSuccess
+  | postApiV1GroupBuysGroupBuyIdPaymentOrdersResponseError;
+
+export const getPostApiV1GroupBuysGroupBuyIdPaymentOrdersUrl = (
+  groupBuyId: number,
+) => {
+  return `/api/v1/group-buys/${groupBuyId}/payment-orders`;
+};
+
+export const postApiV1GroupBuysGroupBuyIdPaymentOrders = async (
+  groupBuyId: number,
+  paymentOrderCreate: PaymentOrderCreate,
+  options?: RequestInit,
+): Promise<postApiV1GroupBuysGroupBuyIdPaymentOrdersResponse> => {
+  return customFetch<postApiV1GroupBuysGroupBuyIdPaymentOrdersResponse>(
+    getPostApiV1GroupBuysGroupBuyIdPaymentOrdersUrl(groupBuyId),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(paymentOrderCreate),
+    },
+  );
+};
+
+export const getPostApiV1GroupBuysGroupBuyIdPaymentOrdersMutationOptions = <
   TError = BadRequestResponse | UnauthorizedResponse | ConflictResponse,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof postApiV1GroupBuysGroupBuyIdParticipations>>,
+    Awaited<ReturnType<typeof postApiV1GroupBuysGroupBuyIdPaymentOrders>>,
     TError,
-    { groupBuyId: number; data: ParticipationCreate },
+    { groupBuyId: number; data: PaymentOrderCreate },
     TContext
   >;
   request?: SecondParameter<typeof customFetch>;
 }): UseMutationOptions<
-  Awaited<ReturnType<typeof postApiV1GroupBuysGroupBuyIdParticipations>>,
+  Awaited<ReturnType<typeof postApiV1GroupBuysGroupBuyIdPaymentOrders>>,
   TError,
-  { groupBuyId: number; data: ParticipationCreate },
+  { groupBuyId: number; data: PaymentOrderCreate },
   TContext
 > => {
-  const mutationKey = ['postApiV1GroupBuysGroupBuyIdParticipations'];
+  const mutationKey = ['postApiV1GroupBuysGroupBuyIdPaymentOrders'];
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation &&
       'mutationKey' in options.mutation &&
@@ -123,12 +367,12 @@ export const getPostApiV1GroupBuysGroupBuyIdParticipationsMutationOptions = <
     : { mutation: { mutationKey }, request: undefined };
 
   const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof postApiV1GroupBuysGroupBuyIdParticipations>>,
-    { groupBuyId: number; data: ParticipationCreate }
+    Awaited<ReturnType<typeof postApiV1GroupBuysGroupBuyIdPaymentOrders>>,
+    { groupBuyId: number; data: PaymentOrderCreate }
   > = (props) => {
     const { groupBuyId, data } = props ?? {};
 
-    return postApiV1GroupBuysGroupBuyIdParticipations(
+    return postApiV1GroupBuysGroupBuyIdPaymentOrders(
       groupBuyId,
       data,
       requestOptions,
@@ -138,70 +382,88 @@ export const getPostApiV1GroupBuysGroupBuyIdParticipationsMutationOptions = <
   return { mutationFn, ...mutationOptions };
 };
 
-export type PostApiV1GroupBuysGroupBuyIdParticipationsMutationResult =
+export type PostApiV1GroupBuysGroupBuyIdPaymentOrdersMutationResult =
   NonNullable<
-    Awaited<ReturnType<typeof postApiV1GroupBuysGroupBuyIdParticipations>>
+    Awaited<ReturnType<typeof postApiV1GroupBuysGroupBuyIdPaymentOrders>>
   >;
-export type PostApiV1GroupBuysGroupBuyIdParticipationsMutationBody =
-  ParticipationCreate;
-export type PostApiV1GroupBuysGroupBuyIdParticipationsMutationError =
+export type PostApiV1GroupBuysGroupBuyIdPaymentOrdersMutationBody =
+  PaymentOrderCreate;
+export type PostApiV1GroupBuysGroupBuyIdPaymentOrdersMutationError =
   | BadRequestResponse
   | UnauthorizedResponse
   | ConflictResponse;
 
 /**
- * @summary 공구 참여 (결제 요청 생성)
+ * @summary PortOne 결제 주문 생성
  */
-export const usePostApiV1GroupBuysGroupBuyIdParticipations = <
+export const usePostApiV1GroupBuysGroupBuyIdPaymentOrders = <
   TError = BadRequestResponse | UnauthorizedResponse | ConflictResponse,
   TContext = unknown,
 >(
   options?: {
     mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof postApiV1GroupBuysGroupBuyIdParticipations>>,
+      Awaited<ReturnType<typeof postApiV1GroupBuysGroupBuyIdPaymentOrders>>,
       TError,
-      { groupBuyId: number; data: ParticipationCreate },
+      { groupBuyId: number; data: PaymentOrderCreate },
       TContext
     >;
     request?: SecondParameter<typeof customFetch>;
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
-  Awaited<ReturnType<typeof postApiV1GroupBuysGroupBuyIdParticipations>>,
+  Awaited<ReturnType<typeof postApiV1GroupBuysGroupBuyIdPaymentOrders>>,
   TError,
-  { groupBuyId: number; data: ParticipationCreate },
+  { groupBuyId: number; data: PaymentOrderCreate },
   TContext
 > => {
   return useMutation(
-    getPostApiV1GroupBuysGroupBuyIdParticipationsMutationOptions(options),
+    getPostApiV1GroupBuysGroupBuyIdPaymentOrdersMutationOptions(options),
     queryClient,
   );
 };
 /**
- * @summary PG 결제 성공 콜백 처리
+ * @summary PortOne 결제 완료 서버 검증
  */
-export type postApiV1PaymentsConfirmResponse200 = {
-  data: SuccessNoDataResponse;
+export type postApiV1PaymentsPortoneCompleteResponse200 = {
+  data: ApiResponsePaymentConfirmed;
   status: 200;
 };
 
-export type postApiV1PaymentsConfirmResponseSuccess =
-  postApiV1PaymentsConfirmResponse200 & {
-    headers: Headers;
-  };
-export type postApiV1PaymentsConfirmResponse =
-  postApiV1PaymentsConfirmResponseSuccess;
-
-export const getPostApiV1PaymentsConfirmUrl = () => {
-  return `/api/v1/payments/confirm`;
+export type postApiV1PaymentsPortoneCompleteResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
 };
 
-export const postApiV1PaymentsConfirm = async (
+export type postApiV1PaymentsPortoneCompleteResponse409 = {
+  data: ConflictResponse;
+  status: 409;
+};
+
+export type postApiV1PaymentsPortoneCompleteResponseSuccess =
+  postApiV1PaymentsPortoneCompleteResponse200 & {
+    headers: Headers;
+  };
+export type postApiV1PaymentsPortoneCompleteResponseError = (
+  | postApiV1PaymentsPortoneCompleteResponse400
+  | postApiV1PaymentsPortoneCompleteResponse409
+) & {
+  headers: Headers;
+};
+
+export type postApiV1PaymentsPortoneCompleteResponse =
+  | postApiV1PaymentsPortoneCompleteResponseSuccess
+  | postApiV1PaymentsPortoneCompleteResponseError;
+
+export const getPostApiV1PaymentsPortoneCompleteUrl = () => {
+  return `/api/v1/payments/portone/complete`;
+};
+
+export const postApiV1PaymentsPortoneComplete = async (
   paymentConfirm: PaymentConfirm,
   options?: RequestInit,
-): Promise<postApiV1PaymentsConfirmResponse> => {
-  return customFetch<postApiV1PaymentsConfirmResponse>(
-    getPostApiV1PaymentsConfirmUrl(),
+): Promise<postApiV1PaymentsPortoneCompleteResponse> => {
+  return customFetch<postApiV1PaymentsPortoneCompleteResponse>(
+    getPostApiV1PaymentsPortoneCompleteUrl(),
     {
       ...options,
       method: 'POST',
@@ -211,24 +473,24 @@ export const postApiV1PaymentsConfirm = async (
   );
 };
 
-export const getPostApiV1PaymentsConfirmMutationOptions = <
-  TError = unknown,
+export const getPostApiV1PaymentsPortoneCompleteMutationOptions = <
+  TError = BadRequestResponse | ConflictResponse,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof postApiV1PaymentsConfirm>>,
+    Awaited<ReturnType<typeof postApiV1PaymentsPortoneComplete>>,
     TError,
     { data: PaymentConfirm },
     TContext
   >;
   request?: SecondParameter<typeof customFetch>;
 }): UseMutationOptions<
-  Awaited<ReturnType<typeof postApiV1PaymentsConfirm>>,
+  Awaited<ReturnType<typeof postApiV1PaymentsPortoneComplete>>,
   TError,
   { data: PaymentConfirm },
   TContext
 > => {
-  const mutationKey = ['postApiV1PaymentsConfirm'];
+  const mutationKey = ['postApiV1PaymentsPortoneComplete'];
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation &&
       'mutationKey' in options.mutation &&
@@ -238,33 +500,35 @@ export const getPostApiV1PaymentsConfirmMutationOptions = <
     : { mutation: { mutationKey }, request: undefined };
 
   const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof postApiV1PaymentsConfirm>>,
+    Awaited<ReturnType<typeof postApiV1PaymentsPortoneComplete>>,
     { data: PaymentConfirm }
   > = (props) => {
     const { data } = props ?? {};
 
-    return postApiV1PaymentsConfirm(data, requestOptions);
+    return postApiV1PaymentsPortoneComplete(data, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
 };
 
-export type PostApiV1PaymentsConfirmMutationResult = NonNullable<
-  Awaited<ReturnType<typeof postApiV1PaymentsConfirm>>
+export type PostApiV1PaymentsPortoneCompleteMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiV1PaymentsPortoneComplete>>
 >;
-export type PostApiV1PaymentsConfirmMutationBody = PaymentConfirm;
-export type PostApiV1PaymentsConfirmMutationError = unknown;
+export type PostApiV1PaymentsPortoneCompleteMutationBody = PaymentConfirm;
+export type PostApiV1PaymentsPortoneCompleteMutationError =
+  | BadRequestResponse
+  | ConflictResponse;
 
 /**
- * @summary PG 결제 성공 콜백 처리
+ * @summary PortOne 결제 완료 서버 검증
  */
-export const usePostApiV1PaymentsConfirm = <
-  TError = unknown,
+export const usePostApiV1PaymentsPortoneComplete = <
+  TError = BadRequestResponse | ConflictResponse,
   TContext = unknown,
 >(
   options?: {
     mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof postApiV1PaymentsConfirm>>,
+      Awaited<ReturnType<typeof postApiV1PaymentsPortoneComplete>>,
       TError,
       { data: PaymentConfirm },
       TContext
@@ -273,68 +537,69 @@ export const usePostApiV1PaymentsConfirm = <
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
-  Awaited<ReturnType<typeof postApiV1PaymentsConfirm>>,
+  Awaited<ReturnType<typeof postApiV1PaymentsPortoneComplete>>,
   TError,
   { data: PaymentConfirm },
   TContext
 > => {
   return useMutation(
-    getPostApiV1PaymentsConfirmMutationOptions(options),
+    getPostApiV1PaymentsPortoneCompleteMutationOptions(options),
     queryClient,
   );
 };
 /**
- * @summary PG 결제 실패 콜백 처리
+ * 웹훅 본문만 신뢰하지 않고 서버에서 PortOne 결제 단건 조회 후 상태를 동기화한다.
+ * @summary PortOne 결제 웹훅 수신
  */
-export type postApiV1PaymentsFailResponse200 = {
-  data: SuccessNoDataResponse;
+export type postApiV1PaymentsPortoneWebhookResponse200 = {
+  data: ApiResponsePortOneWebhook;
   status: 200;
 };
 
-export type postApiV1PaymentsFailResponseSuccess =
-  postApiV1PaymentsFailResponse200 & {
+export type postApiV1PaymentsPortoneWebhookResponseSuccess =
+  postApiV1PaymentsPortoneWebhookResponse200 & {
     headers: Headers;
   };
-export type postApiV1PaymentsFailResponse =
-  postApiV1PaymentsFailResponseSuccess;
+export type postApiV1PaymentsPortoneWebhookResponse =
+  postApiV1PaymentsPortoneWebhookResponseSuccess;
 
-export const getPostApiV1PaymentsFailUrl = () => {
-  return `/api/v1/payments/fail`;
+export const getPostApiV1PaymentsPortoneWebhookUrl = () => {
+  return `/api/v1/payments/portone/webhook`;
 };
 
-export const postApiV1PaymentsFail = async (
-  paymentFail: PaymentFail,
+export const postApiV1PaymentsPortoneWebhook = async (
+  portOneWebhook: PortOneWebhook,
   options?: RequestInit,
-): Promise<postApiV1PaymentsFailResponse> => {
-  return customFetch<postApiV1PaymentsFailResponse>(
-    getPostApiV1PaymentsFailUrl(),
+): Promise<postApiV1PaymentsPortoneWebhookResponse> => {
+  return customFetch<postApiV1PaymentsPortoneWebhookResponse>(
+    getPostApiV1PaymentsPortoneWebhookUrl(),
     {
       ...options,
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...options?.headers },
-      body: JSON.stringify(paymentFail),
+      body: JSON.stringify(portOneWebhook),
     },
   );
 };
 
-export const getPostApiV1PaymentsFailMutationOptions = <
+export const getPostApiV1PaymentsPortoneWebhookMutationOptions = <
   TError = unknown,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof postApiV1PaymentsFail>>,
+    Awaited<ReturnType<typeof postApiV1PaymentsPortoneWebhook>>,
     TError,
-    { data: PaymentFail },
+    { data: PortOneWebhook },
     TContext
   >;
   request?: SecondParameter<typeof customFetch>;
 }): UseMutationOptions<
-  Awaited<ReturnType<typeof postApiV1PaymentsFail>>,
+  Awaited<ReturnType<typeof postApiV1PaymentsPortoneWebhook>>,
   TError,
-  { data: PaymentFail },
+  { data: PortOneWebhook },
   TContext
 > => {
-  const mutationKey = ['postApiV1PaymentsFail'];
+  const mutationKey = ['postApiV1PaymentsPortoneWebhook'];
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation &&
       'mutationKey' in options.mutation &&
@@ -344,45 +609,48 @@ export const getPostApiV1PaymentsFailMutationOptions = <
     : { mutation: { mutationKey }, request: undefined };
 
   const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof postApiV1PaymentsFail>>,
-    { data: PaymentFail }
+    Awaited<ReturnType<typeof postApiV1PaymentsPortoneWebhook>>,
+    { data: PortOneWebhook }
   > = (props) => {
     const { data } = props ?? {};
 
-    return postApiV1PaymentsFail(data, requestOptions);
+    return postApiV1PaymentsPortoneWebhook(data, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
 };
 
-export type PostApiV1PaymentsFailMutationResult = NonNullable<
-  Awaited<ReturnType<typeof postApiV1PaymentsFail>>
+export type PostApiV1PaymentsPortoneWebhookMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiV1PaymentsPortoneWebhook>>
 >;
-export type PostApiV1PaymentsFailMutationBody = PaymentFail;
-export type PostApiV1PaymentsFailMutationError = unknown;
+export type PostApiV1PaymentsPortoneWebhookMutationBody = PortOneWebhook;
+export type PostApiV1PaymentsPortoneWebhookMutationError = unknown;
 
 /**
- * @summary PG 결제 실패 콜백 처리
+ * @summary PortOne 결제 웹훅 수신
  */
-export const usePostApiV1PaymentsFail = <TError = unknown, TContext = unknown>(
+export const usePostApiV1PaymentsPortoneWebhook = <
+  TError = unknown,
+  TContext = unknown,
+>(
   options?: {
     mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof postApiV1PaymentsFail>>,
+      Awaited<ReturnType<typeof postApiV1PaymentsPortoneWebhook>>,
       TError,
-      { data: PaymentFail },
+      { data: PortOneWebhook },
       TContext
     >;
     request?: SecondParameter<typeof customFetch>;
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
-  Awaited<ReturnType<typeof postApiV1PaymentsFail>>,
+  Awaited<ReturnType<typeof postApiV1PaymentsPortoneWebhook>>,
   TError,
-  { data: PaymentFail },
+  { data: PortOneWebhook },
   TContext
 > => {
   return useMutation(
-    getPostApiV1PaymentsFailMutationOptions(options),
+    getPostApiV1PaymentsPortoneWebhookMutationOptions(options),
     queryClient,
   );
 };

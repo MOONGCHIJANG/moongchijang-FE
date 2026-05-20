@@ -10,6 +10,9 @@ import { Chip } from '@/components/Chip';
 import Link from 'next/link';
 import { NeighborhoodPickerBottomSheet } from '@/app/(pages)/(gnb)/feed/_components/NeighborhoodPickerBottomSheet';
 import { DatePickerBottomSheet } from '@/app/(pages)/request/_components/DatePickerBottomSheet';
+import { RequestConfirmModal } from '@/app/(pages)/request/_components/RequestConfirmModal';
+import { SubmitCompleteStep } from '@/app/(pages)/request/_components/SubmitCompleteStep';
+import type { RequestFormData } from '@/app/(pages)/request/_components/RequestFormStep';
 import { StoreSearchCard } from '@/app/(pages)/(gnb)/feed/_components/StoreSearchCard';
 import { cn } from '@/lib/utils';
 import { type RequestRegion } from '@/constants/requestRegions';
@@ -19,7 +22,7 @@ import {
 } from '@/api/hooks/group-buy-request/group-buy-request';
 import type { ApiResponseStoreSearchListDataStoresItem } from '@/api/generated/api.schemas';
 
-type Step = 'form' | 'stores';
+type Step = 'form' | 'stores' | 'complete';
 
 const POPULAR_NEIGHBORHOODS = ['성수', '홍대', '망원', '연남', '이태원'];
 const POPULAR_BAKERIES = [
@@ -53,7 +56,7 @@ const InfoBanner = ({
 const SectionLabel = ({ label }: { label: string }) => (
   <div className="flex items-center gap-1.5">
     <Image src="/icons/icon.svg" alt="" width={20} height={20} />
-    <span className="body-sm-bold text-text-tertiary font-pretendard">
+    <span className="heading-sm-bold text-text-basic font-pretendard">
       {label}
     </span>
   </div>
@@ -124,6 +127,7 @@ export const GroupBuyRequestPage = ({
   const [desiredQuantity, setDesiredQuantity] = useState(1);
   const [desiredPickupDate, setDesiredPickupDate] = useState('');
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
   const hasDetectedBakery = !!detectedBakery;
   const hasDetectedNeighborhood = !!detectedNeighborhood;
@@ -156,7 +160,7 @@ export const GroupBuyRequestPage = ({
     storesData?.status === 200 ? (storesData.data?.data?.stores ?? []) : [];
 
   const { mutate: submitRequest, isPending } = usePostApiV1GroupBuyRequests({
-    mutation: { onSuccess: () => router.back() },
+    mutation: { onSuccess: () => setStep('complete') },
   });
 
   const hasUserSelectedNeighborhood =
@@ -191,6 +195,11 @@ export const GroupBuyRequestPage = ({
 
   const handleSubmit = () => {
     if (!canSubmit) return;
+    setIsConfirmModalOpen(true);
+  };
+
+  const handleConfirm = () => {
+    setIsConfirmModalOpen(false);
     submitRequest({
       data: {
         storeName: selectedStore!.storeName!,
@@ -202,6 +211,20 @@ export const GroupBuyRequestPage = ({
         desiredPickupDate,
       },
     });
+  };
+
+  const confirmModalData: RequestFormData = {
+    store: {
+      placeId: selectedStore?.placeId ?? '',
+      storeName: selectedStore?.storeName ?? '',
+      roadAddress: selectedStore?.roadAddress ?? '',
+      latitude: selectedStore?.latitude ?? 0,
+      longitude: selectedStore?.longitude ?? 0,
+    },
+    productName: effectiveBakery ?? '',
+    quantity: desiredQuantity,
+    pickupDate: desiredPickupDate,
+    additionalNote: '',
   };
 
   const handleNeighborhoodChipClick = (label: string) => {
@@ -323,7 +346,7 @@ export const GroupBuyRequestPage = ({
         />
         {renderNeighborhoodSection()}
         <div className="border-t border-border-subtle" />
-        {renderBakerySection('어떤 베이커리 찾으시나요?')}
+        {renderBakerySection('무슨 상품 찾으시나요?')}
       </div>
     );
   };
@@ -334,7 +357,7 @@ export const GroupBuyRequestPage = ({
         <SectionLabel label={`추천 매장 ${stores.length}곳`} />
         <p className="caption-sm-regular text-text-tertiary font-pretendard">
           {'입력데이터와 자사 공구 이력을 분석해 '}
-          <span className="caption-sm-bold text-text-brand">{`${effectiveNeighborhood} ${effectiveBakery}`}</span>
+          <span className="caption-sm-bold text-text-subtle">{`${effectiveNeighborhood} ${effectiveBakery}`}</span>
           {' 관련된 매장을 찾았어요! 매장을 선택해주세요.'}
         </p>
       </div>
@@ -417,6 +440,14 @@ export const GroupBuyRequestPage = ({
     </div>
   );
 
+  if (step === 'complete') {
+    return (
+      <div className="flex h-dvh flex-col">
+        <SubmitCompleteStep />
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="flex flex-col h-dvh bg-surface-white">
@@ -475,6 +506,13 @@ export const GroupBuyRequestPage = ({
           )}
         </div>
       </div>
+
+      <RequestConfirmModal
+        isOpen={isConfirmModalOpen}
+        onClose={() => setIsConfirmModalOpen(false)}
+        onConfirm={handleConfirm}
+        data={confirmModalData}
+      />
 
       <DatePickerBottomSheet
         isOpen={isDatePickerOpen}

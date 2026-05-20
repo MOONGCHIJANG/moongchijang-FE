@@ -1,6 +1,7 @@
 'use client';
 import { useEffect } from 'react';
 import { postApiV1PaymentsPortoneComplete } from '@/api/generated/participation/participation';
+import { PaymentConfirmedResponse } from '@/api/schemas/participation';
 
 type Props = {
   paymentId?: string;
@@ -36,7 +37,15 @@ const PaymentRedirectClient = ({
 
         if (completeRes.status !== 200) throw new Error('결제 확인 실패');
 
-        const { participationId } = completeRes.data.data;
+        const completeParsed = PaymentConfirmedResponse.safeParse(
+          completeRes.data,
+        );
+        if (!completeParsed.success) {
+          console.error('[complete 응답 파싱 실패]', completeParsed.error);
+          throw new Error('결제 확인 응답 형식 오류');
+        }
+
+        const { participationId } = completeParsed.data.data;
 
         sessionStorage.setItem('paymentSuccess', participationId.toString());
         await new Promise((resolve) => setTimeout(resolve, 50));

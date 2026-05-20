@@ -14,6 +14,11 @@ import {
 import { useRouter } from 'next/navigation';
 import { tokenStorage } from '@/lib/token';
 import { redirectStorage } from '@/lib/redirect';
+import {
+  CheckoutInfoResponse,
+  PaymentOrderCreatedResponse,
+  PaymentConfirmedResponse,
+} from '@/api/schemas/participation';
 
 type Props = {
   groupBuyId: string;
@@ -55,6 +60,13 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
       );
       if (checkoutRes.status !== 200) throw new Error('checkout 조회 실패');
 
+      const checkoutParsed = CheckoutInfoResponse.safeParse(checkoutRes.data);
+      if (!checkoutParsed.success) {
+        console.error('[1] checkout 응답 파싱 실패', checkoutParsed.error);
+        throw new Error('checkout 응답 형식 오류');
+      }
+      const { totalAmount } = checkoutParsed.data.data;
+
       // [2] payment-orders 생성 — PortOne SDK 파라미터 받아옴
       // TODO: 추후 동의 관련 로직 추가
       const orderRes = await postApiV1GroupBuysGroupBuyIdPaymentOrders(
@@ -69,6 +81,12 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
       );
       if (orderRes.status !== 200) throw new Error('결제 주문 생성 실패');
 
+      const orderParsed = PaymentOrderCreatedResponse.safeParse(orderRes.data);
+      if (!orderParsed.success) {
+        console.error('[2] payment-orders 응답 파싱 실패', orderParsed.error);
+        throw new Error('결제 주문 응답 형식 오류');
+      }
+
       const {
         paymentId: serverPaymentId,
         storeId,
@@ -76,7 +94,7 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
         orderName,
         amount,
         customerName,
-      } = orderRes.data.data;
+      } = orderParsed.data.data;
 
       paymentId = serverPaymentId;
 
@@ -96,7 +114,7 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
           pc: 'IFRAME' as const,
           mobile: 'REDIRECTION' as const,
         },
-        redirectUrl: `${window.location.origin}/payment/redirect?paymentId=${paymentId}&amount=${amount}&groupBuyId=${groupBuyId}`,
+        redirectUrl: `${window.location.origin}/payment/redirect?paymentId=${paymentId}&amount=${totalAmount}&groupBuyId=${groupBuyId}`,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any);
 
@@ -110,7 +128,15 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
 
       if (completeRes.status !== 200) throw new Error('결제 확인 실패');
 
-      participationId = completeRes.data.data.participationId;
+      const completeParsed = PaymentConfirmedResponse.safeParse(
+        completeRes.data,
+      );
+      if (!completeParsed.success) {
+        console.error('[4] complete 응답 파싱 실패', completeParsed.error);
+        throw new Error('결제 확인 응답 형식 오류');
+      }
+
+      participationId = completeParsed.data.data.participationId;
 
       // [5] 완료 페이지 이동
       sessionStorage.setItem('paymentSuccess', participationId.toString());

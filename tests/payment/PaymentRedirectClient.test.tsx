@@ -19,7 +19,6 @@ describe('PaymentRedirectClient', () => {
       render(
         <PaymentRedirectClient
           paymentId="pay-123"
-          participationId="456"
           groupBuyId="1"
           code="USER_CANCEL"
           message="사용자 취소"
@@ -51,7 +50,6 @@ describe('PaymentRedirectClient', () => {
       render(
         <PaymentRedirectClient
           paymentId="pay-123"
-          participationId="456"
           groupBuyId="1"
           code="USER_CANCEL"
           message="사용자 취소"
@@ -78,7 +76,6 @@ describe('PaymentRedirectClient', () => {
       render(
         <PaymentRedirectClient
           paymentId="pay-123"
-          participationId="456"
           groupBuyId="1"
           code="PAY/CANCEL+ERROR"
           message="특수문자 에러"
@@ -105,7 +102,6 @@ describe('PaymentRedirectClient', () => {
       render(
         <PaymentRedirectClient
           paymentId="pay-123"
-          participationId="456"
           code="USER_CANCEL"
           message="사용자 취소"
         />,
@@ -134,7 +130,6 @@ describe('PaymentRedirectClient', () => {
       render(
         <PaymentRedirectClient
           paymentId="pay-123"
-          participationId="456"
           amount="10000"
           groupBuyId="1"
         />,
@@ -174,7 +169,6 @@ describe('PaymentRedirectClient', () => {
       render(
         <PaymentRedirectClient
           paymentId="pay-123"
-          participationId="456"
           amount="10000"
           groupBuyId="1"
         />,
@@ -214,7 +208,6 @@ describe('PaymentRedirectClient', () => {
       render(
         <PaymentRedirectClient
           paymentId="pay-123"
-          participationId="456"
           amount="10000"
           groupBuyId="1"
         />,
@@ -249,7 +242,6 @@ describe('PaymentRedirectClient', () => {
       render(
         <PaymentRedirectClient
           paymentId="pay-123"
-          participationId="456"
           amount="10000"
           groupBuyId="1"
         />,
@@ -277,7 +269,6 @@ describe('PaymentRedirectClient', () => {
       render(
         <PaymentRedirectClient
           paymentId="pay-123"
-          participationId="456"
           amount="10000"
           groupBuyId="1"
         />,
@@ -316,7 +307,6 @@ describe('PaymentRedirectClient', () => {
       render(
         <PaymentRedirectClient
           paymentId="pay-123"
-          participationId="456"
           amount="abc"
           groupBuyId="1"
         />,

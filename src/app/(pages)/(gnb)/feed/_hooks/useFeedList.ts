@@ -22,9 +22,11 @@ const FILTER_MAP: Record<FilterId, GetApiV1GroupBuysFilter> = {
 
 const PAGE_SIZE = 10;
 
-type FeedPageData = ApiResponseGroupBuyFeedPageResponseData & { hasSearchResult?: boolean };
+type FeedPageData = ApiResponseGroupBuyFeedPageResponseData;
 
-function extractPageData(page: Awaited<ReturnType<typeof getApiV1GroupBuys>> | undefined): FeedPageData | undefined {
+function extractPageData(
+  page: Awaited<ReturnType<typeof getApiV1GroupBuys>> | undefined,
+): FeedPageData | undefined {
   return page?.data?.data as FeedPageData | undefined;
 }
 
@@ -46,25 +48,44 @@ export function useFeedList(
     [activeFilter, districts, keyword],
   );
 
-  const { data, isLoading, error, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteQuery({
-      queryKey: getGetApiV1GroupBuysQueryKey(baseParams),
-      queryFn: ({ pageParam, signal }) =>
-        getApiV1GroupBuys({ ...baseParams, page: pageParam as number }, { signal }),
-      initialPageParam: 1,
-      getNextPageParam: (lastPage) => {
-        const pageData = extractPageData(lastPage);
-        return pageData?.hasNext ? pageData.page + 1 : undefined;
-      },
-      enabled: options?.enabled ?? true,
-    });
+  const {
+    data,
+    isLoading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: getGetApiV1GroupBuysQueryKey(baseParams),
+    queryFn: ({ pageParam, signal }) =>
+      getApiV1GroupBuys(
+        { ...baseParams, page: pageParam as number },
+        { signal },
+      ),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      const pageData = extractPageData(lastPage);
+      return pageData?.hasNext ? pageData.page + 1 : undefined;
+    },
+    enabled: options?.enabled ?? true,
+  });
 
   const feeds = useMemo<GroupBuyFeedItemResponse[]>(
-    () => data?.pages.flatMap((page) => extractPageData(page)?.content ?? []) ?? [],
+    () =>
+      data?.pages.flatMap((page) => extractPageData(page)?.content ?? []) ?? [],
     [data],
   );
 
-  const hasSearchResult = extractPageData(data?.pages[0])?.hasSearchResult ?? true;
+  const hasSearchResult =
+    extractPageData(data?.pages[0])?.hasRegionalResult ?? true;
 
-  return { feeds, hasSearchResult, isLoading, error, fetchNextPage, hasNextPage, isFetchingNextPage };
+  return {
+    feeds,
+    hasSearchResult,
+    isLoading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  };
 }

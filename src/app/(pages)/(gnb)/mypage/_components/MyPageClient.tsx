@@ -1,12 +1,12 @@
 'use client';
-import { tokenStorage } from '@/lib/token';
+import { useAuthStore } from '@/store/authStore';
 import { Icon } from '@iconify/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 
 const MyPageClient = () => {
-  const isLoggedIn = !!tokenStorage.get();
+  const { isLoggedIn } = useAuthStore();
 
   return (
     <>

@@ -109,7 +109,7 @@ const overrideHandlers = [
         totalPages,
         totalElements: TOTAL_ITEMS,
         hasNext: page < totalPages,
-        hasSearchResult,
+        hasRegionalResult: hasSearchResult,
       },
       error: null,
     });
@@ -190,6 +190,36 @@ const overrideHandlers = [
   http.delete('*/api/v1/search/recent', async () => {
     recentKeywords = [];
     return HttpResponse.json({ success: true, data: {}, error: null });
+  }),
+  http.get('*/api/v1/wishlists', async () => {
+    await delay(600);
+    const content = Array.from({ length: 5 }, (_, i) => {
+      const item = createFeedItem(i + 1);
+      if (i === 0) return { ...item, dDay: 0, dDayLabel: 'D-day' };
+      if (i === 1) return { ...item, dDay: 1, dDayLabel: 'D-1' };
+      return item;
+    });
+    const urgentCount = content.filter((item) => item.dDay <= 1).length;
+    return HttpResponse.json({
+      success: true,
+      data: {
+        content,
+        totalElements: content.length,
+        totalPages: 1,
+        number: 0,
+        size: 20,
+        urgentCount,
+      },
+      error: null,
+    });
+  }),
+  http.post('*/api/v1/group-buys/:groupBuyId/wishlist', async () => {
+    await delay(200);
+    return HttpResponse.json({ success: true, data: null, error: null }, { status: 201 });
+  }),
+  http.delete('*/api/v1/group-buys/:groupBuyId/wishlist', async () => {
+    await delay(200);
+    return HttpResponse.json({ success: true, data: null, error: null });
   }),
   http.delete('*/api/v1/search/recent/:keyword', async ({ params }) => {
     const keyword = decodeURIComponent(params.keyword as string);

@@ -9,7 +9,8 @@ const AuthInitializer = () => {
   useEffect(() => {
     fetch('/api/auth/status')
       .then((res) => res.json())
-      .then(({ isLoggedIn }) => setIsLoggedIn(isLoggedIn));
+      .then(({ isLoggedIn }) => setIsLoggedIn(isLoggedIn))
+      .catch(() => setIsLoggedIn(false));
   }, [setIsLoggedIn]);
 
   return null;

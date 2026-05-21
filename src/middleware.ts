@@ -5,15 +5,11 @@ export function middleware(request: NextRequest) {
 
   if (!token) {
     const response = NextResponse.redirect(new URL('/login', request.url));
-    response.cookies.set(
-      'pendingRedirect',
-      decodeURIComponent(request.nextUrl.pathname),
-      {
-        path: '/',
-        maxAge: 60 * 5,
-        sameSite: 'strict',
-      },
-    );
+    response.cookies.set('pendingRedirect', request.nextUrl.pathname, {
+      path: '/',
+      maxAge: 60 * 5,
+      sameSite: 'strict',
+    });
     return response;
   }
 }

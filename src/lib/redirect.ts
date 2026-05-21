@@ -8,7 +8,9 @@ export const redirectStorage = {
     const match = document.cookie
       .split('; ')
       .find((row) => row.startsWith(`${REDIRECT_KEY}=`));
-    return match ? decodeURIComponent(match.split('=')[1]) : null;
+    return match
+      ? decodeURIComponent(match.slice(REDIRECT_KEY.length + 1))
+      : null;
   },
   consume: (): string | null => {
     const path = redirectStorage.get();

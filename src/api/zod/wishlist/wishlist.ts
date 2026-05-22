@@ -28,6 +28,7 @@ export const DeleteApiV1GroupBuysGroupBuyIdWishlistResponse = zod.object({
  * @summary 찜 목록 조회
  */
 export const getApiV1WishlistsQueryFilterDefault = `ALL`;
+export const getApiV1WishlistsQueryExcludeClosedDefault = false;
 export const getApiV1WishlistsQuerySortDefault = `LATEST`;
 export const getApiV1WishlistsQueryPageDefault = 0;
 export const getApiV1WishlistsQuerySizeDefault = 20;
@@ -35,11 +36,13 @@ export const getApiV1WishlistsQuerySizeMax = 100;
 
 export const GetApiV1WishlistsQueryParams = zod.object({
   filter: zod
-    .enum(['ALL', 'CLOSING_SOON', 'OPEN', 'CLOSED'])
+    .enum(['ALL', 'CLOSING_SOON', 'OPEN'])
     .default(getApiV1WishlistsQueryFilterDefault)
-    .describe(
-      'ALL=전체 \/ CLOSING_SOON=마감임박(D-3) \/ OPEN=모집중 \/ CLOSED=마감공구',
-    ),
+    .describe('ALL=전체 \/ CLOSING_SOON=마감임박(D-3) \/ OPEN=모집중'),
+  excludeClosed: zod
+    .boolean()
+    .default(getApiV1WishlistsQueryExcludeClosedDefault)
+    .describe('true면 마감 공고 제외, false면 마감 포함'),
   sort: zod
     .enum(['LATEST', 'DEADLINE'])
     .default(getApiV1WishlistsQuerySortDefault),

@@ -5,82 +5,58 @@
 import * as zod from 'zod';
 
 /**
- * @summary 알림 목록 조회
+ * @summary 알림 목록 조회 (폴링용)
  */
 export const getApiV1NotificationsQueryCategoryDefault = `ALL`;
-export const getApiV1NotificationsQueryPageDefault = 0;
-export const getApiV1NotificationsQuerySizeDefault = 20;
-export const getApiV1NotificationsQuerySizeMax = 100;
+export const getApiV1NotificationsQueryLimitDefault = 20;
+export const getApiV1NotificationsQueryLimitMax = 100;
 
 export const GetApiV1NotificationsQueryParams = zod.object({
   category: zod
-    .enum(['ALL', 'WISHLIST', 'PARTICIPATION', 'PICKUP', 'REQUEST'])
-    .default(getApiV1NotificationsQueryCategoryDefault),
-  page: zod.number().default(getApiV1NotificationsQueryPageDefault),
-  size: zod
+    .enum(['ALL', 'WISH', 'APPLY', 'PICKUP', 'REQUEST'])
+    .default(getApiV1NotificationsQueryCategoryDefault)
+    .describe('알림 카테고리 필터'),
+  cursor: zod
+    .string()
+    .optional()
+    .describe('다음 페이지 조회 커서. 형식: `{occurredAt}|{id}`'),
+  limit: zod
     .number()
-    .max(getApiV1NotificationsQuerySizeMax)
-    .default(getApiV1NotificationsQuerySizeDefault),
+    .min(1)
+    .max(getApiV1NotificationsQueryLimitMax)
+    .default(getApiV1NotificationsQueryLimitDefault)
+    .describe('조회 개수 (1~100, 기본 20)'),
 });
 
 export const GetApiV1NotificationsResponse = zod.object({
   success: zod.boolean(),
   data: zod.object({
-    content: zod.array(
+    items: zod.array(
       zod.object({
         id: zod.number(),
-        category: zod.enum(['WISHLIST', 'PARTICIPATION', 'PICKUP', 'REQUEST']),
-        type: zod.enum([
-          'PICKUP_TODAY',
-          'PICKUP_TOMORROW',
-          'PICKUP_NOT_CONFIRMED',
-          'WISHLIST_DEADLINE_D3',
-          'WISHLIST_DEADLINE_D1',
-          'WISHLIST_TARGET_ACHIEVED',
-          'PARTICIPATION_CONFIRMED',
-          'GROUP_BUY_ACHIEVED',
-          'GROUP_BUY_FAILED',
-          'REQUEST_OPENED',
-          'REQUEST_REJECTED',
-          'REQUEST_NEW_PARTICIPANT',
-          'REQUEST_TARGET_ACHIEVED',
-          'REQUEST_DEADLINE_D3',
-        ]),
+        type: zod.enum(['PICKUP', 'WISH', 'APPLY', 'REQUEST']),
         title: zod.string(),
-        body: zod.string(),
-        targetType: zod
-          .enum(['GROUP_BUY', 'GROUP_BUY_REQUEST', 'PARTICIPATION'])
-          .nullable(),
-        targetId: zod.number().nullable(),
+        body: zod.string().describe('알림 본문 요약'),
         isRead: zod.boolean(),
-        readAt: zod.iso.datetime({ offset: true }).nullable(),
-        actionType: zod
-          .enum([
-            'QR_CODE',
-            'PICKUP_GUIDE',
-            'GROUP_BUY_DETAIL',
-            'MY_PAGE_ACTIVE',
-            'MY_PAGE_REFUND',
-            'REQUEST_STATUS',
-          ])
-          .nullable()
-          .describe('인라인 액션 버튼 유형. null이면 버튼 미노출'),
-        dateGroup: zod
-          .enum(['TODAY', 'YESTERDAY', 'BEFORE'])
-          .describe('알림 날짜 그룹 (오늘\/어제\/이전)'),
-        createdAt: zod.iso.datetime({ offset: true }),
+        occurredAt: zod.iso.datetime({ offset: true }),
+        targetId: zod.number().nullish(),
+        deeplinkType: zod.enum([
+          'PICKUP_GUIDE',
+          'GROUPBUY_DETAIL',
+          'MY_APPLYING',
+          'REQUEST_STATUS',
+        ]),
+        section: zod.enum(['TODAY', 'YESTERDAY', 'OLDER']),
       }),
     ),
-    totalElements: zod.number(),
-    totalPages: zod.number(),
-    number: zod.number(),
-    size: zod.number(),
+    nextCursor: zod.string().nullish(),
+    hasNext: zod.boolean(),
   }),
   error: zod.unknown().nullable(),
 });
 
 /**
- * @summary 미읽음 알림 개수 조회 (탭바 배지용)
+ * @summary 미읽음 알림 개수 조회
  */
 export const GetApiV1NotificationsUnreadCountResponse = zod.object({
   success: zod.boolean(),
@@ -100,7 +76,7 @@ export const PatchApiV1NotificationsReadAllResponse = zod.object({
 });
 
 /**
- * @summary 개별 알림 읽음 처리
+ * @summary 알림 단건 읽음 처리
  */
 export const PatchApiV1NotificationsNotificationIdReadParams = zod.object({
   notificationId: zod.number(),

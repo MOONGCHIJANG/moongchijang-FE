@@ -19,10 +19,14 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  ApiResponseNotificationPage,
-  ApiResponseUnreadCount,
+  ApiResponseNotificationListResponse,
+  ApiResponseNotificationUnreadCountResponse,
+  BadRequestResponse,
+  ForbiddenResponse,
   GetApiV1NotificationsParams,
+  NotFoundResponse,
   SuccessNoDataResponse,
+  UnauthorizedResponse,
 } from '../api.schemas';
 
 import { customFetch } from '../../../lib/custom-fetch';
@@ -30,19 +34,37 @@ import { customFetch } from '../../../lib/custom-fetch';
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 /**
- * @summary 알림 목록 조회
+ * @summary 알림 목록 조회 (폴링용)
  */
 export type getApiV1NotificationsResponse200 = {
-  data: ApiResponseNotificationPage;
+  data: ApiResponseNotificationListResponse;
   status: 200;
+};
+
+export type getApiV1NotificationsResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type getApiV1NotificationsResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
 };
 
 export type getApiV1NotificationsResponseSuccess =
   getApiV1NotificationsResponse200 & {
     headers: Headers;
   };
+export type getApiV1NotificationsResponseError = (
+  | getApiV1NotificationsResponse400
+  | getApiV1NotificationsResponse401
+) & {
+  headers: Headers;
+};
+
 export type getApiV1NotificationsResponse =
-  getApiV1NotificationsResponseSuccess;
+  | getApiV1NotificationsResponseSuccess
+  | getApiV1NotificationsResponseError;
 
 export const getGetApiV1NotificationsUrl = (
   params?: GetApiV1NotificationsParams,
@@ -83,7 +105,7 @@ export const getGetApiV1NotificationsQueryKey = (
 
 export const getGetApiV1NotificationsQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiV1Notifications>>,
-  TError = unknown,
+  TError = BadRequestResponse | UnauthorizedResponse,
 >(
   params?: GetApiV1NotificationsParams,
   options?: {
@@ -117,11 +139,13 @@ export const getGetApiV1NotificationsQueryOptions = <
 export type GetApiV1NotificationsQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiV1Notifications>>
 >;
-export type GetApiV1NotificationsQueryError = unknown;
+export type GetApiV1NotificationsQueryError =
+  | BadRequestResponse
+  | UnauthorizedResponse;
 
 export function useGetApiV1Notifications<
   TData = Awaited<ReturnType<typeof getApiV1Notifications>>,
-  TError = unknown,
+  TError = BadRequestResponse | UnauthorizedResponse,
 >(
   params: undefined | GetApiV1NotificationsParams,
   options: {
@@ -148,7 +172,7 @@ export function useGetApiV1Notifications<
 };
 export function useGetApiV1Notifications<
   TData = Awaited<ReturnType<typeof getApiV1Notifications>>,
-  TError = unknown,
+  TError = BadRequestResponse | UnauthorizedResponse,
 >(
   params?: GetApiV1NotificationsParams,
   options?: {
@@ -175,7 +199,7 @@ export function useGetApiV1Notifications<
 };
 export function useGetApiV1Notifications<
   TData = Awaited<ReturnType<typeof getApiV1Notifications>>,
-  TError = unknown,
+  TError = BadRequestResponse | UnauthorizedResponse,
 >(
   params?: GetApiV1NotificationsParams,
   options?: {
@@ -193,12 +217,12 @@ export function useGetApiV1Notifications<
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 /**
- * @summary 알림 목록 조회
+ * @summary 알림 목록 조회 (폴링용)
  */
 
 export function useGetApiV1Notifications<
   TData = Awaited<ReturnType<typeof getApiV1Notifications>>,
-  TError = unknown,
+  TError = BadRequestResponse | UnauthorizedResponse,
 >(
   params?: GetApiV1NotificationsParams,
   options?: {
@@ -226,19 +250,30 @@ export function useGetApiV1Notifications<
 }
 
 /**
- * @summary 미읽음 알림 개수 조회 (탭바 배지용)
+ * @summary 미읽음 알림 개수 조회
  */
 export type getApiV1NotificationsUnreadCountResponse200 = {
-  data: ApiResponseUnreadCount;
+  data: ApiResponseNotificationUnreadCountResponse;
   status: 200;
+};
+
+export type getApiV1NotificationsUnreadCountResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
 };
 
 export type getApiV1NotificationsUnreadCountResponseSuccess =
   getApiV1NotificationsUnreadCountResponse200 & {
     headers: Headers;
   };
+export type getApiV1NotificationsUnreadCountResponseError =
+  getApiV1NotificationsUnreadCountResponse401 & {
+    headers: Headers;
+  };
+
 export type getApiV1NotificationsUnreadCountResponse =
-  getApiV1NotificationsUnreadCountResponseSuccess;
+  | getApiV1NotificationsUnreadCountResponseSuccess
+  | getApiV1NotificationsUnreadCountResponseError;
 
 export const getGetApiV1NotificationsUnreadCountUrl = () => {
   return `/api/v1/notifications/unread-count`;
@@ -262,7 +297,7 @@ export const getGetApiV1NotificationsUnreadCountQueryKey = () => {
 
 export const getGetApiV1NotificationsUnreadCountQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiV1NotificationsUnreadCount>>,
-  TError = unknown,
+  TError = UnauthorizedResponse,
 >(options?: {
   query?: Partial<
     UseQueryOptions<
@@ -293,11 +328,11 @@ export const getGetApiV1NotificationsUnreadCountQueryOptions = <
 export type GetApiV1NotificationsUnreadCountQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiV1NotificationsUnreadCount>>
 >;
-export type GetApiV1NotificationsUnreadCountQueryError = unknown;
+export type GetApiV1NotificationsUnreadCountQueryError = UnauthorizedResponse;
 
 export function useGetApiV1NotificationsUnreadCount<
   TData = Awaited<ReturnType<typeof getApiV1NotificationsUnreadCount>>,
-  TError = unknown,
+  TError = UnauthorizedResponse,
 >(
   options: {
     query: Partial<
@@ -323,7 +358,7 @@ export function useGetApiV1NotificationsUnreadCount<
 };
 export function useGetApiV1NotificationsUnreadCount<
   TData = Awaited<ReturnType<typeof getApiV1NotificationsUnreadCount>>,
-  TError = unknown,
+  TError = UnauthorizedResponse,
 >(
   options?: {
     query?: Partial<
@@ -349,7 +384,7 @@ export function useGetApiV1NotificationsUnreadCount<
 };
 export function useGetApiV1NotificationsUnreadCount<
   TData = Awaited<ReturnType<typeof getApiV1NotificationsUnreadCount>>,
-  TError = unknown,
+  TError = UnauthorizedResponse,
 >(
   options?: {
     query?: Partial<
@@ -366,12 +401,12 @@ export function useGetApiV1NotificationsUnreadCount<
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 /**
- * @summary 미읽음 알림 개수 조회 (탭바 배지용)
+ * @summary 미읽음 알림 개수 조회
  */
 
 export function useGetApiV1NotificationsUnreadCount<
   TData = Awaited<ReturnType<typeof getApiV1NotificationsUnreadCount>>,
-  TError = unknown,
+  TError = UnauthorizedResponse,
 >(
   options?: {
     query?: Partial<
@@ -405,12 +440,23 @@ export type patchApiV1NotificationsReadAllResponse200 = {
   status: 200;
 };
 
+export type patchApiV1NotificationsReadAllResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
 export type patchApiV1NotificationsReadAllResponseSuccess =
   patchApiV1NotificationsReadAllResponse200 & {
     headers: Headers;
   };
+export type patchApiV1NotificationsReadAllResponseError =
+  patchApiV1NotificationsReadAllResponse401 & {
+    headers: Headers;
+  };
+
 export type patchApiV1NotificationsReadAllResponse =
-  patchApiV1NotificationsReadAllResponseSuccess;
+  | patchApiV1NotificationsReadAllResponseSuccess
+  | patchApiV1NotificationsReadAllResponseError;
 
 export const getPatchApiV1NotificationsReadAllUrl = () => {
   return `/api/v1/notifications/read-all`;
@@ -429,7 +475,7 @@ export const patchApiV1NotificationsReadAll = async (
 };
 
 export const getPatchApiV1NotificationsReadAllMutationOptions = <
-  TError = unknown,
+  TError = UnauthorizedResponse,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -468,13 +514,13 @@ export type PatchApiV1NotificationsReadAllMutationResult = NonNullable<
   Awaited<ReturnType<typeof patchApiV1NotificationsReadAll>>
 >;
 
-export type PatchApiV1NotificationsReadAllMutationError = unknown;
+export type PatchApiV1NotificationsReadAllMutationError = UnauthorizedResponse;
 
 /**
  * @summary 전체 알림 읽음 처리
  */
 export const usePatchApiV1NotificationsReadAll = <
-  TError = unknown,
+  TError = UnauthorizedResponse,
   TContext = unknown,
 >(
   options?: {
@@ -499,19 +545,43 @@ export const usePatchApiV1NotificationsReadAll = <
   );
 };
 /**
- * @summary 개별 알림 읽음 처리
+ * @summary 알림 단건 읽음 처리
  */
 export type patchApiV1NotificationsNotificationIdReadResponse200 = {
   data: SuccessNoDataResponse;
   status: 200;
 };
 
+export type patchApiV1NotificationsNotificationIdReadResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type patchApiV1NotificationsNotificationIdReadResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type patchApiV1NotificationsNotificationIdReadResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
 export type patchApiV1NotificationsNotificationIdReadResponseSuccess =
   patchApiV1NotificationsNotificationIdReadResponse200 & {
     headers: Headers;
   };
+export type patchApiV1NotificationsNotificationIdReadResponseError = (
+  | patchApiV1NotificationsNotificationIdReadResponse401
+  | patchApiV1NotificationsNotificationIdReadResponse403
+  | patchApiV1NotificationsNotificationIdReadResponse404
+) & {
+  headers: Headers;
+};
+
 export type patchApiV1NotificationsNotificationIdReadResponse =
-  patchApiV1NotificationsNotificationIdReadResponseSuccess;
+  | patchApiV1NotificationsNotificationIdReadResponseSuccess
+  | patchApiV1NotificationsNotificationIdReadResponseError;
 
 export const getPatchApiV1NotificationsNotificationIdReadUrl = (
   notificationId: number,
@@ -533,7 +603,7 @@ export const patchApiV1NotificationsNotificationIdRead = async (
 };
 
 export const getPatchApiV1NotificationsNotificationIdReadMutationOptions = <
-  TError = unknown,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -578,13 +648,16 @@ export type PatchApiV1NotificationsNotificationIdReadMutationResult =
     Awaited<ReturnType<typeof patchApiV1NotificationsNotificationIdRead>>
   >;
 
-export type PatchApiV1NotificationsNotificationIdReadMutationError = unknown;
+export type PatchApiV1NotificationsNotificationIdReadMutationError =
+  | UnauthorizedResponse
+  | ForbiddenResponse
+  | NotFoundResponse;
 
 /**
- * @summary 개별 알림 읽음 처리
+ * @summary 알림 단건 읽음 처리
  */
 export const usePatchApiV1NotificationsNotificationIdRead = <
-  TError = unknown,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
   TContext = unknown,
 >(
   options?: {

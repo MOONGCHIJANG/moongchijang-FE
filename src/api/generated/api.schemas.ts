@@ -1100,122 +1100,69 @@ export interface ApiResponsePickupVerify {
   error: unknown | null;
 }
 
-export type NotificationItemCategory =
-  (typeof NotificationItemCategory)[keyof typeof NotificationItemCategory];
+export type NotificationType =
+  (typeof NotificationType)[keyof typeof NotificationType];
 
-export const NotificationItemCategory = {
-  WISHLIST: 'WISHLIST',
-  PARTICIPATION: 'PARTICIPATION',
+export const NotificationType = {
   PICKUP: 'PICKUP',
+  WISH: 'WISH',
+  APPLY: 'APPLY',
   REQUEST: 'REQUEST',
 } as const;
 
-export type NotificationItemType =
-  (typeof NotificationItemType)[keyof typeof NotificationItemType];
+export type NotificationDeeplinkType =
+  (typeof NotificationDeeplinkType)[keyof typeof NotificationDeeplinkType];
 
-export const NotificationItemType = {
-  PICKUP_TODAY: 'PICKUP_TODAY',
-  PICKUP_TOMORROW: 'PICKUP_TOMORROW',
-  PICKUP_NOT_CONFIRMED: 'PICKUP_NOT_CONFIRMED',
-  WISHLIST_DEADLINE_D3: 'WISHLIST_DEADLINE_D3',
-  WISHLIST_DEADLINE_D1: 'WISHLIST_DEADLINE_D1',
-  WISHLIST_TARGET_ACHIEVED: 'WISHLIST_TARGET_ACHIEVED',
-  PARTICIPATION_CONFIRMED: 'PARTICIPATION_CONFIRMED',
-  GROUP_BUY_ACHIEVED: 'GROUP_BUY_ACHIEVED',
-  GROUP_BUY_FAILED: 'GROUP_BUY_FAILED',
-  REQUEST_OPENED: 'REQUEST_OPENED',
-  REQUEST_REJECTED: 'REQUEST_REJECTED',
-  REQUEST_NEW_PARTICIPANT: 'REQUEST_NEW_PARTICIPANT',
-  REQUEST_TARGET_ACHIEVED: 'REQUEST_TARGET_ACHIEVED',
-  REQUEST_DEADLINE_D3: 'REQUEST_DEADLINE_D3',
-} as const;
-
-/**
- * @nullable
- */
-export type NotificationItemTargetType =
-  | (typeof NotificationItemTargetType)[keyof typeof NotificationItemTargetType]
-  | null;
-
-export const NotificationItemTargetType = {
-  GROUP_BUY: 'GROUP_BUY',
-  GROUP_BUY_REQUEST: 'GROUP_BUY_REQUEST',
-  PARTICIPATION: 'PARTICIPATION',
-} as const;
-
-/**
- * 인라인 액션 버튼 유형. null이면 버튼 미노출
- * @nullable
- */
-export type NotificationItemActionType =
-  | (typeof NotificationItemActionType)[keyof typeof NotificationItemActionType]
-  | null;
-
-export const NotificationItemActionType = {
-  QR_CODE: 'QR_CODE',
+export const NotificationDeeplinkType = {
   PICKUP_GUIDE: 'PICKUP_GUIDE',
-  GROUP_BUY_DETAIL: 'GROUP_BUY_DETAIL',
-  MY_PAGE_ACTIVE: 'MY_PAGE_ACTIVE',
-  MY_PAGE_REFUND: 'MY_PAGE_REFUND',
+  GROUPBUY_DETAIL: 'GROUPBUY_DETAIL',
+  MY_APPLYING: 'MY_APPLYING',
   REQUEST_STATUS: 'REQUEST_STATUS',
 } as const;
 
-/**
- * 알림 날짜 그룹 (오늘/어제/이전)
- */
-export type NotificationItemDateGroup =
-  (typeof NotificationItemDateGroup)[keyof typeof NotificationItemDateGroup];
+export type NotificationSection =
+  (typeof NotificationSection)[keyof typeof NotificationSection];
 
-export const NotificationItemDateGroup = {
+export const NotificationSection = {
   TODAY: 'TODAY',
   YESTERDAY: 'YESTERDAY',
-  BEFORE: 'BEFORE',
+  OLDER: 'OLDER',
 } as const;
 
-export interface NotificationItem {
+export interface NotificationItemResponse {
   id: number;
-  category: NotificationItemCategory;
-  type: NotificationItemType;
+  type: NotificationType;
   title: string;
+  /** 알림 본문 요약 */
   body: string;
-  /** @nullable */
-  targetType: NotificationItemTargetType;
-  /** @nullable */
-  targetId: number | null;
   isRead: boolean;
+  occurredAt: string;
   /** @nullable */
-  readAt: string | null;
-  /**
-   * 인라인 액션 버튼 유형. null이면 버튼 미노출
-   * @nullable
-   */
-  actionType: NotificationItemActionType;
-  /** 알림 날짜 그룹 (오늘/어제/이전) */
-  dateGroup: NotificationItemDateGroup;
-  createdAt: string;
+  targetId?: number | null;
+  deeplinkType: NotificationDeeplinkType;
+  section: NotificationSection;
 }
 
-export interface NotificationPage {
-  content: NotificationItem[];
-  totalElements: number;
-  totalPages: number;
-  number: number;
-  size: number;
+export interface NotificationListResponse {
+  items: NotificationItemResponse[];
+  /** @nullable */
+  nextCursor?: string | null;
+  hasNext: boolean;
 }
 
-export interface ApiResponseNotificationPage {
+export interface ApiResponseNotificationListResponse {
   success: boolean;
-  data: NotificationPage;
+  data: NotificationListResponse;
   error: unknown | null;
 }
 
-export type ApiResponseUnreadCountData = {
+export type ApiResponseNotificationUnreadCountResponseData = {
   count: number;
 };
 
-export interface ApiResponseUnreadCount {
+export interface ApiResponseNotificationUnreadCountResponse {
   success: boolean;
-  data: ApiResponseUnreadCountData;
+  data: ApiResponseNotificationUnreadCountResponseData;
   error: unknown | null;
 }
 
@@ -2208,9 +2155,13 @@ export type GetApiV1StoresSearchParams = {
 
 export type GetApiV1WishlistsParams = {
   /**
-   * ALL=전체 / CLOSING_SOON=마감임박(D-3) / OPEN=모집중 / CLOSED=마감공구
+   * ALL=전체 / CLOSING_SOON=마감임박(D-3) / OPEN=모집중
    */
   filter?: GetApiV1WishlistsFilter;
+  /**
+   * true면 마감 공고 제외, false면 마감 포함
+   */
+  excludeClosed?: boolean;
   sort?: GetApiV1WishlistsSort;
   page?: PageParameter;
   /**
@@ -2226,7 +2177,6 @@ export const GetApiV1WishlistsFilter = {
   ALL: 'ALL',
   CLOSING_SOON: 'CLOSING_SOON',
   OPEN: 'OPEN',
-  CLOSED: 'CLOSED',
 } as const;
 
 export type GetApiV1WishlistsSort =
@@ -2246,12 +2196,20 @@ export type GetApiV1GroupBuysGroupBuyIdCheckoutParams = {
 };
 
 export type GetApiV1NotificationsParams = {
-  category?: GetApiV1NotificationsCategory;
-  page?: PageParameter;
   /**
+   * 알림 카테고리 필터
+   */
+  category?: GetApiV1NotificationsCategory;
+  /**
+   * 다음 페이지 조회 커서. 형식: `{occurredAt}|{id}`
+   */
+  cursor?: string;
+  /**
+   * 조회 개수 (1~100, 기본 20)
+   * @minimum 1
    * @maximum 100
    */
-  size?: SizeParameter;
+  limit?: number;
 };
 
 export type GetApiV1NotificationsCategory =
@@ -2259,8 +2217,8 @@ export type GetApiV1NotificationsCategory =
 
 export const GetApiV1NotificationsCategory = {
   ALL: 'ALL',
-  WISHLIST: 'WISHLIST',
-  PARTICIPATION: 'PARTICIPATION',
+  WISH: 'WISH',
+  APPLY: 'APPLY',
   PICKUP: 'PICKUP',
   REQUEST: 'REQUEST',
 } as const;

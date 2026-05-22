@@ -383,6 +383,10 @@ const overrideHandlers = [
     await delay(300);
     return HttpResponse.json(createMyPageRefundsMock());
   }),
+  http.post('*/api/v1/participations/:participationId/cancel', async () => {
+    await delay(500);
+    return HttpResponse.json({ success: true, data: {}, error: null });
+  }),
   http.get('*/api/v1/participations/:participationId/pickup', async () => {
     await delay(300);
     return HttpResponse.json(createMyPagePickupInfoMock());

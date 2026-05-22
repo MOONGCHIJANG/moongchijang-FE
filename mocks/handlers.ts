@@ -191,24 +191,37 @@ const overrideHandlers = [
     recentKeywords = [];
     return HttpResponse.json({ success: true, data: {}, error: null });
   }),
-  http.get('*/api/v1/wishlists', async () => {
+  http.get('*/api/v1/wishlists', async ({ request }) => {
     await delay(600);
-    const content = Array.from({ length: 5 }, (_, i) => {
+    const url = new URL(request.url);
+    const filter = url.searchParams.get('filter') ?? 'ALL';
+    const excludeClosed = url.searchParams.get('excludeClosed') === 'true';
+
+    // filter별 dDay 세트: ALL=전 상태 혼합, OPEN=마감 여유, CLOSING_SOON=마감임박
+    const dDayByFilter: Record<string, number[]> = {
+      ALL: [-1, 0, 1, 3, 7],        // 마감(-1), D-0, D-1, D-3, D-7 혼합
+      OPEN: [5, 7, 10, 14, 20],     // 여유 있는 모집중
+      CLOSING_SOON: [0, 1, 2, 3],   // D-0 ~ D-3 마감임박
+    };
+    const rawDDays = dDayByFilter[filter] ?? dDayByFilter['ALL'];
+    const dDays = excludeClosed ? rawDDays.filter((d) => d >= 0) : rawDDays;
+
+    const content = dDays.map((dDay, i) => {
       const { id, currentQuantity, targetQuantity, ...rest } = createFeedItem(i + 1);
-      const base = {
+      const dDayLabel = dDay === 0 ? 'D-day' : dDay < 0 ? '마감' : `D-${dDay}`;
+      return {
         ...rest,
         groupBuyId: id,
         currentParticipantCount: currentQuantity,
         targetParticipantCount: targetQuantity,
         pickupDate: rest.deadline,
-        deadlineLabel: rest.dDayLabel,
+        dDay,
+        dDayLabel,
+        deadlineLabel: dDayLabel,
         isWishlisted: true,
       };
-      if (i === 0) return { ...base, dDay: 0, dDayLabel: 'D-day', deadlineLabel: 'D-day' };
-      if (i === 1) return { ...base, dDay: 1, dDayLabel: 'D-1', deadlineLabel: 'D-1' };
-      return base;
     });
-    const urgentCount = content.filter((item) => item.dDay <= 1).length;
+    const urgentCount = content.filter((item) => item.dDay >= 0 && item.dDay <= 2).length;
     return HttpResponse.json({
       success: true,
       data: {

@@ -45,3 +45,12 @@ export const Tertiary: Story = {
     children: '다시 생각하기',
   },
 };
+
+export const Black: Story = {
+  args: {
+    variant: 'black',
+    size: 'lg',
+    fullWidth: true,
+    children: '다른 상품 둘러보기',
+  },
+};

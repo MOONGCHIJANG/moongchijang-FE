@@ -75,7 +75,7 @@ export default function Modal({
                 {cancelLabel}
               </Button>
               <Button
-                variant="primary"
+                variant="black"
                 size="md"
                 className={`flex-1${confirmVariant === 'danger' ? ' !bg-surface-inverse' : ''}`}
                 onClick={onConfirm}
@@ -85,7 +85,7 @@ export default function Modal({
             </div>
           ) : (
             <Button
-              variant="primary"
+              variant="black"
               size="md"
               fullWidth
               className={

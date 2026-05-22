@@ -64,18 +64,14 @@ export function FavoriteClient() {
   }, []);
 
   const {
-    items: rawItems,
+    items,
     isLoading,
     totalElements,
     urgentCount,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useWishlistList(filter, sort);
-
-  const items = excludeClosed
-    ? rawItems.filter((item) => item.dDay >= 0)
-    : rawItems;
+  } = useWishlistList(filter, sort, excludeClosed);
 
   const scrollStateRef = useRef({ hasNextPage, isFetchingNextPage });
   useLayoutEffect(() => {

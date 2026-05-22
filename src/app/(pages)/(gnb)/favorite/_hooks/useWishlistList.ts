@@ -17,10 +17,16 @@ const PAGE_SIZE = 20;
 export function useWishlistList(
   filter: GetApiV1WishlistsFilter,
   sort: GetApiV1WishlistsSort,
+  excludeClosed?: boolean,
 ) {
   const baseParams = useMemo(
-    () => ({ filter, sort, size: PAGE_SIZE }),
-    [filter, sort],
+    () => ({
+      filter,
+      sort,
+      size: PAGE_SIZE,
+      ...(excludeClosed ? { excludeClosed: true } : {}),
+    }),
+    [filter, sort, excludeClosed],
   );
 
   const {
@@ -37,12 +43,11 @@ export function useWishlistList(
         { ...baseParams, page: pageParam as number },
         { signal },
       ),
-    initialPageParam: 1,
+    initialPageParam: 0,
     getNextPageParam: (lastPage) => {
       const d = lastPage?.data?.data;
       if (!d) return undefined;
-      // number는 0-based: 다음 1-based page = number + 2, 마지막 페이지이면 undefined
-      return d.number + 1 < d.totalPages ? d.number + 2 : undefined;
+      return d.number + 1 < d.totalPages ? d.number + 1 : undefined;
     },
   });
 

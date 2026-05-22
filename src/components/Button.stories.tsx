@@ -37,3 +37,11 @@ export const Medium: Story = {
     children: '설정하기',
   },
 };
+
+export const Tertiary: Story = {
+  args: {
+    variant: 'tertiary',
+    size: 'md',
+    children: '다시 생각하기',
+  },
+};

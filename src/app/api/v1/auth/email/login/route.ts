@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
 
     const response = NextResponse.json(result.data, { status: 200 });
     response.cookies.set('accessToken', accessToken, {
-      httpOnly: false,
+      httpOnly: false, // TODO: customFetch 구조 변경 후 httpOnly: true로 전환 필요
       maxAge: expiresIn,
       path: '/',
       sameSite: 'strict',

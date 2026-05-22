@@ -8,6 +8,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Toast from '@/app/(pages)/item/[groupBuyId]/_components/Toast';
 import { redirectStorage } from '@/lib/redirect';
+import { useAuthStore } from '@/store/authStore';
 
 const InputArea = () => {
   const [email, setEmail] = useState('');
@@ -15,6 +16,8 @@ const InputArea = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
   const router = useRouter();
+
+  const { setIsLoggedIn } = useAuthStore();
 
   const handleLogin = async () => {
     setErrorMessage(null);
@@ -35,6 +38,7 @@ const InputArea = () => {
       });
 
       if (res.ok) {
+        setIsLoggedIn(true);
         const redirect = redirectStorage.consume();
         router.push(redirect ?? '/feed');
       } else {

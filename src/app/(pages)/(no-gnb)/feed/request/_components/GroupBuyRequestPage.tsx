@@ -201,8 +201,8 @@ export const GroupBuyRequestPage = ({
       data: {
         storeName: selectedStore!.storeName!,
         storeAddress: selectedStore!.roadAddress ?? null,
-        storeLatitude: selectedStore!.latitude ?? null,
-        storeLongitude: selectedStore!.longitude ?? null,
+        latitude: selectedStore!.latitude ?? null,
+        longitude: selectedStore!.longitude ?? null,
         productName: effectiveBakery ?? '',
         desiredQuantity,
         desiredPickupDate,

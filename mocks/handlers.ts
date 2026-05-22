@@ -194,10 +194,19 @@ const overrideHandlers = [
   http.get('*/api/v1/wishlists', async () => {
     await delay(600);
     const content = Array.from({ length: 5 }, (_, i) => {
-      const item = createFeedItem(i + 1);
-      if (i === 0) return { ...item, dDay: 0, dDayLabel: 'D-day' };
-      if (i === 1) return { ...item, dDay: 1, dDayLabel: 'D-1' };
-      return item;
+      const { id, currentQuantity, targetQuantity, ...rest } = createFeedItem(i + 1);
+      const base = {
+        ...rest,
+        groupBuyId: id,
+        currentParticipantCount: currentQuantity,
+        targetParticipantCount: targetQuantity,
+        pickupDate: rest.deadline,
+        deadlineLabel: rest.dDayLabel,
+        isWishlisted: true,
+      };
+      if (i === 0) return { ...base, dDay: 0, dDayLabel: 'D-day', deadlineLabel: 'D-day' };
+      if (i === 1) return { ...base, dDay: 1, dDayLabel: 'D-1', deadlineLabel: 'D-1' };
+      return base;
     });
     const urgentCount = content.filter((item) => item.dDay <= 1).length;
     return HttpResponse.json({

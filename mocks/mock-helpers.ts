@@ -26,6 +26,16 @@ import {
   getGetApiV1StoresSearchResponseMock,
   getPostApiV1GroupBuyRequestsResponseMock,
 } from '../src/api/generated/group-buy-request/group-buy-request.msw';
+import { getGetApiV1UsersMeResponseMock } from '../src/api/generated/auth/auth.msw';
+import {
+  getGetApiV1UsersMeTabsCountsResponseMock,
+  getGetApiV1UsersMeParticipationsResponseMock,
+} from '../src/api/generated/my-page/my-page.msw';
+import { getGetApiV1RefundsResponseMock } from '../src/api/generated/participation/participation.msw';
+import {
+  getGetApiV1ParticipationsParticipationIdPickupResponseMock,
+  getGetApiV1ParticipationsParticipationIdQrResponseMock,
+} from '../src/api/generated/pickup/pickup.msw';
 import { koFaker } from './ko-faker';
 
 const MOCK_IMAGES = [
@@ -69,6 +79,14 @@ const LOT_ADDRESSES = [
   null,
   null,
 ];
+
+function pastDate(minDays: number, maxDays: number): string {
+  const date = new Date();
+  date.setDate(
+    date.getDate() - faker.number.int({ min: minDays, max: maxDays }),
+  );
+  return date.toISOString().slice(0, 10);
+}
 
 export { koFaker } from './ko-faker';
 
@@ -142,6 +160,198 @@ export function createGroupBuyDetailMock() {
       pickupTimeEnd: koFaker.groupBuy.pickupTime(),
       dDay: koFaker.groupBuy.dDay(),
     },
+  };
+}
+
+export function createMyPageUserMeMock() {
+  const base = getGetApiV1UsersMeResponseMock();
+  return {
+    ...base,
+    success: true,
+    data: {
+      ...base.data,
+      provider: 'EMAIL' as const,
+      email: koFaker.user.email(),
+      nickname: koFaker.user.nickname(),
+      role: 'BUYER' as const,
+      signupCompleted: true,
+      deletedAt: null,
+    },
+    error: null,
+  };
+}
+
+export function createMyPageTabCountsMock() {
+  const base = getGetApiV1UsersMeTabsCountsResponseMock();
+  return {
+    ...base,
+    success: true,
+    data: {
+      activeCount: 3,
+      completedCount: 2,
+      refundedCount: 2,
+      requestCount: 1,
+    },
+    error: null,
+  };
+}
+
+function participationBase(id: number, pickupDate: string) {
+  return {
+    participationId: id,
+    groupBuyId: id,
+    productName: koFaker.product.name(),
+    storeName: koFaker.store.name(),
+    pickupDate,
+    pickupTimeStart: koFaker.groupBuy.pickupTime(),
+    pickupTimeEnd: koFaker.groupBuy.pickupTime(),
+    paymentAmount: 18000,
+    quantity: 1,
+  };
+}
+
+export function createMyPageParticipationsMock(status: 'ACTIVE' | 'COMPLETED') {
+  const base = getGetApiV1UsersMeParticipationsResponseMock();
+
+  const activeContent = [
+    {
+      ...participationBase(1, koFaker.groupBuy.pickupDate()),
+      achievementRate: koFaker.groupBuy.achievementRate(),
+      achievementStatus: 'BEFORE_ACHIEVED' as const,
+      dDay: koFaker.groupBuy.dDay(),
+      canCancel: true,
+      canViewPickup: false,
+      canViewQr: false,
+    },
+    {
+      ...participationBase(2, koFaker.groupBuy.pickupDate()),
+      achievementRate: koFaker.groupBuy.achievementRate(),
+      achievementStatus: 'BEFORE_ACHIEVED' as const,
+      dDay: koFaker.groupBuy.dDay(),
+      canCancel: false,
+      canViewPickup: false,
+      canViewQr: false,
+    },
+    {
+      ...participationBase(3, koFaker.groupBuy.pickupDate()),
+      achievementRate: 100,
+      achievementStatus: 'ACHIEVED' as const,
+      dDay: koFaker.groupBuy.dDay(),
+      canCancel: false,
+      canViewPickup: true,
+      canViewQr: true,
+    },
+  ];
+
+  const completedContent = [
+    {
+      ...participationBase(4, pastDate(1, 30)),
+      achievementRate: 100,
+      achievementStatus: 'ACHIEVED' as const,
+      dDay: 0,
+      canCancel: false,
+      canViewPickup: true,
+      canViewQr: true,
+    },
+    {
+      ...participationBase(5, pastDate(1, 30)),
+      achievementRate: 100,
+      achievementStatus: 'ACHIEVED' as const,
+      dDay: 0,
+      canCancel: false,
+      canViewPickup: true,
+      canViewQr: true,
+    },
+  ];
+
+  const content = status === 'ACTIVE' ? activeContent : completedContent;
+
+  return {
+    ...base,
+    success: true,
+    data: { content, totalElements: content.length, totalPages: 1 },
+    error: null,
+  };
+}
+
+export function createMyPageRefundsMock() {
+  const base = getGetApiV1RefundsResponseMock();
+  return {
+    ...base,
+    success: true,
+    data: [
+      {
+        participationId: 6,
+        productName: koFaker.product.name(),
+        storeName: koFaker.store.name(),
+        pickupDate: pastDate(1, 30),
+        pickupTimeStart: koFaker.groupBuy.pickupTime(),
+        pickupTimeEnd: koFaker.groupBuy.pickupTime(),
+        paymentAmount: 18000,
+        quantity: 1,
+        refundStatus: 'PENDING' as const,
+        cancelReason: 'NOT_ACHIEVED' as const,
+      },
+      {
+        participationId: 7,
+        productName: koFaker.product.name(),
+        storeName: koFaker.store.name(),
+        pickupDate: pastDate(1, 30),
+        pickupTimeStart: koFaker.groupBuy.pickupTime(),
+        pickupTimeEnd: koFaker.groupBuy.pickupTime(),
+        paymentAmount: 18000,
+        quantity: 1,
+        refundStatus: 'COMPLETED' as const,
+        cancelReason: 'EARLY_EXIT' as const,
+      },
+    ],
+    error: null,
+  };
+}
+
+export function createMyPagePickupInfoMock() {
+  const base = getGetApiV1ParticipationsParticipationIdPickupResponseMock();
+  return {
+    ...base,
+    success: true,
+    data: {
+      ...base.data,
+      participationId: 3,
+      storeName: koFaker.store.name(),
+      storePhone: '02-1234-5678',
+      storeAddress: koFaker.location.address(),
+      latitude: koFaker.location.lat(),
+      longitude: koFaker.location.lng(),
+      transitInfo: null,
+      pickupDate: koFaker.groupBuy.pickupDate(),
+      pickupTimeStart: koFaker.groupBuy.pickupTime(),
+      pickupTimeEnd: koFaker.groupBuy.pickupTime(),
+      productName: koFaker.product.name(),
+      quantity: 1,
+      remainingMinutes: faker.number.int({ min: 10, max: 120 }),
+    },
+    error: null,
+  };
+}
+
+export function createMyPageQrMock() {
+  const base = getGetApiV1ParticipationsParticipationIdQrResponseMock();
+  return {
+    ...base,
+    success: true,
+    data: {
+      ...base.data,
+      qrCode: faker.string.uuid(),
+      nickname: koFaker.user.nickname(),
+      productName: koFaker.product.name(),
+      quantity: 1,
+      isUsed: false,
+      storeName: koFaker.store.name(),
+      pickupDate: koFaker.groupBuy.pickupDate(),
+      pickupTimeStart: koFaker.groupBuy.pickupTime(),
+      pickupTimeEnd: koFaker.groupBuy.pickupTime(),
+    },
+    error: null,
   };
 }
 

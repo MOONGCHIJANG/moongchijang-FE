@@ -21,6 +21,12 @@ import {
   createGroupBuyDetailMock,
   createStoreSearchMock,
   createGroupBuyRequestMock,
+  createMyPageUserMeMock,
+  createMyPageTabCountsMock,
+  createMyPageParticipationsMock,
+  createMyPageRefundsMock,
+  createMyPagePickupInfoMock,
+  createMyPageQrMock,
 } from './mock-helpers';
 import { formatDeadline } from '@/lib/date';
 
@@ -354,6 +360,36 @@ const overrideHandlers = [
       },
       error: null,
     });
+  }),
+
+  // 마이페이지
+  http.get('*/api/v1/users/me', async () => {
+    await delay(300);
+    return HttpResponse.json(createMyPageUserMeMock());
+  }),
+  http.get('*/api/v1/users/me/tabs/counts', async () => {
+    await delay(300);
+    return HttpResponse.json(createMyPageTabCountsMock());
+  }),
+  http.get('*/api/v1/users/me/participations', async ({ request }) => {
+    await delay(500);
+    const url = new URL(request.url);
+    const status = (url.searchParams.get('status') ?? 'ACTIVE') as
+      | 'ACTIVE'
+      | 'COMPLETED';
+    return HttpResponse.json(createMyPageParticipationsMock(status));
+  }),
+  http.get('*/api/v1/refunds', async () => {
+    await delay(300);
+    return HttpResponse.json(createMyPageRefundsMock());
+  }),
+  http.get('*/api/v1/participations/:participationId/pickup', async () => {
+    await delay(300);
+    return HttpResponse.json(createMyPagePickupInfoMock());
+  }),
+  http.get('*/api/v1/participations/:participationId/qr', async () => {
+    await delay(300);
+    return HttpResponse.json(createMyPageQrMock());
   }),
 ];
 

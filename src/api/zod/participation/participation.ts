@@ -123,9 +123,33 @@ export const PostApiV1ParticipationsParticipationIdCancelParams = zod.object({
   participationId: zod.number(),
 });
 
+export const postApiV1ParticipationsParticipationIdCancelBodyReasonDetailMax = 500;
+
+export const PostApiV1ParticipationsParticipationIdCancelBody = zod.object({
+  reason: zod
+    .enum([
+      'TIME_UNAVAILABLE',
+      'NO_LONGER_WANTED',
+      'PREFER_DIRECT_VISIT',
+      'BOUGHT_ELSEWHERE',
+      'OTHER',
+    ])
+    .describe('취소 사유. OTHER 선택 시 reasonDetail 필수.'),
+  reasonDetail: zod
+    .string()
+    .max(postApiV1ParticipationsParticipationIdCancelBodyReasonDetailMax)
+    .nullish()
+    .describe('기타 상세 사유'),
+});
+
 export const PostApiV1ParticipationsParticipationIdCancelResponse = zod.object({
   success: zod.boolean(),
-  data: zod.unknown().nullable(),
+  data: zod.object({
+    participationId: zod.number(),
+    status: zod.enum(['REFUNDED']),
+    cancelledAt: zod.iso.datetime({ offset: true }),
+    refundedAt: zod.iso.datetime({ offset: true }),
+  }),
   error: zod.unknown().nullable(),
 });
 

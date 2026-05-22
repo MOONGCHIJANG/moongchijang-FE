@@ -8,12 +8,12 @@ import { HttpResponse, http } from 'msw';
 import type { RequestHandlerOptions } from 'msw';
 
 import type {
+  ApiResponseCancelParticipation,
   ApiResponseCheckoutInfo,
   ApiResponsePaymentConfirmed,
   ApiResponsePaymentOrderCreated,
   ApiResponsePortOneWebhook,
   ApiResponseRefundList,
-  SuccessNoDataResponse,
 } from '../api.schemas';
 
 export const getGetApiV1GroupBuysGroupBuyIdCheckoutResponseMock = (
@@ -105,10 +105,17 @@ export const getPostApiV1PaymentsPortoneWebhookResponseMock = (
 });
 
 export const getPostApiV1ParticipationsParticipationIdCancelResponseMock = (
-  overrideResponse: Partial<Extract<SuccessNoDataResponse, object>> = {},
-): SuccessNoDataResponse => ({
+  overrideResponse: Partial<
+    Extract<ApiResponseCancelParticipation, object>
+  > = {},
+): ApiResponseCancelParticipation => ({
   success: faker.datatype.boolean(),
-  data: {},
+  data: {
+    participationId: faker.number.int(),
+    status: faker.helpers.arrayElement(['REFUNDED'] as const),
+    cancelledAt: faker.date.past().toISOString().slice(0, 19) + 'Z',
+    refundedAt: faker.date.past().toISOString().slice(0, 19) + 'Z',
+  },
   error: {},
   ...overrideResponse,
 });
@@ -259,10 +266,12 @@ export const getPostApiV1PaymentsPortoneWebhookMockHandler = (
 
 export const getPostApiV1ParticipationsParticipationIdCancelMockHandler = (
   overrideResponse?:
-    | SuccessNoDataResponse
+    | ApiResponseCancelParticipation
     | ((
         info: Parameters<Parameters<typeof http.post>[1]>[0],
-      ) => Promise<SuccessNoDataResponse> | SuccessNoDataResponse),
+      ) =>
+        | Promise<ApiResponseCancelParticipation>
+        | ApiResponseCancelParticipation),
   options?: RequestHandlerOptions,
 ) => {
   return http.post(

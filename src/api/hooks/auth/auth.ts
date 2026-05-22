@@ -280,11 +280,23 @@ export type postApiV1AuthLogoutResponse200 = {
   status: 200;
 };
 
+export type postApiV1AuthLogoutResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
 export type postApiV1AuthLogoutResponseSuccess =
   postApiV1AuthLogoutResponse200 & {
     headers: Headers;
   };
-export type postApiV1AuthLogoutResponse = postApiV1AuthLogoutResponseSuccess;
+export type postApiV1AuthLogoutResponseError =
+  postApiV1AuthLogoutResponse401 & {
+    headers: Headers;
+  };
+
+export type postApiV1AuthLogoutResponse =
+  | postApiV1AuthLogoutResponseSuccess
+  | postApiV1AuthLogoutResponseError;
 
 export const getPostApiV1AuthLogoutUrl = () => {
   return `/api/v1/auth/logout`;
@@ -300,7 +312,7 @@ export const postApiV1AuthLogout = async (
 };
 
 export const getPostApiV1AuthLogoutMutationOptions = <
-  TError = unknown,
+  TError = UnauthorizedResponse,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -339,12 +351,15 @@ export type PostApiV1AuthLogoutMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiV1AuthLogout>>
 >;
 
-export type PostApiV1AuthLogoutMutationError = unknown;
+export type PostApiV1AuthLogoutMutationError = UnauthorizedResponse;
 
 /**
  * @summary 로그아웃
  */
-export const usePostApiV1AuthLogout = <TError = unknown, TContext = unknown>(
+export const usePostApiV1AuthLogout = <
+  TError = UnauthorizedResponse,
+  TContext = unknown,
+>(
   options?: {
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof postApiV1AuthLogout>>,

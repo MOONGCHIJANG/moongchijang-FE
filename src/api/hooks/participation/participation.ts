@@ -19,19 +19,20 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  ApiResponseCancelParticipation,
   ApiResponseCheckoutInfo,
   ApiResponsePaymentConfirmed,
   ApiResponsePaymentOrderCreated,
   ApiResponsePortOneWebhook,
   ApiResponseRefundList,
   BadRequestResponse,
+  CancelParticipationRequest,
   ConflictResponse,
   ForbiddenResponse,
   GetApiV1GroupBuysGroupBuyIdCheckoutParams,
   PaymentConfirm,
   PaymentOrderCreate,
   PortOneWebhook,
-  SuccessNoDataResponse,
   UnauthorizedResponse,
 } from '../api.schemas';
 
@@ -434,6 +435,11 @@ export type postApiV1PaymentsPortoneCompleteResponse400 = {
   status: 400;
 };
 
+export type postApiV1PaymentsPortoneCompleteResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
 export type postApiV1PaymentsPortoneCompleteResponse409 = {
   data: ConflictResponse;
   status: 409;
@@ -445,6 +451,7 @@ export type postApiV1PaymentsPortoneCompleteResponseSuccess =
   };
 export type postApiV1PaymentsPortoneCompleteResponseError = (
   | postApiV1PaymentsPortoneCompleteResponse400
+  | postApiV1PaymentsPortoneCompleteResponse401
   | postApiV1PaymentsPortoneCompleteResponse409
 ) & {
   headers: Headers;
@@ -474,7 +481,7 @@ export const postApiV1PaymentsPortoneComplete = async (
 };
 
 export const getPostApiV1PaymentsPortoneCompleteMutationOptions = <
-  TError = BadRequestResponse | ConflictResponse,
+  TError = BadRequestResponse | UnauthorizedResponse | ConflictResponse,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -517,13 +524,14 @@ export type PostApiV1PaymentsPortoneCompleteMutationResult = NonNullable<
 export type PostApiV1PaymentsPortoneCompleteMutationBody = PaymentConfirm;
 export type PostApiV1PaymentsPortoneCompleteMutationError =
   | BadRequestResponse
+  | UnauthorizedResponse
   | ConflictResponse;
 
 /**
  * @summary PortOne 결제 완료 서버 검증
  */
 export const usePostApiV1PaymentsPortoneComplete = <
-  TError = BadRequestResponse | ConflictResponse,
+  TError = BadRequestResponse | UnauthorizedResponse | ConflictResponse,
   TContext = unknown,
 >(
   options?: {
@@ -659,8 +667,13 @@ export const usePostApiV1PaymentsPortoneWebhook = <
  * @summary 참여 취소 (달성 전 이탈)
  */
 export type postApiV1ParticipationsParticipationIdCancelResponse200 = {
-  data: SuccessNoDataResponse;
+  data: ApiResponseCancelParticipation;
   status: 200;
+};
+
+export type postApiV1ParticipationsParticipationIdCancelResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
 };
 
 export type postApiV1ParticipationsParticipationIdCancelResponse403 = {
@@ -678,6 +691,7 @@ export type postApiV1ParticipationsParticipationIdCancelResponseSuccess =
     headers: Headers;
   };
 export type postApiV1ParticipationsParticipationIdCancelResponseError = (
+  | postApiV1ParticipationsParticipationIdCancelResponse401
   | postApiV1ParticipationsParticipationIdCancelResponse403
   | postApiV1ParticipationsParticipationIdCancelResponse409
 ) & {
@@ -696,6 +710,7 @@ export const getPostApiV1ParticipationsParticipationIdCancelUrl = (
 
 export const postApiV1ParticipationsParticipationIdCancel = async (
   participationId: number,
+  cancelParticipationRequest: CancelParticipationRequest,
   options?: RequestInit,
 ): Promise<postApiV1ParticipationsParticipationIdCancelResponse> => {
   return customFetch<postApiV1ParticipationsParticipationIdCancelResponse>(
@@ -703,25 +718,27 @@ export const postApiV1ParticipationsParticipationIdCancel = async (
     {
       ...options,
       method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(cancelParticipationRequest),
     },
   );
 };
 
 export const getPostApiV1ParticipationsParticipationIdCancelMutationOptions = <
-  TError = ForbiddenResponse | ConflictResponse,
+  TError = UnauthorizedResponse | ForbiddenResponse | ConflictResponse,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiV1ParticipationsParticipationIdCancel>>,
     TError,
-    { participationId: number },
+    { participationId: number; data: CancelParticipationRequest },
     TContext
   >;
   request?: SecondParameter<typeof customFetch>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postApiV1ParticipationsParticipationIdCancel>>,
   TError,
-  { participationId: number },
+  { participationId: number; data: CancelParticipationRequest },
   TContext
 > => {
   const mutationKey = ['postApiV1ParticipationsParticipationIdCancel'];
@@ -735,12 +752,13 @@ export const getPostApiV1ParticipationsParticipationIdCancelMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postApiV1ParticipationsParticipationIdCancel>>,
-    { participationId: number }
+    { participationId: number; data: CancelParticipationRequest }
   > = (props) => {
-    const { participationId } = props ?? {};
+    const { participationId, data } = props ?? {};
 
     return postApiV1ParticipationsParticipationIdCancel(
       participationId,
+      data,
       requestOptions,
     );
   };
@@ -752,8 +770,10 @@ export type PostApiV1ParticipationsParticipationIdCancelMutationResult =
   NonNullable<
     Awaited<ReturnType<typeof postApiV1ParticipationsParticipationIdCancel>>
   >;
-
+export type PostApiV1ParticipationsParticipationIdCancelMutationBody =
+  CancelParticipationRequest;
 export type PostApiV1ParticipationsParticipationIdCancelMutationError =
+  | UnauthorizedResponse
   | ForbiddenResponse
   | ConflictResponse;
 
@@ -761,14 +781,14 @@ export type PostApiV1ParticipationsParticipationIdCancelMutationError =
  * @summary 참여 취소 (달성 전 이탈)
  */
 export const usePostApiV1ParticipationsParticipationIdCancel = <
-  TError = ForbiddenResponse | ConflictResponse,
+  TError = UnauthorizedResponse | ForbiddenResponse | ConflictResponse,
   TContext = unknown,
 >(
   options?: {
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof postApiV1ParticipationsParticipationIdCancel>>,
       TError,
-      { participationId: number },
+      { participationId: number; data: CancelParticipationRequest },
       TContext
     >;
     request?: SecondParameter<typeof customFetch>;
@@ -777,7 +797,7 @@ export const usePostApiV1ParticipationsParticipationIdCancel = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiV1ParticipationsParticipationIdCancel>>,
   TError,
-  { participationId: number },
+  { participationId: number; data: CancelParticipationRequest },
   TContext
 > => {
   return useMutation(

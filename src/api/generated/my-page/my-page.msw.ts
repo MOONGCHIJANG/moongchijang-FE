@@ -2,69 +2,358 @@
 /**
  * // 이 파일은 Orval이 자동 생성합니다. 직접 수정하지 마세요.
  */
-import {
-  faker
-} from '@faker-js/faker';
+import { faker } from '@faker-js/faker';
 
-import {
-  HttpResponse,
-  http
-} from 'msw';
-import type {
-  RequestHandlerOptions
-} from 'msw';
+import { HttpResponse, http } from 'msw';
+import type { RequestHandlerOptions } from 'msw';
 
 import type {
   ApiResponseGroupBuyRequestList,
+  ApiResponseInProgressParticipationPage,
   ApiResponseParticipationPage,
-  ApiResponseTabCounts
+  ApiResponsePickupWaitingParticipationPage,
+  ApiResponseTabCounts,
 } from '../api.schemas';
 
+export const getGetApiV1UsersMeParticipationsResponseMock = (
+  overrideResponse: Partial<Extract<ApiResponseParticipationPage, object>> = {},
+): ApiResponseParticipationPage => ({
+  success: faker.datatype.boolean(),
+  data: {
+    content: Array.from(
+      { length: faker.number.int({ min: 1, max: 10 }) },
+      (_, i) => i + 1,
+    ).map(() => ({
+      participationId: faker.number.int(),
+      productName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      storeName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      pickupDate: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.date.past().toISOString().slice(0, 10),
+          null,
+        ]),
+        null,
+      ]),
+      pickupTimeStart: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          null,
+        ]),
+        null,
+      ]),
+      pickupTimeEnd: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          null,
+        ]),
+        null,
+      ]),
+      paymentAmount: faker.number.int(),
+      quantity: faker.number.int(),
+      achievementRate: faker.number.int(),
+      achievementStatus: faker.helpers.arrayElement([
+        'BEFORE_ACHIEVED',
+        'ACHIEVED',
+      ] as const),
+      dDay: faker.number.int(),
+      groupBuyId: faker.number.int(),
+      canCancel: faker.datatype.boolean(),
+      canViewPickup: faker.datatype.boolean(),
+      canViewQr: faker.datatype.boolean(),
+    })),
+    totalElements: faker.number.int(),
+    totalPages: faker.number.int(),
+  },
+  error: {},
+  ...overrideResponse,
+});
 
-export const getGetApiV1UsersMeParticipationsResponseMock = (overrideResponse: Partial<Extract<ApiResponseParticipationPage, object>> = {}): ApiResponseParticipationPage => ({success: faker.datatype.boolean(), data: {content: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({participationId: faker.number.int(), productName: faker.string.alpha({length: {min: 10, max: 20}}), storeName: faker.string.alpha({length: {min: 10, max: 20}}), pickupDate: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 10), null]), null]), pickupTimeStart: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), null]), pickupTimeEnd: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), null]), paymentAmount: faker.number.int(), quantity: faker.number.int(), achievementRate: faker.number.int(), achievementStatus: faker.helpers.arrayElement(['BEFORE_ACHIEVED','ACHIEVED'] as const), dDay: faker.number.int(), groupBuyId: faker.number.int(), canCancel: faker.datatype.boolean(), canViewPickup: faker.datatype.boolean(), canViewQr: faker.datatype.boolean()})), totalElements: faker.number.int(), totalPages: faker.number.int()}, error: {}, ...overrideResponse})
+export const getGetApiV1UsersMeParticipationsInProgressResponseMock = (
+  overrideResponse: Partial<
+    Extract<ApiResponseInProgressParticipationPage, object>
+  > = {},
+): ApiResponseInProgressParticipationPage => ({
+  success: faker.datatype.boolean(),
+  data: {
+    content: Array.from(
+      { length: faker.number.int({ min: 1, max: 10 }) },
+      (_, i) => i + 1,
+    ).map(() => ({
+      participationId: faker.number.int(),
+      groupBuyId: faker.number.int(),
+      productName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      storeName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      pickupAt: faker.date.past().toISOString().slice(0, 19) + 'Z',
+      paidAmount: faker.number.int(),
+      quantity: faker.number.int(),
+      achievementRate: faker.number.int(),
+      dDay: faker.number.int(),
+      participatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z',
+    })),
+    totalElements: faker.number.int(),
+    totalPages: faker.number.int(),
+  },
+  error: {},
+  ...overrideResponse,
+});
 
-export const getGetApiV1UsersMeGroupBuyRequestsResponseMock = (overrideResponse: Partial<Extract<ApiResponseGroupBuyRequestList, object>> = {}): ApiResponseGroupBuyRequestList => ({success: faker.datatype.boolean(), data: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({requestId: faker.number.int(), storeName: faker.string.alpha({length: {min: 10, max: 20}}), productName: faker.string.alpha({length: {min: 10, max: 20}}), desiredQuantity: faker.number.int(), desiredPickupDate: faker.date.past().toISOString().slice(0, 10), additionalNote: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined]), status: faker.helpers.arrayElement(['SUBMITTED','IN_REVIEW','IN_CONTACT','OPENED','REJECTED'] as const), rejectionReason: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), null]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), error: {}, ...overrideResponse})
+export const getGetApiV1UsersMeParticipationsPickupWaitingResponseMock = (
+  overrideResponse: Partial<
+    Extract<ApiResponsePickupWaitingParticipationPage, object>
+  > = {},
+): ApiResponsePickupWaitingParticipationPage => ({
+  success: faker.datatype.boolean(),
+  data: {
+    content: Array.from(
+      { length: faker.number.int({ min: 1, max: 10 }) },
+      (_, i) => i + 1,
+    ).map(() => ({
+      participationId: faker.number.int(),
+      groupBuyId: faker.number.int(),
+      productName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      storeName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      pickupAt: faker.date.past().toISOString().slice(0, 19) + 'Z',
+      paidAmount: faker.number.int(),
+      quantity: faker.number.int(),
+      isClosed: faker.datatype.boolean(),
+      participatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z',
+    })),
+    totalElements: faker.number.int(),
+    totalPages: faker.number.int(),
+  },
+  error: {},
+  ...overrideResponse,
+});
 
-export const getGetApiV1UsersMeTabsCountsResponseMock = (overrideResponse: Partial<Extract<ApiResponseTabCounts, object>> = {}): ApiResponseTabCounts => ({success: faker.datatype.boolean(), data: {activeCount: faker.number.int(), completedCount: faker.number.int(), refundedCount: faker.number.int(), requestCount: faker.number.int()}, error: {}, ...overrideResponse})
+export const getGetApiV1UsersMeGroupBuyRequestsResponseMock = (
+  overrideResponse: Partial<
+    Extract<ApiResponseGroupBuyRequestList, object>
+  > = {},
+): ApiResponseGroupBuyRequestList => ({
+  success: faker.datatype.boolean(),
+  data: Array.from(
+    { length: faker.number.int({ min: 1, max: 10 }) },
+    (_, i) => i + 1,
+  ).map(() => ({
+    requestId: faker.number.int(),
+    storeName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    storeAddress: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        null,
+      ]),
+      undefined,
+    ]),
+    placeId: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        null,
+      ]),
+      undefined,
+    ]),
+    roadAddress: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        null,
+      ]),
+      undefined,
+    ]),
+    lotAddress: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        null,
+      ]),
+      undefined,
+    ]),
+    latitude: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.number.float({ fractionDigits: 2 }),
+        null,
+      ]),
+      undefined,
+    ]),
+    longitude: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.number.float({ fractionDigits: 2 }),
+        null,
+      ]),
+      undefined,
+    ]),
+    productName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    desiredQuantity: faker.number.int(),
+    desiredPickupDate: faker.date.past().toISOString().slice(0, 10),
+    additionalNote: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        null,
+      ]),
+      undefined,
+    ]),
+    status: faker.helpers.arrayElement([
+      'SUBMITTED',
+      'IN_REVIEW',
+      'IN_CONTACT',
+      'OPENED',
+      'REJECTED',
+    ] as const),
+    rejectionReason: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        null,
+      ]),
+      null,
+    ]),
+    createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z',
+  })),
+  error: {},
+  ...overrideResponse,
+});
 
+export const getGetApiV1UsersMeTabsCountsResponseMock = (
+  overrideResponse: Partial<Extract<ApiResponseTabCounts, object>> = {},
+): ApiResponseTabCounts => ({
+  success: faker.datatype.boolean(),
+  data: {
+    activeCount: faker.number.int(),
+    completedCount: faker.number.int(),
+    refundedCount: faker.number.int(),
+    requestCount: faker.number.int(),
+  },
+  error: {},
+  ...overrideResponse,
+});
 
-export const getGetApiV1UsersMeParticipationsMockHandler = (overrideResponse?: ApiResponseParticipationPage | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ApiResponseParticipationPage> | ApiResponseParticipationPage), options?: RequestHandlerOptions) => {
-  return http.get('*/api/v1/users/me/participations', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+export const getGetApiV1UsersMeParticipationsMockHandler = (
+  overrideResponse?:
+    | ApiResponseParticipationPage
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) =>
+        | Promise<ApiResponseParticipationPage>
+        | ApiResponseParticipationPage),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    '*/api/v1/users/me/participations',
+    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getGetApiV1UsersMeParticipationsResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
 
+export const getGetApiV1UsersMeParticipationsInProgressMockHandler = (
+  overrideResponse?:
+    | ApiResponseInProgressParticipationPage
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) =>
+        | Promise<ApiResponseInProgressParticipationPage>
+        | ApiResponseInProgressParticipationPage),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    '*/api/v1/users/me/participations/in-progress',
+    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getGetApiV1UsersMeParticipationsInProgressResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
 
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getGetApiV1UsersMeParticipationsResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
+export const getGetApiV1UsersMeParticipationsPickupWaitingMockHandler = (
+  overrideResponse?:
+    | ApiResponsePickupWaitingParticipationPage
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) =>
+        | Promise<ApiResponsePickupWaitingParticipationPage>
+        | ApiResponsePickupWaitingParticipationPage),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    '*/api/v1/users/me/participations/pickup-waiting',
+    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getGetApiV1UsersMeParticipationsPickupWaitingResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
 
-export const getGetApiV1UsersMeGroupBuyRequestsMockHandler = (overrideResponse?: ApiResponseGroupBuyRequestList | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ApiResponseGroupBuyRequestList> | ApiResponseGroupBuyRequestList), options?: RequestHandlerOptions) => {
-  return http.get('*/api/v1/users/me/group-buy-requests', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+export const getGetApiV1UsersMeGroupBuyRequestsMockHandler = (
+  overrideResponse?:
+    | ApiResponseGroupBuyRequestList
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) =>
+        | Promise<ApiResponseGroupBuyRequestList>
+        | ApiResponseGroupBuyRequestList),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    '*/api/v1/users/me/group-buy-requests',
+    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getGetApiV1UsersMeGroupBuyRequestsResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
 
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getGetApiV1UsersMeGroupBuyRequestsResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
-
-export const getGetApiV1UsersMeTabsCountsMockHandler = (overrideResponse?: ApiResponseTabCounts | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ApiResponseTabCounts> | ApiResponseTabCounts), options?: RequestHandlerOptions) => {
-  return http.get('*/api/v1/users/me/tabs/counts', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getGetApiV1UsersMeTabsCountsResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
+export const getGetApiV1UsersMeTabsCountsMockHandler = (
+  overrideResponse?:
+    | ApiResponseTabCounts
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) => Promise<ApiResponseTabCounts> | ApiResponseTabCounts),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    '*/api/v1/users/me/tabs/counts',
+    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getGetApiV1UsersMeTabsCountsResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
 export const getMyPageMock = () => [
   getGetApiV1UsersMeParticipationsMockHandler(),
+  getGetApiV1UsersMeParticipationsInProgressMockHandler(),
+  getGetApiV1UsersMeParticipationsPickupWaitingMockHandler(),
   getGetApiV1UsersMeGroupBuyRequestsMockHandler(),
-  getGetApiV1UsersMeTabsCountsMockHandler()
-]
+  getGetApiV1UsersMeTabsCountsMockHandler(),
+];

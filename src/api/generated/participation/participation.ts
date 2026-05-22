@@ -3,19 +3,20 @@
  * // 이 파일은 Orval이 자동 생성합니다. 직접 수정하지 마세요.
  */
 import type {
+  ApiResponseCancelParticipation,
   ApiResponseCheckoutInfo,
   ApiResponsePaymentConfirmed,
   ApiResponsePaymentOrderCreated,
   ApiResponsePortOneWebhook,
   ApiResponseRefundList,
   BadRequestResponse,
+  CancelParticipationRequest,
   ConflictResponse,
   ForbiddenResponse,
   GetApiV1GroupBuysGroupBuyIdCheckoutParams,
   PaymentConfirm,
   PaymentOrderCreate,
   PortOneWebhook,
-  SuccessNoDataResponse,
   UnauthorizedResponse,
 } from '../api.schemas';
 
@@ -161,6 +162,11 @@ export type postApiV1PaymentsPortoneCompleteResponse400 = {
   status: 400;
 };
 
+export type postApiV1PaymentsPortoneCompleteResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
 export type postApiV1PaymentsPortoneCompleteResponse409 = {
   data: ConflictResponse;
   status: 409;
@@ -172,6 +178,7 @@ export type postApiV1PaymentsPortoneCompleteResponseSuccess =
   };
 export type postApiV1PaymentsPortoneCompleteResponseError = (
   | postApiV1PaymentsPortoneCompleteResponse400
+  | postApiV1PaymentsPortoneCompleteResponse401
   | postApiV1PaymentsPortoneCompleteResponse409
 ) & {
   headers: Headers;
@@ -240,8 +247,13 @@ export const postApiV1PaymentsPortoneWebhook = async (
  * @summary 참여 취소 (달성 전 이탈)
  */
 export type postApiV1ParticipationsParticipationIdCancelResponse200 = {
-  data: SuccessNoDataResponse;
+  data: ApiResponseCancelParticipation;
   status: 200;
+};
+
+export type postApiV1ParticipationsParticipationIdCancelResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
 };
 
 export type postApiV1ParticipationsParticipationIdCancelResponse403 = {
@@ -259,6 +271,7 @@ export type postApiV1ParticipationsParticipationIdCancelResponseSuccess =
     headers: Headers;
   };
 export type postApiV1ParticipationsParticipationIdCancelResponseError = (
+  | postApiV1ParticipationsParticipationIdCancelResponse401
   | postApiV1ParticipationsParticipationIdCancelResponse403
   | postApiV1ParticipationsParticipationIdCancelResponse409
 ) & {
@@ -277,6 +290,7 @@ export const getPostApiV1ParticipationsParticipationIdCancelUrl = (
 
 export const postApiV1ParticipationsParticipationIdCancel = async (
   participationId: number,
+  cancelParticipationRequest: CancelParticipationRequest,
   options?: RequestInit,
 ): Promise<postApiV1ParticipationsParticipationIdCancelResponse> => {
   return customFetch<postApiV1ParticipationsParticipationIdCancelResponse>(
@@ -284,6 +298,8 @@ export const postApiV1ParticipationsParticipationIdCancel = async (
     {
       ...options,
       method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(cancelParticipationRequest),
     },
   );
 };

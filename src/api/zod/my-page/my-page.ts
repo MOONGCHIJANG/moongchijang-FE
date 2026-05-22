@@ -53,6 +53,89 @@ export const GetApiV1UsersMeParticipationsResponse = zod.object({
 });
 
 /**
+ * 페이지네이션 기반으로 진행 중 탭 카드를 조회한다. 정렬 기준은 참여일시(participatedAt) 내림차순이다.
+ * @summary 진행 중 탭 참여 공구 목록 조회
+ */
+export const getApiV1UsersMeParticipationsInProgressQueryPageDefault = 0;
+export const getApiV1UsersMeParticipationsInProgressQuerySizeDefault = 20;
+export const getApiV1UsersMeParticipationsInProgressQuerySizeMax = 100;
+
+export const GetApiV1UsersMeParticipationsInProgressQueryParams = zod.object({
+  page: zod
+    .number()
+    .default(getApiV1UsersMeParticipationsInProgressQueryPageDefault),
+  size: zod
+    .number()
+    .max(getApiV1UsersMeParticipationsInProgressQuerySizeMax)
+    .default(getApiV1UsersMeParticipationsInProgressQuerySizeDefault),
+});
+
+export const GetApiV1UsersMeParticipationsInProgressResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    content: zod.array(
+      zod.object({
+        participationId: zod.number(),
+        groupBuyId: zod.number(),
+        productName: zod.string(),
+        storeName: zod.string(),
+        pickupAt: zod.iso.datetime({ offset: true }),
+        paidAmount: zod.number(),
+        quantity: zod.number(),
+        achievementRate: zod.number().describe('0~100 정수 퍼센트'),
+        dDay: zod.number().describe('마감일까지 남은 일수'),
+        participatedAt: zod.iso.datetime({ offset: true }),
+      }),
+    ),
+    totalElements: zod.number(),
+    totalPages: zod.number(),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * 페이지네이션 기반으로 픽업 대기 탭 카드를 조회한다. 정렬 기준은 참여일시(participatedAt) 내림차순이다.
+ * @summary 픽업 대기 탭 참여 완료 공구 이력 조회
+ */
+export const getApiV1UsersMeParticipationsPickupWaitingQueryPageDefault = 0;
+export const getApiV1UsersMeParticipationsPickupWaitingQuerySizeDefault = 20;
+export const getApiV1UsersMeParticipationsPickupWaitingQuerySizeMax = 100;
+
+export const GetApiV1UsersMeParticipationsPickupWaitingQueryParams = zod.object(
+  {
+    page: zod
+      .number()
+      .default(getApiV1UsersMeParticipationsPickupWaitingQueryPageDefault),
+    size: zod
+      .number()
+      .max(getApiV1UsersMeParticipationsPickupWaitingQuerySizeMax)
+      .default(getApiV1UsersMeParticipationsPickupWaitingQuerySizeDefault),
+  },
+);
+
+export const GetApiV1UsersMeParticipationsPickupWaitingResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    content: zod.array(
+      zod.object({
+        participationId: zod.number(),
+        groupBuyId: zod.number(),
+        productName: zod.string(),
+        storeName: zod.string(),
+        pickupAt: zod.iso.datetime({ offset: true }),
+        paidAmount: zod.number(),
+        quantity: zod.number(),
+        isClosed: zod.boolean().describe('마감 공구 여부'),
+        participatedAt: zod.iso.datetime({ offset: true }),
+      }),
+    ),
+    totalElements: zod.number(),
+    totalPages: zod.number(),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
  * @summary 내 공구 요청 목록 조회 (개설 요청 내역 탭)
  */
 export const GetApiV1UsersMeGroupBuyRequestsResponse = zod.object({
@@ -61,6 +144,12 @@ export const GetApiV1UsersMeGroupBuyRequestsResponse = zod.object({
     zod.object({
       requestId: zod.number(),
       storeName: zod.string(),
+      storeAddress: zod.string().nullish(),
+      placeId: zod.string().nullish(),
+      roadAddress: zod.string().nullish(),
+      lotAddress: zod.string().nullish(),
+      latitude: zod.number().nullish(),
+      longitude: zod.number().nullish(),
       productName: zod.string(),
       desiredQuantity: zod.number(),
       desiredPickupDate: zod.iso.date(),

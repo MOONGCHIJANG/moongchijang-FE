@@ -587,13 +587,14 @@ export const PostApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse = zod.object({
 /**
  * @summary 다건 공구 달성률 조회 (피드 갱신용)
  */
+
 export const getApiV1GroupBuysProgressQueryIdsMax = 20;
 
 export const GetApiV1GroupBuysProgressQueryParams = zod.object({
   ids: zod
-    .array(zod.number())
+    .array(zod.number().min(1))
     .max(getApiV1GroupBuysProgressQueryIdsMax)
-    .describe('조회할 공구 ID 목록 (최대 20개)'),
+    .describe('조회할 공구 ID 목록 (양수 ID만 허용, 최대 20개)'),
 });
 
 export const GetApiV1GroupBuysProgressResponse = zod.object({

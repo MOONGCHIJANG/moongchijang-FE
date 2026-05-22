@@ -3,9 +3,9 @@
 import Image from 'next/image';
 import { Icon } from '@iconify/react';
 import { cn } from '@/lib/utils';
-import type { GroupBuyFeedItemResponse } from '@/api/generated/api.schemas';
+import type { WishlistItemResponse } from '@/api/generated/api.schemas';
 
-interface WishlistCardProps extends GroupBuyFeedItemResponse {
+interface WishlistCardProps extends WishlistItemResponse {
   onRemove: () => void;
   isRemoving?: boolean;
 }

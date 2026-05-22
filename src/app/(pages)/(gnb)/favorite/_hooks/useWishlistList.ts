@@ -9,7 +9,7 @@ import {
 import {
   GetApiV1WishlistsFilter,
   GetApiV1WishlistsSort,
-  type GroupBuyFeedItemResponse,
+  type WishlistItemResponse,
 } from '@/api/generated/api.schemas';
 
 const PAGE_SIZE = 20;
@@ -46,7 +46,7 @@ export function useWishlistList(
     },
   });
 
-  const items = useMemo<GroupBuyFeedItemResponse[]>(
+  const items = useMemo<WishlistItemResponse[]>(
     () => data?.pages.flatMap((page) => page?.data?.data?.content ?? []) ?? [],
     [data],
   );

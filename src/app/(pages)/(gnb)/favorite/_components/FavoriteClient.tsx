@@ -26,7 +26,6 @@ const FILTER_TABS: { label: string; value: WishlistFilter }[] = [
   { label: '전체', value: GetApiV1WishlistsFilter.ALL },
   { label: '모집중', value: GetApiV1WishlistsFilter.OPEN },
   { label: '마감임박', value: GetApiV1WishlistsFilter.CLOSING_SOON },
-  { label: '마감', value: GetApiV1WishlistsFilter.CLOSED },
 ];
 
 const WishlistSkeleton = () => (
@@ -47,6 +46,7 @@ export function FavoriteClient() {
     GetApiV1WishlistsFilter.ALL,
   );
   const [sort, setSort] = useState<WishlistSort>(GetApiV1WishlistsSort.LATEST);
+  const [excludeClosed, setExcludeClosed] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -64,7 +64,7 @@ export function FavoriteClient() {
   }, []);
 
   const {
-    items,
+    items: rawItems,
     isLoading,
     totalElements,
     urgentCount,
@@ -72,6 +72,10 @@ export function FavoriteClient() {
     hasNextPage,
     isFetchingNextPage,
   } = useWishlistList(filter, sort);
+
+  const items = excludeClosed
+    ? rawItems.filter((item) => item.dDay >= 0)
+    : rawItems;
 
   const scrollStateRef = useRef({ hasNextPage, isFetchingNextPage });
   useLayoutEffect(() => {
@@ -114,7 +118,7 @@ export function FavoriteClient() {
     <div className="flex flex-col h-full">
       <Header text="찜" showBackButton={false} />
 
-      <div className="flex-1 overflow-y-auto bg-[#F9F9FA]">
+      <div className="flex-1 overflow-y-auto bg-white">
         {/* 필터 탭 */}
         <div className="flex gap-2 px-4 pt-4 pb-2">
           {FILTER_TABS.map(({ label, value }) => (
@@ -131,8 +135,29 @@ export function FavoriteClient() {
           ))}
         </div>
 
-        {/* 정렬 */}
-        <div className="flex items-center justify-end px-4 pb-3">
+        {/* 마감 제외 · 정렬 */}
+        <div className="flex items-center justify-between px-4 pb-3">
+          <button
+            type="button"
+            onClick={() => setExcludeClosed((prev) => !prev)}
+            className="flex items-center gap-2"
+          >
+            <Icon
+              icon={
+                excludeClosed
+                  ? 'material-symbols:radio-button-checked'
+                  : 'material-symbols:radio-button-unchecked'
+              }
+              className={
+                excludeClosed
+                  ? 'w-4 h-4 text-button-natural'
+                  : 'w-4 h-4 text-icon-tertiary'
+              }
+            />
+            <span className="caption-sm-regular text-text-basic font-pretendard">
+              마감 제외
+            </span>
+          </button>
           <button
             type="button"
             onClick={() =>
@@ -158,7 +183,7 @@ export function FavoriteClient() {
 
         {/* 목록 */}
         {isLoading ? (
-          <div className="bg-bg-white rounded-t-3xl overflow-hidden">
+          <div className="bg-bg-white overflow-hidden">
             {Array.from({ length: 4 }, (_, i) => (
               <WishlistSkeleton key={i} />
             ))}
@@ -169,13 +194,13 @@ export function FavoriteClient() {
             description={'마음에 드는 공구를 찜해보세요!'}
           />
         ) : (
-          <div className="bg-bg-white rounded-t-3xl overflow-hidden pb-5">
+          <div className="bg-bg-white overflow-hidden pb-5">
             {items.map((item) => (
-              <Link key={item.id} href={`/item/${item.id}`}>
+              <Link key={item.groupBuyId} href={`/item/${item.groupBuyId}`}>
                 <WishlistCard
                   {...item}
-                  isRemoving={isPending && removingVars?.groupBuyId === item.id}
-                  onRemove={() => removeWishlist({ groupBuyId: item.id })}
+                  isRemoving={isPending && removingVars?.groupBuyId === item.groupBuyId}
+                  onRemove={() => removeWishlist({ groupBuyId: item.groupBuyId })}
                 />
               </Link>
             ))}

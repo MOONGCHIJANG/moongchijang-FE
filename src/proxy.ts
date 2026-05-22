@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export function proxy(request: NextRequest) {
   const token = request.cookies.get('accessToken')?.value;
+  const { pathname } = request.nextUrl;
+
+  // 로그인 유저가 /login 접근 시 /feed로 redirect
+  if (pathname.startsWith('/login') && token) {
+    return NextResponse.redirect(new URL('/feed', request.url));
+  }
 
   if (!token) {
     const response = NextResponse.redirect(new URL('/login', request.url));

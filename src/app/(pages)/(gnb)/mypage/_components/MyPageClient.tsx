@@ -6,7 +6,9 @@ import Link from 'next/link';
 import React from 'react';
 
 const MyPageClient = () => {
-  const { isLoggedIn } = useAuthStore();
+  const { isLoggedIn, isInitialized } = useAuthStore();
+
+  if (!isInitialized) return null;
 
   return (
     <>

@@ -166,22 +166,32 @@ const overrideHandlers = [
       success: true,
       data: {
         // ── 분기 확인용: 하나만 주석 해제해서 확인 ───────────────────────
-        // case 1: 베이커리 인식, 동네 미인식
-        // searchCase: 1,
-        // detectedBakery: '두쫀쿠',
-        // detectedNeighborhood: null,
-        // case 2: 동네 인식, 베이커리 미인식
-        // searchCase: 2,
-        // detectedBakery: null,
-        // detectedNeighborhood: '성수',
-        // case 3: 동네 + 베이커리 모두 인식
-        // searchCase: 3,
-        // detectedBakery: '두쫀쿠',
-        // detectedNeighborhood: '분당',
+        // case 1: 상품 인식, 동네 미인식
+        // searchCase: 'PRODUCT_ONLY',
+        // detectedProduct: '두쫀쿠',
+        // detectedRegion: null,
+        // uiState: 'RESULTS',
+        // results: [],
+        // case 2: 동네 인식, 상품 미인식
+        // searchCase: 'NEIGHBORHOOD_ONLY',
+        // detectedProduct: null,
+        // detectedRegion: '성수',
+        // uiState: 'RESULTS',
+        // results: [],
+        // case 3: 동네 + 상품 모두 인식
+        // searchCase: 'BOTH_DETECTED',
+        // detectedProduct: '두쫀쿠',
+        // detectedRegion: '분당',
+        // uiState: 'RESULTS',
+        // results: [],
         // case 4: 모두 인식 불가 (현재 활성)
-        searchCase: 4,
-        detectedBakery: null,
-        detectedNeighborhood: null,
+        searchCase: 'NONE_DETECTED',
+        detectedProduct: null,
+        detectedRegion: null,
+        uiState: 'RESULTS',
+        results: [],
+        totalCount: 0,
+        confidence: 0.9,
         // ─────────────────────────────────────────────────────────────────
       },
       error: null,
@@ -287,6 +297,68 @@ const overrideHandlers = [
       { status: 200 },
     );
   }),
+  // 피드용 가장 가까운 픽업 QR 조회
+  http.get('*/api/v1/pickups/me/nearest-qr', async () => {
+    await delay(300);
+    return HttpResponse.json({
+      success: true,
+      data: {
+        // ── 분기 확인용: 하나만 주석 해제해서 확인 ───────────────────────
+        // 후보 없음
+        // hasCandidate: false,
+        // hasMultipleToday: false,
+        // reason: 'NO_AVAILABLE_PICKUP',
+        // item: null,
+
+        // 향후 픽업 예정 (LOCKED)
+        // hasCandidate: true,
+        // hasMultipleToday: false,
+        // reason: 'ONLY_FUTURE_PICKUP',
+        // item: {
+        //   participationId: 1,
+        //   reservationNumber: 'MCJ-P000001',
+        //   availabilityStatus: 'LOCKED',
+        //   pickupStatus: 'READY',
+        //   productName: '밤티 말빵',
+        //   quantity: 2,
+        //   storeName: '밤티',
+        //   storeAddress: '서울 성동구 성동로 32길',
+        //   pickupLocation: '서울 성동구 성동로 32길, 사이드템포',
+        //   qrCode: null,
+        //   pickupDate: '2026-06-01',
+        //   pickupTimeStart: '14:00',
+        //   pickupTimeEnd: '18:00',
+        //   dDay: 8,
+        //   pickedUpAt: null,
+        // },
+
+        // 당일 픽업 (AVAILABLE, 현재 활성)
+        hasCandidate: true,
+        hasMultipleToday: false,
+        reason: null,
+        item: {
+          participationId: 1,
+          reservationNumber: 'MCJ-P000001',
+          availabilityStatus: 'AVAILABLE',
+          pickupStatus: 'READY',
+          productName: '밤티 말빵',
+          quantity: 2,
+          storeName: '밤티',
+          storeAddress: '서울 성동구 성동로 32길',
+          pickupLocation: '서울 성동구 성동로 32길, 사이드템포',
+          qrCode: 'https://moongchijang.com/verify/MCJ-P000001',
+          pickupDate: '2026-05-24',
+          pickupTimeStart: '14:00',
+          pickupTimeEnd: '18:00',
+          dDay: 0,
+          pickedUpAt: null,
+        },
+        // ─────────────────────────────────────────────────────────────────
+      },
+      error: null,
+    });
+  }),
+
   // checkout
   http.get('*/api/v1/group-buys/:groupBuyId/checkout', async ({ request }) => {
     await delay(300);

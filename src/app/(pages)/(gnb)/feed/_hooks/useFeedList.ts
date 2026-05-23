@@ -34,7 +34,6 @@ function extractPageData(
 export function useFeedList(
   activeFilter: FilterId,
   districts?: string[],
-  keyword?: string,
   options?: { enabled?: boolean },
 ) {
   const baseParams = useMemo(
@@ -43,9 +42,8 @@ export function useFeedList(
         filter: FILTER_MAP[activeFilter],
         size: PAGE_SIZE,
         ...(districts?.length ? { districts } : {}),
-        ...(keyword ? { keyword } : {}),
       }) as GetApiV1GroupBuysParams,
-    [activeFilter, districts, keyword],
+    [activeFilter, districts],
   );
 
   const {

@@ -10,18 +10,12 @@ import {
   type getApiV1SearchRecentResponseSuccess,
 } from '@/api/hooks/group-buy/group-buy';
 
-// TODO: 백엔드 Swagger 스펙이 string[] 로 확정되면 { keywords: [...] } 분기 제거
 function patchKeywords(
   old: getApiV1SearchRecentResponseSuccess | undefined,
   updater: (keywords: string[]) => string[],
 ) {
   if (!old) return old;
-  const inner = old.data?.data as unknown;
-  const keywords: string[] = Array.isArray(inner)
-    ? inner.filter((k): k is string => typeof k === 'string')
-    : ((inner as { keywords?: { keyword: string }[] })?.keywords ?? [])
-        .map((k) => k.keyword)
-        .filter((k): k is string => !!k);
+  const keywords = (old.data?.data as string[]) ?? [];
   return {
     ...old,
     data: { ...old.data, data: updater(keywords) as typeof old.data.data },
@@ -35,14 +29,7 @@ export function useRecentSearches() {
   const { data } = useGetApiV1SearchRecent();
   const recentSearches = useMemo(() => {
     if (data?.status !== 200) return [];
-    const inner = data.data?.data;
-    if (Array.isArray(inner))
-      return (inner as string[]).filter(
-        (k): k is string => typeof k === 'string',
-      );
-    return (inner?.keywords ?? [])
-      .map((k) => k.keyword)
-      .filter((k): k is string => !!k);
+    return (data.data?.data as string[]) ?? [];
   }, [data]);
 
   const { mutate: clearAll } = useDeleteApiV1SearchRecent({

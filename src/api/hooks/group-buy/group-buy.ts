@@ -24,12 +24,14 @@ import type {
   ApiResponseGroupBuyFeedPageResponse,
   ApiResponseGroupBuyProgress,
   ApiResponseGroupBuyProgressList,
+  ApiResponseGroupBuyViewerCount,
   ApiResponseRecentSearchList,
   ApiResponseSearchAnalysis,
   ApiResponseShareMeta,
   BadRequestResponse,
   GetApiV1GroupBuysParams,
   GetApiV1GroupBuysProgressParams,
+  GroupBuyViewerHeartbeatRequest,
   NotFoundResponse,
   PostApiV1SearchBody,
   SuccessNoDataResponse,
@@ -658,6 +660,144 @@ export function useGetApiV1GroupBuysGroupBuyIdProgress<
   return { ...query, queryKey: queryOptions.queryKey };
 }
 
+/**
+ * 공구 상세 화면 진입 시 및 체류 중 일정 주기(예: 20~30초)로 호출한다.
+서버는 세션 TTL을 연장하고 최신 활성 조회자 수를 반환한다.
+
+ * @summary 활성 조회자 heartbeat 조회/갱신
+ */
+export type postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse200 = {
+  data: ApiResponseGroupBuyViewerCount;
+  status: 200;
+};
+
+export type postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponseSuccess =
+  postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse200 & {
+    headers: Headers;
+  };
+export type postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponseError = (
+  | postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse400
+  | postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse404
+) & {
+  headers: Headers;
+};
+
+export type postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse =
+  | postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponseSuccess
+  | postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponseError;
+
+export const getPostApiV1GroupBuysGroupBuyIdViewersHeartbeatUrl = (
+  groupBuyId: number,
+) => {
+  return `/api/v1/group-buys/${groupBuyId}/viewers/heartbeat`;
+};
+
+export const postApiV1GroupBuysGroupBuyIdViewersHeartbeat = async (
+  groupBuyId: number,
+  groupBuyViewerHeartbeatRequest: GroupBuyViewerHeartbeatRequest,
+  options?: RequestInit,
+): Promise<postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse> => {
+  return customFetch<postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse>(
+    getPostApiV1GroupBuysGroupBuyIdViewersHeartbeatUrl(groupBuyId),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(groupBuyViewerHeartbeatRequest),
+    },
+  );
+};
+
+export const getPostApiV1GroupBuysGroupBuyIdViewersHeartbeatMutationOptions = <
+  TError = BadRequestResponse | NotFoundResponse,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiV1GroupBuysGroupBuyIdViewersHeartbeat>>,
+    TError,
+    { groupBuyId: number; data: GroupBuyViewerHeartbeatRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiV1GroupBuysGroupBuyIdViewersHeartbeat>>,
+  TError,
+  { groupBuyId: number; data: GroupBuyViewerHeartbeatRequest },
+  TContext
+> => {
+  const mutationKey = ['postApiV1GroupBuysGroupBuyIdViewersHeartbeat'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiV1GroupBuysGroupBuyIdViewersHeartbeat>>,
+    { groupBuyId: number; data: GroupBuyViewerHeartbeatRequest }
+  > = (props) => {
+    const { groupBuyId, data } = props ?? {};
+
+    return postApiV1GroupBuysGroupBuyIdViewersHeartbeat(
+      groupBuyId,
+      data,
+      requestOptions,
+    );
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiV1GroupBuysGroupBuyIdViewersHeartbeatMutationResult =
+  NonNullable<
+    Awaited<ReturnType<typeof postApiV1GroupBuysGroupBuyIdViewersHeartbeat>>
+  >;
+export type PostApiV1GroupBuysGroupBuyIdViewersHeartbeatMutationBody =
+  GroupBuyViewerHeartbeatRequest;
+export type PostApiV1GroupBuysGroupBuyIdViewersHeartbeatMutationError =
+  | BadRequestResponse
+  | NotFoundResponse;
+
+/**
+ * @summary 활성 조회자 heartbeat 조회/갱신
+ */
+export const usePostApiV1GroupBuysGroupBuyIdViewersHeartbeat = <
+  TError = BadRequestResponse | NotFoundResponse,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiV1GroupBuysGroupBuyIdViewersHeartbeat>>,
+      TError,
+      { groupBuyId: number; data: GroupBuyViewerHeartbeatRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiV1GroupBuysGroupBuyIdViewersHeartbeat>>,
+  TError,
+  { groupBuyId: number; data: GroupBuyViewerHeartbeatRequest },
+  TContext
+> => {
+  return useMutation(
+    getPostApiV1GroupBuysGroupBuyIdViewersHeartbeatMutationOptions(options),
+    queryClient,
+  );
+};
 /**
  * @summary 다건 공구 달성률 조회 (피드 갱신용)
  */

@@ -11,9 +11,13 @@
     "prepare": "husky",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "generate": "orval && tsx scripts/generate-msw-index.ts && tsx scripts/generate-static-registry.ts"
+    "generate": "orval && tsx scripts/generate-msw-index.ts && tsx scripts/generate-static-registry.ts",
+    "test": "vitest"
   },
   "dependencies": {
+    "@iconify-json/lucide": "^1.2.108",
+    "@iconify-json/material-symbols": "^1.2.73",
+    "@iconify-json/mingcute": "^1.2.7",
     "@hookform/resolvers": "^5.2.2",
     "@iconify/react": "^6.0.2",
     "@portone/browser-sdk": "^0.1.6",
@@ -26,7 +30,8 @@
     "react-dom": "19.2.4",
     "react-hook-form": "^7.76.0",
     "tailwind-merge": "^3.5.0",
-    "zod": "^4.3.6"
+    "zod": "^4.3.6",
+    "zustand": "^5.0.13"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^5.1.1",
@@ -38,12 +43,16 @@
     "@storybook/addon-vitest": "^10.3.5",
     "@storybook/nextjs-vite": "^10.3.5",
     "@tailwindcss/postcss": "^4",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/navermaps": "^3.9.1",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^6.0.1",
     "@vitest/browser-playwright": "^4.1.4",
     "@vitest/coverage-v8": "^4.1.4",
     "chromatic": "^16.2.0",
@@ -56,6 +65,7 @@
     "eslint-plugin-storybook": "^10.3.5",
     "express": "^5.2.1",
     "husky": "^9.1.7",
+    "jsdom": "^29.1.1",
     "lint-staged": "^16.4.0",
     "msw": "^2.13.0",
     "orval": "^8.8.1",

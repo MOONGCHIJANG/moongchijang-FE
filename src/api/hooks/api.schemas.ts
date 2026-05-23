@@ -493,6 +493,8 @@ export type ApiResponseGroupBuyFeedPageResponseData = {
   totalElements: number;
   /** 다음 페이지 존재 여부 */
   hasNext: boolean;
+  /** 지역 설정 조건에 맞는 공구 존재 여부 (없으면 false) */
+  hasRegionalResult: boolean;
 };
 
 export interface ApiResponseGroupBuyFeedPageResponse {
@@ -552,6 +554,30 @@ export type ApiResponseGroupBuyDetailResponseData = {
 export interface ApiResponseGroupBuyDetailResponse {
   success: boolean;
   data: ApiResponseGroupBuyDetailResponseData;
+  error: unknown | null;
+}
+
+export interface GroupBuyViewerHeartbeatRequest {
+  /**
+   * 클라이언트가 생성/보관하는 조회 세션 식별자(UUID 권장)
+   * @minLength 8
+   * @maxLength 128
+   */
+  viewerSessionId: string;
+}
+
+export type ApiResponseGroupBuyViewerCountData = {
+  /** @minimum 0 */
+  activeViewerCount: number;
+  /** FOMO 문구/뱃지 노출 여부 (activeViewerCount >= threshold) */
+  showFomoBadge: boolean;
+  /** 노출 기준 인원 수 */
+  threshold: number;
+};
+
+export interface ApiResponseGroupBuyViewerCount {
+  success: boolean;
+  data: ApiResponseGroupBuyViewerCountData;
   error: unknown | null;
 }
 
@@ -703,24 +729,9 @@ export interface ApiResponseWishlistPage {
   error: unknown | null;
 }
 
-export type ParticipationCreateAgreedTermsItem =
-  (typeof ParticipationCreateAgreedTermsItem)[keyof typeof ParticipationCreateAgreedTermsItem];
-
-export const ParticipationCreateAgreedTermsItem = {
-  NO_CANCEL_AFTER_ACHIEVED: 'NO_CANCEL_AFTER_ACHIEVED',
-  FULL_REFUND_BEFORE_ACHIEVED: 'FULL_REFUND_BEFORE_ACHIEVED',
-  NO_REFUND_IF_NOT_PICKED_UP: 'NO_REFUND_IF_NOT_PICKED_UP',
-  NO_WITHDRAWAL_RIGHT: 'NO_WITHDRAWAL_RIGHT',
-} as const;
-
 export interface ParticipationCreate {
   /** @minimum 1 */
   quantity: number;
-  /**
-   * 4개 항목 모두 포함 필수
-   * @minItems 4
-   */
-  agreedTerms: ParticipationCreateAgreedTermsItem[];
 }
 
 export type ApiResponseParticipationCreatedData = {
@@ -746,27 +757,107 @@ export interface ApiResponseParticipationCreated {
 
  */
 export interface PaymentConfirm {
-  /** 포트원 결제 ID (클라이언트가 UUID로 생성하여 SDK 호출 시 사용한 값) */
+  /** 서버가 결제 주문 생성 시 반환한 PortOne paymentId */
   paymentId: string;
-  participationId: number;
   /** 결제 요청 금액 — 서버 저장값과 불일치 시 위변조로 처리 */
   amount: number;
 }
 
-/**
- * 포트원 v2 결제 실패/취소 콜백 처리
- */
-export interface PaymentFail {
-  /** 포트원 결제 ID */
+export interface PaymentOrderCreate {
+  /** @minimum 1 */
+  quantity: number;
+  /** 달성 후 취소 불가 동의 */
+  agreedNoCancelAfterGoal: boolean;
+  /** 달성 전 이탈 시 전액 환불 동의 */
+  agreedRefundBeforeGoal: boolean;
+  /** 미수령 환불 불가 동의 */
+  agreedNoRefundAfterNoShow: boolean;
+  /** 청약철회 불가 동의 */
+  agreedNoWithdrawal: boolean;
+}
+
+export type ApiResponseCheckoutInfoData = {
+  groupBuyId: number;
+  storeName: string;
+  productName: string;
+  /** @nullable */
+  thumbnailUrl: string | null;
+  pickupDate: string;
+  pickupTimeStart: string;
+  pickupTimeEnd: string;
+  unitPrice: number;
+  quantity: number;
+  productAmount: number;
+  feeAmount: number;
+  totalAmount: number;
+  remainingQuantity: number;
+};
+
+export interface ApiResponseCheckoutInfo {
+  success: boolean;
+  data: ApiResponseCheckoutInfoData;
+  error: unknown | null;
+}
+
+export type ApiResponsePaymentOrderCreatedData = {
+  /** PortOne SDK requestPayment에 전달할 paymentId */
+  paymentId: string;
+  storeId: string;
+  channelKey: string;
+  orderName: string;
+  amount: number;
+  /** @nullable */
+  customerName: string | null;
+};
+
+export interface ApiResponsePaymentOrderCreated {
+  success: boolean;
+  data: ApiResponsePaymentOrderCreatedData;
+  error: unknown | null;
+}
+
+export type ApiResponsePaymentConfirmedDataParticipationStatus =
+  (typeof ApiResponsePaymentConfirmedDataParticipationStatus)[keyof typeof ApiResponsePaymentConfirmedDataParticipationStatus];
+
+export const ApiResponsePaymentConfirmedDataParticipationStatus = {
+  PAID_WAITING_GOAL: 'PAID_WAITING_GOAL',
+  CONFIRMED: 'CONFIRMED',
+} as const;
+
+export type ApiResponsePaymentConfirmedData = {
   paymentId: string;
   participationId: number;
-  /** 포트원/토스페이먼츠 오류 코드 */
-  errorCode: string;
-  /**
-   * 오류 메시지
-   * @nullable
-   */
-  message: string | null;
+  participationStatus: ApiResponsePaymentConfirmedDataParticipationStatus;
+  displayStatus: string;
+  amount: number;
+  /** @nullable */
+  method?: string | null;
+  approvedAt: string;
+};
+
+export interface ApiResponsePaymentConfirmed {
+  success: boolean;
+  data: ApiResponsePaymentConfirmedData;
+  error: unknown | null;
+}
+
+export interface PortOneWebhook {
+  /** @nullable */
+  type?: string | null;
+  /** @nullable */
+  storeId?: string | null;
+  /** @nullable */
+  paymentId?: string | null;
+}
+
+export type ApiResponsePortOneWebhookData = {
+  received: boolean;
+};
+
+export interface ApiResponsePortOneWebhook {
+  success: boolean;
+  data: ApiResponsePortOneWebhookData;
+  error: unknown | null;
 }
 
 /**
@@ -1668,10 +1759,6 @@ export type GetApiV1GroupBuysParams = {
    * @maxItems 10
    */
   districts?: DistrictType[];
-  /**
-   * 매장명 또는 상품명 검색어
-   */
-  keyword?: string;
   page?: PageParameter;
   /**
    * @maximum 100
@@ -1739,6 +1826,14 @@ export const GetApiV1WishlistsSort = {
   LATEST: 'LATEST',
   DEADLINE: 'DEADLINE',
 } as const;
+
+export type GetApiV1GroupBuysGroupBuyIdCheckoutParams = {
+  /**
+   * 참여 수량
+   * @minimum 1
+   */
+  quantity: number;
+};
 
 export type GetApiV1NotificationsParams = {
   category?: GetApiV1NotificationsCategory;

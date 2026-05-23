@@ -1,9 +1,16 @@
 'use client';
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, {
+  useRef,
+  useEffect,
+  useState,
+  useCallback,
+  useMemo,
+} from 'react';
 import DetailTab from './DetailTab';
 import GuideLine from './GuideLine';
 import { ApiResponseGroupBuyDetailResponseData } from '@/api/generated/api.schemas';
 import { formatPickupDate, formatPickupTime } from '@/lib/date';
+import NaverMap from '@/components/NaverMap';
 
 interface Props {
   data: ApiResponseGroupBuyDetailResponseData;
@@ -31,6 +38,20 @@ const ItemDetail = ({ data }: Props) => {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const markers = useMemo(
+    () =>
+      data.pickupLatitude && data.pickupLongitude
+        ? [
+            {
+              lat: data.pickupLatitude,
+              lng: data.pickupLongitude,
+              title: data.storeName,
+            },
+          ]
+        : [],
+    [data],
+  );
 
   // 탭 클릭 시 해당 섹션으로 스크롤
   const handleTabClick = useCallback((tab: 'description' | 'guidelines') => {
@@ -60,8 +81,19 @@ const ItemDetail = ({ data }: Props) => {
             </p>
           </div>
           <div className="flex flex-col gap-g5">
-            {/* TODO: 지도 컴포넌트 (pickupLatitude, pickupLongitude 활용) */}
-            <div className="w-full h-56 rounded-medium bg-gray-200">지도</div>
+            <div className="w-full h-56 rounded-medium overflow-hidden">
+              {data.pickupLatitude && data.pickupLongitude && (
+                <NaverMap
+                  center={{
+                    lat: data.pickupLatitude,
+                    lng: data.pickupLongitude,
+                  }}
+                  zoom={16}
+                  markers={markers}
+                  height="226px"
+                />
+              )}
+            </div>
             <div className="flex gap-g5 items-start">
               <div className="shrink-0 px-g3 py-g2 rounded-large bg-surface-brand-lighter text-text-brand caption-sm-bold">
                 픽업 장소

@@ -157,7 +157,6 @@ export const GetApiV1GroupBuysQueryParams = zod.object({
     .describe(
       '지역\/세부지역 통합 필터 (복수 선택, 최대 10개, 예: SEOUL_ALL \/ SEOUL_GANGNAM_YEOKSAM_SAMSEONG)',
     ),
-  keyword: zod.string().optional().describe('매장명 또는 상품명 검색어'),
   page: zod.number().default(getApiV1GroupBuysQueryPageDefault),
   size: zod
     .number()
@@ -336,6 +335,9 @@ export const GetApiV1GroupBuysResponse = zod.object({
     totalPages: zod.number().describe('전체 페이지 수'),
     totalElements: zod.number(),
     hasNext: zod.boolean().describe('다음 페이지 존재 여부'),
+    hasRegionalResult: zod
+      .boolean()
+      .describe('지역 설정 조건에 맞는 공구 존재 여부 (없으면 false)'),
   }),
   error: zod.unknown().nullable(),
 });
@@ -539,6 +541,45 @@ export const GetApiV1GroupBuysGroupBuyIdProgressResponse = zod.object({
     currentQuantity: zod.number(),
     targetQuantity: zod.number(),
     isClosed: zod.boolean(),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * 공구 상세 화면 진입 시 및 체류 중 일정 주기(예: 20~30초)로 호출한다.
+서버는 세션 TTL을 연장하고 최신 활성 조회자 수를 반환한다.
+
+ * @summary 활성 조회자 heartbeat 조회/갱신
+ */
+export const PostApiV1GroupBuysGroupBuyIdViewersHeartbeatParams = zod.object({
+  groupBuyId: zod.number(),
+});
+
+export const postApiV1GroupBuysGroupBuyIdViewersHeartbeatBodyViewerSessionIdMin = 8;
+export const postApiV1GroupBuysGroupBuyIdViewersHeartbeatBodyViewerSessionIdMax = 128;
+
+export const PostApiV1GroupBuysGroupBuyIdViewersHeartbeatBody = zod.object({
+  viewerSessionId: zod
+    .string()
+    .min(postApiV1GroupBuysGroupBuyIdViewersHeartbeatBodyViewerSessionIdMin)
+    .max(postApiV1GroupBuysGroupBuyIdViewersHeartbeatBodyViewerSessionIdMax)
+    .describe('클라이언트가 생성\/보관하는 조회 세션 식별자(UUID 권장)'),
+});
+
+export const postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponseDataActiveViewerCountMin = 0;
+
+export const PostApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    activeViewerCount: zod
+      .number()
+      .min(
+        postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponseDataActiveViewerCountMin,
+      ),
+    showFomoBadge: zod
+      .boolean()
+      .describe('FOMO 문구\/뱃지 노출 여부 (activeViewerCount >= threshold)'),
+    threshold: zod.number().describe('노출 기준 인원 수'),
   }),
   error: zod.unknown().nullable(),
 });

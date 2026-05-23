@@ -9,8 +9,6 @@ import {
 } from '@/api/generated/wishlist/wishlist';
 import { ApiResponseGroupBuyDetailResponseData } from '@/api/generated/api.schemas';
 import { useRouter } from 'next/navigation';
-import { tokenStorage } from '@/lib/token';
-import { redirectStorage } from '@/lib/redirect';
 
 interface Props {
   data: ApiResponseGroupBuyDetailResponseData;
@@ -63,14 +61,6 @@ const BottomJoin = ({ data }: Props) => {
 
   const handleJoin = () => {
     if (isExpired) return;
-
-    const token = tokenStorage.get();
-    if (!token) {
-      redirectStorage.set(`/item/${data.id}/join`);
-      router.push('/login');
-      return;
-    }
-
     router.push(`/item/${data.id}/join`);
   };
 

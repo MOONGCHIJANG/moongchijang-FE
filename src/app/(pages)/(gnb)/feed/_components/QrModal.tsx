@@ -10,28 +10,30 @@ interface QrModalProps {
   isOpen: boolean;
   onClose: () => void;
   isPickupDay: boolean;
-  orderNumber: string;
-  pickupLocation: string;
-  pickupTime: string;
   storeName: string;
-  qrValue: string;
+  pickupAddress: string;
+  pickupTimeStart: string;
+  pickupTimeEnd: string;
+  qrCode: string;
   dDayText: string;
   shakeEnabled: boolean;
   onShakeToggle: (enabled: boolean) => void;
+  onDetailClick: () => void;
 }
 
 export const QrModal = ({
   isOpen,
   onClose,
   isPickupDay,
-  orderNumber,
-  pickupLocation,
-  pickupTime,
   storeName,
-  qrValue,
+  pickupAddress,
+  pickupTimeStart,
+  pickupTimeEnd,
+  qrCode,
   dDayText,
   shakeEnabled,
   onShakeToggle,
+  onDetailClick,
 }: QrModalProps) => {
   const [animate, setAnimate] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -110,7 +112,7 @@ export const QrModal = ({
         onClick={(e) => e.stopPropagation()}
       >
         <div
-          className="w-[342px] flex items-center justify-center py-2 cursor-grab active:cursor-grabbing touch-none"
+          className="w-[280px] flex items-center justify-center py-2 cursor-grab active:cursor-grabbing touch-none"
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
@@ -118,7 +120,7 @@ export const QrModal = ({
           <div className="w-9 h-1 bg-alpha-white-50 rounded-max" />
         </div>
 
-        <div className="w-[342px] bg-surface-white rounded-3xlarge shadow-2xl overflow-hidden">
+        <div className="w-[280px] bg-surface-white rounded-3xlarge shadow-2xl overflow-hidden">
           <div className="bg-surface-default rounded-tl-3xlarge rounded-tr-3xlarge px-5 py-3.5 flex justify-between items-center">
             <span className="text-text-basic heading-sm-bold font-pretendard">
               픽업 QR코드
@@ -139,47 +141,37 @@ export const QrModal = ({
           >
             <div className="px-5 pt-4 pb-5 flex flex-col gap-3.5 border-b border-dashed border-border-default">
               <div className="flex items-center gap-2">
-                <span className="bg-brand-primary text-text-basic-inverse body-sm-bold font-pretendard w-[41px] h-5 flex items-center justify-center rounded-max">
+                <span className="bg-brand-primary text-text-basic-inverse caption-xs-bold font-pretendard px-2 h-5 flex items-center justify-center rounded-max">
                   {dDayText}
                 </span>
-                <span className="text-text-basic body-sm-bold font-pretendard">
+                <span className="text-text-basic heading-lg-bold font-pretendard">
                   {storeName}
                 </span>
               </div>
 
               <div className="flex flex-col gap-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-text-basic body-sm-semibold font-pretendard">
-                    예약 번호
-                  </span>
-                  <span className="text-text-subtle body-sm-regular font-pretendard">
-                    {orderNumber}
-                  </span>
-                </div>
                 <div className="flex justify-between items-start gap-4">
-                  <span className="text-text-basic body-sm-semibold font-pretendard shrink-0">
+                  <span className="text-text-basic body-md-semibold font-pretendard shrink-0">
                     픽업 장소
                   </span>
-                  <span className="text-text-subtle body-sm-regular font-pretendard text-right break-keep">
-                    {pickupLocation.split('\n').map((line, i, arr) => (
-                      <span key={i}>
-                        {line}
-                        {i < arr.length - 1 && <br />}
-                      </span>
-                    ))}
+                  <span className="text-text-subtle body-md-regular font-pretendard text-right break-keep">
+                    {pickupAddress}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-text-basic body-sm-semibold font-pretendard">
+                  <span className="text-text-basic body-md-semibold font-pretendard">
                     픽업 일시
                   </span>
-                  <span className="text-text-subtle body-sm-regular font-pretendard">
-                    {pickupTime}
+                  <span className="text-text-subtle body-md-regular font-pretendard">
+                    {pickupTimeStart}~{pickupTimeEnd}
                   </span>
                 </div>
               </div>
 
-              <button className="self-end bg-surface-brand-lighter text-text-brand body-sm-bold font-pretendard w-[90px] h-7 flex items-center justify-center rounded-xlarge">
+              <button
+                onClick={onDetailClick}
+                className="self-end bg-surface-brand-lighter text-text-brand caption-xs-bold font-pretendard w-[90px] h-7 flex items-center justify-center rounded-xlarge"
+              >
                 자세히 보기 →
               </button>
             </div>
@@ -199,7 +191,7 @@ export const QrModal = ({
                   !isPickupDay && 'blur-sm opacity-70',
                 )}
               >
-                <QRCodeSVG value={qrValue} size={isExpanded ? 220 : 128} />
+                <QRCodeSVG value={qrCode} size={isExpanded ? 220 : 128} />
               </div>
               {!isPickupDay && (
                 <div className="absolute inset-0 flex items-center justify-center">

@@ -33,7 +33,7 @@ function normalizeHeaders(headers?: HeadersInit): Record<string, string> {
 
 function buildAuthHeaders(token?: string): Record<string, string> {
   if (!token) return {};
-  return { Cookie: `accessToken=${token}` };
+  return { Authorization: `Bearer ${token}` };
 }
 
 /**

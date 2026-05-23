@@ -1,7 +1,8 @@
 'use client';
 import { Button } from '@/components/Button';
 import { Icon } from '@iconify/react';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   postApiV1GroupBuysGroupBuyIdWishlist,
   deleteApiV1GroupBuysGroupBuyIdWishlist,
@@ -16,6 +17,8 @@ interface Props {
 }
 
 const BottomJoin = ({ data }: Props) => {
+  const queryClient = useQueryClient();
+  const router = useRouter();
   const [liked, setLiked] = useState(data.isWishlisted);
   const [timeLeft, setTimeLeft] = useState('');
 
@@ -51,12 +54,12 @@ const BottomJoin = ({ data }: Props) => {
       } else {
         await deleteApiV1GroupBuysGroupBuyIdWishlist(data.id);
       }
+      queryClient.invalidateQueries({ queryKey: ['/api/v1/wishlists'] });
+      router.refresh();
     } catch {
-      setLiked(!next); // 실패 시 롤백
+      setLiked(!next);
     }
   };
-
-  const router = useRouter();
 
   const handleJoin = () => {
     if (isExpired) return;

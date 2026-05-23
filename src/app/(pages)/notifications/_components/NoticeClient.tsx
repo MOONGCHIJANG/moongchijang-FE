@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import { Chip } from '@/components/Chip';
 import { Button } from '@/components/Button';
 import Image from 'next/image';
+import NoticeItem from './NoticeItem';
 
 type NoticeClientProps = {
   data: NotificationPage;
@@ -32,7 +33,7 @@ const NoticeClient = ({ data }: NoticeClientProps) => {
     GetApiV1NotificationsCategory.ALL,
   );
 
-  const isEmpty = true; // TODO: 알림 리스트가 비어있는지 여부
+  const isEmpty = false; // TODO: 알림 리스트가 비어있는지 여부
 
   return (
     <div>
@@ -66,7 +67,41 @@ const NoticeClient = ({ data }: NoticeClientProps) => {
           </Button>
         </div>
       ) : (
-        <></>
+        <div className="flex flex-col h-dvh bg-bg-white-muted gap-g5 overflow-y-auto">
+          {/* 오늘 */}
+          <div className="flx flex-col gap-1.25 pt-p5 bg-surface-white">
+            <p className="px-p6 caption-sm-regular text-text-subtle-inverse">
+              오늘
+            </p>
+            <div>
+              <NoticeItem />
+              <NoticeItem />
+              <NoticeItem />
+            </div>
+          </div>
+          {/* 어제 */}
+          <div className="flx flex-col gap-1.25 pt-p5 bg-surface-white">
+            <p className="px-p6 caption-sm-regular text-text-subtle-inverse">
+              어제
+            </p>
+            <div>
+              <NoticeItem />
+              <NoticeItem />
+              <NoticeItem />
+            </div>
+          </div>
+          {/* 이전 */}
+          <div className="flx flex-col gap-1.25 pt-p5 bg-surface-white">
+            <p className="px-p6 caption-sm-regular text-text-subtle-inverse">
+              이전
+            </p>
+            <div>
+              <NoticeItem />
+              <NoticeItem />
+              <NoticeItem />
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -4,12 +4,15 @@ import { useState } from 'react';
 import StepEmail from './StepEmail/StepEmail';
 import StepProfile from './StepProfile';
 import StepRole from './StepRole';
+import { useSearchParams } from 'next/navigation';
 
 type Step = 1 | 2 | 3;
 
 export default function SignUpClient() {
-  const [step, setStep] = useState<Step>(1);
-
+  const searchParams = useSearchParams();
+  const [step, setStep] = useState<Step>(
+    searchParams.get('step') === 'profile' ? 2 : 1,
+  );
   const handleNextStep = () => {
     setStep((prev) => (prev < 3 ? ((prev + 1) as Step) : prev));
   };

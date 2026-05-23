@@ -114,27 +114,31 @@ export function FavoriteClient() {
 
         {/* 마감 제외 · 정렬 */}
         <div className="flex items-center justify-between px-4 pb-3">
-          <button
-            type="button"
-            onClick={() => setExcludeClosed((prev) => !prev)}
-            className="flex items-center gap-2"
-          >
-            <Icon
-              icon={
-                excludeClosed
-                  ? 'material-symbols:radio-button-checked'
-                  : 'material-symbols:radio-button-unchecked'
-              }
-              className={
-                excludeClosed
-                  ? 'w-4 h-4 text-button-natural'
-                  : 'w-4 h-4 text-icon-tertiary'
-              }
-            />
-            <span className="caption-sm-regular text-text-basic font-pretendard">
-              마감 제외
-            </span>
-          </button>
+          {filter === GetApiV1WishlistsFilter.ALL ? (
+            <button
+              type="button"
+              onClick={() => setExcludeClosed((prev) => !prev)}
+              className="flex items-center gap-2"
+            >
+              <Icon
+                icon={
+                  excludeClosed
+                    ? 'material-symbols:radio-button-checked'
+                    : 'material-symbols:radio-button-unchecked'
+                }
+                className={
+                  excludeClosed
+                    ? 'w-4 h-4 text-button-natural'
+                    : 'w-4 h-4 text-icon-tertiary'
+                }
+              />
+              <span className="caption-sm-regular text-text-basic font-pretendard">
+                마감 제외
+              </span>
+            </button>
+          ) : (
+            <div />
+          )}
           <button
             type="button"
             onClick={() =>

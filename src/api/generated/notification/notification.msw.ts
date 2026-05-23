@@ -14,23 +14,30 @@ import type {
   RequestHandlerOptions
 } from 'msw';
 
+import {
+  NotificationDeeplinkType,
+  NotificationSection,
+  NotificationType
+} from '../api.schemas';
 import type {
-  ApiResponseNotificationPage,
-  ApiResponseUnreadCount,
+  ApiResponseNotificationListResponse,
+  ApiResponseNotificationUnreadCountResponse,
   SuccessNoDataResponse
 } from '../api.schemas';
 
 
-export const getGetApiV1NotificationsResponseMock = (overrideResponse: Partial<Extract<ApiResponseNotificationPage, object>> = {}): ApiResponseNotificationPage => ({success: faker.datatype.boolean(), data: {content: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.number.int(), category: faker.helpers.arrayElement(['WISHLIST','PARTICIPATION','PICKUP','REQUEST'] as const), type: faker.helpers.arrayElement(['PICKUP_TODAY','PICKUP_TOMORROW','PICKUP_NOT_CONFIRMED','WISHLIST_DEADLINE_D3','WISHLIST_DEADLINE_D1','WISHLIST_TARGET_ACHIEVED','PARTICIPATION_CONFIRMED','GROUP_BUY_ACHIEVED','GROUP_BUY_FAILED','REQUEST_OPENED','REQUEST_REJECTED','REQUEST_NEW_PARTICIPANT','REQUEST_TARGET_ACHIEVED','REQUEST_DEADLINE_D3'] as const), title: faker.string.alpha({length: {min: 10, max: 20}}), body: faker.string.alpha({length: {min: 10, max: 20}}), targetType: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.helpers.arrayElement(['GROUP_BUY','GROUP_BUY_REQUEST','PARTICIPATION'] as const), null]), null]), targetId: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.number.int(), null]), null]), isRead: faker.datatype.boolean(), readAt: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), null]), actionType: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.helpers.arrayElement(['QR_CODE','PICKUP_GUIDE','GROUP_BUY_DETAIL','MY_PAGE_ACTIVE','MY_PAGE_REFUND','REQUEST_STATUS'] as const), null]), null]), dateGroup: faker.helpers.arrayElement(['TODAY','YESTERDAY','BEFORE'] as const), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), totalElements: faker.number.int(), totalPages: faker.number.int(), number: faker.number.int(), size: faker.number.int()}, error: {}, ...overrideResponse})
+export const getGetApiV1NotificationsResponseMock = (overrideResponse: Partial<Extract<ApiResponseNotificationListResponse, object>> = {}): ApiResponseNotificationListResponse => ({success: faker.datatype.boolean(), data: {items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.number.int(), type: faker.helpers.arrayElement(Object.values(NotificationType)), title: faker.string.alpha({length: {min: 10, max: 20}}), body: faker.string.alpha({length: {min: 10, max: 20}}), isRead: faker.datatype.boolean(), occurredAt: faker.date.past().toISOString().slice(0, 19) + 'Z', targetId: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.number.int(), null]), undefined]), deeplinkType: faker.helpers.arrayElement(Object.values(NotificationDeeplinkType)), deeplinkParams: {
+        [faker.string.alphanumeric(5)]: faker.string.alpha({length: {min: 10, max: 20}})
+      }, section: faker.helpers.arrayElement(Object.values(NotificationSection))})), nextCursor: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined]), hasNext: faker.datatype.boolean()}, error: {}, ...overrideResponse})
 
-export const getGetApiV1NotificationsUnreadCountResponseMock = (overrideResponse: Partial<Extract<ApiResponseUnreadCount, object>> = {}): ApiResponseUnreadCount => ({success: faker.datatype.boolean(), data: {count: faker.number.int()}, error: {}, ...overrideResponse})
+export const getGetApiV1NotificationsUnreadCountResponseMock = (overrideResponse: Partial<Extract<ApiResponseNotificationUnreadCountResponse, object>> = {}): ApiResponseNotificationUnreadCountResponse => ({success: faker.datatype.boolean(), data: {count: faker.number.int()}, error: {}, ...overrideResponse})
 
 export const getPatchApiV1NotificationsReadAllResponseMock = (overrideResponse: Partial<Extract<SuccessNoDataResponse, object>> = {}): SuccessNoDataResponse => ({success: faker.datatype.boolean(), data: {}, error: {}, ...overrideResponse})
 
 export const getPatchApiV1NotificationsNotificationIdReadResponseMock = (overrideResponse: Partial<Extract<SuccessNoDataResponse, object>> = {}): SuccessNoDataResponse => ({success: faker.datatype.boolean(), data: {}, error: {}, ...overrideResponse})
 
 
-export const getGetApiV1NotificationsMockHandler = (overrideResponse?: ApiResponseNotificationPage | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ApiResponseNotificationPage> | ApiResponseNotificationPage), options?: RequestHandlerOptions) => {
+export const getGetApiV1NotificationsMockHandler = (overrideResponse?: ApiResponseNotificationListResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ApiResponseNotificationListResponse> | ApiResponseNotificationListResponse), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/notifications', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
 
@@ -42,7 +49,7 @@ export const getGetApiV1NotificationsMockHandler = (overrideResponse?: ApiRespon
   }, options)
 }
 
-export const getGetApiV1NotificationsUnreadCountMockHandler = (overrideResponse?: ApiResponseUnreadCount | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ApiResponseUnreadCount> | ApiResponseUnreadCount), options?: RequestHandlerOptions) => {
+export const getGetApiV1NotificationsUnreadCountMockHandler = (overrideResponse?: ApiResponseNotificationUnreadCountResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ApiResponseNotificationUnreadCountResponse> | ApiResponseNotificationUnreadCountResponse), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/notifications/unread-count', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
 

@@ -196,13 +196,14 @@ export const GroupBuyRequestPage = ({
   };
 
   const handleConfirm = () => {
+    if (!selectedStore?.storeName) return;
     setIsConfirmModalOpen(false);
     submitRequest({
       data: {
-        storeName: selectedStore!.storeName!,
+        storeName: selectedStore.storeName,
         storeAddress: selectedStore!.roadAddress ?? null,
-        storeLatitude: selectedStore!.latitude ?? null,
-        storeLongitude: selectedStore!.longitude ?? null,
+        latitude: selectedStore!.latitude ?? null,
+        longitude: selectedStore!.longitude ?? null,
         productName: effectiveBakery ?? '',
         desiredQuantity,
         desiredPickupDate,

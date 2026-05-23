@@ -2,12 +2,22 @@
 /**
  * // 이 파일은 Orval이 자동 생성합니다. 직접 수정하지 마세요.
  */
-import { faker } from '@faker-js/faker';
+import {
+  faker
+} from '@faker-js/faker';
 
-import { HttpResponse, http } from 'msw';
-import type { RequestHandlerOptions } from 'msw';
+import {
+  HttpResponse,
+  http
+} from 'msw';
+import type {
+  RequestHandlerOptions
+} from 'msw';
 
-import { DistrictType, RegionType } from '../api.schemas';
+import {
+  DistrictType,
+  RegionType
+} from '../api.schemas';
 import type {
   ApiResponseGroupBuyDetailResponse,
   ApiResponseGroupBuyFeedPageResponse,
@@ -17,561 +27,150 @@ import type {
   ApiResponseRecentSearchList,
   ApiResponseSearchAnalysis,
   ApiResponseShareMeta,
-  SuccessNoDataResponse,
+  SuccessNoDataResponse
 } from '../api.schemas';
 
-export const getGetApiV1GroupBuysResponseMock = (
-  overrideResponse: Partial<
-    Extract<ApiResponseGroupBuyFeedPageResponse, object>
-  > = {},
-): ApiResponseGroupBuyFeedPageResponse => ({
-  success: faker.datatype.boolean(),
-  data: {
-    content: Array.from(
-      { length: faker.number.int({ min: 1, max: 10 }) },
-      (_, i) => i + 1,
-    ).map(() => ({
-      id: faker.number.int(),
-      thumbnailUrl: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([
-          faker.string.alpha({ length: { min: 10, max: 20 } }),
-          null,
-        ]),
-        null,
-      ]),
-      dDay: faker.number.int(),
-      dDayLabel: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      storeName: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      regionType: faker.helpers.arrayElement(Object.values(RegionType)),
-      regionLabel: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      districtType: faker.helpers.arrayElement(Object.values(DistrictType)),
-      districtLabel: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      productName: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      price: faker.number.int(),
-      achievementRate: faker.number.int(),
-      currentQuantity: faker.number.int(),
-      targetQuantity: faker.number.int(),
-      pickupDateLabel: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      deadline: faker.date.past().toISOString().slice(0, 19) + 'Z',
-    })),
-    page: faker.number.int(),
-    size: faker.number.int(),
-    totalPages: faker.number.int(),
-    totalElements: faker.number.int(),
-    hasNext: faker.datatype.boolean(),
-    hasRegionalResult: faker.datatype.boolean(),
-  },
-  error: {},
-  ...overrideResponse,
-});
 
-export const getGetApiV1GroupBuysGroupBuyIdResponseMock = (
-  overrideResponse: Partial<
-    Extract<ApiResponseGroupBuyDetailResponse, object>
-  > = {},
-): ApiResponseGroupBuyDetailResponse => ({
-  success: faker.datatype.boolean(),
-  data: {
-    id: faker.number.int(),
-    storeName: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    regionType: faker.helpers.arrayElement(Object.values(RegionType)),
-    regionLabel: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    districtType: faker.helpers.arrayElement(Object.values(DistrictType)),
-    districtLabel: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    productName: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    productDescription: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    thumbnailUrl: faker.helpers.arrayElement([
-      faker.helpers.arrayElement([
-        faker.string.alpha({ length: { min: 10, max: 20 } }),
-        null,
-      ]),
-      undefined,
-    ]),
-    imageUrls: Array.from(
-      { length: faker.number.int({ min: 1, max: 10 }) },
-      (_, i) => i + 1,
-    ).map(() => faker.string.alpha({ length: { min: 10, max: 20 } })),
-    price: faker.number.int(),
-    achievementRate: faker.number.int(),
-    currentQuantity: faker.number.int(),
-    targetQuantity: faker.number.int(),
-    maxQuantity: faker.helpers.arrayElement([
-      faker.helpers.arrayElement([faker.number.int(), null]),
-      undefined,
-    ]),
-    deadline: faker.date.past().toISOString().slice(0, 19) + 'Z',
-    pickupDate: faker.date.past().toISOString().slice(0, 10),
-    pickupTimeStart: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    pickupTimeEnd: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    pickupDateLabel: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    pickupDateTimeLabel: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    deadlineDateTimeLabel: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    pickupLocation: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    pickupLatitude: faker.helpers.arrayElement([
-      faker.helpers.arrayElement([
-        faker.number.float({ fractionDigits: 2 }),
-        null,
-      ]),
-      undefined,
-    ]),
-    pickupLongitude: faker.helpers.arrayElement([
-      faker.helpers.arrayElement([
-        faker.number.float({ fractionDigits: 2 }),
-        null,
-      ]),
-      undefined,
-    ]),
-    dDay: faker.number.int(),
-    dDayLabel: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    isWishlisted: faker.datatype.boolean(),
-    isClosed: faker.datatype.boolean(),
-    isParticipated: faker.datatype.boolean(),
-    canParticipate: faker.datatype.boolean(),
-  },
-  error: {},
-  ...overrideResponse,
-});
+export const getGetApiV1GroupBuysResponseMock = (overrideResponse: Partial<Extract<ApiResponseGroupBuyFeedPageResponse, object>> = {}): ApiResponseGroupBuyFeedPageResponse => ({success: faker.datatype.boolean(), data: {content: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.number.int(), thumbnailUrl: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), null]), dDay: faker.number.int(), dDayLabel: faker.string.alpha({length: {min: 10, max: 20}}), storeName: faker.string.alpha({length: {min: 10, max: 20}}), regionType: faker.helpers.arrayElement(Object.values(RegionType)), regionLabel: faker.string.alpha({length: {min: 10, max: 20}}), districtType: faker.helpers.arrayElement(Object.values(DistrictType)), districtLabel: faker.string.alpha({length: {min: 10, max: 20}}), productName: faker.string.alpha({length: {min: 10, max: 20}}), price: faker.number.int(), achievementRate: faker.number.int(), currentQuantity: faker.number.int(), targetQuantity: faker.number.int(), pickupDateLabel: faker.string.alpha({length: {min: 10, max: 20}}), deadline: faker.date.past().toISOString().slice(0, 19) + 'Z'})), page: faker.number.int(), size: faker.number.int(), totalPages: faker.number.int(), totalElements: faker.number.int(), hasNext: faker.datatype.boolean(), hasRegionalResult: faker.datatype.boolean()}, error: {}, ...overrideResponse})
 
-export const getGetApiV1GroupBuysGroupBuyIdProgressResponseMock = (
-  overrideResponse: Partial<Extract<ApiResponseGroupBuyProgress, object>> = {},
-): ApiResponseGroupBuyProgress => ({
-  success: faker.datatype.boolean(),
-  data: {
-    groupBuyId: faker.number.int(),
-    achievementRate: faker.number.int(),
-    currentQuantity: faker.number.int(),
-    targetQuantity: faker.number.int(),
-    isClosed: faker.datatype.boolean(),
-  },
-  error: {},
-  ...overrideResponse,
-});
+export const getGetApiV1GroupBuysGroupBuyIdResponseMock = (overrideResponse: Partial<Extract<ApiResponseGroupBuyDetailResponse, object>> = {}): ApiResponseGroupBuyDetailResponse => ({success: faker.datatype.boolean(), data: {id: faker.number.int(), storeName: faker.string.alpha({length: {min: 10, max: 20}}), regionType: faker.helpers.arrayElement(Object.values(RegionType)), regionLabel: faker.string.alpha({length: {min: 10, max: 20}}), districtType: faker.helpers.arrayElement(Object.values(DistrictType)), districtLabel: faker.string.alpha({length: {min: 10, max: 20}}), productName: faker.string.alpha({length: {min: 10, max: 20}}), productDescription: faker.string.alpha({length: {min: 10, max: 20}}), thumbnailUrl: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined]), imageUrls: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), price: faker.number.int(), achievementRate: faker.number.int(), currentQuantity: faker.number.int(), targetQuantity: faker.number.int(), maxQuantity: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.number.int(), null]), undefined]), deadline: faker.date.past().toISOString().slice(0, 19) + 'Z', pickupDate: faker.date.past().toISOString().slice(0, 10), pickupTimeStart: faker.string.alpha({length: {min: 10, max: 20}}), pickupTimeEnd: faker.string.alpha({length: {min: 10, max: 20}}), pickupDateLabel: faker.string.alpha({length: {min: 10, max: 20}}), pickupDateTimeLabel: faker.string.alpha({length: {min: 10, max: 20}}), deadlineDateTimeLabel: faker.string.alpha({length: {min: 10, max: 20}}), pickupLocation: faker.string.alpha({length: {min: 10, max: 20}}), pickupLatitude: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.number.float({fractionDigits: 2}), null]), undefined]), pickupLongitude: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.number.float({fractionDigits: 2}), null]), undefined]), dDay: faker.number.int(), dDayLabel: faker.string.alpha({length: {min: 10, max: 20}}), isWishlisted: faker.datatype.boolean(), isClosed: faker.datatype.boolean(), isParticipated: faker.datatype.boolean(), canParticipate: faker.datatype.boolean()}, error: {}, ...overrideResponse})
 
-export const getPostApiV1GroupBuysGroupBuyIdViewersHeartbeatResponseMock = (
-  overrideResponse: Partial<
-    Extract<ApiResponseGroupBuyViewerCount, object>
-  > = {},
-): ApiResponseGroupBuyViewerCount => ({
-  success: faker.datatype.boolean(),
-  data: {
-    activeViewerCount: faker.number.int({ min: 0 }),
-    showFomoBadge: faker.datatype.boolean(),
-    threshold: faker.number.int(),
-  },
-  error: {},
-  ...overrideResponse,
-});
+export const getGetApiV1GroupBuysGroupBuyIdProgressResponseMock = (overrideResponse: Partial<Extract<ApiResponseGroupBuyProgress, object>> = {}): ApiResponseGroupBuyProgress => ({success: faker.datatype.boolean(), data: {groupBuyId: faker.number.int(), achievementRate: faker.number.int(), currentQuantity: faker.number.int(), targetQuantity: faker.number.int(), isClosed: faker.datatype.boolean()}, error: {}, ...overrideResponse})
 
-export const getGetApiV1GroupBuysProgressResponseMock = (
-  overrideResponse: Partial<
-    Extract<ApiResponseGroupBuyProgressList, object>
-  > = {},
-): ApiResponseGroupBuyProgressList => ({
-  success: faker.datatype.boolean(),
-  data: Array.from(
-    { length: faker.number.int({ min: 1, max: 10 }) },
-    (_, i) => i + 1,
-  ).map(() => ({
-    groupBuyId: faker.number.int(),
-    achievementRate: faker.number.int(),
-    currentQuantity: faker.number.int(),
-    targetQuantity: faker.number.int(),
-    isClosed: faker.datatype.boolean(),
-  })),
-  error: {},
-  ...overrideResponse,
-});
+export const getPostApiV1GroupBuysGroupBuyIdViewersHeartbeatResponseMock = (overrideResponse: Partial<Extract<ApiResponseGroupBuyViewerCount, object>> = {}): ApiResponseGroupBuyViewerCount => ({success: faker.datatype.boolean(), data: {activeViewerCount: faker.number.int({min: 0}), showFomoBadge: faker.datatype.boolean(), threshold: faker.number.int()}, error: {}, ...overrideResponse})
 
-export const getGetApiV1GroupBuysGroupBuyIdShareResponseMock = (
-  overrideResponse: Partial<Extract<ApiResponseShareMeta, object>> = {},
-): ApiResponseShareMeta => ({
-  success: faker.datatype.boolean(),
-  data: {
-    shareUrl: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    title: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    description: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    imageUrl: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    storeName: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    deadline: faker.date.past().toISOString().slice(0, 19) + 'Z',
-    pickupDate: faker.date.past().toISOString().slice(0, 10),
-    pickupTimeStart: faker.helpers.arrayElement([
-      faker.helpers.arrayElement([
-        faker.string.alpha({ length: { min: 10, max: 20 } }),
-        null,
-      ]),
-      null,
-    ]),
-    pickupTimeEnd: faker.helpers.arrayElement([
-      faker.helpers.arrayElement([
-        faker.string.alpha({ length: { min: 10, max: 20 } }),
-        null,
-      ]),
-      null,
-    ]),
-  },
-  error: {},
-  ...overrideResponse,
-});
+export const getGetApiV1GroupBuysProgressResponseMock = (overrideResponse: Partial<Extract<ApiResponseGroupBuyProgressList, object>> = {}): ApiResponseGroupBuyProgressList => ({success: faker.datatype.boolean(), data: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({groupBuyId: faker.number.int(), achievementRate: faker.number.int(), currentQuantity: faker.number.int(), targetQuantity: faker.number.int(), isClosed: faker.datatype.boolean()})), error: {}, ...overrideResponse})
 
-export const getPostApiV1SearchResponseMock = (
-  overrideResponse: Partial<Extract<ApiResponseSearchAnalysis, object>> = {},
-): ApiResponseSearchAnalysis => ({
-  success: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-  data: faker.helpers.arrayElement([
-    {
-      keyword: faker.helpers.arrayElement([
-        faker.string.alpha({ length: { min: 10, max: 20 } }),
-        undefined,
-      ]),
-      detectedNeighborhood: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([
-          faker.string.alpha({ length: { min: 10, max: 20 } }),
-          null,
-        ]),
-        undefined,
-      ]),
-      detectedBakery: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([
-          faker.string.alpha({ length: { min: 10, max: 20 } }),
-          null,
-        ]),
-        undefined,
-      ]),
-      searchCase: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([1, 2, 3, 4] as const),
-        undefined,
-      ]),
-      groupBuys: faker.helpers.arrayElement([
-        Array.from(
-          { length: faker.number.int({ min: 1, max: 10 }) },
-          (_, i) => i + 1,
-        ).map(() => ({
-          id: faker.number.int(),
-          thumbnailUrl: faker.helpers.arrayElement([
-            faker.helpers.arrayElement([
-              faker.string.alpha({ length: { min: 10, max: 20 } }),
-              null,
-            ]),
-            null,
-          ]),
-          dDay: faker.number.int(),
-          dDayLabel: faker.string.alpha({ length: { min: 10, max: 20 } }),
-          storeName: faker.string.alpha({ length: { min: 10, max: 20 } }),
-          regionType: faker.helpers.arrayElement(Object.values(RegionType)),
-          regionLabel: faker.string.alpha({ length: { min: 10, max: 20 } }),
-          districtType: faker.helpers.arrayElement(Object.values(DistrictType)),
-          districtLabel: faker.string.alpha({ length: { min: 10, max: 20 } }),
-          productName: faker.string.alpha({ length: { min: 10, max: 20 } }),
-          price: faker.number.int(),
-          achievementRate: faker.number.int(),
-          currentQuantity: faker.number.int(),
-          targetQuantity: faker.number.int(),
-          pickupDateLabel: faker.string.alpha({ length: { min: 10, max: 20 } }),
-          deadline: faker.date.past().toISOString().slice(0, 19) + 'Z',
-        })),
-        undefined,
-      ]),
-    },
-    undefined,
-  ]),
-  error: faker.helpers.arrayElement([{}, null]),
-  ...overrideResponse,
-});
+export const getGetApiV1GroupBuysGroupBuyIdShareResponseMock = (overrideResponse: Partial<Extract<ApiResponseShareMeta, object>> = {}): ApiResponseShareMeta => ({success: faker.datatype.boolean(), data: {shareUrl: faker.string.alpha({length: {min: 10, max: 20}}), title: faker.string.alpha({length: {min: 10, max: 20}}), description: faker.string.alpha({length: {min: 10, max: 20}}), imageUrl: faker.string.alpha({length: {min: 10, max: 20}}), storeName: faker.string.alpha({length: {min: 10, max: 20}}), deadline: faker.date.past().toISOString().slice(0, 19) + 'Z', pickupDate: faker.date.past().toISOString().slice(0, 10), pickupTimeStart: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), null]), pickupTimeEnd: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), null])}, error: {}, ...overrideResponse})
 
-export const getGetApiV1SearchRecentResponseMock = (
-  overrideResponse: Partial<Extract<ApiResponseRecentSearchList, object>> = {},
-): ApiResponseRecentSearchList => ({
-  success: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-  data: faker.helpers.arrayElement([
-    {
-      keywords: faker.helpers.arrayElement([
-        Array.from(
-          { length: faker.number.int({ min: 1, max: 10 }) },
-          (_, i) => i + 1,
-        ).map(() => ({
-          keyword: faker.helpers.arrayElement([
-            faker.string.alpha({ length: { min: 10, max: 20 } }),
-            undefined,
-          ]),
-          searchedAt: faker.helpers.arrayElement([
-            faker.date.past().toISOString().slice(0, 19) + 'Z',
-            undefined,
-          ]),
-        })),
-        undefined,
-      ]),
-    },
-    undefined,
-  ]),
-  error: faker.helpers.arrayElement([{}, null]),
-  ...overrideResponse,
-});
+export const getPostApiV1SearchResponseMock = (overrideResponse: Partial<Extract<ApiResponseSearchAnalysis, object>> = {}): ApiResponseSearchAnalysis => ({success: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]), data: faker.helpers.arrayElement([{searchCase: faker.helpers.arrayElement(['BOTH_DETECTED','PRODUCT_ONLY','NEIGHBORHOOD_ONLY','NONE_DETECTED'] as const), detectedRegion: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined]), detectedProduct: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined]), confidence: faker.number.float({fractionDigits: 2}), uiState: faker.helpers.arrayElement(['RESULTS','EMPTY_CAN_REQUEST','NEED_REGION','NEED_PRODUCT','NEED_BOTH','AMBIGUOUS_CONFIRMATION'] as const), totalCount: faker.number.int(), results: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.number.int(), thumbnailUrl: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), null]), dDay: faker.number.int(), dDayLabel: faker.string.alpha({length: {min: 10, max: 20}}), storeName: faker.string.alpha({length: {min: 10, max: 20}}), regionType: faker.helpers.arrayElement(Object.values(RegionType)), regionLabel: faker.string.alpha({length: {min: 10, max: 20}}), districtType: faker.helpers.arrayElement(Object.values(DistrictType)), districtLabel: faker.string.alpha({length: {min: 10, max: 20}}), productName: faker.string.alpha({length: {min: 10, max: 20}}), price: faker.number.int(), achievementRate: faker.number.int(), currentQuantity: faker.number.int(), targetQuantity: faker.number.int(), pickupDateLabel: faker.string.alpha({length: {min: 10, max: 20}}), deadline: faker.date.past().toISOString().slice(0, 19) + 'Z'})), recommendedStores: faker.helpers.arrayElement([Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({placeId: faker.string.alpha({length: {min: 10, max: 20}}), storeName: faker.string.alpha({length: {min: 10, max: 20}}), roadAddress: faker.string.alpha({length: {min: 10, max: 20}}), lotAddress: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined]), latitude: faker.number.float({fractionDigits: 2}), longitude: faker.number.float({fractionDigits: 2})})), undefined])}, undefined]), error: faker.helpers.arrayElement([{}, null]), ...overrideResponse})
 
-export const getDeleteApiV1SearchRecentResponseMock = (
-  overrideResponse: Partial<Extract<SuccessNoDataResponse, object>> = {},
-): SuccessNoDataResponse => ({
-  success: faker.datatype.boolean(),
-  data: {},
-  error: {},
-  ...overrideResponse,
-});
+export const getGetApiV1SearchRecentResponseMock = (overrideResponse: Partial<Extract<ApiResponseRecentSearchList, object>> = {}): ApiResponseRecentSearchList => ({success: faker.datatype.boolean(), data: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), error: {}, ...overrideResponse})
 
-export const getDeleteApiV1SearchRecentKeywordResponseMock = (
-  overrideResponse: Partial<Extract<SuccessNoDataResponse, object>> = {},
-): SuccessNoDataResponse => ({
-  success: faker.datatype.boolean(),
-  data: {},
-  error: {},
-  ...overrideResponse,
-});
+export const getDeleteApiV1SearchRecentResponseMock = (overrideResponse: Partial<Extract<SuccessNoDataResponse, object>> = {}): SuccessNoDataResponse => ({success: faker.datatype.boolean(), data: {}, error: {}, ...overrideResponse})
 
-export const getGetApiV1GroupBuysMockHandler = (
-  overrideResponse?:
-    | ApiResponseGroupBuyFeedPageResponse
-    | ((
-        info: Parameters<Parameters<typeof http.get>[1]>[0],
-      ) =>
-        | Promise<ApiResponseGroupBuyFeedPageResponse>
-        | ApiResponseGroupBuyFeedPageResponse),
-  options?: RequestHandlerOptions,
-) => {
-  return http.get(
-    '*/api/v1/group-buys',
-    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
-      return HttpResponse.json(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === 'function'
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getGetApiV1GroupBuysResponseMock(),
-        { status: 200 },
-      );
-    },
-    options,
-  );
-};
+export const getDeleteApiV1SearchRecentKeywordResponseMock = (overrideResponse: Partial<Extract<SuccessNoDataResponse, object>> = {}): SuccessNoDataResponse => ({success: faker.datatype.boolean(), data: {}, error: {}, ...overrideResponse})
 
-export const getGetApiV1GroupBuysGroupBuyIdMockHandler = (
-  overrideResponse?:
-    | ApiResponseGroupBuyDetailResponse
-    | ((
-        info: Parameters<Parameters<typeof http.get>[1]>[0],
-      ) =>
-        | Promise<ApiResponseGroupBuyDetailResponse>
-        | ApiResponseGroupBuyDetailResponse),
-  options?: RequestHandlerOptions,
-) => {
-  return http.get(
-    '*/api/v1/group-buys/:groupBuyId',
-    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
-      return HttpResponse.json(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === 'function'
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getGetApiV1GroupBuysGroupBuyIdResponseMock(),
-        { status: 200 },
-      );
-    },
-    options,
-  );
-};
 
-export const getGetApiV1GroupBuysGroupBuyIdProgressMockHandler = (
-  overrideResponse?:
-    | ApiResponseGroupBuyProgress
-    | ((
-        info: Parameters<Parameters<typeof http.get>[1]>[0],
-      ) => Promise<ApiResponseGroupBuyProgress> | ApiResponseGroupBuyProgress),
-  options?: RequestHandlerOptions,
-) => {
-  return http.get(
-    '*/api/v1/group-buys/:groupBuyId/progress',
-    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
-      return HttpResponse.json(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === 'function'
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getGetApiV1GroupBuysGroupBuyIdProgressResponseMock(),
-        { status: 200 },
-      );
-    },
-    options,
-  );
-};
+export const getGetApiV1GroupBuysMockHandler = (overrideResponse?: ApiResponseGroupBuyFeedPageResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ApiResponseGroupBuyFeedPageResponse> | ApiResponseGroupBuyFeedPageResponse), options?: RequestHandlerOptions) => {
+  return http.get('*/api/v1/group-buys', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
-export const getPostApiV1GroupBuysGroupBuyIdViewersHeartbeatMockHandler = (
-  overrideResponse?:
-    | ApiResponseGroupBuyViewerCount
-    | ((
-        info: Parameters<Parameters<typeof http.post>[1]>[0],
-      ) =>
-        | Promise<ApiResponseGroupBuyViewerCount>
-        | ApiResponseGroupBuyViewerCount),
-  options?: RequestHandlerOptions,
-) => {
-  return http.post(
-    '*/api/v1/group-buys/:groupBuyId/viewers/heartbeat',
-    async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
-      return HttpResponse.json(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === 'function'
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getPostApiV1GroupBuysGroupBuyIdViewersHeartbeatResponseMock(),
-        { status: 200 },
-      );
-    },
-    options,
-  );
-};
 
-export const getGetApiV1GroupBuysProgressMockHandler = (
-  overrideResponse?:
-    | ApiResponseGroupBuyProgressList
-    | ((
-        info: Parameters<Parameters<typeof http.get>[1]>[0],
-      ) =>
-        | Promise<ApiResponseGroupBuyProgressList>
-        | ApiResponseGroupBuyProgressList),
-  options?: RequestHandlerOptions,
-) => {
-  return http.get(
-    '*/api/v1/group-buys/progress',
-    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
-      return HttpResponse.json(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === 'function'
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getGetApiV1GroupBuysProgressResponseMock(),
-        { status: 200 },
-      );
-    },
-    options,
-  );
-};
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getGetApiV1GroupBuysResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
 
-export const getGetApiV1GroupBuysGroupBuyIdShareMockHandler = (
-  overrideResponse?:
-    | ApiResponseShareMeta
-    | ((
-        info: Parameters<Parameters<typeof http.get>[1]>[0],
-      ) => Promise<ApiResponseShareMeta> | ApiResponseShareMeta),
-  options?: RequestHandlerOptions,
-) => {
-  return http.get(
-    '*/api/v1/group-buys/:groupBuyId/share',
-    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
-      return HttpResponse.json(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === 'function'
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getGetApiV1GroupBuysGroupBuyIdShareResponseMock(),
-        { status: 200 },
-      );
-    },
-    options,
-  );
-};
+export const getGetApiV1GroupBuysGroupBuyIdMockHandler = (overrideResponse?: ApiResponseGroupBuyDetailResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ApiResponseGroupBuyDetailResponse> | ApiResponseGroupBuyDetailResponse), options?: RequestHandlerOptions) => {
+  return http.get('*/api/v1/group-buys/:groupBuyId', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
-export const getPostApiV1SearchMockHandler = (
-  overrideResponse?:
-    | ApiResponseSearchAnalysis
-    | ((
-        info: Parameters<Parameters<typeof http.post>[1]>[0],
-      ) => Promise<ApiResponseSearchAnalysis> | ApiResponseSearchAnalysis),
-  options?: RequestHandlerOptions,
-) => {
-  return http.post(
-    '*/api/v1/search',
-    async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
-      return HttpResponse.json(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === 'function'
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getPostApiV1SearchResponseMock(),
-        { status: 200 },
-      );
-    },
-    options,
-  );
-};
 
-export const getGetApiV1SearchRecentMockHandler = (
-  overrideResponse?:
-    | ApiResponseRecentSearchList
-    | ((
-        info: Parameters<Parameters<typeof http.get>[1]>[0],
-      ) => Promise<ApiResponseRecentSearchList> | ApiResponseRecentSearchList),
-  options?: RequestHandlerOptions,
-) => {
-  return http.get(
-    '*/api/v1/search/recent',
-    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
-      return HttpResponse.json(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === 'function'
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getGetApiV1SearchRecentResponseMock(),
-        { status: 200 },
-      );
-    },
-    options,
-  );
-};
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getGetApiV1GroupBuysGroupBuyIdResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
 
-export const getDeleteApiV1SearchRecentMockHandler = (
-  overrideResponse?:
-    | SuccessNoDataResponse
-    | ((
-        info: Parameters<Parameters<typeof http.delete>[1]>[0],
-      ) => Promise<SuccessNoDataResponse> | SuccessNoDataResponse),
-  options?: RequestHandlerOptions,
-) => {
-  return http.delete(
-    '*/api/v1/search/recent',
-    async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
-      return HttpResponse.json(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === 'function'
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getDeleteApiV1SearchRecentResponseMock(),
-        { status: 200 },
-      );
-    },
-    options,
-  );
-};
+export const getGetApiV1GroupBuysGroupBuyIdProgressMockHandler = (overrideResponse?: ApiResponseGroupBuyProgress | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ApiResponseGroupBuyProgress> | ApiResponseGroupBuyProgress), options?: RequestHandlerOptions) => {
+  return http.get('*/api/v1/group-buys/:groupBuyId/progress', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
-export const getDeleteApiV1SearchRecentKeywordMockHandler = (
-  overrideResponse?:
-    | SuccessNoDataResponse
-    | ((
-        info: Parameters<Parameters<typeof http.delete>[1]>[0],
-      ) => Promise<SuccessNoDataResponse> | SuccessNoDataResponse),
-  options?: RequestHandlerOptions,
-) => {
-  return http.delete(
-    '*/api/v1/search/recent/:keyword',
-    async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
-      return HttpResponse.json(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === 'function'
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getDeleteApiV1SearchRecentKeywordResponseMock(),
-        { status: 200 },
-      );
-    },
-    options,
-  );
-};
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getGetApiV1GroupBuysGroupBuyIdProgressResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getPostApiV1GroupBuysGroupBuyIdViewersHeartbeatMockHandler = (overrideResponse?: ApiResponseGroupBuyViewerCount | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<ApiResponseGroupBuyViewerCount> | ApiResponseGroupBuyViewerCount), options?: RequestHandlerOptions) => {
+  return http.post('*/api/v1/group-buys/:groupBuyId/viewers/heartbeat', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getPostApiV1GroupBuysGroupBuyIdViewersHeartbeatResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getGetApiV1GroupBuysProgressMockHandler = (overrideResponse?: ApiResponseGroupBuyProgressList | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ApiResponseGroupBuyProgressList> | ApiResponseGroupBuyProgressList), options?: RequestHandlerOptions) => {
+  return http.get('*/api/v1/group-buys/progress', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getGetApiV1GroupBuysProgressResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getGetApiV1GroupBuysGroupBuyIdShareMockHandler = (overrideResponse?: ApiResponseShareMeta | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ApiResponseShareMeta> | ApiResponseShareMeta), options?: RequestHandlerOptions) => {
+  return http.get('*/api/v1/group-buys/:groupBuyId/share', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getGetApiV1GroupBuysGroupBuyIdShareResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getPostApiV1SearchMockHandler = (overrideResponse?: ApiResponseSearchAnalysis | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<ApiResponseSearchAnalysis> | ApiResponseSearchAnalysis), options?: RequestHandlerOptions) => {
+  return http.post('*/api/v1/search', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getPostApiV1SearchResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getGetApiV1SearchRecentMockHandler = (overrideResponse?: ApiResponseRecentSearchList | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ApiResponseRecentSearchList> | ApiResponseRecentSearchList), options?: RequestHandlerOptions) => {
+  return http.get('*/api/v1/search/recent', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getGetApiV1SearchRecentResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getDeleteApiV1SearchRecentMockHandler = (overrideResponse?: SuccessNoDataResponse | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<SuccessNoDataResponse> | SuccessNoDataResponse), options?: RequestHandlerOptions) => {
+  return http.delete('*/api/v1/search/recent', async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getDeleteApiV1SearchRecentResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getDeleteApiV1SearchRecentKeywordMockHandler = (overrideResponse?: SuccessNoDataResponse | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<SuccessNoDataResponse> | SuccessNoDataResponse), options?: RequestHandlerOptions) => {
+  return http.delete('*/api/v1/search/recent/:keyword', async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getDeleteApiV1SearchRecentKeywordResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
 export const getGroupBuyMock = () => [
   getGetApiV1GroupBuysMockHandler(),
   getGetApiV1GroupBuysGroupBuyIdMockHandler(),
@@ -582,5 +181,5 @@ export const getGroupBuyMock = () => [
   getPostApiV1SearchMockHandler(),
   getGetApiV1SearchRecentMockHandler(),
   getDeleteApiV1SearchRecentMockHandler(),
-  getDeleteApiV1SearchRecentKeywordMockHandler(),
-];
+  getDeleteApiV1SearchRecentKeywordMockHandler()
+]

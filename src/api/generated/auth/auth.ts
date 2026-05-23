@@ -129,12 +129,19 @@ export type postApiV1AuthLogoutResponse200 = {
   status: 200
 }
 
+export type postApiV1AuthLogoutResponse401 = {
+  data: UnauthorizedResponse
+  status: 401
+}
+
 export type postApiV1AuthLogoutResponseSuccess = (postApiV1AuthLogoutResponse200) & {
   headers: Headers;
 };
-;
+export type postApiV1AuthLogoutResponseError = (postApiV1AuthLogoutResponse401) & {
+  headers: Headers;
+};
 
-export type postApiV1AuthLogoutResponse = (postApiV1AuthLogoutResponseSuccess)
+export type postApiV1AuthLogoutResponse = (postApiV1AuthLogoutResponseSuccess | postApiV1AuthLogoutResponseError)
 
 export const getPostApiV1AuthLogoutUrl = () => {
 

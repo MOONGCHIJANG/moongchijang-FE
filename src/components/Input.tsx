@@ -7,18 +7,26 @@ interface InputProps {
   label?: string;
   isPassword?: boolean;
   helperText?: string;
+  helperTextClassName?: string;
   placeholder?: string;
   value?: string;
   onChange?: (value: string) => void;
+  leftIcon?: string;
+  isError?: boolean;
+  focusVariant?: 'default' | 'brand';
 }
 
 const Input = ({
   label,
   isPassword = false,
   helperText,
+  helperTextClassName,
   placeholder,
   value: externalValue,
   onChange,
+  leftIcon,
+  isError = false,
+  focusVariant = 'default',
 }: InputProps) => {
   const [internalValue, setInternalValue] = useState('');
   const [isFocused, setIsFocused] = useState(false);
@@ -39,9 +47,14 @@ const Input = ({
   const inputType = isPassword ? (showPassword ? 'text' : 'password') : 'text';
 
   return (
-    <div className="flex flex-col gap-g2 w-full">
+    <div className="flex flex-col gap-g3 w-full">
       {label && <p className="caption-sm-medium text-text-tertiary">{label}</p>}
       <div className="relative w-full">
+        {leftIcon && (
+          <div className="absolute left-g4 top-1/2 -translate-y-1/2 pointer-events-none">
+            <Icon icon={leftIcon} className="w-4 h-4 text-icon-subtle" />
+          </div>
+        )}
         <input
           type={inputType}
           value={value}
@@ -49,7 +62,7 @@ const Input = ({
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           placeholder={placeholder}
-          className="w-full px-g4 py-g5 border-border-subtle border rounded-2xlarge body-md-regular focus:outline-none text-icon-basic placeholder:text-text-subtle-inverse pr-10"
+          className={`w-full py-g5 border rounded-2xlarge body-md-regular focus:outline-none text-icon-basic placeholder:text-text-subtle-inverse pr-10 ${leftIcon ? 'pl-8' : 'px-g4'} ${isError ? 'border-border-error' : focusVariant === 'brand' ? 'border-border-subtle focus:border-border-brand' : 'border-border-subtle focus:border-text-basic'}`}
         />
         <div className="absolute right-g4 top-1/2 -translate-y-1/2 flex items-center gap-g4">
           {showClear && (
@@ -85,7 +98,9 @@ const Input = ({
         </div>
       </div>
       {helperText ? (
-        <p className="caption-sm-medium text-text-subtle-inverse">
+        <p
+          className={`caption-sm-medium ${helperTextClassName ?? 'text-text-subtle-inverse'}`}
+        >
           {helperText}
         </p>
       ) : (

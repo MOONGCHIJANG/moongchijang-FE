@@ -14,10 +14,6 @@ import type {
   RequestHandlerOptions
 } from 'msw';
 
-import {
-  DistrictType,
-  RegionType
-} from '../api.schemas';
 import type {
   ApiResponseWishlistPage,
   SuccessNoDataResponse
@@ -28,7 +24,7 @@ export const getPostApiV1GroupBuysGroupBuyIdWishlistResponseMock = (overrideResp
 
 export const getDeleteApiV1GroupBuysGroupBuyIdWishlistResponseMock = (overrideResponse: Partial<Extract<SuccessNoDataResponse, object>> = {}): SuccessNoDataResponse => ({success: faker.datatype.boolean(), data: {}, error: {}, ...overrideResponse})
 
-export const getGetApiV1WishlistsResponseMock = (overrideResponse: Partial<Extract<ApiResponseWishlistPage, object>> = {}): ApiResponseWishlistPage => ({success: faker.datatype.boolean(), data: {content: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.number.int(), thumbnailUrl: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), null]), dDay: faker.number.int(), dDayLabel: faker.string.alpha({length: {min: 10, max: 20}}), storeName: faker.string.alpha({length: {min: 10, max: 20}}), regionType: faker.helpers.arrayElement(Object.values(RegionType)), regionLabel: faker.string.alpha({length: {min: 10, max: 20}}), districtType: faker.helpers.arrayElement(Object.values(DistrictType)), districtLabel: faker.string.alpha({length: {min: 10, max: 20}}), productName: faker.string.alpha({length: {min: 10, max: 20}}), price: faker.number.int(), achievementRate: faker.number.int(), currentQuantity: faker.number.int(), targetQuantity: faker.number.int(), pickupDateLabel: faker.string.alpha({length: {min: 10, max: 20}}), deadline: faker.date.past().toISOString().slice(0, 19) + 'Z'})), totalElements: faker.number.int(), totalPages: faker.number.int(), number: faker.number.int(), size: faker.number.int(), urgentCount: faker.number.int()}, error: {}, ...overrideResponse})
+export const getGetApiV1WishlistsResponseMock = (overrideResponse: Partial<Extract<ApiResponseWishlistPage, object>> = {}): ApiResponseWishlistPage => ({success: faker.datatype.boolean(), data: {content: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({groupBuyId: faker.number.int(), thumbnailUrl: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), null]), dDay: faker.number.int(), dDayLabel: faker.string.alpha({length: {min: 10, max: 20}}), storeName: faker.string.alpha({length: {min: 10, max: 20}}), regionLabel: faker.string.alpha({length: {min: 10, max: 20}}), productName: faker.string.alpha({length: {min: 10, max: 20}}), pickupDate: faker.date.past().toISOString().slice(0, 10), pickupDateLabel: faker.string.alpha({length: {min: 10, max: 20}}), deadline: faker.date.past().toISOString().slice(0, 19) + 'Z', deadlineLabel: faker.string.alpha({length: {min: 10, max: 20}}), achievementRate: faker.number.int(), price: faker.number.int(), currentParticipantCount: faker.number.int(), targetParticipantCount: faker.number.int(), isWishlisted: faker.datatype.boolean()})), totalElements: faker.number.int(), totalPages: faker.number.int(), number: faker.number.int(), size: faker.number.int(), urgentCount: faker.number.int()}, error: {}, ...overrideResponse})
 
 
 export const getPostApiV1GroupBuysGroupBuyIdWishlistMockHandler = (overrideResponse?: SuccessNoDataResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<SuccessNoDataResponse> | SuccessNoDataResponse), options?: RequestHandlerOptions) => {

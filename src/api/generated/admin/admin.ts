@@ -15,6 +15,7 @@ import type {
   ApiResponseAdminRequestDetail,
   ApiResponseAdminRequestPage,
   ApiResponseGroupBuyId,
+  ApiResponseGroupBuyRequestDetail,
   ApiResponseSettlementId,
   ApiResponseSettlementPage,
   BadRequestResponse,
@@ -160,7 +161,7 @@ export const getApiV1AdminGroupBuyRequestsRequestId = async (requestId: number, 
  * @summary 공구 요청 상태 변경
  */
 export type patchApiV1AdminGroupBuyRequestsRequestIdStatusResponse200 = {
-  data: SuccessNoDataResponse
+  data: ApiResponseGroupBuyRequestDetail
   status: 200
 }
 

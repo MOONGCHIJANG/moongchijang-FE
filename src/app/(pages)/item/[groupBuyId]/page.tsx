@@ -7,6 +7,7 @@ import type { ApiResponseGroupBuyDetailResponse } from '@/api/generated/api.sche
 import { notFound } from 'next/navigation';
 import ViewerToast from './_components/ViewerToast';
 import Footer from '@/components/Footer';
+import { cookies } from 'next/headers';
 
 interface Props {
   params: Promise<{ groupBuyId: string }>;
@@ -14,8 +15,10 @@ interface Props {
 
 const page = async ({ params }: Props) => {
   const { groupBuyId } = await params;
+  const token = (await cookies()).get('accessToken')?.value;
   const responseData = await serverFetch<ApiResponseGroupBuyDetailResponse>(
     `/api/v1/group-buys/${groupBuyId}`,
+    token,
   ).catch(() => notFound());
 
   const { data } = responseData;

@@ -109,7 +109,7 @@ const overrideHandlers = [
         totalPages,
         totalElements: TOTAL_ITEMS,
         hasNext: page < totalPages,
-        hasSearchResult,
+        hasRegionalResult: hasSearchResult,
       },
       error: null,
     });
@@ -155,7 +155,7 @@ const overrideHandlers = [
   http.get('*/api/v1/search/recent', async () => {
     return HttpResponse.json({
       success: true,
-      data: { keywords: recentKeywords },
+      data: recentKeywords.map((k) => k.keyword),
       error: null,
     });
   }),
@@ -190,6 +190,58 @@ const overrideHandlers = [
   http.delete('*/api/v1/search/recent', async () => {
     recentKeywords = [];
     return HttpResponse.json({ success: true, data: {}, error: null });
+  }),
+  http.get('*/api/v1/wishlists', async ({ request }) => {
+    await delay(600);
+    const url = new URL(request.url);
+    const filter = url.searchParams.get('filter') ?? 'ALL';
+    const excludeClosed = url.searchParams.get('excludeClosed') === 'true';
+
+    // filter별 dDay 세트: ALL=전 상태 혼합, OPEN=마감 여유, CLOSING_SOON=마감임박
+    const dDayByFilter: Record<string, number[]> = {
+      ALL: [-1, 0, 1, 3, 7],        // 마감(-1), D-0, D-1, D-3, D-7 혼합
+      OPEN: [5, 7, 10, 14, 20],     // 여유 있는 모집중
+      CLOSING_SOON: [0, 1, 2, 3],   // D-0 ~ D-3 마감임박
+    };
+    const rawDDays = dDayByFilter[filter] ?? dDayByFilter['ALL'];
+    const dDays = excludeClosed ? rawDDays.filter((d) => d >= 0) : rawDDays;
+
+    const content = dDays.map((dDay, i) => {
+      const { id, currentQuantity, targetQuantity, ...rest } = createFeedItem(i + 1);
+      const dDayLabel = dDay === 0 ? 'D-day' : dDay < 0 ? '마감' : `D-${dDay}`;
+      return {
+        ...rest,
+        groupBuyId: id,
+        currentParticipantCount: currentQuantity,
+        targetParticipantCount: targetQuantity,
+        pickupDate: rest.deadline,
+        dDay,
+        dDayLabel,
+        deadlineLabel: dDayLabel,
+        isWishlisted: true,
+      };
+    });
+    const urgentCount = content.filter((item) => item.dDay >= 0 && item.dDay <= 2).length;
+    return HttpResponse.json({
+      success: true,
+      data: {
+        content,
+        totalElements: content.length,
+        totalPages: 1,
+        number: 0,
+        size: 20,
+        urgentCount,
+      },
+      error: null,
+    });
+  }),
+  http.post('*/api/v1/group-buys/:groupBuyId/wishlist', async () => {
+    await delay(200);
+    return HttpResponse.json({ success: true, data: null, error: null }, { status: 201 });
+  }),
+  http.delete('*/api/v1/group-buys/:groupBuyId/wishlist', async () => {
+    await delay(200);
+    return HttpResponse.json({ success: true, data: null, error: null });
   }),
   http.delete('*/api/v1/search/recent/:keyword', async ({ params }) => {
     const keyword = decodeURIComponent(params.keyword as string);

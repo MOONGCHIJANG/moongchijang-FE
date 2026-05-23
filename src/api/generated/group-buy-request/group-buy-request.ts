@@ -6,12 +6,16 @@ import type {
   ApiResponseGroupBuyRequestDetail,
   ApiResponseGroupBuyRequestList,
   ApiResponseRequestId,
+  ApiResponseStoreRecommendation,
   ApiResponseStoreSearchList,
   BadRequestResponse,
   ForbiddenResponse,
   GetApiV1StoresSearchParams,
   GroupBuyRequestCreate,
   NotFoundResponse,
+  PostApiV1GroupBuyOpenRequestsBody,
+  StoreRecommendationRequest,
+  SuccessNoDataResponse,
   UnauthorizedResponse
 } from '../api.schemas';
 
@@ -195,6 +199,111 @@ export const getApiV1GroupBuyRequestsRequestId = async (requestId: number, optio
     method: 'GET'
 
 
+  }
+);}
+
+
+/**
+ * 특정 지역/상품 조합으로 공구가 개설되면 알림을 받기 위해 등록한다.
+검색 결과가 비어 있을 때(EMPTY_CAN_REQUEST 상태) 진입 가능한 진입점이다.
+
+ * @summary 공구 개설 알림 신청
+ */
+export type postApiV1GroupBuyOpenRequestsResponse201 = {
+  data: SuccessNoDataResponse
+  status: 201
+}
+
+export type postApiV1GroupBuyOpenRequestsResponse400 = {
+  data: BadRequestResponse
+  status: 400
+}
+
+export type postApiV1GroupBuyOpenRequestsResponse401 = {
+  data: UnauthorizedResponse
+  status: 401
+}
+
+export type postApiV1GroupBuyOpenRequestsResponseSuccess = (postApiV1GroupBuyOpenRequestsResponse201) & {
+  headers: Headers;
+};
+export type postApiV1GroupBuyOpenRequestsResponseError = (postApiV1GroupBuyOpenRequestsResponse400 | postApiV1GroupBuyOpenRequestsResponse401) & {
+  headers: Headers;
+};
+
+export type postApiV1GroupBuyOpenRequestsResponse = (postApiV1GroupBuyOpenRequestsResponseSuccess | postApiV1GroupBuyOpenRequestsResponseError)
+
+export const getPostApiV1GroupBuyOpenRequestsUrl = () => {
+
+
+
+
+  return `/api/v1/group-buy-open-requests`
+}
+
+export const postApiV1GroupBuyOpenRequests = async (postApiV1GroupBuyOpenRequestsBody: PostApiV1GroupBuyOpenRequestsBody, options?: RequestInit): Promise<postApiV1GroupBuyOpenRequestsResponse> => {
+
+  return customFetch<postApiV1GroupBuyOpenRequestsResponse>(getPostApiV1GroupBuyOpenRequestsUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      postApiV1GroupBuyOpenRequestsBody,)
+  }
+);}
+
+
+/**
+ * 동네와 상품 조건이 확정된 뒤 네이버 Local Search API와 자사 공구 이력을 기반으로
+최대 10개의 매장 후보를 추천한다.
+
+네이버 결과가 0건이거나 네이버 API 호출 실패/timeout이 발생하면 `stores=[]`를 반환하며,
+프론트는 기존 공구 개설 요청 플로우로 fallback한다.
+
+ * @summary AI 매장 추천 바텀시트용 매장 후보 조회
+ */
+export type postApiV1GroupBuyOpenRequestsStoreRecommendationsResponse200 = {
+  data: ApiResponseStoreRecommendation
+  status: 200
+}
+
+export type postApiV1GroupBuyOpenRequestsStoreRecommendationsResponse400 = {
+  data: BadRequestResponse
+  status: 400
+}
+
+export type postApiV1GroupBuyOpenRequestsStoreRecommendationsResponse401 = {
+  data: UnauthorizedResponse
+  status: 401
+}
+
+export type postApiV1GroupBuyOpenRequestsStoreRecommendationsResponseSuccess = (postApiV1GroupBuyOpenRequestsStoreRecommendationsResponse200) & {
+  headers: Headers;
+};
+export type postApiV1GroupBuyOpenRequestsStoreRecommendationsResponseError = (postApiV1GroupBuyOpenRequestsStoreRecommendationsResponse400 | postApiV1GroupBuyOpenRequestsStoreRecommendationsResponse401) & {
+  headers: Headers;
+};
+
+export type postApiV1GroupBuyOpenRequestsStoreRecommendationsResponse = (postApiV1GroupBuyOpenRequestsStoreRecommendationsResponseSuccess | postApiV1GroupBuyOpenRequestsStoreRecommendationsResponseError)
+
+export const getPostApiV1GroupBuyOpenRequestsStoreRecommendationsUrl = () => {
+
+
+
+
+  return `/api/v1/group-buy-open-requests/store-recommendations`
+}
+
+export const postApiV1GroupBuyOpenRequestsStoreRecommendations = async (storeRecommendationRequest: StoreRecommendationRequest, options?: RequestInit): Promise<postApiV1GroupBuyOpenRequestsStoreRecommendationsResponse> => {
+
+  return customFetch<postApiV1GroupBuyOpenRequestsStoreRecommendationsResponse>(getPostApiV1GroupBuyOpenRequestsStoreRecommendationsUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      storeRecommendationRequest,)
   }
 );}
 

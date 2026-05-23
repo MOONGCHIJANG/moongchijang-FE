@@ -75,7 +75,6 @@ export function FeedClient() {
   const [searchAnalysis, setSearchAnalysis] =
     useState<ApiResponseSearchAnalysisData | null>(null);
 
-
   const queryClient = useQueryClient();
   const { recentSearches, removeRecentSearch, clearRecentSearches } =
     useRecentSearches();
@@ -234,6 +233,7 @@ export function FeedClient() {
           location={locationDisplayText}
           onLocationClick={() => setIsLocationSheetOpen(true)}
           onQrClick={() => setIsQrModalOpen(true)}
+          onNotificationClick={() => router.push('/notifications')}
         />
         <div className="cursor-pointer" onClick={() => setIsSearchOpen(true)}>
           <SearchBar

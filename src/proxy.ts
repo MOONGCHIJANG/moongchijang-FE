@@ -22,5 +22,5 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   // 비로그인 사용자 접근을 막는 경로 패턴
-  matcher: ['/item/:path*/join', '/payment/:path*'],
+  matcher: ['/item/:path*/join', '/payment/:path*', '/notifications'],
 };

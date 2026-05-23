@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useQueryClient } from '@tanstack/react-query';
 import { Icon } from '@iconify/react';
 import Header from '@/components/Header';
-import { ToastBlack } from '@/components/ToastBlack';
 import Toast from '@/app/(pages)/item/[groupBuyId]/_components/Toast';
 import { Chip } from '@/components/Chip';
 import { EmptyState } from '@/app/(pages)/(gnb)/feed/_components/EmptyState';
@@ -47,21 +46,7 @@ export function FavoriteClient() {
   );
   const [sort, setSort] = useState<WishlistSort>(GetApiV1WishlistsSort.LATEST);
   const [excludeClosed, setExcludeClosed] = useState(false);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
-
-  const showToast = (message: string) => {
-    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
-    setToastMessage(message);
-    toastTimerRef.current = setTimeout(() => setToastMessage(null), 3000);
-  };
-
-  useEffect(() => {
-    return () => {
-      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
-    };
-  }, []);
 
   const {
     items,
@@ -102,10 +87,6 @@ export function FavoriteClient() {
     mutation: {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['/api/v1/wishlists'] });
-        showToast('찜이 해제되었어요');
-      },
-      onError: () => {
-        showToast('찜 해제에 실패했어요');
       },
     },
   });
@@ -195,8 +176,12 @@ export function FavoriteClient() {
               <Link key={item.groupBuyId} href={`/item/${item.groupBuyId}`}>
                 <WishlistCard
                   {...item}
-                  isRemoving={isPending && removingVars?.groupBuyId === item.groupBuyId}
-                  onRemove={() => removeWishlist({ groupBuyId: item.groupBuyId })}
+                  isRemoving={
+                    isPending && removingVars?.groupBuyId === item.groupBuyId
+                  }
+                  onRemove={() =>
+                    removeWishlist({ groupBuyId: item.groupBuyId })
+                  }
                 />
               </Link>
             ))}
@@ -218,10 +203,6 @@ export function FavoriteClient() {
           </Toast>
         </div>
       )}
-
-      <div className="fixed bottom-[74px] left-1/2 z-50 -translate-x-1/2 w-[calc(100%-32px)] max-w-[408px] pointer-events-none">
-        <ToastBlack isVisible={!!toastMessage} message={toastMessage ?? ''} />
-      </div>
     </div>
   );
 }

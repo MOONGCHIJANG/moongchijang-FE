@@ -155,7 +155,7 @@ const overrideHandlers = [
   http.get('*/api/v1/search/recent', async () => {
     return HttpResponse.json({
       success: true,
-      data: { keywords: recentKeywords },
+      data: recentKeywords.map((k) => k.keyword),
       error: null,
     });
   }),

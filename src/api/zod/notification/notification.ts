@@ -46,6 +46,11 @@ export const GetApiV1NotificationsResponse = zod.object({
           'MY_APPLYING',
           'REQUEST_STATUS',
         ]),
+        deeplinkParams: zod
+          .record(zod.string(), zod.string())
+          .describe(
+            '딥링크 파라미터. PICKUP_GUIDE\/GROUPBUY_DETAIL\/MY_APPLYING은 groupBuyId, REQUEST_STATUS는 targetId를 사용합니다.',
+          ),
         section: zod.enum(['TODAY', 'YESTERDAY', 'OLDER']),
       }),
     ),

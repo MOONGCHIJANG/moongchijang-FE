@@ -117,14 +117,24 @@ export const GetApiV1GroupBuyRequestsResponse = zod.object({
       desiredPickupDate: zod.iso.date(),
       additionalNote: zod.string().nullish(),
       status: zod
-        .enum(['SUBMITTED', 'IN_REVIEW', 'IN_CONTACT', 'OPENED', 'REJECTED'])
+        .enum(['IN_REVIEW', 'IN_CONTACT', 'OPENED', 'REJECTED'])
         .describe(
-          'SUBMITTED=요청 접수 \/ IN_REVIEW=검토 중 \/ IN_CONTACT=매장 컨택 중 \/\nOPENED=공구 개설 완료 \/ REJECTED=개설 불가\n',
+          'IN_REVIEW=검토 중 \/ IN_CONTACT=매장 컨택 중 \/\nOPENED=공구 개설 완료 \/ REJECTED=개설 불가\n',
         ),
       rejectionReason: zod
         .string()
         .nullable()
         .describe('status=REJECTED 시 노출'),
+      openedGroupBuyId: zod
+        .number()
+        .nullable()
+        .describe('status=OPENED 시 개설된 공구 id'),
+      statusHistory: zod.array(
+        zod.object({
+          status: zod.enum(['IN_REVIEW', 'IN_CONTACT', 'OPENED', 'REJECTED']),
+          changedAt: zod.iso.datetime({ offset: true }),
+        }),
+      ),
       createdAt: zod.iso.datetime({ offset: true }),
     }),
   ),
@@ -154,17 +164,48 @@ export const GetApiV1GroupBuyRequestsRequestIdResponse = zod.object({
     desiredPickupDate: zod.iso.date(),
     additionalNote: zod.string().nullish(),
     status: zod
-      .enum(['SUBMITTED', 'IN_REVIEW', 'IN_CONTACT', 'OPENED', 'REJECTED'])
+      .enum(['IN_REVIEW', 'IN_CONTACT', 'OPENED', 'REJECTED'])
       .describe(
-        'SUBMITTED=요청 접수 \/ IN_REVIEW=검토 중 \/ IN_CONTACT=매장 컨택 중 \/\nOPENED=공구 개설 완료 \/ REJECTED=개설 불가\n',
+        'IN_REVIEW=검토 중 \/ IN_CONTACT=매장 컨택 중 \/\nOPENED=공구 개설 완료 \/ REJECTED=개설 불가\n',
       ),
     rejectionReason: zod
       .string()
       .nullable()
       .describe('status=REJECTED 시 노출'),
+    openedGroupBuyId: zod
+      .number()
+      .nullable()
+      .describe('status=OPENED 시 개설된 공구 id'),
+    statusHistory: zod.array(
+      zod.object({
+        status: zod.enum(['IN_REVIEW', 'IN_CONTACT', 'OPENED', 'REJECTED']),
+        changedAt: zod.iso.datetime({ offset: true }),
+      }),
+    ),
     createdAt: zod.iso.datetime({ offset: true }),
   }),
   error: zod.unknown().nullable(),
+});
+
+/**
+ * 특정 지역/상품 조합으로 공구가 개설되면 알림을 받기 위해 등록한다.
+검색 결과가 비어 있을 때(EMPTY_CAN_REQUEST 상태) 진입 가능한 진입점이다.
+
+ * @summary 공구 개설 알림 신청
+ */
+export const postApiV1GroupBuyOpenRequestsBodyRegionMax = 50;
+
+export const postApiV1GroupBuyOpenRequestsBodyProductNameMax = 100;
+
+export const PostApiV1GroupBuyOpenRequestsBody = zod.object({
+  region: zod
+    .string()
+    .max(postApiV1GroupBuyOpenRequestsBodyRegionMax)
+    .describe('알림 신청 대상 지역(동\/구 등)'),
+  productName: zod
+    .string()
+    .max(postApiV1GroupBuyOpenRequestsBodyProductNameMax)
+    .describe('알림 신청 대상 상품명'),
 });
 
 /**

@@ -152,29 +152,3 @@ export const PostApiV1ParticipationsParticipationIdCancelResponse = zod.object({
   }),
   error: zod.unknown().nullable(),
 });
-
-/**
- * @summary 내 환불 내역 조회
- */
-export const GetApiV1RefundsResponse = zod.object({
-  success: zod.boolean(),
-  data: zod.array(
-    zod.object({
-      participationId: zod.number(),
-      productName: zod.string(),
-      storeName: zod.string(),
-      pickupDate: zod.iso.date().nullable(),
-      pickupTimeStart: zod.iso.time({}).nullable(),
-      pickupTimeEnd: zod.iso.time({}).nullable(),
-      paymentAmount: zod.number(),
-      quantity: zod.number(),
-      refundStatus: zod
-        .enum(['PENDING', 'COMPLETED'])
-        .describe('PENDING=환불대기 \/ COMPLETED=환불완료'),
-      cancelReason: zod
-        .enum(['NOT_ACHIEVED', 'EARLY_EXIT', 'PAYMENT_ERROR', 'OTHER'])
-        .describe('취소 사유'),
-    }),
-  ),
-  error: zod.unknown().nullable(),
-});

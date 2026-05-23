@@ -30,28 +30,51 @@ const SLIDES = [
 export const OnboardingCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [startX, setStartX] = useState<number | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setStartX(e.touches[0].clientX);
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
+  const handleDragEnd = (endX: number) => {
     if (startX === null) return;
-    const diff = startX - e.changedTouches[0].clientX;
+    const diff = startX - endX;
     if (Math.abs(diff) < 50) return;
     if (diff > 0) setCurrentIndex((i) => Math.min(i + 1, SLIDES.length - 1));
     else setCurrentIndex((i) => Math.max(i - 1, 0));
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) =>
+    setStartX(e.touches[0].clientX);
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    handleDragEnd(e.changedTouches[0].clientX);
     setStartX(null);
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setStartX(e.clientX);
+    setIsDragging(true);
+  };
+  const handleMouseUp = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    handleDragEnd(e.clientX);
+    setStartX(null);
+    setIsDragging(false);
+  };
+  const handleMouseLeave = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    handleDragEnd(e.clientX);
+    setStartX(null);
+    setIsDragging(false);
   };
 
   return (
     <div
-      className="flex flex-col bg-background-white-muted"
+      className={`flex flex-col bg-background-white-muted select-none  ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseLeave}
     >
       <div
-        className="relative w-full overflow-hidden bg-surface-inverse"
+        className={`relative w-full overflow-hidden bg-surface-inverse`}
         style={{ height: 'min(95vw, 440px)' }}
       >
         <div
@@ -59,13 +82,15 @@ export const OnboardingCarousel = () => {
           style={{ transform: `translateX(-${currentIndex * 100}%)` }}
         >
           {SLIDES.map((slide, i) => (
-            <div key={i} className="relative w-full h-full shrink-0">
+            <div key={i} className="relative w-full min-w-full h-full">
               <Image
                 src={slide.image}
                 alt={slide.title}
                 fill
                 className="object-contain"
                 priority={i === 0}
+                onDragStart={(e) => e.preventDefault()}
+                sizes="100vw"
               />
             </div>
           ))}

@@ -1,4 +1,3 @@
-import Header from '@/components/Header';
 import React from 'react';
 import NoticeClient from './_components/NoticeClient';
 import { serverFetch } from '@/lib/fetcher';
@@ -19,7 +18,6 @@ const page = async () => {
 
   return (
     <>
-      <Header text="알림" />
       <NoticeClient data={notifications} />
     </>
   );

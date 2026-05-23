@@ -124,7 +124,7 @@ export default function SettingsPage() {
             label="로그아웃"
             onClick={() => setShowLogoutModal(true)}
           />
-          <SettingRow label="탈퇴하기" />
+          <SettingRow label="탈퇴하기" href="/mypage/withdraw" />
         </div>
 
         <div className="border-t border-border-subtle" />

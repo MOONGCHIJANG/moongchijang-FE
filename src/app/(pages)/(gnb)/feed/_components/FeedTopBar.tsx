@@ -9,6 +9,7 @@ interface FeedTopBarProps {
   onLocationClick?: () => void;
   onNotificationClick?: () => void;
   onQrClick?: () => void;
+  showQr?: boolean;
   className?: string;
 }
 
@@ -17,6 +18,7 @@ export const FeedTopBar = ({
   onLocationClick,
   onNotificationClick,
   onQrClick,
+  showQr = false,
   className,
 }: FeedTopBarProps) => {
   return (
@@ -57,16 +59,18 @@ export const FeedTopBar = ({
             className="h-6 w-6 text-text-basic"
           />
         </button>
-        <button
-          onClick={onQrClick}
-          className="flex h-6 w-6 items-center justify-center"
-          type="button"
-        >
-          <Icon
-            icon="solar:qr-code-outline"
-            className="h-6 w-6 text-text-basic"
-          />
-        </button>
+        {showQr && (
+          <button
+            onClick={onQrClick}
+            className="flex h-6 w-6 items-center justify-center"
+            type="button"
+          >
+            <Icon
+              icon="solar:qr-code-outline"
+              className="h-6 w-6 text-text-basic"
+            />
+          </button>
+        )}
       </div>
     </div>
   );

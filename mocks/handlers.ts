@@ -207,15 +207,17 @@ const overrideHandlers = [
 
     // filter별 dDay 세트: ALL=전 상태 혼합, OPEN=마감 여유, CLOSING_SOON=마감임박
     const dDayByFilter: Record<string, number[]> = {
-      ALL: [-1, 0, 1, 3, 7],        // 마감(-1), D-0, D-1, D-3, D-7 혼합
-      OPEN: [5, 7, 10, 14, 20],     // 여유 있는 모집중
-      CLOSING_SOON: [0, 1, 2, 3],   // D-0 ~ D-3 마감임박
+      ALL: [-1, 0, 1, 3, 7], // 마감(-1), D-0, D-1, D-3, D-7 혼합
+      OPEN: [5, 7, 10, 14, 20], // 여유 있는 모집중
+      CLOSING_SOON: [0, 1, 2, 3], // D-0 ~ D-3 마감임박
     };
     const rawDDays = dDayByFilter[filter] ?? dDayByFilter['ALL'];
     const dDays = excludeClosed ? rawDDays.filter((d) => d >= 0) : rawDDays;
 
     const content = dDays.map((dDay, i) => {
-      const { id, currentQuantity, targetQuantity, ...rest } = createFeedItem(i + 1);
+      const { id, currentQuantity, targetQuantity, ...rest } = createFeedItem(
+        i + 1,
+      );
       const dDayLabel = dDay === 0 ? 'D-day' : dDay < 0 ? '마감' : `D-${dDay}`;
       return {
         ...rest,
@@ -229,7 +231,9 @@ const overrideHandlers = [
         isWishlisted: true,
       };
     });
-    const urgentCount = content.filter((item) => item.dDay >= 0 && item.dDay <= 2).length;
+    const urgentCount = content.filter(
+      (item) => item.dDay >= 0 && item.dDay <= 2,
+    ).length;
     return HttpResponse.json({
       success: true,
       data: {
@@ -245,7 +249,10 @@ const overrideHandlers = [
   }),
   http.post('*/api/v1/group-buys/:groupBuyId/wishlist', async () => {
     await delay(200);
-    return HttpResponse.json({ success: true, data: null, error: null }, { status: 201 });
+    return HttpResponse.json(
+      { success: true, data: null, error: null },
+      { status: 201 },
+    );
   }),
   http.delete('*/api/v1/group-buys/:groupBuyId/wishlist', async () => {
     await delay(200);
@@ -381,7 +388,7 @@ const overrideHandlers = [
       | 'COMPLETED';
     return HttpResponse.json(createMyPageParticipationsMock(status));
   }),
-  http.get('*/api/v1/refunds', async () => {
+  http.get('*/api/v1/users/me/refunds', async () => {
     await delay(300);
     return HttpResponse.json(createMyPageRefundsMock());
   }),
@@ -400,6 +407,23 @@ const overrideHandlers = [
   http.get('*/api/v1/participations/:participationId/qr', async () => {
     await delay(300);
     return HttpResponse.json(createMyPageQrMock());
+  }),
+  // 닉네임 중복 확인 — available: true 고정 (false로 바꿔 중복 케이스 확인 가능)
+  http.get('*/api/v1/users/nickname/availability', async () => {
+    await delay(300);
+    return HttpResponse.json({
+      success: true,
+      data: { available: true },
+      error: null,
+    });
+  }),
+  // 프로필(닉네임) 업데이트
+  http.patch('*/api/v1/users/me/profile', async () => {
+    await delay(400);
+    return HttpResponse.json(
+      { success: true, data: {}, error: null },
+      { status: 200 },
+    );
   }),
   http.post('*/api/v1/auth/logout', async () => {
     await delay(300);

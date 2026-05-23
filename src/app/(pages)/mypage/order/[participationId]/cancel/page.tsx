@@ -4,7 +4,10 @@ import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useGetApiV1UsersMeParticipations } from '@/api/hooks/my-page/my-page';
 import { usePostApiV1ParticipationsParticipationIdCancel } from '@/api/hooks/participation/participation';
-import { CancelParticipationRequestReason } from '@/api/generated/api.schemas';
+import {
+  ApiResponseMypageParticipationListDataItem,
+  CancelParticipationRequestReason,
+} from '@/api/generated/api.schemas';
 import Header from '@/components/Header';
 import { Button } from '@/components/Button';
 import { ToastBlack } from '@/components/ToastBlack';
@@ -66,8 +69,8 @@ export default function CancelPage({
   const { data: activeRes } = useGetApiV1UsersMeParticipations({
     status: 'ACTIVE',
   });
-  const activeItems =
-    activeRes?.status === 200 ? (activeRes.data?.data?.content ?? []) : [];
+  const activeItems: ApiResponseMypageParticipationListDataItem[] =
+    activeRes?.status === 200 ? (activeRes.data?.data ?? []) : [];
   const item = activeItems.find((p) => p.participationId === id);
 
   const { mutate: cancel, isPending } =

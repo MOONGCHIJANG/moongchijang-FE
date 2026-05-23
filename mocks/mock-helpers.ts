@@ -31,8 +31,8 @@ import {
   getGetApiV1UsersMeTabsCountsResponseMock,
   getGetApiV1UsersMeParticipationsResponseMock,
   getGetApiV1UsersMeParticipationsPickupWaitingResponseMock,
+  getGetApiV1UsersMeRefundsResponseMock,
 } from '../src/api/generated/my-page/my-page.msw';
-import { getGetApiV1RefundsResponseMock } from '../src/api/generated/participation/participation.msw';
 import {
   getGetApiV1ParticipationsParticipationIdPickupResponseMock,
   getGetApiV1ParticipationsParticipationIdQrResponseMock,
@@ -270,13 +270,13 @@ export function createMyPageParticipationsMock(status: 'ACTIVE' | 'COMPLETED') {
   return {
     ...base,
     success: true,
-    data: { content, totalElements: content.length, totalPages: 1 },
+    data: content,
     error: null,
   };
 }
 
 export function createMyPageRefundsMock() {
-  const base = getGetApiV1RefundsResponseMock();
+  const base = getGetApiV1UsersMeRefundsResponseMock();
   return {
     ...base,
     success: true,

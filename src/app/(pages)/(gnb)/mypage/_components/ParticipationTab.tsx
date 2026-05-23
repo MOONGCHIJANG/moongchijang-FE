@@ -2,8 +2,14 @@
 
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { useGetApiV1UsersMeParticipations } from '@/api/hooks/my-page/my-page';
-import { useGetApiV1Refunds } from '@/api/hooks/participation/participation';
+import {
+  useGetApiV1UsersMeParticipations,
+  useGetApiV1UsersMeRefunds,
+} from '@/api/hooks/my-page/my-page';
+import {
+  ApiResponseMypageParticipationListDataItem,
+  ApiResponseRefundListDataItem,
+} from '@/api/generated/api.schemas';
 import {
   useGetApiV1ParticipationsParticipationIdPickup,
   useGetApiV1ParticipationsParticipationIdQr,
@@ -51,7 +57,7 @@ export function ParticipationTab({ tabType }: ParticipationTabProps) {
     { query: { enabled: !isRefunded } },
   );
 
-  const { data: refundData } = useGetApiV1Refunds({
+  const { data: refundData } = useGetApiV1UsersMeRefunds({
     query: { enabled: isRefunded },
   });
 
@@ -81,28 +87,33 @@ export function ParticipationTab({ tabType }: ParticipationTabProps) {
     [router],
   );
 
-  const allActiveOrCompleted =
+  const allActiveOrCompleted: ApiResponseMypageParticipationListDataItem[] =
     participationData?.status === 200
-      ? (participationData.data?.data?.content ?? [])
+      ? (participationData.data?.data ?? [])
       : [];
 
   const items =
     tabType === 'active'
       ? allActiveOrCompleted.filter(
-          (i) => i.achievementStatus === 'BEFORE_ACHIEVED',
+          (i: ApiResponseMypageParticipationListDataItem) =>
+            i.achievementStatus === 'BEFORE_ACHIEVED',
         )
       : tabType === 'waiting'
-        ? allActiveOrCompleted.filter((i) => i.achievementStatus === 'ACHIEVED')
+        ? allActiveOrCompleted.filter(
+            (i: ApiResponseMypageParticipationListDataItem) =>
+              i.achievementStatus === 'ACHIEVED',
+          )
         : allActiveOrCompleted;
 
-  const refundItems =
+  const refundItems: ApiResponseRefundListDataItem[] =
     refundData?.status === 200 ? (refundData.data?.data ?? []) : [];
 
   const qrValue =
     qrData?.status === 200 ? (qrData.data?.data?.qrCode ?? '') : '';
   const pickup = pickupData?.status === 200 ? pickupData.data?.data : null;
   const selectedItem = items.find(
-    (item) => item.participationId === qrParticipationId,
+    (item: ApiResponseMypageParticipationListDataItem) =>
+      item.participationId === qrParticipationId,
   );
 
   const isEmpty = isRefunded ? refundItems.length === 0 : items.length === 0;
@@ -115,7 +126,7 @@ export function ParticipationTab({ tabType }: ParticipationTabProps) {
             {EMPTY_MESSAGES[tabType]}
           </div>
         ) : isRefunded ? (
-          refundItems.map((item) => (
+          refundItems.map((item: ApiResponseRefundListDataItem) => (
             <ParticipationCard
               key={item.participationId}
               variant="refunded"
@@ -129,7 +140,7 @@ export function ParticipationTab({ tabType }: ParticipationTabProps) {
             />
           ))
         ) : tabType === 'active' ? (
-          items.map((item) => (
+          items.map((item: ApiResponseMypageParticipationListDataItem) => (
             <ParticipationCard
               key={item.participationId}
               variant="active"
@@ -144,7 +155,7 @@ export function ParticipationTab({ tabType }: ParticipationTabProps) {
             />
           ))
         ) : tabType === 'waiting' ? (
-          items.map((item) => (
+          items.map((item: ApiResponseMypageParticipationListDataItem) => (
             <ParticipationCard
               key={item.participationId}
               variant="pickup"
@@ -159,7 +170,7 @@ export function ParticipationTab({ tabType }: ParticipationTabProps) {
             />
           ))
         ) : (
-          items.map((item) => (
+          items.map((item: ApiResponseMypageParticipationListDataItem) => (
             <ParticipationCard
               key={item.participationId}
               variant="completed"

@@ -2,8 +2,14 @@
 
 import { use, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useGetApiV1UsersMeParticipations } from '@/api/hooks/my-page/my-page';
-import { useGetApiV1Refunds } from '@/api/hooks/participation/participation';
+import {
+  useGetApiV1UsersMeParticipations,
+  useGetApiV1UsersMeRefunds,
+} from '@/api/hooks/my-page/my-page';
+import {
+  ApiResponseMypageParticipationListDataItem,
+  ApiResponseRefundListDataItem,
+} from '@/api/generated/api.schemas';
 import { useGetApiV1ParticipationsParticipationIdPickup } from '@/api/hooks/pickup/pickup';
 import Header from '@/components/Header';
 import Tooltip from '@/components/Tooltip';
@@ -75,17 +81,15 @@ export default function OrderDetailPage({
   const { data: completedRes } = useGetApiV1UsersMeParticipations({
     status: 'COMPLETED',
   });
-  const { data: refundRes } = useGetApiV1Refunds();
+  const { data: refundRes } = useGetApiV1UsersMeRefunds();
   const { data: pickupRes } =
     useGetApiV1ParticipationsParticipationIdPickup(id);
 
-  const activeItems =
-    activeRes?.status === 200 ? (activeRes.data?.data?.content ?? []) : [];
-  const completedItems =
-    completedRes?.status === 200
-      ? (completedRes.data?.data?.content ?? [])
-      : [];
-  const refundItems =
+  const activeItems: ApiResponseMypageParticipationListDataItem[] =
+    activeRes?.status === 200 ? (activeRes.data?.data ?? []) : [];
+  const completedItems: ApiResponseMypageParticipationListDataItem[] =
+    completedRes?.status === 200 ? (completedRes.data?.data ?? []) : [];
+  const refundItems: ApiResponseRefundListDataItem[] =
     refundRes?.status === 200 ? (refundRes.data?.data ?? []) : [];
   const pickup = pickupRes?.status === 200 ? pickupRes.data?.data : null;
 

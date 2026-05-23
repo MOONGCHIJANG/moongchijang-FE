@@ -1,11 +1,20 @@
 const REDIRECT_KEY = 'pendingRedirect';
 
 export const redirectStorage = {
-  set: (path: string) => localStorage.setItem(REDIRECT_KEY, path),
-  get: () => localStorage.getItem(REDIRECT_KEY),
-  consume: () => {
-    const path = localStorage.getItem(REDIRECT_KEY);
-    localStorage.removeItem(REDIRECT_KEY);
+  set: (path: string) => {
+    document.cookie = `${REDIRECT_KEY}=${encodeURIComponent(path)}; path=/; max-age=${60 * 5}; SameSite=Strict`;
+  },
+  get: (): string | null => {
+    const match = document.cookie
+      .split('; ')
+      .find((row) => row.startsWith(`${REDIRECT_KEY}=`));
+    return match
+      ? decodeURIComponent(match.slice(REDIRECT_KEY.length + 1))
+      : null;
+  },
+  consume: (): string | null => {
+    const path = redirectStorage.get();
+    document.cookie = `${REDIRECT_KEY}=; path=/; max-age=0`;
     return path;
   },
 };

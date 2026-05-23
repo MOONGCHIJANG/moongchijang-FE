@@ -8,6 +8,8 @@ import {
 import Header from '@/components/Header';
 import { useRouter } from 'next/navigation';
 import { Chip } from '@/components/Chip';
+import { Button } from '@/components/Button';
+import Image from 'next/image';
 
 type NoticeClientProps = {
   data: NotificationPage;
@@ -45,7 +47,27 @@ const NoticeClient = ({ data }: NoticeClientProps) => {
           />
         ))}
       </div>
-      {isEmpty ? <></> : <></>}
+      {isEmpty ? (
+        <div className="px-7 flex flex-col gap-g9 items-center w-full pt-30">
+          <div className="flex flex-col gap-3.25 items-center">
+            <Image
+              src="/images/group-buy-request-complete.svg"
+              alt="알림 없음"
+              width={110}
+              height={72.5}
+            />
+            <div className="flex flex-col gap-g3 items-center">
+              <p className="text-center heading-md-bold">아직 알림이 없어요</p>
+              <p className="whitespace-pre-line text-center body-md-semibold text-[#757575]">{`공구를 찜하거나 신청하면\n마감·픽업 일정을 알려드려요.`}</p>
+            </div>
+          </div>
+          <Button fullWidth onClick={() => router.push('/feed')}>
+            공구 둘러보기
+          </Button>
+        </div>
+      ) : (
+        <></>
+      )}
     </div>
   );
 };

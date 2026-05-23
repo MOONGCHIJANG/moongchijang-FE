@@ -1,4 +1,3 @@
-import { cookies } from 'next/headers';
 import Header from '@/components/Header';
 import MyPageClient from './_components/MyPageClient';
 
@@ -9,8 +8,7 @@ export default async function MyPage({
 }: {
   searchParams: Promise<{ tab?: string }>;
 }) {
-  const [{ tab }, cookieStore] = await Promise.all([searchParams, cookies()]);
-  const isLoggedIn = !!cookieStore.get('accessToken')?.value;
+  const { tab } = await searchParams;
   const validTabs: TabKey[] = ['active', 'waiting', 'completed', 'refunded'];
   const activeTab: TabKey = validTabs.includes(tab as TabKey)
     ? (tab as TabKey)
@@ -18,8 +16,8 @@ export default async function MyPage({
 
   return (
     <>
-      <Header text="마이페이지" showBackButton={false} />
-      <MyPageClient tab={activeTab} isLoggedIn={isLoggedIn} />
+      <Header text="마이페이지" />
+      <MyPageClient tab={activeTab} />
     </>
   );
 }

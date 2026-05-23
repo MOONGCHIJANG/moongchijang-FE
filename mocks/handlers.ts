@@ -395,6 +395,14 @@ const overrideHandlers = [
     await delay(300);
     return HttpResponse.json(createMyPageQrMock());
   }),
+  http.post('*/api/v1/auth/logout', async () => {
+    await delay(300);
+    return HttpResponse.json({ success: true, data: {}, error: null });
+  }),
+  http.delete('*/api/v1/users/me', async () => {
+    await delay(500);
+    return HttpResponse.json({ success: true, data: {}, error: null });
+  }),
 ];
 
 export const handlers = [...overrideHandlers, ...generatedHandlers];

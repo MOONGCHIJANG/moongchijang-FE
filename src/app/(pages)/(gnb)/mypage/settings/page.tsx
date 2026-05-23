@@ -4,10 +4,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Icon } from '@iconify/react';
 import { useGetApiV1UsersMe } from '@/api/hooks/auth/auth';
-import { usePostApiV1AuthLogout } from '@/api/hooks/auth/auth';
-import { useDeleteApiV1UsersMe } from '@/api/hooks/auth/auth';
 import { AuthUserRole } from '@/api/generated/api.schemas';
-import { tokenStorage } from '@/lib/token';
+import { useAuthStore } from '@/store/authStore';
 import Header from '@/components/Header';
 import Modal from '@/components/Modal';
 import { useState } from 'react';
@@ -50,31 +48,16 @@ function SettingRow({
 export default function SettingsPage() {
   const router = useRouter();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const { data: meData } = useGetApiV1UsersMe();
   const user = meData?.status === 200 ? meData.data?.data : null;
   const isSeller = user?.role === AuthUserRole.SELLER;
 
-  const { mutate: logout } = usePostApiV1AuthLogout();
-  const { mutate: deleteMe } = useDeleteApiV1UsersMe();
+  const storeLogout = useAuthStore((s) => s.logout);
 
-  function handleLogout() {
-    logout(undefined, {
-      onSuccess: () => {
-        tokenStorage.remove();
-        router.push('/login');
-      },
-    });
-  }
-
-  function handleDelete() {
-    deleteMe(undefined, {
-      onSuccess: () => {
-        tokenStorage.remove();
-        router.push('/login');
-      },
-    });
+  async function handleLogout() {
+    await storeLogout();
+    router.push('/login');
   }
 
   return (
@@ -141,10 +124,7 @@ export default function SettingsPage() {
             label="로그아웃"
             onClick={() => setShowLogoutModal(true)}
           />
-          <SettingRow
-            label="탈퇴하기"
-            onClick={() => setShowDeleteModal(true)}
-          />
+          <SettingRow label="탈퇴하기" />
         </div>
 
         <div className="border-t border-border-subtle" />
@@ -153,23 +133,12 @@ export default function SettingsPage() {
       <Modal
         isOpen={showLogoutModal}
         iconType="warning"
-        title="로그아웃 할까요?"
+        title="로그아웃"
+        description="정말 로그아웃 하시겠어요?"
         confirmLabel="로그아웃"
         cancelLabel="취소"
         onConfirm={handleLogout}
         onCancel={() => setShowLogoutModal(false)}
-      />
-
-      <Modal
-        isOpen={showDeleteModal}
-        iconType="warning"
-        title="정말 탈퇴할까요?"
-        description={`탈퇴하면 모든 데이터가\n삭제되며 복구할 수 없어요.`}
-        confirmLabel="탈퇴하기"
-        cancelLabel="취소"
-        confirmVariant="danger"
-        onConfirm={handleDelete}
-        onCancel={() => setShowDeleteModal(false)}
       />
     </div>
   );

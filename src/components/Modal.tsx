@@ -58,7 +58,7 @@ export default function Modal({
                 {title}
               </p>
               {description && (
-                <p className="body-md-regular whitespace-pre-line text-center text-text-subtle">
+                <p className="heading-md-medium whitespace-pre-line text-center text-text-subtle">
                   {description}
                 </p>
               )}

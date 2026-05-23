@@ -75,7 +75,6 @@ export function FeedClient() {
   const [searchAnalysis, setSearchAnalysis] =
     useState<ApiResponseSearchAnalysisData | null>(null);
 
-
   const queryClient = useQueryClient();
   const { recentSearches, removeRecentSearch, clearRecentSearches } =
     useRecentSearches();

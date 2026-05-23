@@ -139,13 +139,9 @@ export const NeighborhoodPickerBottomSheet = ({
 
           <div className="h-full flex-1 overflow-y-auto bg-bg-white px-4 scrollbar-hide">
             {currentCity.regions.map((region) => {
-              const isSelected =
-                selectedRegion?.key === region.key;
+              const isSelected = selectedRegion?.key === region.key;
               return (
-                <div
-                  key={region.key}
-                  className="h-[52px] flex items-center"
-                >
+                <div key={region.key} className="h-[52px] flex items-center">
                   <button
                     type="button"
                     onClick={() => handleSelect(region)}

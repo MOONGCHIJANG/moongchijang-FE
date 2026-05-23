@@ -30,6 +30,7 @@ import { getGetApiV1UsersMeResponseMock } from '../src/api/generated/auth/auth.m
 import {
   getGetApiV1UsersMeTabsCountsResponseMock,
   getGetApiV1UsersMeParticipationsResponseMock,
+  getGetApiV1UsersMeParticipationsPickupWaitingResponseMock,
 } from '../src/api/generated/my-page/my-page.msw';
 import { getGetApiV1RefundsResponseMock } from '../src/api/generated/participation/participation.msw';
 import {
@@ -329,6 +330,38 @@ export function createMyPagePickupInfoMock() {
       productName: koFaker.product.name(),
       quantity: 1,
       remainingMinutes: faker.number.int({ min: 10, max: 120 }),
+    },
+    error: null,
+  };
+}
+
+// ── 분기 확인용: true(탈퇴 불가) / false(탈퇴 가능) 로 전환 ──────────
+export const MOCK_HAS_PICKUP_WAITING = false;
+
+export function createMyPagePickupWaitingMock() {
+  const base = getGetApiV1UsersMeParticipationsPickupWaitingResponseMock();
+  const content = MOCK_HAS_PICKUP_WAITING
+    ? [
+        {
+          participationId: 3,
+          groupBuyId: 3,
+          productName: koFaker.product.name(),
+          storeName: koFaker.store.name(),
+          pickupAt: koFaker.groupBuy.pickupDate(),
+          paidAmount: 18000,
+          quantity: 1,
+          isClosed: false,
+          participatedAt: new Date().toISOString(),
+        },
+      ]
+    : [];
+  return {
+    ...base,
+    success: true,
+    data: {
+      content,
+      totalElements: content.length,
+      totalPages: content.length > 0 ? 1 : 0,
     },
     error: null,
   };

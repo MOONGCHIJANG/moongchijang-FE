@@ -26,7 +26,9 @@ import {
   createMyPageParticipationsMock,
   createMyPageRefundsMock,
   createMyPagePickupInfoMock,
+  createMyPagePickupWaitingMock,
   createMyPageQrMock,
+  MOCK_HAS_PICKUP_WAITING,
 } from './mock-helpers';
 import { formatDeadline } from '@/lib/date';
 
@@ -387,6 +389,10 @@ const overrideHandlers = [
     await delay(500);
     return HttpResponse.json({ success: true, data: {}, error: null });
   }),
+  http.get('*/api/v1/users/me/participations/pickup-waiting', async () => {
+    await delay(300);
+    return HttpResponse.json(createMyPagePickupWaitingMock());
+  }),
   http.get('*/api/v1/participations/:participationId/pickup', async () => {
     await delay(300);
     return HttpResponse.json(createMyPagePickupInfoMock());
@@ -401,7 +407,20 @@ const overrideHandlers = [
   }),
   http.delete('*/api/v1/users/me', async () => {
     await delay(500);
-    return HttpResponse.json({ success: true, data: {}, error: null });
+    if (MOCK_HAS_PICKUP_WAITING) {
+      return HttpResponse.json(
+        {
+          success: false,
+          data: null,
+          error: { message: '수령 예정인 공구가 있어요.' },
+        },
+        { status: 400 },
+      );
+    }
+    return HttpResponse.json(
+      { success: true, data: {}, error: null },
+      { status: 200 },
+    );
   }),
 ];
 

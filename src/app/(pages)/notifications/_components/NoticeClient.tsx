@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import {
   GetApiV1NotificationsCategory,
-  NotificationPage,
+  NotificationListResponse,
 } from '@/api/generated/api.schemas';
 import Header from '@/components/Header';
 import { useRouter } from 'next/navigation';
@@ -13,7 +13,7 @@ import Image from 'next/image';
 import NoticeItem from './NoticeItem';
 
 type NoticeClientProps = {
-  data: NotificationPage;
+  data: NotificationListResponse;
 };
 
 type NotificationsCategory =
@@ -22,12 +22,13 @@ type NotificationsCategory =
 const FILTER_TABS: { label: string; value: GetApiV1NotificationsCategory }[] = [
   { label: '전체', value: GetApiV1NotificationsCategory.ALL },
   { label: '픽업', value: GetApiV1NotificationsCategory.PICKUP },
-  { label: '공구 참여', value: GetApiV1NotificationsCategory.PARTICIPATION },
+  { label: '공구 참여', value: GetApiV1NotificationsCategory.APPLY },
   { label: '공구 신청', value: GetApiV1NotificationsCategory.REQUEST },
-  { label: '찜', value: GetApiV1NotificationsCategory.WISHLIST },
+  { label: '찜', value: GetApiV1NotificationsCategory.WISH },
 ];
 
 const NoticeClient = ({ data }: NoticeClientProps) => {
+  console.log('알림 데이터:', data);
   const router = useRouter();
   const [filter, setFilter] = useState<NotificationsCategory>(
     GetApiV1NotificationsCategory.ALL,

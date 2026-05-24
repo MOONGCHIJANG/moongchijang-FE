@@ -38,11 +38,14 @@ function SettingRow({
   if (href) {
     return <Link href={href}>{inner}</Link>;
   }
-  return (
-    <button type="button" className="w-full text-left" onClick={onClick}>
-      {inner}
-    </button>
-  );
+  if (onClick) {
+    return (
+      <button type="button" className="w-full text-left" onClick={onClick}>
+        {inner}
+      </button>
+    );
+  }
+  return <div>{inner}</div>;
 }
 
 export default function SettingsPage() {
@@ -107,7 +110,7 @@ export default function SettingsPage() {
           <p className="caption-sm-medium text-text-disabled pt-p6 pb-p3">
             정보
           </p>
-          <SettingRow label="휴대폰 번호" href="/mypage/phone-change" />
+          <SettingRow label="휴대폰 번호" />
           <SettingRow label="닉네임 변경" href="/mypage/nickname-change" />
           <SettingRow label="비밀번호 변경" href="/mypage/password-change" />
         </div>

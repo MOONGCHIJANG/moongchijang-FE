@@ -21,6 +21,8 @@ import {
   createGroupBuyDetailMock,
   createStoreSearchMock,
   createGroupBuyRequestMock,
+  createGroupBuyRequestListMock,
+  createGroupBuyRequestDetailMock,
 } from './mock-helpers';
 import { formatDeadline } from '@/lib/date';
 
@@ -121,6 +123,15 @@ const overrideHandlers = [
   http.get('*/api/v1/stores/search', async () => {
     await delay(800);
     return HttpResponse.json(createStoreSearchMock());
+  }),
+  http.get('*/api/v1/group-buy-requests', async () => {
+    await delay(600);
+    return HttpResponse.json(createGroupBuyRequestListMock());
+  }),
+  http.get('*/api/v1/group-buy-requests/:requestId', async ({ params }) => {
+    await delay(600);
+    const requestId = Number(params.requestId);
+    return HttpResponse.json(createGroupBuyRequestDetailMock(requestId));
   }),
   http.post('*/api/v1/group-buy-requests', async () => {
     await delay(800);

@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   GetApiV1NotificationsCategory,
+  NotificationItemResponse,
   NotificationListResponse,
   NotificationSection,
 } from '@/api/generated/api.schemas';
@@ -12,9 +13,11 @@ import { Chip } from '@/components/Chip';
 import { Button } from '@/components/Button';
 import Image from 'next/image';
 import NoticeItem from './NoticeItem';
+import NoticeSkeleton from './NoticeSkeleton';
+import { useNotificationList } from '../_hooks/useNotificationList';
 
 type NoticeClientProps = {
-  data: NotificationListResponse;
+  initialData: NotificationListResponse;
 };
 
 type NotificationsCategory =
@@ -28,28 +31,61 @@ const FILTER_TABS: { label: string; value: GetApiV1NotificationsCategory }[] = [
   { label: '찜', value: GetApiV1NotificationsCategory.WISH },
 ];
 
-const NoticeClient = ({ data }: NoticeClientProps) => {
-  console.log('알림 데이터:', data);
+function groupBySection(items: NotificationItemResponse[]) {
+  return {
+    today: items.filter((i) => i.section === NotificationSection.TODAY),
+    yesterday: items.filter((i) => i.section === NotificationSection.YESTERDAY),
+    older: items.filter((i) => i.section === NotificationSection.OLDER),
+  };
+}
+
+const NoticeClient = ({ initialData }: NoticeClientProps) => {
   const router = useRouter();
+  const sentinelRef = useRef<HTMLDivElement>(null);
   const [filter, setFilter] = useState<NotificationsCategory>(
     GetApiV1NotificationsCategory.ALL,
   );
 
-  const filteredItems = data.items.filter((item) =>
-    filter === GetApiV1NotificationsCategory.ALL ? true : item.type === filter,
-  );
+  const { items, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useNotificationList(filter);
 
-  const todayItems = filteredItems.filter(
-    (item) => item.section === NotificationSection.TODAY,
-  );
-  const yesterdayItems = filteredItems.filter(
-    (item) => item.section === NotificationSection.YESTERDAY,
-  );
-  const olderItems = filteredItems.filter(
-    (item) => item.section === NotificationSection.OLDER,
-  );
+  const scrollStateRef = useRef({ hasNextPage, isFetchingNextPage });
+  useLayoutEffect(() => {
+    scrollStateRef.current = { hasNextPage, isFetchingNextPage };
+  });
 
-  const isEmpty = filteredItems.length === 0;
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const { hasNextPage, isFetchingNextPage } = scrollStateRef.current;
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1 },
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [fetchNextPage]);
+
+  // 필터 변경 시 SSR initialData 무시하고 클라이언트 데이터 사용
+  // ALL + isLoading 상태일 때만 initialData fallback
+  const displayItems =
+    filter === GetApiV1NotificationsCategory.ALL && isLoading
+      ? initialData.items
+      : items;
+
+  const { today, yesterday, older } = groupBySection(displayItems);
+  const isEmpty = displayItems.length === 0 && !isLoading;
+
+  const SECTIONS = [
+    { label: '오늘', items: today },
+    { label: '어제', items: yesterday },
+    { label: '이전', items: older },
+  ] as const;
+
   return (
     <div>
       <Header text="알림" onBack={() => router.push('/feed')} />
@@ -63,7 +99,9 @@ const NoticeClient = ({ data }: NoticeClientProps) => {
           />
         ))}
       </div>
-      {isEmpty ? (
+      {isLoading && filter !== GetApiV1NotificationsCategory.ALL ? (
+        <NoticeSkeleton />
+      ) : isEmpty ? (
         <div className="px-7 flex flex-col gap-g9 items-center w-full pt-30">
           <div className="flex flex-col gap-3.25 items-center">
             <Image
@@ -74,7 +112,9 @@ const NoticeClient = ({ data }: NoticeClientProps) => {
             />
             <div className="flex flex-col gap-g3 items-center">
               <p className="text-center heading-md-bold">아직 알림이 없어요</p>
-              <p className="whitespace-pre-line text-center body-md-semibold text-[#757575]">{`공구를 찜하거나 신청하면\n마감·픽업 일정을 알려드려요.`}</p>
+              <p className="whitespace-pre-line text-center body-md-semibold text-[#757575]">
+                {`공구를 찜하거나 신청하면\n마감·픽업 일정을 알려드려요.`}
+              </p>
             </div>
           </div>
           <Button fullWidth onClick={() => router.push('/feed')}>
@@ -82,16 +122,9 @@ const NoticeClient = ({ data }: NoticeClientProps) => {
           </Button>
         </div>
       ) : (
-        <div className="flex flex-col h-dvh bg-bg-white-muted gap-g5">
-          {(
-            [
-              { label: '오늘', items: todayItems },
-              { label: '어제', items: yesterdayItems },
-              { label: '이전', items: olderItems },
-            ] as const
-          )
-            .filter(({ items }) => items.length > 0)
-            .map(({ label, items }) => (
+        <div className="flex flex-col bg-bg-white-muted gap-g5">
+          {SECTIONS.filter(({ items }) => items.length > 0).map(
+            ({ label, items }) => (
               <div
                 key={label}
                 className="flex flex-col gap-1.25 pt-p5 bg-surface-white"
@@ -105,9 +138,12 @@ const NoticeClient = ({ data }: NoticeClientProps) => {
                   ))}
                 </div>
               </div>
-            ))}
+            ),
+          )}
         </div>
       )}
+      <div ref={sentinelRef} className="h-1" />
+      {isFetchingNextPage && <NoticeSkeleton count={3} />}
     </div>
   );
 };

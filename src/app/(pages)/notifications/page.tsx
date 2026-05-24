@@ -14,11 +14,11 @@ const page = async () => {
     token,
   ).catch(() => notFound());
 
-  const notifications = responseData?.data;
+  const notifications = responseData.data;
 
   return (
     <>
-      <NoticeClient data={notifications} />
+      <NoticeClient initialData={notifications} />
     </>
   );
 };

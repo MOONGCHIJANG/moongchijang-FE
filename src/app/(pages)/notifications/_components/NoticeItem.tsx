@@ -74,7 +74,9 @@ const NoticeItem = ({ item }: NoticeItemProps) => {
       />
       <div className="flex flex-1">
         <div className="flex flex-col gap-g3 flex-1 items-start">
-          <p className={`${textColor} body-md-semibold`}>{title}</p>
+          <p className={`${textColor} body-md-semibold line-clamp-1`}>
+            {title}
+          </p>
           <p
             className={`${textColor} caption-sm-regular line-clamp-2 text-left`}
           >

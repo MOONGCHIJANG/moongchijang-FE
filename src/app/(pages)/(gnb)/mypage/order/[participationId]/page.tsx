@@ -211,7 +211,6 @@ export default function OrderDetailPage({
         iconType="warning"
         confirmLabel="취소하기"
         cancelLabel="다시 생각하기"
-        confirmVariant="danger"
         onConfirm={() => router.push(`/mypage/order/${id}/cancel`)}
         onCancel={() => setShowCancelModal(false)}
       />

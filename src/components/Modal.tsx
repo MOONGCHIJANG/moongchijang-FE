@@ -12,7 +12,6 @@ interface ModalProps {
   cancelLabel?: string;
   onConfirm: () => void;
   onCancel?: () => void;
-  confirmVariant?: 'primary' | 'danger';
 }
 
 const ICON_MAP = {
@@ -29,7 +28,6 @@ export default function Modal({
   cancelLabel,
   onConfirm,
   onCancel,
-  confirmVariant = 'primary',
 }: ModalProps) {
   if (!isOpen) return null;
 
@@ -77,22 +75,14 @@ export default function Modal({
               <Button
                 variant="black"
                 size="md"
-                className={`flex-1${confirmVariant === 'danger' ? ' !bg-surface-inverse' : ''}`}
+                className="flex-1"
                 onClick={onConfirm}
               >
                 {confirmLabel}
               </Button>
             </div>
           ) : (
-            <Button
-              variant="black"
-              size="md"
-              fullWidth
-              className={
-                confirmVariant === 'danger' ? '!bg-surface-inverse' : ''
-              }
-              onClick={onConfirm}
-            >
+            <Button variant="black" size="md" fullWidth onClick={onConfirm}>
               {confirmLabel}
             </Button>
           )}

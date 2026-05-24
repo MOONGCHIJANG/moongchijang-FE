@@ -30,7 +30,6 @@ export const TwoButtonWithDescription: Story = {
           iconType="warning"
           confirmLabel="취소할게요"
           cancelLabel="아니요"
-          confirmVariant="danger"
           onConfirm={() => setIsOpen(false)}
           onCancel={() => setIsOpen(false)}
         />
@@ -53,7 +52,6 @@ export const TwoButton: Story = {
           iconType="warning"
           confirmLabel="취소하기"
           cancelLabel="다시 생각하기"
-          confirmVariant="danger"
           onConfirm={() => setIsOpen(false)}
           onCancel={() => setIsOpen(false)}
         />

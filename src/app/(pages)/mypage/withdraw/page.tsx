@@ -164,7 +164,6 @@ export default function WithdrawPage() {
         description={`탈퇴 시 모든 정보가 삭제되며\n복구가 불가해요`}
         confirmLabel="탈퇴하기"
         cancelLabel="다시 생각하기"
-        confirmVariant="danger"
         onConfirm={handleWithdraw}
         onCancel={() => setShowConfirmModal(false)}
       />

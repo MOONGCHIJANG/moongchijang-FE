@@ -1,9 +1,19 @@
 import Image from 'next/image';
 import React from 'react';
+import { NotificationItemResponse } from '@/api/generated/api.schemas';
+import { formatNotificationTime } from '@/lib/notice';
 
-const NoticeItem = () => {
+type NoticeItemProps = {
+  item: NotificationItemResponse;
+};
+
+const NoticeItem = ({ item }: NoticeItemProps) => {
+  const { title, body, isRead, occurredAt, section } = item;
+  const timeLabel = formatNotificationTime(occurredAt, section);
+  const textColor = isRead ? 'text-text-subtle-inverse' : 'text-text-subtle';
+
   return (
-    <button className="px-p7 py-g4 flex gap-5.5 items-center border-b border-b-border-natural">
+    <button className="px-p7 py-g4 flex gap-5.5 items-center border-b border-b-border-natural w-full">
       <Image
         src="/icons/notifications/store.svg"
         alt="store"
@@ -12,13 +22,15 @@ const NoticeItem = () => {
       />
       <div className="flex flex-1">
         <div className="flex flex-col gap-g3 flex-1 items-start">
-          <p className="text-text-subtle body-md-semibold">오늘 팝업일이에요</p>
-          <p className="text-text-subtle caption-sm-regular line-clamp-2 text-left">
-            설명내용이에요설명내용이에요설명내용이에요설명내용이에요설명내용이에요설명내용이에요
+          <p className={`${textColor} body-md-semibold`}>{title}</p>
+          <p
+            className={`${textColor} caption-sm-regular line-clamp-2 text-left`}
+          >
+            {body}
           </p>
         </div>
         <p className="text-text-subtle-inverse caption-sm-regular min-w-15 text-right">
-          시간
+          {timeLabel}
         </p>
       </div>
     </button>

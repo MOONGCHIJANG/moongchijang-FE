@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import {
   GetApiV1NotificationsCategory,
   NotificationListResponse,
+  NotificationSection,
 } from '@/api/generated/api.schemas';
 import Header from '@/components/Header';
 import { useRouter } from 'next/navigation';
@@ -34,8 +35,21 @@ const NoticeClient = ({ data }: NoticeClientProps) => {
     GetApiV1NotificationsCategory.ALL,
   );
 
-  const isEmpty = false; // TODO: 알림 리스트가 비어있는지 여부
+  const filteredItems = data.items.filter((item) =>
+    filter === GetApiV1NotificationsCategory.ALL ? true : item.type === filter,
+  );
 
+  const todayItems = filteredItems.filter(
+    (item) => item.section === NotificationSection.TODAY,
+  );
+  const yesterdayItems = filteredItems.filter(
+    (item) => item.section === NotificationSection.YESTERDAY,
+  );
+  const olderItems = filteredItems.filter(
+    (item) => item.section === NotificationSection.OLDER,
+  );
+
+  const isEmpty = filteredItems.length === 0;
   return (
     <div>
       <Header text="알림" onBack={() => router.push('/feed')} />
@@ -68,40 +82,30 @@ const NoticeClient = ({ data }: NoticeClientProps) => {
           </Button>
         </div>
       ) : (
-        <div className="flex flex-col h-dvh bg-bg-white-muted gap-g5 overflow-y-auto">
-          {/* 오늘 */}
-          <div className="flx flex-col gap-1.25 pt-p5 bg-surface-white">
-            <p className="px-p6 caption-sm-regular text-text-subtle-inverse">
-              오늘
-            </p>
-            <div>
-              <NoticeItem />
-              <NoticeItem />
-              <NoticeItem />
-            </div>
-          </div>
-          {/* 어제 */}
-          <div className="flx flex-col gap-1.25 pt-p5 bg-surface-white">
-            <p className="px-p6 caption-sm-regular text-text-subtle-inverse">
-              어제
-            </p>
-            <div>
-              <NoticeItem />
-              <NoticeItem />
-              <NoticeItem />
-            </div>
-          </div>
-          {/* 이전 */}
-          <div className="flx flex-col gap-1.25 pt-p5 bg-surface-white">
-            <p className="px-p6 caption-sm-regular text-text-subtle-inverse">
-              이전
-            </p>
-            <div>
-              <NoticeItem />
-              <NoticeItem />
-              <NoticeItem />
-            </div>
-          </div>
+        <div className="flex flex-col h-dvh bg-bg-white-muted gap-g5">
+          {(
+            [
+              { label: '오늘', items: todayItems },
+              { label: '어제', items: yesterdayItems },
+              { label: '이전', items: olderItems },
+            ] as const
+          )
+            .filter(({ items }) => items.length > 0)
+            .map(({ label, items }) => (
+              <div
+                key={label}
+                className="flex flex-col gap-1.25 pt-p5 bg-surface-white"
+              >
+                <p className="px-p6 caption-sm-regular text-text-subtle-inverse">
+                  {label}
+                </p>
+                <div>
+                  {items.map((item) => (
+                    <NoticeItem key={item.id} item={item} />
+                  ))}
+                </div>
+              </div>
+            ))}
         </div>
       )}
     </div>

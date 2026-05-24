@@ -11,13 +11,7 @@ import {
 import Header from '@/components/Header';
 import { Button } from '@/components/Button';
 import { ToastBlack } from '@/components/ToastBlack';
-
-function formatDate(dateStr: string | null | undefined): string {
-  if (!dateStr) return '-';
-  const d = new Date(dateStr);
-  const days = ['일', '월', '화', '수', '목', '금', '토'];
-  return `${d.getMonth() + 1}/${d.getDate()}(${days[d.getDay()]})`;
-}
+import { formatShortDate } from '@/lib/date';
 
 function formatAmount(n: number): string {
   return n.toLocaleString('ko-KR') + '원';
@@ -125,7 +119,7 @@ export default function CancelPage({
                 </p>
                 <p className="caption-sm-medium text-text-tertiary">
                   {item.storeName} · 픽업{' '}
-                  {item.pickupDate ? formatDate(item.pickupDate) : '-'} · 수량{' '}
+                  {formatShortDate(item.pickupDate) ?? '-'} · 수량{' '}
                   {item.quantity}개
                 </p>
               </div>

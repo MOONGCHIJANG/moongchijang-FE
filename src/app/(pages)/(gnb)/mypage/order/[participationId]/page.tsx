@@ -14,6 +14,7 @@ import { useGetApiV1ParticipationsParticipationIdPickup } from '@/api/hooks/pick
 import Header from '@/components/Header';
 import Tooltip from '@/components/Tooltip';
 import Modal from '@/components/Modal';
+import { formatShortDate, formatCompactDate } from '@/lib/date';
 
 type OrderVariant =
   | 'active'
@@ -44,22 +45,6 @@ const MINI_TAG: Record<OrderVariant, { label: string; className: string }> = {
     className: 'bg-surface-brand text-text-basic-inverse',
   },
 };
-
-function formatDate(dateStr: string | null | undefined): string {
-  if (!dateStr) return '-';
-  const d = new Date(dateStr);
-  const days = ['일', '월', '화', '수', '목', '금', '토'];
-  return `${d.getMonth() + 1}/${d.getDate()}(${days[d.getDay()]})`;
-}
-
-function formatOrderDate(dateStr: string | null | undefined): string {
-  if (!dateStr) return '-';
-  const d = new Date(dateStr);
-  const yy = String(d.getFullYear()).slice(2);
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  return `${yy}.${mm}.${dd}`;
-}
 
 function formatAmount(n: number): string {
   return n.toLocaleString('ko-KR') + '원';
@@ -140,7 +125,7 @@ export default function OrderDetailPage({
         {/* 주문 상태 */}
         <div className="bg-surface-white px-g5 py-g5">
           <p className="heading-sm-bold text-text-basic mb-g5">
-            {formatOrderDate(pickupDate)} 결제
+            {formatCompactDate(pickupDate)} 결제
           </p>
           {tag && (
             <span
@@ -154,8 +139,8 @@ export default function OrderDetailPage({
             <div className="flex flex-col gap-p3">
               <p className="heading-md-bold text-text-basic">{productName}</p>
               <p className="caption-sm-medium text-text-tertiary">
-                {storeName} · 픽업 {pickupDate ? formatDate(pickupDate) : '-'} ·
-                수량 {quantity}개
+                {storeName} · 픽업 {formatShortDate(pickupDate) ?? '-'} · 수량{' '}
+                {quantity}개
               </p>
             </div>
           </div>

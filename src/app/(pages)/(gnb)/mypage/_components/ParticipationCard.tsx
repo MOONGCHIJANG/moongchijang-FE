@@ -4,6 +4,7 @@ import { ApiResponseRefundListDataItemRefundStatus } from '@/api/hooks/api.schem
 import { Icon } from '@iconify/react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { formatCompactDate, formatShortDate } from '@/lib/date';
 
 interface BaseCardFields {
   participationId: number;
@@ -41,19 +42,6 @@ type ParticipationCardProps =
   | CompletedProps
   | RefundedProps;
 
-function formatDate(dateStr: string | null): string {
-  if (!dateStr) return '날짜 미정';
-  const d = new Date(dateStr);
-  return `${String(d.getFullYear()).slice(2)}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
-}
-
-function formatPickupDate(dateStr: string | null): string | null {
-  if (!dateStr) return null;
-  const d = new Date(dateStr);
-  const days = ['일', '월', '화', '수', '목', '금', '토'];
-  return `${d.getMonth() + 1}/${d.getDate()}(${days[d.getDay()]})`;
-}
-
 function formatDDay(dDay: number): string {
   if (dDay === 0) return 'D-day';
   if (dDay < 0) return `D${dDay}`;
@@ -70,8 +58,8 @@ export function ParticipationCard(props: ParticipationCardProps) {
     variant,
     imageUrl,
   } = props;
-  const dateLabel = formatDate(pickupDate);
-  const pickupDateStr = formatPickupDate(pickupDate);
+  const dateLabel = formatCompactDate(pickupDate, '날짜 미정');
+  const pickupDateStr = formatShortDate(pickupDate);
 
   return (
     <div className="bg-surface-white p-g5">

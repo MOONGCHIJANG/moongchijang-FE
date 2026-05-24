@@ -68,6 +68,7 @@ export default function SettingsPage() {
       <Header text="마이페이지" />
 
       {/* 역할 배너 */}
+      {/* TODO: 사장님 전환 기능 미구현 — 온클릭 핸들러 추가 필요 */}
       {isSeller ? (
         <div className="bg-surface-brand-lighter px-p6 py-p5 flex items-center justify-between">
           <span className="body-md-semibold text-text-brand">

@@ -101,10 +101,11 @@ export function FeedClient() {
   const { data: nearestQrResponse } = useGetApiV1PickupsMeNearestQr({
     query: { enabled: isLoggedIn },
   });
-  const qrItem =
-    nearestQrResponse?.status === 200
-      ? (nearestQrResponse.data?.data?.item ?? null)
-      : null;
+  const nearestQrData =
+    nearestQrResponse?.status === 200 ? nearestQrResponse.data?.data : null;
+  const qrItem = nearestQrData?.item ?? null;
+  const hasCandidate = nearestQrData?.hasCandidate ?? false;
+  const hasMultipleToday = nearestQrData?.hasMultipleToday ?? false;
   const isPickupDay = qrItem?.availabilityStatus === 'AVAILABLE';
   const dDayText = qrItem
     ? qrItem.dDay === 0
@@ -383,6 +384,8 @@ export function FeedClient() {
           isOpen={isQrModalOpen}
           onClose={() => setIsQrModalOpen(false)}
           isPickupDay={isPickupDay}
+          hasCandidate={hasCandidate}
+          hasMultipleToday={hasMultipleToday}
           storeName={qrItem?.storeName ?? ''}
           pickupAddress={qrItem?.pickupLocation ?? ''}
           pickupTimeStart={
@@ -397,6 +400,10 @@ export function FeedClient() {
           onShakeToggle={() => toggleShake()}
           onDetailClick={() => {
             if (qrItem) router.push(`/mypage/pickup/${qrItem.participationId}`);
+          }}
+          onMultiplePickupClick={() => {
+            setIsQrModalOpen(false);
+            router.push('/mypage');
           }}
         />
       )}

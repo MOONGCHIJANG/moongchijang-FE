@@ -23,6 +23,7 @@ export function formatNotificationTime(
 
   if (section === NotificationSection.TODAY) {
     if (diffMinutes <= 3) return '방금 전';
+    if (diffHours < 1) return `${diffMinutes}분 전`;
     return `${diffHours}시간 전`;
   }
 

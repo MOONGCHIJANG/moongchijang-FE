@@ -2,10 +2,13 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Icon } from '@iconify/react';
 import { Button } from '@/components/Button';
 
 export default function CancelCompletePage() {
+  const router = useRouter();
+
   return (
     <div className="min-h-dvh bg-bg-white-muted flex flex-col items-center">
       {/* 완료 아이콘 + 메시지 */}
@@ -52,7 +55,7 @@ export default function CancelCompletePage() {
           variant="black"
           size="lg"
           fullWidth
-          onClick={() => (window.location.href = '/feed')}
+          onClick={() => router.push('/feed')}
         >
           다른 상품 둘러보기
         </Button>

@@ -396,7 +396,7 @@ export function FeedClient() {
           shakeEnabled={isEnabled}
           onShakeToggle={() => toggleShake()}
           onDetailClick={() => {
-            if (qrItem) router.push(`/mypage/order/${qrItem.participationId}/pickup`);
+            if (qrItem) router.push(`/mypage/pickup/${qrItem.participationId}`);
           }}
         />
       )}

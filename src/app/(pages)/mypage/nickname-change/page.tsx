@@ -97,18 +97,14 @@ export default function NicknameChangePage() {
               isError={checkState === 'unavailable'}
             />
           </div>
-          <button
-            type="button"
+          <Button
+            size="sm"
             disabled={!canCheck}
             onClick={handleCheck}
-            className={`flex-shrink-0 mt-[5px] h-10 w-[58px] rounded-large caption-sm-bold text-white transition-colors ${
-              canCheck
-                ? 'bg-button-primary-fill'
-                : 'bg-button-tertiary-fill-pressed'
-            }`}
+            className="flex-shrink-0 mt-[5px] w-[58px]"
           >
             {isChecking ? '확인 중' : '중복확인'}
-          </button>
+          </Button>
         </div>
       </div>
 

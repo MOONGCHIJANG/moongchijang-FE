@@ -54,3 +54,20 @@ export const Black: Story = {
     children: '다른 상품 둘러보기',
   },
 };
+
+export const Small: Story = {
+  args: {
+    variant: 'primary',
+    size: 'sm',
+    children: '중복확인',
+  },
+};
+
+export const SmallDisabled: Story = {
+  args: {
+    variant: 'primary',
+    size: 'sm',
+    children: '중복확인',
+    disabled: true,
+  },
+};

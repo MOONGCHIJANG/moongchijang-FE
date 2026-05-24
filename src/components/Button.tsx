@@ -5,13 +5,13 @@ import { cn } from '@/lib/utils';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'outline' | 'ghost' | 'tertiary' | 'black';
-  size?: 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg';
   fullWidth?: boolean;
 }
 
 const variants = {
   primary:
-    'bg-button-primary-fill text-white shadow-sm active:scale-[0.98] disabled:bg-button-disabled-fill disabled:text-button-white',
+    'bg-button-primary-fill text-white active:scale-[0.98] disabled:bg-button-disabled-fill disabled:text-button-white',
   outline:
     'border border-border-default bg-button-white text-text-tertiary active:bg-surface-default',
   ghost: 'bg-transparent text-text-disabled hover:text-gray-600',
@@ -20,6 +20,7 @@ const variants = {
 };
 
 const sizes = {
+  sm: 'h-10 px-2 caption-sm-bold rounded-large gap-1.5',
   md: 'h-11 heading-sm-bold rounded-xl gap-2.5',
   lg: 'h-14 px-6 py-2.5 heading-md-semibold rounded-lg gap-1',
 };

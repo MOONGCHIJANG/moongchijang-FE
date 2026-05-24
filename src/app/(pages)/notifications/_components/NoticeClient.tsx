@@ -46,8 +46,14 @@ const NoticeClient = ({ initialData }: NoticeClientProps) => {
     GetApiV1NotificationsCategory.ALL,
   );
 
-  const { items, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useNotificationList(filter);
+  const {
+    items,
+    isLoading,
+    isFetching,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useNotificationList(filter);
 
   const scrollStateRef = useRef({ hasNextPage, isFetchingNextPage });
   useLayoutEffect(() => {
@@ -73,12 +79,14 @@ const NoticeClient = ({ initialData }: NoticeClientProps) => {
   // 필터 변경 시 SSR initialData 무시하고 클라이언트 데이터 사용
   // ALL + isLoading 상태일 때만 initialData fallback
   const displayItems =
-    filter === GetApiV1NotificationsCategory.ALL && isLoading
+    filter === GetApiV1NotificationsCategory.ALL && (isLoading || isFetching)
       ? initialData.items
       : items;
 
   const { today, yesterday, older } = groupBySection(displayItems);
   const isEmpty = displayItems.length === 0 && !isLoading;
+
+  const showSkeleton = isLoading || (isFetching && !isFetchingNextPage);
 
   const SECTIONS = [
     { label: '오늘', items: today },
@@ -99,7 +107,7 @@ const NoticeClient = ({ initialData }: NoticeClientProps) => {
           />
         ))}
       </div>
-      {isLoading && filter !== GetApiV1NotificationsCategory.ALL ? (
+      {showSkeleton ? (
         <NoticeSkeleton />
       ) : isEmpty ? (
         <div className="px-7 flex flex-col gap-g9 items-center w-full pt-30">

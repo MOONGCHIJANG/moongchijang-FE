@@ -82,7 +82,7 @@ export function ParticipationTab({ tabType }: ParticipationTabProps) {
 
   const handlePickupClick = useCallback(
     (id: number) => {
-      router.push(`/mypage/order/${id}`);
+      router.push(`/mypage/pickup/${id}`);
     },
     [router],
   );

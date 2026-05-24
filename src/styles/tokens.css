@@ -67,6 +67,9 @@
   --color-alpha-black-10: rgba(0, 0, 0, 0.1);
   --color-alpha-black-5: rgba(0, 0, 0, 0.05);
 
+  /* Info */
+  --color-info: #146ce8;
+
   /* Accent Red */
   --color-accent-red-25: #fff5f6;
   --color-accent-red-50: #ffe5ea;
@@ -140,6 +143,7 @@
   --color-text-subtle: var(--color-gray-700);
   --color-text-basic-inverse: var(--color-gray-0);
   --color-text-error: var(--color-accent-red-600);
+  --color-text-info: var(--color-info);
   --color-text-alpha: var(--color-alpha-black-50);
 
   /* Semantic / Icon */

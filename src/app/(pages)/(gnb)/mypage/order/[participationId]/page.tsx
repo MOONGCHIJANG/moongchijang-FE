@@ -75,15 +75,25 @@ export default function OrderDetailPage({
   const router = useRouter();
   const [showCancelModal, setShowCancelModal] = useState(false);
 
-  const { data: activeRes } = useGetApiV1UsersMeParticipations({
-    status: 'ACTIVE',
-  });
-  const { data: completedRes } = useGetApiV1UsersMeParticipations({
-    status: 'COMPLETED',
-  });
-  const { data: refundRes } = useGetApiV1UsersMeRefunds();
+  const { data: activeRes, isPending: isActivePending } =
+    useGetApiV1UsersMeParticipations({ status: 'ACTIVE' });
+  const { data: completedRes, isPending: isCompletedPending } =
+    useGetApiV1UsersMeParticipations({ status: 'COMPLETED' });
+  const { data: refundRes, isPending: isRefundPending } =
+    useGetApiV1UsersMeRefunds();
   const { data: pickupRes } =
     useGetApiV1ParticipationsParticipationIdPickup(id);
+
+  if (isActivePending || isCompletedPending || isRefundPending) {
+    return (
+      <div className="min-h-dvh bg-bg-white-muted flex flex-col">
+        <Header text="주문 상세" showBackButton />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="w-8 h-8 border-4 border-border-brand border-t-transparent rounded-full animate-spin" />
+        </div>
+      </div>
+    );
+  }
 
   const activeItems: ApiResponseMypageParticipationListDataItem[] =
     activeRes?.status === 200 ? (activeRes.data?.data ?? []) : [];

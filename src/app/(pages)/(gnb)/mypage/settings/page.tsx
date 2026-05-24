@@ -94,19 +94,19 @@ export default function SettingsPage() {
 
       <div className="flex flex-col py-0">
         {/* 프로필 */}
-        <div className="bg-surface-white px-[16px] py-[16px] flex items-center justify-between border-b border-dashed border-divider-default">
+        <div className="bg-surface-white px-g5 py-[16px] flex items-center justify-between border-b border-dashed border-divider-default">
           <div>
             <p className="heading-md-bold text-text-basic">
               {user?.nickname ?? '-'}
             </p>
-            <p className="caption-sm-regular text-[#5C5D68] mt-p1">
+            <p className="caption-sm-regular text-text-tertiary mt-p1">
               {user?.email ?? '-'}
             </p>
           </div>
         </div>
 
         {/* 정보 */}
-        <div className="bg-surface-white px-[16px]">
+        <div className="bg-surface-white px-g5">
           <p className="caption-sm-medium text-text-disabled pt-p6 pb-p3">
             정보
           </p>
@@ -118,7 +118,7 @@ export default function SettingsPage() {
         <div className="border-t border-border-subtle" />
 
         {/* 기타 */}
-        <div className="bg-surface-white px-[16px]">
+        <div className="bg-surface-white px-g5">
           <p className="caption-sm-medium text-text-disabled pt-p6 pb-p3">
             기타
           </p>

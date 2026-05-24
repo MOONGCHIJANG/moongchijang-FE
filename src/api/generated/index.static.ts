@@ -3,57 +3,15 @@
  * Do not edit manually.
  */
 
-import {
-  getGetApiV1AdminSummaryResponseMock,
-  getGetApiV1AdminGroupBuyRequestsResponseMock,
-  getGetApiV1AdminGroupBuyRequestsRequestIdResponseMock,
-  getGetApiV1AdminGroupBuysResponseMock,
-  getGetApiV1AdminGroupBuysGroupBuyIdResponseMock,
-  getGetApiV1AdminRefundsResponseMock,
-  getGetApiV1AdminSettlementsResponseMock,
-} from './admin/admin.msw';
-import {
-  getGetApiV1UsersMeResponseMock,
-  getGetApiV1UsersNicknameAvailabilityResponseMock,
-  getGetApiV1AuthEmailAvailabilityResponseMock,
-  getGetApiV1UsersMeRegionsResponseMock,
-} from './auth/auth.msw';
-import {
-  getGetApiV1GroupBuysResponseMock,
-  getGetApiV1GroupBuysGroupBuyIdResponseMock,
-  getGetApiV1GroupBuysGroupBuyIdProgressResponseMock,
-  getGetApiV1GroupBuysProgressResponseMock,
-  getGetApiV1GroupBuysGroupBuyIdShareResponseMock,
-  getGetApiV1SearchRecentResponseMock,
-} from './group-buy/group-buy.msw';
-import {
-  getGetApiV1StoresSearchResponseMock,
-  getGetApiV1GroupBuyRequestsResponseMock,
-  getGetApiV1GroupBuyRequestsRequestIdResponseMock,
-} from './group-buy-request/group-buy-request.msw';
-import {
-  getGetApiV1UsersMeParticipationsResponseMock,
-  getGetApiV1UsersMeGroupBuyRequestsResponseMock,
-  getGetApiV1UsersMeTabsCountsResponseMock,
-} from './my-page/my-page.msw';
-import {
-  getGetApiV1NotificationsResponseMock,
-  getGetApiV1NotificationsUnreadCountResponseMock,
-} from './notification/notification.msw';
-import {
-  getGetApiV1OwnerHomeSummaryResponseMock,
-  getGetApiV1OwnerHomePickupScheduleResponseMock,
-  getGetApiV1OwnerGroupBuysResponseMock,
-  getGetApiV1OwnerReservationsResponseMock,
-} from './owner/owner.msw';
-import {
-  getGetApiV1GroupBuysGroupBuyIdCheckoutResponseMock,
-  getGetApiV1RefundsResponseMock,
-} from './participation/participation.msw';
-import {
-  getGetApiV1ParticipationsParticipationIdPickupResponseMock,
-  getGetApiV1ParticipationsParticipationIdQrResponseMock,
-} from './pickup/pickup.msw';
+import { getGetApiV1AdminSummaryResponseMock, getGetApiV1AdminGroupBuyRequestsResponseMock, getGetApiV1AdminGroupBuyRequestsRequestIdResponseMock, getGetApiV1AdminGroupBuysResponseMock, getGetApiV1AdminGroupBuysGroupBuyIdResponseMock, getGetApiV1AdminRefundsResponseMock, getGetApiV1AdminSettlementsResponseMock } from './admin/admin.msw';
+import { getGetApiV1UsersMeResponseMock, getGetApiV1UsersNicknameAvailabilityResponseMock, getGetApiV1AuthEmailAvailabilityResponseMock, getGetApiV1UsersMeRegionsResponseMock } from './auth/auth.msw';
+import { getGetApiV1GroupBuysResponseMock, getGetApiV1GroupBuysGroupBuyIdResponseMock, getGetApiV1GroupBuysGroupBuyIdProgressResponseMock, getGetApiV1GroupBuysProgressResponseMock, getGetApiV1GroupBuysGroupBuyIdShareResponseMock, getGetApiV1SearchRecentResponseMock } from './group-buy/group-buy.msw';
+import { getGetApiV1StoresSearchResponseMock, getGetApiV1GroupBuyRequestsResponseMock, getGetApiV1GroupBuyRequestsRequestIdResponseMock } from './group-buy-request/group-buy-request.msw';
+import { getGetApiV1UsersMeParticipationsResponseMock, getGetApiV1UsersMeParticipationsInProgressResponseMock, getGetApiV1UsersMeParticipationsPickupWaitingResponseMock, getGetApiV1UsersMeGroupBuyRequestsResponseMock, getGetApiV1UsersMeTabsCountsResponseMock, getGetApiV1MypageSummaryResponseMock, getGetApiV1MypageParticipationsActiveResponseMock, getGetApiV1MypageParticipationsCompletedResponseMock, getGetApiV1MypageRefundsResponseMock, getGetApiV1UsersMeRefundsResponseMock, getGetApiV1MypageGroupBuyRequestsResponseMock } from './my-page/my-page.msw';
+import { getGetApiV1NotificationsResponseMock, getGetApiV1NotificationsUnreadCountResponseMock } from './notification/notification.msw';
+import { getGetApiV1OwnerHomeSummaryResponseMock, getGetApiV1OwnerHomePickupScheduleResponseMock, getGetApiV1OwnerGroupBuysResponseMock, getGetApiV1OwnerReservationsResponseMock } from './owner/owner.msw';
+import { getGetApiV1GroupBuysGroupBuyIdCheckoutResponseMock } from './participation/participation.msw';
+import { getGetApiV1ParticipationsParticipationIdPickupResponseMock, getGetApiV1ParticipationsParticipationIdQrResponseMock, getGetApiV1PickupsMeNearestQrResponseMock } from './pickup/pickup.msw';
 import { getGetApiV1WishlistsResponseMock } from './wishlist/wishlist.msw';
 
 export interface StaticMockEntry {
@@ -62,140 +20,46 @@ export interface StaticMockEntry {
 }
 
 export const generatedStaticMockEntries: StaticMockEntry[] = [
-  {
-    urlPattern: '/api/v1/admin/summary',
-    getResponseData: getGetApiV1AdminSummaryResponseMock,
-  },
-  {
-    urlPattern: '/api/v1/admin/group-buy-requests',
-    getResponseData: getGetApiV1AdminGroupBuyRequestsResponseMock,
-  },
-  {
-    urlPattern: '/api/v1/admin/group-buy-requests/:requestId',
-    getResponseData: getGetApiV1AdminGroupBuyRequestsRequestIdResponseMock,
-  },
-  {
-    urlPattern: '/api/v1/admin/group-buys',
-    getResponseData: getGetApiV1AdminGroupBuysResponseMock,
-  },
-  {
-    urlPattern: '/api/v1/admin/group-buys/:groupBuyId',
-    getResponseData: getGetApiV1AdminGroupBuysGroupBuyIdResponseMock,
-  },
-  {
-    urlPattern: '/api/v1/admin/refunds',
-    getResponseData: getGetApiV1AdminRefundsResponseMock,
-  },
-  {
-    urlPattern: '/api/v1/admin/settlements',
-    getResponseData: getGetApiV1AdminSettlementsResponseMock,
-  },
-  {
-    urlPattern: '/api/v1/users/me',
-    getResponseData: getGetApiV1UsersMeResponseMock,
-  },
-  {
-    urlPattern: '/api/v1/users/nickname/availability',
-    getResponseData: getGetApiV1UsersNicknameAvailabilityResponseMock,
-  },
-  {
-    urlPattern: '/api/v1/auth/email/availability',
-    getResponseData: getGetApiV1AuthEmailAvailabilityResponseMock,
-  },
-  {
-    urlPattern: '/api/v1/users/me/regions',
-    getResponseData: getGetApiV1UsersMeRegionsResponseMock,
-  },
-  {
-    urlPattern: '/api/v1/group-buys',
-    getResponseData: getGetApiV1GroupBuysResponseMock,
-  },
-  {
-    urlPattern: '/api/v1/group-buys/:groupBuyId',
-    getResponseData: getGetApiV1GroupBuysGroupBuyIdResponseMock,
-  },
-  {
-    urlPattern: '/api/v1/group-buys/:groupBuyId/progress',
-    getResponseData: getGetApiV1GroupBuysGroupBuyIdProgressResponseMock,
-  },
-  {
-    urlPattern: '/api/v1/group-buys/progress',
-    getResponseData: getGetApiV1GroupBuysProgressResponseMock,
-  },
-  {
-    urlPattern: '/api/v1/group-buys/:groupBuyId/share',
-    getResponseData: getGetApiV1GroupBuysGroupBuyIdShareResponseMock,
-  },
-  {
-    urlPattern: '/api/v1/search/recent',
-    getResponseData: getGetApiV1SearchRecentResponseMock,
-  },
-  {
-    urlPattern: '/api/v1/stores/search',
-    getResponseData: getGetApiV1StoresSearchResponseMock,
-  },
-  {
-    urlPattern: '/api/v1/group-buy-requests',
-    getResponseData: getGetApiV1GroupBuyRequestsResponseMock,
-  },
-  {
-    urlPattern: '/api/v1/group-buy-requests/:requestId',
-    getResponseData: getGetApiV1GroupBuyRequestsRequestIdResponseMock,
-  },
-  {
-    urlPattern: '/api/v1/users/me/participations',
-    getResponseData: getGetApiV1UsersMeParticipationsResponseMock,
-  },
-  {
-    urlPattern: '/api/v1/users/me/group-buy-requests',
-    getResponseData: getGetApiV1UsersMeGroupBuyRequestsResponseMock,
-  },
-  {
-    urlPattern: '/api/v1/users/me/tabs/counts',
-    getResponseData: getGetApiV1UsersMeTabsCountsResponseMock,
-  },
-  {
-    urlPattern: '/api/v1/notifications',
-    getResponseData: getGetApiV1NotificationsResponseMock,
-  },
-  {
-    urlPattern: '/api/v1/notifications/unread-count',
-    getResponseData: getGetApiV1NotificationsUnreadCountResponseMock,
-  },
-  {
-    urlPattern: '/api/v1/owner/home/summary',
-    getResponseData: getGetApiV1OwnerHomeSummaryResponseMock,
-  },
-  {
-    urlPattern: '/api/v1/owner/home/pickup-schedule',
-    getResponseData: getGetApiV1OwnerHomePickupScheduleResponseMock,
-  },
-  {
-    urlPattern: '/api/v1/owner/group-buys',
-    getResponseData: getGetApiV1OwnerGroupBuysResponseMock,
-  },
-  {
-    urlPattern: '/api/v1/owner/reservations',
-    getResponseData: getGetApiV1OwnerReservationsResponseMock,
-  },
-  {
-    urlPattern: '/api/v1/group-buys/:groupBuyId/checkout',
-    getResponseData: getGetApiV1GroupBuysGroupBuyIdCheckoutResponseMock,
-  },
-  {
-    urlPattern: '/api/v1/refunds',
-    getResponseData: getGetApiV1RefundsResponseMock,
-  },
-  {
-    urlPattern: '/api/v1/participations/:participationId/pickup',
-    getResponseData: getGetApiV1ParticipationsParticipationIdPickupResponseMock,
-  },
-  {
-    urlPattern: '/api/v1/participations/:participationId/qr',
-    getResponseData: getGetApiV1ParticipationsParticipationIdQrResponseMock,
-  },
-  {
-    urlPattern: '/api/v1/wishlists',
-    getResponseData: getGetApiV1WishlistsResponseMock,
-  },
+  { urlPattern: '/api/v1/admin/summary', getResponseData: getGetApiV1AdminSummaryResponseMock },
+  { urlPattern: '/api/v1/admin/group-buy-requests', getResponseData: getGetApiV1AdminGroupBuyRequestsResponseMock },
+  { urlPattern: '/api/v1/admin/group-buy-requests/:requestId', getResponseData: getGetApiV1AdminGroupBuyRequestsRequestIdResponseMock },
+  { urlPattern: '/api/v1/admin/group-buys', getResponseData: getGetApiV1AdminGroupBuysResponseMock },
+  { urlPattern: '/api/v1/admin/group-buys/:groupBuyId', getResponseData: getGetApiV1AdminGroupBuysGroupBuyIdResponseMock },
+  { urlPattern: '/api/v1/admin/refunds', getResponseData: getGetApiV1AdminRefundsResponseMock },
+  { urlPattern: '/api/v1/admin/settlements', getResponseData: getGetApiV1AdminSettlementsResponseMock },
+  { urlPattern: '/api/v1/users/me', getResponseData: getGetApiV1UsersMeResponseMock },
+  { urlPattern: '/api/v1/users/nickname/availability', getResponseData: getGetApiV1UsersNicknameAvailabilityResponseMock },
+  { urlPattern: '/api/v1/auth/email/availability', getResponseData: getGetApiV1AuthEmailAvailabilityResponseMock },
+  { urlPattern: '/api/v1/users/me/regions', getResponseData: getGetApiV1UsersMeRegionsResponseMock },
+  { urlPattern: '/api/v1/group-buys', getResponseData: getGetApiV1GroupBuysResponseMock },
+  { urlPattern: '/api/v1/group-buys/:groupBuyId', getResponseData: getGetApiV1GroupBuysGroupBuyIdResponseMock },
+  { urlPattern: '/api/v1/group-buys/:groupBuyId/progress', getResponseData: getGetApiV1GroupBuysGroupBuyIdProgressResponseMock },
+  { urlPattern: '/api/v1/group-buys/progress', getResponseData: getGetApiV1GroupBuysProgressResponseMock },
+  { urlPattern: '/api/v1/group-buys/:groupBuyId/share', getResponseData: getGetApiV1GroupBuysGroupBuyIdShareResponseMock },
+  { urlPattern: '/api/v1/search/recent', getResponseData: getGetApiV1SearchRecentResponseMock },
+  { urlPattern: '/api/v1/stores/search', getResponseData: getGetApiV1StoresSearchResponseMock },
+  { urlPattern: '/api/v1/group-buy-requests', getResponseData: getGetApiV1GroupBuyRequestsResponseMock },
+  { urlPattern: '/api/v1/group-buy-requests/:requestId', getResponseData: getGetApiV1GroupBuyRequestsRequestIdResponseMock },
+  { urlPattern: '/api/v1/users/me/participations', getResponseData: getGetApiV1UsersMeParticipationsResponseMock },
+  { urlPattern: '/api/v1/users/me/participations/in-progress', getResponseData: getGetApiV1UsersMeParticipationsInProgressResponseMock },
+  { urlPattern: '/api/v1/users/me/participations/pickup-waiting', getResponseData: getGetApiV1UsersMeParticipationsPickupWaitingResponseMock },
+  { urlPattern: '/api/v1/users/me/group-buy-requests', getResponseData: getGetApiV1UsersMeGroupBuyRequestsResponseMock },
+  { urlPattern: '/api/v1/users/me/tabs/counts', getResponseData: getGetApiV1UsersMeTabsCountsResponseMock },
+  { urlPattern: '/api/v1/mypage/summary', getResponseData: getGetApiV1MypageSummaryResponseMock },
+  { urlPattern: '/api/v1/mypage/participations/active', getResponseData: getGetApiV1MypageParticipationsActiveResponseMock },
+  { urlPattern: '/api/v1/mypage/participations/completed', getResponseData: getGetApiV1MypageParticipationsCompletedResponseMock },
+  { urlPattern: '/api/v1/mypage/refunds', getResponseData: getGetApiV1MypageRefundsResponseMock },
+  { urlPattern: '/api/v1/users/me/refunds', getResponseData: getGetApiV1UsersMeRefundsResponseMock },
+  { urlPattern: '/api/v1/mypage/group-buy-requests', getResponseData: getGetApiV1MypageGroupBuyRequestsResponseMock },
+  { urlPattern: '/api/v1/notifications', getResponseData: getGetApiV1NotificationsResponseMock },
+  { urlPattern: '/api/v1/notifications/unread-count', getResponseData: getGetApiV1NotificationsUnreadCountResponseMock },
+  { urlPattern: '/api/v1/owner/home/summary', getResponseData: getGetApiV1OwnerHomeSummaryResponseMock },
+  { urlPattern: '/api/v1/owner/home/pickup-schedule', getResponseData: getGetApiV1OwnerHomePickupScheduleResponseMock },
+  { urlPattern: '/api/v1/owner/group-buys', getResponseData: getGetApiV1OwnerGroupBuysResponseMock },
+  { urlPattern: '/api/v1/owner/reservations', getResponseData: getGetApiV1OwnerReservationsResponseMock },
+  { urlPattern: '/api/v1/group-buys/:groupBuyId/checkout', getResponseData: getGetApiV1GroupBuysGroupBuyIdCheckoutResponseMock },
+  { urlPattern: '/api/v1/participations/:participationId/pickup', getResponseData: getGetApiV1ParticipationsParticipationIdPickupResponseMock },
+  { urlPattern: '/api/v1/participations/:participationId/qr', getResponseData: getGetApiV1ParticipationsParticipationIdQrResponseMock },
+  { urlPattern: '/api/v1/pickups/me/nearest-qr', getResponseData: getGetApiV1PickupsMeNearestQrResponseMock },
+  { urlPattern: '/api/v1/wishlists', getResponseData: getGetApiV1WishlistsResponseMock },
 ];

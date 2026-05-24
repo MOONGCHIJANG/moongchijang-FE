@@ -30,6 +30,7 @@ import {
 import {
   type ApiResponseSearchAnalysisData,
   ApiResponseSearchAnalysisDataSearchCase,
+  ApiResponseSearchAnalysisDataUiState,
 } from '@/api/generated/api.schemas';
 import { useFeedList } from '../_hooks/useFeedList';
 import { useRecentSearches } from '../_hooks/useRecentSearches';
@@ -78,18 +79,19 @@ export function FeedClient() {
   const queryClient = useQueryClient();
   const { recentSearches, removeRecentSearch, clearRecentSearches } =
     useRecentSearches();
-  const { mutate: executeSearch } = usePostApiV1Search({
-    mutation: {
-      onSuccess: (data) => {
-        queryClient.invalidateQueries({
-          queryKey: getGetApiV1SearchRecentQueryKey(),
-        });
-        setSearchAnalysis(
-          data.status === 200 ? (data.data?.data ?? null) : null,
-        );
+  const { mutate: executeSearch, isPending: isSearchPending } =
+    usePostApiV1Search({
+      mutation: {
+        onSuccess: (data) => {
+          queryClient.invalidateQueries({
+            queryKey: getGetApiV1SearchRecentQueryKey(),
+          });
+          setSearchAnalysis(
+            data.status === 200 ? (data.data?.data ?? null) : null,
+          );
+        },
       },
-    },
-  });
+    });
 
   const isPickupDay = false;
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -125,7 +127,13 @@ export function FeedClient() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useFeedList(activeFilter, districts, searchKeyword);
+  } = useFeedList(activeFilter, districts, { enabled: !searchKeyword });
+
+  const isSearchMode = !!searchKeyword;
+  const displayItems = isSearchMode ? (searchAnalysis?.results ?? []) : feeds;
+  const isDisplayLoading = isSearchMode
+    ? isSearchPending && !searchAnalysis
+    : isLoading;
 
   // ref로 최신 scroll 상태 유지 → observer는 fetchNextPage가 바뀔 때만 재생성
   const scrollStateRef = useRef({
@@ -207,10 +215,10 @@ export function FeedClient() {
 
   const handleOpenRequestSheet = useCallback(() => {
     const params = new URLSearchParams();
-    if (searchAnalysis?.detectedBakery)
-      params.set('bakery', searchAnalysis.detectedBakery);
-    if (searchAnalysis?.detectedNeighborhood)
-      params.set('neighborhood', searchAnalysis.detectedNeighborhood);
+    if (searchAnalysis?.detectedProduct)
+      params.set('bakery', searchAnalysis.detectedProduct);
+    if (searchAnalysis?.detectedRegion)
+      params.set('neighborhood', searchAnalysis.detectedRegion);
     const qs = params.toString();
     router.push(`/feed/request${qs ? `?${qs}` : ''}`);
   }, [router, searchAnalysis]);
@@ -251,9 +259,9 @@ export function FeedClient() {
       </header>
 
       <div className="flex flex-col gap-4 px-5 pb-5">
-        {isLoading ? (
+        {isDisplayLoading ? (
           <FeedSkeletonList />
-        ) : !hasSearchResult ? (
+        ) : !isSearchMode && !hasSearchResult ? (
           <>
             <div className="flex flex-col items-center pt-6 pb-0">
               <div className="px-3 py-1 bg-surface-brand-lighter rounded-lg inline-flex justify-center items-center">
@@ -275,7 +283,7 @@ export function FeedClient() {
               ))}
             </div>
           </>
-        ) : feeds.length === 0 ? (
+        ) : displayItems.length === 0 ? (
           <div className="flex flex-col gap-4">
             <EmptyState
               title={'원하시는 공구가\n아직 없어요'}
@@ -287,42 +295,44 @@ export function FeedClient() {
           </div>
         ) : (
           <>
-            {feeds.map((feed) => (
+            {displayItems.map((feed) => (
               <Link key={feed.id} href={`/item/${feed.id}`}>
                 <FeedCard {...feed} />
               </Link>
             ))}
-            {searchKeyword &&
-              searchAnalysis?.searchCase ===
-                ApiResponseSearchAnalysisDataSearchCase.NUMBER_1 && (
-                <GroupBuyRequestCard
-                  icon="/icons/search.svg"
-                  title={`찾으시는 ${searchAnalysis.detectedBakery ?? searchKeyword} 공구가\n없나요?`}
-                  onRequest={handleOpenRequestSheet}
-                />
-              )}
-            {searchKeyword &&
-              searchAnalysis?.searchCase ===
-                ApiResponseSearchAnalysisDataSearchCase.NUMBER_2 && (
-                <GroupBuyRequestCard
-                  icon="/icons/search.svg"
-                  title={`찾으시는 ${searchAnalysis.detectedNeighborhood ?? searchKeyword} 공구가\n없나요?`}
-                  onRequest={handleOpenRequestSheet}
-                />
-              )}
-            {searchKeyword &&
-              searchAnalysis?.searchCase ===
-                ApiResponseSearchAnalysisDataSearchCase.NUMBER_3 && (
-                <GroupBuyRequestCard
-                  icon="/icons/search.svg"
-                  title={`찾으시는 ${searchAnalysis.detectedBakery ?? searchKeyword} 공구가\n없나요?`}
-                  onRequest={handleOpenRequestSheet}
-                />
-              )}
-            {searchKeyword &&
-              searchAnalysis?.searchCase ===
-                ApiResponseSearchAnalysisDataSearchCase.NUMBER_4 && (
-                <GroupBuyRequestCard onRequest={handleOpenRequestSheet} />
+            {isSearchMode &&
+              searchAnalysis?.uiState ===
+                ApiResponseSearchAnalysisDataUiState.RESULTS && (
+                <>
+                  {searchAnalysis.searchCase ===
+                    ApiResponseSearchAnalysisDataSearchCase.PRODUCT_ONLY && (
+                    <GroupBuyRequestCard
+                      icon="/icons/search.svg"
+                      title={`찾으시는 ${searchAnalysis.detectedProduct ?? searchKeyword} 공구가\n없나요?`}
+                      onRequest={handleOpenRequestSheet}
+                    />
+                  )}
+                  {searchAnalysis.searchCase ===
+                    ApiResponseSearchAnalysisDataSearchCase.NEIGHBORHOOD_ONLY && (
+                    <GroupBuyRequestCard
+                      icon="/icons/search.svg"
+                      title={`찾으시는 ${searchAnalysis.detectedRegion ?? searchKeyword} 공구가\n없나요?`}
+                      onRequest={handleOpenRequestSheet}
+                    />
+                  )}
+                  {searchAnalysis.searchCase ===
+                    ApiResponseSearchAnalysisDataSearchCase.BOTH_DETECTED && (
+                    <GroupBuyRequestCard
+                      icon="/icons/search.svg"
+                      title={`찾으시는 ${searchAnalysis.detectedProduct ?? searchKeyword} 공구가\n없나요?`}
+                      onRequest={handleOpenRequestSheet}
+                    />
+                  )}
+                  {searchAnalysis.searchCase ===
+                    ApiResponseSearchAnalysisDataSearchCase.NONE_DETECTED && (
+                    <GroupBuyRequestCard onRequest={handleOpenRequestSheet} />
+                  )}
+                </>
               )}
           </>
         )}

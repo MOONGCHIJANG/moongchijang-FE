@@ -1,4 +1,7 @@
-import { NotificationSection } from '@/api/generated/api.schemas';
+import {
+  NotificationSection,
+  NotificationType,
+} from '@/api/generated/api.schemas';
 
 export function formatNotificationTime(
   occurredAt: string,
@@ -29,4 +32,25 @@ export function formatNotificationTime(
   }
 
   return formatDate(occurred);
+}
+
+export function resolveIcon(type: NotificationType, title: string): string {
+  switch (type) {
+    case NotificationType.PICKUP:
+      return title === '픽업완료 확인이 필요해요.' ? 'check' : 'store';
+
+    case NotificationType.WISH:
+      return title === '찜한 공구 목표 인원 달성!' ? 'party' : 'heart';
+
+    case NotificationType.APPLY:
+      if (title === '공구 성공! 픽업 일정 확인하세요.') return 'party';
+      if (title === '아쉽게도 공구가 미달성됐어요.') return 'x';
+      return 'bag'; // '공구 참여 완료! 결제됐어요.'
+
+    case NotificationType.REQUEST:
+      if (title === '[요청공구] 새 참여자가 신청했어요.') return 'hand';
+      if (title === '[요청공구] 공구 마감이 3일 남았어요.') return 'clock';
+      if (title === '[요청공구] 공구 개설 실패..') return 'x';
+      return 'party'; // 개설 성공, 달성 성공
+  }
 }

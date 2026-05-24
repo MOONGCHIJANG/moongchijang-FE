@@ -5,7 +5,7 @@ import {
   NotificationDeeplinkType,
   NotificationItemResponse,
 } from '@/api/generated/api.schemas';
-import { formatNotificationTime } from '@/lib/notice';
+import { formatNotificationTime, resolveIcon } from '@/lib/notice';
 import { usePatchApiV1NotificationsNotificationIdRead } from '@/api/hooks/notification/notification';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -39,11 +39,13 @@ const NoticeItem = ({ item }: NoticeItemProps) => {
     section,
     deeplinkType,
     deeplinkParams,
+    type,
   } = item;
   const router = useRouter();
   const queryClient = useQueryClient();
   const timeLabel = formatNotificationTime(occurredAt, section);
   const textColor = isRead ? 'text-text-subtle-inverse' : 'text-text-subtle';
+  const icon = resolveIcon(type, title);
 
   const { mutate: markAsRead } = usePatchApiV1NotificationsNotificationIdRead({
     mutation: {
@@ -67,16 +69,14 @@ const NoticeItem = ({ item }: NoticeItemProps) => {
       onClick={handleClick}
     >
       <Image
-        src="/icons/notifications/store.svg"
-        alt="store"
+        src={`/icons/notifications/${icon}.svg`}
+        alt={icon}
         width={20}
         height={20}
       />
       <div className="flex flex-1">
         <div className="flex flex-col gap-g3 flex-1 items-start">
-          <p className={`${textColor} body-md-semibold line-clamp-1`}>
-            {title}
-          </p>
+          <p className={`${textColor} body-md-semibold`}>{title}</p>
           <p
             className={`${textColor} caption-sm-regular line-clamp-2 text-left`}
           >

@@ -5,7 +5,7 @@ type NoticeSkeletonProps = {
 };
 
 const NoticeSkeletonItem = () => (
-  <div className="px-p7 py-g4 flex gap-5.5 items-center border-b border-b-border-natural animate-pulse">
+  <div className="px-p7 py-g4 flex gap-5.5 items-center animate-pulse h-22">
     <div className="w-5 h-5 rounded-full bg-bg-white-muted shrink-0" />
     <div className="flex flex-1 justify-between">
       <div className="flex flex-col gap-g3 flex-1">

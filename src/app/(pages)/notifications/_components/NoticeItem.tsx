@@ -1,11 +1,12 @@
 import Image from 'next/image';
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import { NotificationItemResponse } from '@/api/generated/api.schemas';
 import {
-  NotificationDeeplinkType,
-  NotificationItemResponse,
-} from '@/api/generated/api.schemas';
-import { formatNotificationTime, resolveIcon } from '@/lib/notice';
+  formatNotificationTime,
+  resolveDeeplinkPath,
+  resolveIcon,
+} from '@/lib/notice';
 import { usePatchApiV1NotificationsNotificationIdRead } from '@/api/hooks/notification/notification';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -13,39 +14,13 @@ type NoticeItemProps = {
   item: NotificationItemResponse;
 };
 
-function resolveDeeplinkPath(
-  deeplinkType: NotificationDeeplinkType,
-  deeplinkParams: Record<string, string>,
-): string {
-  switch (deeplinkType) {
-    case NotificationDeeplinkType.PICKUP_GUIDE:
-      return `/mypage/pickup/${deeplinkParams.participationId}`; // 임시
-    case NotificationDeeplinkType.GROUPBUY_DETAIL:
-      return `/item/${deeplinkParams.groupBuyId}`;
-    case NotificationDeeplinkType.MY_APPLYING:
-      return `/mypage`; // 임시
-    case NotificationDeeplinkType.REQUEST_STATUS:
-      return `/request`;
-  }
-}
-
 const NoticeItem = ({ item }: NoticeItemProps) => {
-  const {
-    id,
-    title,
-    body,
-    isRead,
-    occurredAt,
-    section,
-    deeplinkType,
-    deeplinkParams,
-    type,
-  } = item;
+  const { id, title, body, isRead, occurredAt, section } = item;
   const router = useRouter();
   const queryClient = useQueryClient();
   const timeLabel = formatNotificationTime(occurredAt, section);
   const textColor = isRead ? 'text-text-subtle-inverse' : 'text-text-subtle';
-  const icon = resolveIcon(type, title);
+  const icon = resolveIcon(item.triggerType, item.deeplinkType);
 
   const { mutate: markAsRead } = usePatchApiV1NotificationsNotificationIdRead({
     mutation: {
@@ -56,7 +31,11 @@ const NoticeItem = ({ item }: NoticeItemProps) => {
   });
 
   const handleClick = () => {
-    const path = resolveDeeplinkPath(deeplinkType, deeplinkParams);
+    const path = resolveDeeplinkPath(
+      item.triggerType,
+      item.deeplinkType,
+      item.deeplinkParams,
+    );
     if (!isRead) {
       markAsRead({ notificationId: id });
     }

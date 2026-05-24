@@ -1,6 +1,7 @@
 import {
   NotificationSection,
-  NotificationType,
+  NotificationTriggerType,
+  NotificationDeeplinkType,
 } from '@/api/generated/api.schemas';
 
 export function formatNotificationTime(
@@ -35,23 +36,58 @@ export function formatNotificationTime(
   return formatDate(occurred);
 }
 
-export function resolveIcon(type: NotificationType, title: string): string {
-  switch (type) {
-    case NotificationType.PICKUP:
-      return title === '픽업완료 확인이 필요해요.' ? 'check' : 'store';
+// triggerType 기반 아이콘
+const TRIGGER_ICON_MAP: Partial<Record<NotificationTriggerType, string>> = {
+  [NotificationTriggerType.PICKUP_SAME_DAY_MORNING]: 'store',
+  [NotificationTriggerType.PICKUP_DAY_BEFORE_MORNING]: 'store',
+  [NotificationTriggerType.PICKUP_NOT_COMPLETED_AFTER_CUTOFF]: 'check',
+  [NotificationTriggerType.WISH_DEADLINE_MINUS_3_DAYS]: 'heart',
+  [NotificationTriggerType.WISH_DEADLINE_MINUS_1_DAY]: 'heart',
+  [NotificationTriggerType.WISH_TARGET_ACHIEVED_IMMEDIATE]: 'party',
+  [NotificationTriggerType.APPLY_PAYMENT_SUCCESS_IMMEDIATE]: 'bag',
+  [NotificationTriggerType.APPLY_GROUPBUY_ACHIEVED_IMMEDIATE]: 'party',
+  [NotificationTriggerType.APPLY_GROUPBUY_FAILED_IMMEDIATE]: 'x',
+  [NotificationTriggerType.REQUEST_OPENED_IMMEDIATE]: 'party',
+  [NotificationTriggerType.REQUEST_REJECTED_IMMEDIATE]: 'x',
+  [NotificationTriggerType.REQUEST_NEW_PARTICIPANT_IMMEDIATE]: 'hand',
+  [NotificationTriggerType.REQUEST_TARGET_ACHIEVED_IMMEDIATE]: 'party',
+  [NotificationTriggerType.REQUEST_DEADLINE_MINUS_3_DAYS]: 'clock',
+};
 
-    case NotificationType.WISH:
-      return title === '찜한 공구 목표 인원 달성!' ? 'party' : 'heart';
+const DEEPLINK_ICON_FALLBACK: Record<NotificationDeeplinkType, string> = {
+  [NotificationDeeplinkType.PICKUP_GUIDE]: 'store',
+  [NotificationDeeplinkType.GROUPBUY_DETAIL]: 'heart',
+  [NotificationDeeplinkType.MY_APPLYING]: 'bag',
+  [NotificationDeeplinkType.REQUEST_STATUS]: 'party',
+};
 
-    case NotificationType.APPLY:
-      if (title === '공구 성공! 픽업 일정 확인하세요.') return 'party';
-      if (title === '아쉽게도 공구가 미달성됐어요.') return 'x';
-      return 'bag'; // '공구 참여 완료! 결제됐어요.'
+export function resolveIcon(
+  triggerType: NotificationTriggerType | null | undefined,
+  deeplinkType: NotificationDeeplinkType,
+): string {
+  if (triggerType && TRIGGER_ICON_MAP[triggerType]) {
+    return TRIGGER_ICON_MAP[triggerType]!;
+  }
+  return DEEPLINK_ICON_FALLBACK[deeplinkType];
+}
 
-    case NotificationType.REQUEST:
-      if (title === '[요청공구] 새 참여자가 신청했어요.') return 'hand';
-      if (title === '[요청공구] 공구 마감이 3일 남았어요.') return 'clock';
-      if (title === '[요청공구] 공구 개설 실패..') return 'x';
-      return 'party'; // 개설 성공, 달성 성공
+export function resolveDeeplinkPath(
+  triggerType: NotificationTriggerType | null | undefined,
+  deeplinkType: NotificationDeeplinkType,
+  deeplinkParams: Record<string, string>,
+): string {
+  if (triggerType === NotificationTriggerType.REQUEST_OPENED_IMMEDIATE) {
+    return `/item/${deeplinkParams.groupBuyId}`; // 임시
+  }
+
+  switch (deeplinkType) {
+    case NotificationDeeplinkType.PICKUP_GUIDE:
+      return `/mypage/pickup/${deeplinkParams.participationId}`; // TODO: 실제 경로로 수정 필요
+    case NotificationDeeplinkType.GROUPBUY_DETAIL:
+      return `/item/${deeplinkParams.groupBuyId}`;
+    case NotificationDeeplinkType.MY_APPLYING:
+      return `/mypage`; // TODO: 실제 경로로 수정 필요
+    case NotificationDeeplinkType.REQUEST_STATUS:
+      return `/request`;
   }
 }

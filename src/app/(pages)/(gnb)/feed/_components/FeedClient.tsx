@@ -34,7 +34,7 @@ import {
 } from '@/api/generated/api.schemas';
 import { useGetApiV1PickupsMeNearestQr } from '@/api/hooks/pickup/pickup';
 import { useAuthStore } from '@/store/authStore';
-import { formatPickupDateTime } from '@/lib/date';
+import { formatPickupDateTime, formatTime } from '@/lib/date';
 import { useFeedList } from '../_hooks/useFeedList';
 import { useRecentSearches } from '../_hooks/useRecentSearches';
 
@@ -386,14 +386,15 @@ export function FeedClient() {
           isPickupDay={isPickupDay}
           hasCandidate={hasCandidate}
           hasMultipleToday={hasMultipleToday}
-          storeName={qrItem?.storeName ?? ''}
+          productName={qrItem?.productName ?? ''}
+          reservationNumber={qrItem?.reservationNumber ?? ''}
           pickupAddress={qrItem?.pickupLocation ?? ''}
           pickupTimeStart={
             qrItem
               ? formatPickupDateTime(qrItem.pickupDate, qrItem.pickupTimeStart)
               : ''
           }
-          pickupTimeEnd={qrItem?.pickupTimeEnd ?? ''}
+          pickupTimeEnd={qrItem ? formatTime(qrItem.pickupTimeEnd) : ''}
           qrCode={qrItem?.qrCode ?? ''}
           dDayText={dDayText}
           shakeEnabled={isEnabled}

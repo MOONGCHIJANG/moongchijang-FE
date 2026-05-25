@@ -6,6 +6,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { Icon } from '@iconify/react';
 import { cn } from '@/lib/utils';
 import { Toggle } from '@/components/Toggle';
+import { QrExpandTooltip } from './QrExpandTooltip';
 
 interface QrModalProps {
   isOpen: boolean;
@@ -13,7 +14,8 @@ interface QrModalProps {
   isPickupDay: boolean;
   hasCandidate: boolean;
   hasMultipleToday: boolean;
-  storeName: string;
+  productName: string;
+  reservationNumber: string;
   pickupAddress: string;
   pickupTimeStart: string;
   pickupTimeEnd: string;
@@ -31,7 +33,8 @@ export const QrModal = ({
   isPickupDay,
   hasCandidate,
   hasMultipleToday,
-  storeName,
+  productName,
+  reservationNumber,
   pickupAddress,
   pickupTimeStart,
   pickupTimeEnd,
@@ -150,15 +153,23 @@ export const QrModal = ({
               >
                 <div className="px-5 pt-4 pb-5 flex flex-col gap-3.5 border-b border-dashed border-border-default">
                   <div className="flex items-center gap-2">
-                    <span className="bg-brand-primary text-text-basic-inverse caption-xs-bold font-pretendard px-2 h-5 flex items-center justify-center rounded-max">
+                    <span className="bg-brand-primary text-text-basic-inverse caption-xs-bold font-pretendard px-2 h-5 flex items-center justify-center rounded-max shrink-0 whitespace-nowrap">
                       {dDayText}
                     </span>
-                    <span className="text-text-basic heading-lg-bold font-pretendard">
-                      {storeName}
+                    <span className="text-text-basic heading-lg-bold font-pretendard truncate">
+                      {productName}
                     </span>
                   </div>
 
                   <div className="flex flex-col gap-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-text-basic body-md-semibold font-pretendard shrink-0">
+                        예약 번호
+                      </span>
+                      <span className="text-text-subtle body-md-regular font-pretendard">
+                        {reservationNumber}
+                      </span>
+                    </div>
                     <div className="flex justify-between items-start gap-4">
                       <span className="text-text-basic body-md-semibold font-pretendard shrink-0">
                         픽업 장소
@@ -187,6 +198,18 @@ export const QrModal = ({
               </div>
 
               <div className="px-5 py-6 flex flex-col items-center gap-3">
+                {isExpanded && isPickupDay && (
+                  <div className="flex flex-col items-center gap-1">
+                    <Icon
+                      icon="ic:round-warning"
+                      className="size-5 text-brand-primary"
+                    />
+                    <span className="caption-xs-bold font-pretendard text-brand-primary text-center">
+                      QR 코드는 1회만 사용 가능하며 픽업 후 무효 처리돼요
+                    </span>
+                  </div>
+                )}
+
                 <div
                   className={cn(
                     'relative flex items-center justify-center',
@@ -212,20 +235,11 @@ export const QrModal = ({
                   )}
                 </div>
 
-                <p
-                  className={cn(
-                    'text-text-subtle body-sm-bold font-pretendard text-center transition-all duration-300 overflow-hidden',
-                    isExpanded ? 'max-h-0 opacity-0' : 'max-h-10 opacity-100',
-                  )}
-                >
-                  {isPickupDay
-                    ? 'QR코드를 클릭하면 크게 볼 수 있어요'
-                    : '픽업일이 되면 QR코드가 활성화돼요'}
-                </p>
+                {!isExpanded && isPickupDay && <QrExpandTooltip />}
 
-                {isPickupDay && (
-                  <p className="caption-xs-bold font-pretendard text-text-error text-center">
-                  QR 코드는 1회만 사용 가능하며 픽업 후 무효 처리돼요
+                {!isExpanded && !isPickupDay && (
+                  <p className="text-text-subtle body-sm-bold font-pretendard text-center">
+                    픽업일이 되면 QR코드가 활성화돼요
                   </p>
                 )}
               </div>
@@ -257,6 +271,13 @@ export const QrModal = ({
           </div>
         )}
 
+        <div className="flex items-center gap-2">
+          <span className="text-text-basic-inverse body-sm-medium font-pretendard">
+            흔들어서 큐알 화면 열기
+          </span>
+          <Toggle checked={shakeEnabled} onChange={onShakeToggle} size="sm" />
+        </div>
+
         {hasMultipleToday && (
           <button
             onClick={onMultiplePickupClick}
@@ -271,13 +292,6 @@ export const QrModal = ({
             </span>
           </button>
         )}
-
-        <div className="flex items-center gap-2 bg-bg-dim-darker rounded-max px-5 py-2.5">
-          <span className="text-text-basic-inverse body-sm-medium font-pretendard">
-            흔들어서 큐알 화면 열기
-          </span>
-          <Toggle checked={shakeEnabled} onChange={onShakeToggle} size="sm" />
-        </div>
       </div>
     </div>
   );

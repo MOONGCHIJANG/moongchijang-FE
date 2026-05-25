@@ -22,7 +22,7 @@ function getStatusConfig(status: GroupBuyRequestDetailStatus): {
   if (status === GroupBuyRequestDetailStatus.REJECTED) {
     return {
       badge: '검토 완료',
-      statusText: '개설 불가',
+      statusText: '공구 개설 불가',
       badgeClassName: 'bg-surface-default text-text-tertiary',
     };
   }
@@ -49,12 +49,8 @@ export function RequestDetailClient({ requestId }: RequestDetailClientProps) {
     return (
       <div className="flex flex-col h-full">
         <Header text="신청 내역" />
-        <div className="flex-1 overflow-y-auto px-p6 py-p7">
-          <div className="rounded-xlarge bg-bg-white p-p7 flex flex-col gap-g7 shadow-[0px_2px_12px_0px_rgba(0,0,0,0.04)]">
-            {Array.from({ length: 6 }, (_, i) => (
-              <div key={i} className="h-10 rounded animate-pulse bg-gray-200" />
-            ))}
-          </div>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="w-8 h-8 border-4 border-border-brand border-t-transparent rounded-full animate-spin" />
         </div>
       </div>
     );
@@ -157,10 +153,6 @@ export function RequestDetailClient({ requestId }: RequestDetailClientProps) {
           </div>
         </div>
 
-        <p className="body-sm-regular text-text-disabled text-center">
-          신청 완료된 내용은 수정할 수 없어요
-        </p>
-
         {request.status === GroupBuyRequestDetailStatus.REJECTED &&
           request.rejectionReason && (
             <div className="rounded-xlarge bg-bg-white p-p7 shadow-[0px_2px_12px_0px_rgba(0,0,0,0.04)]">
@@ -173,14 +165,9 @@ export function RequestDetailClient({ requestId }: RequestDetailClientProps) {
             </div>
           )}
 
-        {request.status === GroupBuyRequestDetailStatus.OPENED &&
-          request.openedGroupBuyId && (
-            <Link href={`/item/${request.openedGroupBuyId}`} className="w-full">
-              <Button variant="primary" fullWidth>
-                공구 바로가기
-              </Button>
-            </Link>
-          )}
+        <p className="body-sm-regular text-text-disabled text-center">
+          신청 완료된 내용은 수정할 수 없어요
+        </p>
       </div>
     </div>
   );

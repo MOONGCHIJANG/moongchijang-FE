@@ -106,8 +106,8 @@ export function RequestStatusClient({ requestId }: RequestStatusClientProps) {
     return (
       <div className="flex flex-col h-full">
         <Header text="요청 현황" />
-        <div className="flex-1 overflow-y-auto px-p6 py-p6">
-          <div className="h-24 rounded-large animate-pulse bg-gray-200" />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="w-8 h-8 border-4 border-border-brand border-t-transparent rounded-full animate-spin" />
         </div>
       </div>
     );

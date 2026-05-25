@@ -30,6 +30,7 @@ export const metadata: Metadata = {
     siteName: '뭉치장',
     type: 'website',
     locale: 'ko_KR',
+    url: '/',
     images: [
       {
         url: '/og/og-1200x630.png',

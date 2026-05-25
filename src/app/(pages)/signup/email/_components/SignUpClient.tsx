@@ -8,6 +8,9 @@ import { useSearchParams } from 'next/navigation';
 
 type Step = 1 | 2 | 3;
 
+// TODO: 토큰 없는 사람들이 Step 2, 3으로 직접 접근하는 경우 막기 (현재는 URL에 ?step=profile 붙이면 접근 가능)
+// 회원 추가정보 완료 안하고 이탈 시에 로그아웃 처리
+
 export default function SignUpClient() {
   const searchParams = useSearchParams();
   const [step, setStep] = useState<Step>(

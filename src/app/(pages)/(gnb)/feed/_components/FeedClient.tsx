@@ -260,9 +260,11 @@ export function FeedClient() {
         <FeedTopBar
           location={locationDisplayText}
           onLocationClick={() => setIsLocationSheetOpen(true)}
+          onNotificationClick={() => router.push('/notifications')}
           onQrClick={() => setIsQrModalOpen(true)}
           showQr={isLoggedIn}
         />
+
         <div className="cursor-pointer" onClick={() => setIsSearchOpen(true)}>
           <SearchBar
             value={searchInput}

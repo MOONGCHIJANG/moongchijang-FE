@@ -34,6 +34,7 @@ export const PostApiV1AuthKakaoResponse = zod.object({
       nickname: zod.string().nullish(),
       phoneNumber: zod.string().nullish(),
       role: zod.enum(['BUYER', 'SELLER', 'ADMIN']),
+      lastRole: zod.enum(['BUYER', 'SELLER', 'ADMIN']).nullish(),
       signupCompleted: zod.boolean(),
       deletedAt: zod.iso.datetime({ offset: true }).nullish(),
       createdAt: zod.iso.datetime({ offset: true }),
@@ -83,6 +84,7 @@ export const GetApiV1UsersMeResponse = zod.object({
     nickname: zod.string().nullish(),
     phoneNumber: zod.string().nullish(),
     role: zod.enum(['BUYER', 'SELLER', 'ADMIN']),
+    lastRole: zod.enum(['BUYER', 'SELLER', 'ADMIN']).nullish(),
     signupCompleted: zod.boolean(),
     deletedAt: zod.iso.datetime({ offset: true }).nullish(),
     createdAt: zod.iso.datetime({ offset: true }),
@@ -92,8 +94,34 @@ export const GetApiV1UsersMeResponse = zod.object({
 });
 
 /**
+ * 회원 탈퇴를 처리한다.
+- 수령 예정 공구(달성 완료 + 픽업 미완료)가 있으면 탈퇴할 수 없다.
+- 참여 중 공구(PAID_WAITING_GOAL)는 자동 취소된다.
+- 찜 목록은 모두 삭제된다.
+- 동일 계정은 탈퇴 후 30일 이후 재가입 가능하다.
+
  * @summary 회원 탈퇴
  */
+export const deleteApiV1UsersMeBodyReasonDetailMax = 500;
+
+export const DeleteApiV1UsersMeBody = zod.object({
+  reason: zod
+    .enum([
+      'TIME_NOT_AVAILABLE',
+      'NO_LONGER_INTERESTED',
+      'PREFER_DIRECT_VISIT',
+      'BUYING_ELSEWHERE',
+      'OTHER',
+    ])
+    .nullish()
+    .describe('탈퇴 사유(선택)'),
+  reasonDetail: zod
+    .string()
+    .max(deleteApiV1UsersMeBodyReasonDetailMax)
+    .nullish()
+    .describe('탈퇴 상세 사유 (reason=OTHER 일 때 입력)'),
+});
+
 export const DeleteApiV1UsersMeResponse = zod.object({
   success: zod.boolean(),
   data: zod.unknown().nullable(),
@@ -315,6 +343,7 @@ export const PostApiV1AuthEmailSignupResponse = zod.object({
       nickname: zod.string().nullish(),
       phoneNumber: zod.string().nullish(),
       role: zod.enum(['BUYER', 'SELLER', 'ADMIN']),
+      lastRole: zod.enum(['BUYER', 'SELLER', 'ADMIN']).nullish(),
       signupCompleted: zod.boolean(),
       deletedAt: zod.iso.datetime({ offset: true }).nullish(),
       createdAt: zod.iso.datetime({ offset: true }),
@@ -351,6 +380,7 @@ export const PostApiV1AuthEmailLoginResponse = zod.object({
       nickname: zod.string().nullish(),
       phoneNumber: zod.string().nullish(),
       role: zod.enum(['BUYER', 'SELLER', 'ADMIN']),
+      lastRole: zod.enum(['BUYER', 'SELLER', 'ADMIN']).nullish(),
       signupCompleted: zod.boolean(),
       deletedAt: zod.iso.datetime({ offset: true }).nullish(),
       createdAt: zod.iso.datetime({ offset: true }),

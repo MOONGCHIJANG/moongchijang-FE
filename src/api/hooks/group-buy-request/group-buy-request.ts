@@ -2,10 +2,7 @@
 /**
  * // 이 파일은 Orval이 자동 생성합니다. 직접 수정하지 마세요.
  */
-import {
-  useMutation,
-  useQuery
-} from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -18,7 +15,7 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult
+  UseQueryResult,
 } from '@tanstack/react-query';
 
 import type {
@@ -35,15 +32,12 @@ import type {
   PostApiV1GroupBuyOpenRequestsBody,
   StoreRecommendationRequest,
   SuccessNoDataResponse,
-  UnauthorizedResponse
+  UnauthorizedResponse,
 } from '../api.schemas';
 
 import { customFetch } from '../../../lib/custom-fetch';
 
-
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
-
-
 
 /**
  * 매장명 또는 주소 입력 시 외부 지도/장소 API 기반 매장 후보 목록을 반환한다.
@@ -52,457 +46,716 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
  * @summary 매장 검색 자동완성 (2.1.1-1)
  */
 export type getApiV1StoresSearchResponse200 = {
-  data: ApiResponseStoreSearchList
-  status: 200
-}
+  data: ApiResponseStoreSearchList;
+  status: 200;
+};
 
 export type getApiV1StoresSearchResponse400 = {
-  data: BadRequestResponse
-  status: 400
-}
-
-export type getApiV1StoresSearchResponseSuccess = (getApiV1StoresSearchResponse200) & {
-  headers: Headers;
-};
-export type getApiV1StoresSearchResponseError = (getApiV1StoresSearchResponse400) & {
-  headers: Headers;
+  data: BadRequestResponse;
+  status: 400;
 };
 
-export type getApiV1StoresSearchResponse = (getApiV1StoresSearchResponseSuccess | getApiV1StoresSearchResponseError)
+export type getApiV1StoresSearchResponseSuccess =
+  getApiV1StoresSearchResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1StoresSearchResponseError =
+  getApiV1StoresSearchResponse400 & {
+    headers: Headers;
+  };
 
-export const getGetApiV1StoresSearchUrl = (params: GetApiV1StoresSearchParams,) => {
+export type getApiV1StoresSearchResponse =
+  | getApiV1StoresSearchResponseSuccess
+  | getApiV1StoresSearchResponseError;
+
+export const getGetApiV1StoresSearchUrl = (
+  params: GetApiV1StoresSearchParams,
+) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
+      normalizedParams.append(key, value === null ? 'null' : value.toString());
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/v1/stores/search?${stringifiedParams}` : `/api/v1/stores/search`
-}
+  return stringifiedParams.length > 0
+    ? `/api/v1/stores/search?${stringifiedParams}`
+    : `/api/v1/stores/search`;
+};
 
-export const getApiV1StoresSearch = async (params: GetApiV1StoresSearchParams, options?: RequestInit): Promise<getApiV1StoresSearchResponse> => {
+export const getApiV1StoresSearch = async (
+  params: GetApiV1StoresSearchParams,
+  options?: RequestInit,
+): Promise<getApiV1StoresSearchResponse> => {
+  return customFetch<getApiV1StoresSearchResponse>(
+    getGetApiV1StoresSearchUrl(params),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
 
-  return customFetch<getApiV1StoresSearchResponse>(getGetApiV1StoresSearchUrl(params),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-export const getGetApiV1StoresSearchQueryKey = (params?: GetApiV1StoresSearchParams,) => {
-    return [
-    `/api/v1/stores/search`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getGetApiV1StoresSearchQueryOptions = <TData = Awaited<ReturnType<typeof getApiV1StoresSearch>>, TError = BadRequestResponse>(params: GetApiV1StoresSearchParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1StoresSearch>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetApiV1StoresSearchQueryKey = (
+  params?: GetApiV1StoresSearchParams,
 ) => {
+  return [`/api/v1/stores/search`, ...(params ? [params] : [])] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getGetApiV1StoresSearchQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiV1StoresSearch>>,
+  TError = BadRequestResponse,
+>(
+  params: GetApiV1StoresSearchParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1StoresSearch>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetApiV1StoresSearchQueryKey(params);
+  const queryKey =
+    queryOptions?.queryKey ?? getGetApiV1StoresSearchQueryKey(params);
 
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiV1StoresSearch>>
+  > = ({ signal }) =>
+    getApiV1StoresSearch(params, { signal, ...requestOptions });
 
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiV1StoresSearch>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiV1StoresSearch>>> = ({ signal }) => getApiV1StoresSearch(params, { signal, ...requestOptions });
+export type GetApiV1StoresSearchQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiV1StoresSearch>>
+>;
+export type GetApiV1StoresSearchQueryError = BadRequestResponse;
 
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getApiV1StoresSearch>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetApiV1StoresSearchQueryResult = NonNullable<Awaited<ReturnType<typeof getApiV1StoresSearch>>>
-export type GetApiV1StoresSearchQueryError = BadRequestResponse
-
-
-export function useGetApiV1StoresSearch<TData = Awaited<ReturnType<typeof getApiV1StoresSearch>>, TError = BadRequestResponse>(
- params: GetApiV1StoresSearchParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1StoresSearch>>, TError, TData>> & Pick<
+export function useGetApiV1StoresSearch<
+  TData = Awaited<ReturnType<typeof getApiV1StoresSearch>>,
+  TError = BadRequestResponse,
+>(
+  params: GetApiV1StoresSearchParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1StoresSearch>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getApiV1StoresSearch>>,
           TError,
           Awaited<ReturnType<typeof getApiV1StoresSearch>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetApiV1StoresSearch<TData = Awaited<ReturnType<typeof getApiV1StoresSearch>>, TError = BadRequestResponse>(
- params: GetApiV1StoresSearchParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1StoresSearch>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1StoresSearch<
+  TData = Awaited<ReturnType<typeof getApiV1StoresSearch>>,
+  TError = BadRequestResponse,
+>(
+  params: GetApiV1StoresSearchParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1StoresSearch>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getApiV1StoresSearch>>,
           TError,
           Awaited<ReturnType<typeof getApiV1StoresSearch>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetApiV1StoresSearch<TData = Awaited<ReturnType<typeof getApiV1StoresSearch>>, TError = BadRequestResponse>(
- params: GetApiV1StoresSearchParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1StoresSearch>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1StoresSearch<
+  TData = Awaited<ReturnType<typeof getApiV1StoresSearch>>,
+  TError = BadRequestResponse,
+>(
+  params: GetApiV1StoresSearchParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1StoresSearch>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary 매장 검색 자동완성 (2.1.1-1)
  */
 
-export function useGetApiV1StoresSearch<TData = Awaited<ReturnType<typeof getApiV1StoresSearch>>, TError = BadRequestResponse>(
- params: GetApiV1StoresSearchParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1StoresSearch>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useGetApiV1StoresSearch<
+  TData = Awaited<ReturnType<typeof getApiV1StoresSearch>>,
+  TError = BadRequestResponse,
+>(
+  params: GetApiV1StoresSearchParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1StoresSearch>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiV1StoresSearchQueryOptions(params, options);
 
-  const queryOptions = getGetApiV1StoresSearchQueryOptions(params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
-
-
-
-
-
 
 /**
  * @summary 공구 개설 요청 제출
  */
 export type postApiV1GroupBuyRequestsResponse201 = {
-  data: ApiResponseRequestId
-  status: 201
-}
+  data: ApiResponseRequestId;
+  status: 201;
+};
 
 export type postApiV1GroupBuyRequestsResponse400 = {
-  data: BadRequestResponse
-  status: 400
-}
+  data: BadRequestResponse;
+  status: 400;
+};
 
 export type postApiV1GroupBuyRequestsResponse401 = {
-  data: UnauthorizedResponse
-  status: 401
-}
-
-export type postApiV1GroupBuyRequestsResponseSuccess = (postApiV1GroupBuyRequestsResponse201) & {
-  headers: Headers;
-};
-export type postApiV1GroupBuyRequestsResponseError = (postApiV1GroupBuyRequestsResponse400 | postApiV1GroupBuyRequestsResponse401) & {
-  headers: Headers;
+  data: UnauthorizedResponse;
+  status: 401;
 };
 
-export type postApiV1GroupBuyRequestsResponse = (postApiV1GroupBuyRequestsResponseSuccess | postApiV1GroupBuyRequestsResponseError)
+export type postApiV1GroupBuyRequestsResponseSuccess =
+  postApiV1GroupBuyRequestsResponse201 & {
+    headers: Headers;
+  };
+export type postApiV1GroupBuyRequestsResponseError = (
+  | postApiV1GroupBuyRequestsResponse400
+  | postApiV1GroupBuyRequestsResponse401
+) & {
+  headers: Headers;
+};
+
+export type postApiV1GroupBuyRequestsResponse =
+  | postApiV1GroupBuyRequestsResponseSuccess
+  | postApiV1GroupBuyRequestsResponseError;
 
 export const getPostApiV1GroupBuyRequestsUrl = () => {
+  return `/api/v1/group-buy-requests`;
+};
 
+export const postApiV1GroupBuyRequests = async (
+  groupBuyRequestCreate: GroupBuyRequestCreate,
+  options?: RequestInit,
+): Promise<postApiV1GroupBuyRequestsResponse> => {
+  return customFetch<postApiV1GroupBuyRequestsResponse>(
+    getPostApiV1GroupBuyRequestsUrl(),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(groupBuyRequestCreate),
+    },
+  );
+};
 
+export const getPostApiV1GroupBuyRequestsMutationOptions = <
+  TError = BadRequestResponse | UnauthorizedResponse,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiV1GroupBuyRequests>>,
+    TError,
+    { data: GroupBuyRequestCreate },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiV1GroupBuyRequests>>,
+  TError,
+  { data: GroupBuyRequestCreate },
+  TContext
+> => {
+  const mutationKey = ['postApiV1GroupBuyRequests'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiV1GroupBuyRequests>>,
+    { data: GroupBuyRequestCreate }
+  > = (props) => {
+    const { data } = props ?? {};
 
-  return `/api/v1/group-buy-requests`
-}
+    return postApiV1GroupBuyRequests(data, requestOptions);
+  };
 
-export const postApiV1GroupBuyRequests = async (groupBuyRequestCreate: GroupBuyRequestCreate, options?: RequestInit): Promise<postApiV1GroupBuyRequestsResponse> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-  return customFetch<postApiV1GroupBuyRequestsResponse>(getPostApiV1GroupBuyRequestsUrl(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      groupBuyRequestCreate,)
-  }
-);}
+export type PostApiV1GroupBuyRequestsMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiV1GroupBuyRequests>>
+>;
+export type PostApiV1GroupBuyRequestsMutationBody = GroupBuyRequestCreate;
+export type PostApiV1GroupBuyRequestsMutationError =
+  | BadRequestResponse
+  | UnauthorizedResponse;
 
-
-
-
-export const getPostApiV1GroupBuyRequestsMutationOptions = <TError = BadRequestResponse | UnauthorizedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiV1GroupBuyRequests>>, TError,{data: GroupBuyRequestCreate}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof postApiV1GroupBuyRequests>>, TError,{data: GroupBuyRequestCreate}, TContext> => {
-
-const mutationKey = ['postApiV1GroupBuyRequests'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postApiV1GroupBuyRequests>>, {data: GroupBuyRequestCreate}> = (props) => {
-          const {data} = props ?? {};
-
-          return  postApiV1GroupBuyRequests(data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type PostApiV1GroupBuyRequestsMutationResult = NonNullable<Awaited<ReturnType<typeof postApiV1GroupBuyRequests>>>
-    export type PostApiV1GroupBuyRequestsMutationBody = GroupBuyRequestCreate
-    export type PostApiV1GroupBuyRequestsMutationError = BadRequestResponse | UnauthorizedResponse
-
-    /**
+/**
  * @summary 공구 개설 요청 제출
  */
-export const usePostApiV1GroupBuyRequests = <TError = BadRequestResponse | UnauthorizedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiV1GroupBuyRequests>>, TError,{data: GroupBuyRequestCreate}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof postApiV1GroupBuyRequests>>,
-        TError,
-        {data: GroupBuyRequestCreate},
-        TContext
-      > => {
-      return useMutation(getPostApiV1GroupBuyRequestsMutationOptions(options), queryClient);
-    }
-    /**
+export const usePostApiV1GroupBuyRequests = <
+  TError = BadRequestResponse | UnauthorizedResponse,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiV1GroupBuyRequests>>,
+      TError,
+      { data: GroupBuyRequestCreate },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiV1GroupBuyRequests>>,
+  TError,
+  { data: GroupBuyRequestCreate },
+  TContext
+> => {
+  return useMutation(
+    getPostApiV1GroupBuyRequestsMutationOptions(options),
+    queryClient,
+  );
+};
+/**
  * @summary 내 공구 요청 목록 조회
  */
 export type getApiV1GroupBuyRequestsResponse200 = {
-  data: ApiResponseGroupBuyRequestList
-  status: 200
-}
-
-export type getApiV1GroupBuyRequestsResponseSuccess = (getApiV1GroupBuyRequestsResponse200) & {
-  headers: Headers;
+  data: ApiResponseGroupBuyRequestList;
+  status: 200;
 };
-;
 
-export type getApiV1GroupBuyRequestsResponse = (getApiV1GroupBuyRequestsResponseSuccess)
+export type getApiV1GroupBuyRequestsResponseSuccess =
+  getApiV1GroupBuyRequestsResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1GroupBuyRequestsResponse =
+  getApiV1GroupBuyRequestsResponseSuccess;
 
 export const getGetApiV1GroupBuyRequestsUrl = () => {
+  return `/api/v1/group-buy-requests`;
+};
 
-
-
-
-  return `/api/v1/group-buy-requests`
-}
-
-export const getApiV1GroupBuyRequests = async ( options?: RequestInit): Promise<getApiV1GroupBuyRequestsResponse> => {
-
-  return customFetch<getApiV1GroupBuyRequestsResponse>(getGetApiV1GroupBuyRequestsUrl(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
+export const getApiV1GroupBuyRequests = async (
+  options?: RequestInit,
+): Promise<getApiV1GroupBuyRequestsResponse> => {
+  return customFetch<getApiV1GroupBuyRequestsResponse>(
+    getGetApiV1GroupBuyRequestsUrl(),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
 
 export const getGetApiV1GroupBuyRequestsQueryKey = () => {
-    return [
-    `/api/v1/group-buy-requests`
-    ] as const;
-    }
+  return [`/api/v1/group-buy-requests`] as const;
+};
 
+export const getGetApiV1GroupBuyRequestsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiV1GroupBuyRequests>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getApiV1GroupBuyRequests>>,
+      TError,
+      TData
+    >
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-export const getGetApiV1GroupBuyRequestsQueryOptions = <TData = Awaited<ReturnType<typeof getApiV1GroupBuyRequests>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1GroupBuyRequests>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
+  const queryKey =
+    queryOptions?.queryKey ?? getGetApiV1GroupBuyRequestsQueryKey();
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiV1GroupBuyRequests>>
+  > = ({ signal }) => getApiV1GroupBuyRequests({ signal, ...requestOptions });
 
-  const queryKey =  queryOptions?.queryKey ?? getGetApiV1GroupBuyRequestsQueryKey();
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiV1GroupBuyRequests>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
+export type GetApiV1GroupBuyRequestsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiV1GroupBuyRequests>>
+>;
+export type GetApiV1GroupBuyRequestsQueryError = unknown;
 
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiV1GroupBuyRequests>>> = ({ signal }) => getApiV1GroupBuyRequests({ signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getApiV1GroupBuyRequests>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetApiV1GroupBuyRequestsQueryResult = NonNullable<Awaited<ReturnType<typeof getApiV1GroupBuyRequests>>>
-export type GetApiV1GroupBuyRequestsQueryError = unknown
-
-
-export function useGetApiV1GroupBuyRequests<TData = Awaited<ReturnType<typeof getApiV1GroupBuyRequests>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1GroupBuyRequests>>, TError, TData>> & Pick<
+export function useGetApiV1GroupBuyRequests<
+  TData = Awaited<ReturnType<typeof getApiV1GroupBuyRequests>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1GroupBuyRequests>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getApiV1GroupBuyRequests>>,
           TError,
           Awaited<ReturnType<typeof getApiV1GroupBuyRequests>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetApiV1GroupBuyRequests<TData = Awaited<ReturnType<typeof getApiV1GroupBuyRequests>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1GroupBuyRequests>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1GroupBuyRequests<
+  TData = Awaited<ReturnType<typeof getApiV1GroupBuyRequests>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1GroupBuyRequests>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getApiV1GroupBuyRequests>>,
           TError,
           Awaited<ReturnType<typeof getApiV1GroupBuyRequests>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetApiV1GroupBuyRequests<TData = Awaited<ReturnType<typeof getApiV1GroupBuyRequests>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1GroupBuyRequests>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1GroupBuyRequests<
+  TData = Awaited<ReturnType<typeof getApiV1GroupBuyRequests>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1GroupBuyRequests>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary 내 공구 요청 목록 조회
  */
 
-export function useGetApiV1GroupBuyRequests<TData = Awaited<ReturnType<typeof getApiV1GroupBuyRequests>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1GroupBuyRequests>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useGetApiV1GroupBuyRequests<
+  TData = Awaited<ReturnType<typeof getApiV1GroupBuyRequests>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1GroupBuyRequests>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiV1GroupBuyRequestsQueryOptions(options);
 
-  const queryOptions = getGetApiV1GroupBuyRequestsQueryOptions(options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
-
-
-
-
-
 
 /**
  * @summary 공구 요청 상세 조회
  */
 export type getApiV1GroupBuyRequestsRequestIdResponse200 = {
-  data: ApiResponseGroupBuyRequestDetail
-  status: 200
-}
+  data: ApiResponseGroupBuyRequestDetail;
+  status: 200;
+};
 
 export type getApiV1GroupBuyRequestsRequestIdResponse403 = {
-  data: ForbiddenResponse
-  status: 403
-}
+  data: ForbiddenResponse;
+  status: 403;
+};
 
 export type getApiV1GroupBuyRequestsRequestIdResponse404 = {
-  data: NotFoundResponse
-  status: 404
-}
-
-export type getApiV1GroupBuyRequestsRequestIdResponseSuccess = (getApiV1GroupBuyRequestsRequestIdResponse200) & {
-  headers: Headers;
-};
-export type getApiV1GroupBuyRequestsRequestIdResponseError = (getApiV1GroupBuyRequestsRequestIdResponse403 | getApiV1GroupBuyRequestsRequestIdResponse404) & {
-  headers: Headers;
+  data: NotFoundResponse;
+  status: 404;
 };
 
-export type getApiV1GroupBuyRequestsRequestIdResponse = (getApiV1GroupBuyRequestsRequestIdResponseSuccess | getApiV1GroupBuyRequestsRequestIdResponseError)
+export type getApiV1GroupBuyRequestsRequestIdResponseSuccess =
+  getApiV1GroupBuyRequestsRequestIdResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1GroupBuyRequestsRequestIdResponseError = (
+  | getApiV1GroupBuyRequestsRequestIdResponse403
+  | getApiV1GroupBuyRequestsRequestIdResponse404
+) & {
+  headers: Headers;
+};
 
-export const getGetApiV1GroupBuyRequestsRequestIdUrl = (requestId: number,) => {
+export type getApiV1GroupBuyRequestsRequestIdResponse =
+  | getApiV1GroupBuyRequestsRequestIdResponseSuccess
+  | getApiV1GroupBuyRequestsRequestIdResponseError;
 
+export const getGetApiV1GroupBuyRequestsRequestIdUrl = (requestId: number) => {
+  return `/api/v1/group-buy-requests/${requestId}`;
+};
 
+export const getApiV1GroupBuyRequestsRequestId = async (
+  requestId: number,
+  options?: RequestInit,
+): Promise<getApiV1GroupBuyRequestsRequestIdResponse> => {
+  return customFetch<getApiV1GroupBuyRequestsRequestIdResponse>(
+    getGetApiV1GroupBuyRequestsRequestIdUrl(requestId),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
 
-
-  return `/api/v1/group-buy-requests/${requestId}`
-}
-
-export const getApiV1GroupBuyRequestsRequestId = async (requestId: number, options?: RequestInit): Promise<getApiV1GroupBuyRequestsRequestIdResponse> => {
-
-  return customFetch<getApiV1GroupBuyRequestsRequestIdResponse>(getGetApiV1GroupBuyRequestsRequestIdUrl(requestId),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-export const getGetApiV1GroupBuyRequestsRequestIdQueryKey = (requestId: number,) => {
-    return [
-    `/api/v1/group-buy-requests/${requestId}`
-    ] as const;
-    }
-
-
-export const getGetApiV1GroupBuyRequestsRequestIdQueryOptions = <TData = Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>, TError = ForbiddenResponse | NotFoundResponse>(requestId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetApiV1GroupBuyRequestsRequestIdQueryKey = (
+  requestId: number,
 ) => {
+  return [`/api/v1/group-buy-requests/${requestId}`] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getGetApiV1GroupBuyRequestsRequestIdQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>,
+  TError = ForbiddenResponse | NotFoundResponse,
+>(
+  requestId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetApiV1GroupBuyRequestsRequestIdQueryKey(requestId);
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetApiV1GroupBuyRequestsRequestIdQueryKey(requestId);
 
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>
+  > = ({ signal }) =>
+    getApiV1GroupBuyRequestsRequestId(requestId, { signal, ...requestOptions });
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!requestId,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>> = ({ signal }) => getApiV1GroupBuyRequestsRequestId(requestId, { signal, ...requestOptions });
+export type GetApiV1GroupBuyRequestsRequestIdQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>
+>;
+export type GetApiV1GroupBuyRequestsRequestIdQueryError =
+  | ForbiddenResponse
+  | NotFoundResponse;
 
-
-
-
-
-   return  { queryKey, queryFn, enabled: !!(requestId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetApiV1GroupBuyRequestsRequestIdQueryResult = NonNullable<Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>>
-export type GetApiV1GroupBuyRequestsRequestIdQueryError = ForbiddenResponse | NotFoundResponse
-
-
-export function useGetApiV1GroupBuyRequestsRequestId<TData = Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>, TError = ForbiddenResponse | NotFoundResponse>(
- requestId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>, TError, TData>> & Pick<
+export function useGetApiV1GroupBuyRequestsRequestId<
+  TData = Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>,
+  TError = ForbiddenResponse | NotFoundResponse,
+>(
+  requestId: number,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>,
           TError,
           Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetApiV1GroupBuyRequestsRequestId<TData = Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>, TError = ForbiddenResponse | NotFoundResponse>(
- requestId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1GroupBuyRequestsRequestId<
+  TData = Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>,
+  TError = ForbiddenResponse | NotFoundResponse,
+>(
+  requestId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>,
           TError,
           Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetApiV1GroupBuyRequestsRequestId<TData = Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>, TError = ForbiddenResponse | NotFoundResponse>(
- requestId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1GroupBuyRequestsRequestId<
+  TData = Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>,
+  TError = ForbiddenResponse | NotFoundResponse,
+>(
+  requestId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary 공구 요청 상세 조회
  */
 
-export function useGetApiV1GroupBuyRequestsRequestId<TData = Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>, TError = ForbiddenResponse | NotFoundResponse>(
- requestId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useGetApiV1GroupBuyRequestsRequestId<
+  TData = Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>,
+  TError = ForbiddenResponse | NotFoundResponse,
+>(
+  requestId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiV1GroupBuyRequestsRequestIdQueryOptions(
+    requestId,
+    options,
+  );
 
-  const queryOptions = getGetApiV1GroupBuyRequestsRequestIdQueryOptions(requestId,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
-
-
-
-
-
 
 /**
  * 특정 지역/상품 조합으로 공구가 개설되면 알림을 받기 위해 등록한다.
@@ -511,193 +764,288 @@ export function useGetApiV1GroupBuyRequestsRequestId<TData = Awaited<ReturnType<
  * @summary 공구 개설 알림 신청
  */
 export type postApiV1GroupBuyOpenRequestsResponse201 = {
-  data: SuccessNoDataResponse
-  status: 201
-}
+  data: SuccessNoDataResponse;
+  status: 201;
+};
 
 export type postApiV1GroupBuyOpenRequestsResponse400 = {
-  data: BadRequestResponse
-  status: 400
-}
+  data: BadRequestResponse;
+  status: 400;
+};
 
 export type postApiV1GroupBuyOpenRequestsResponse401 = {
-  data: UnauthorizedResponse
-  status: 401
-}
-
-export type postApiV1GroupBuyOpenRequestsResponseSuccess = (postApiV1GroupBuyOpenRequestsResponse201) & {
-  headers: Headers;
-};
-export type postApiV1GroupBuyOpenRequestsResponseError = (postApiV1GroupBuyOpenRequestsResponse400 | postApiV1GroupBuyOpenRequestsResponse401) & {
-  headers: Headers;
+  data: UnauthorizedResponse;
+  status: 401;
 };
 
-export type postApiV1GroupBuyOpenRequestsResponse = (postApiV1GroupBuyOpenRequestsResponseSuccess | postApiV1GroupBuyOpenRequestsResponseError)
+export type postApiV1GroupBuyOpenRequestsResponseSuccess =
+  postApiV1GroupBuyOpenRequestsResponse201 & {
+    headers: Headers;
+  };
+export type postApiV1GroupBuyOpenRequestsResponseError = (
+  | postApiV1GroupBuyOpenRequestsResponse400
+  | postApiV1GroupBuyOpenRequestsResponse401
+) & {
+  headers: Headers;
+};
+
+export type postApiV1GroupBuyOpenRequestsResponse =
+  | postApiV1GroupBuyOpenRequestsResponseSuccess
+  | postApiV1GroupBuyOpenRequestsResponseError;
 
 export const getPostApiV1GroupBuyOpenRequestsUrl = () => {
+  return `/api/v1/group-buy-open-requests`;
+};
 
+export const postApiV1GroupBuyOpenRequests = async (
+  postApiV1GroupBuyOpenRequestsBody: PostApiV1GroupBuyOpenRequestsBody,
+  options?: RequestInit,
+): Promise<postApiV1GroupBuyOpenRequestsResponse> => {
+  return customFetch<postApiV1GroupBuyOpenRequestsResponse>(
+    getPostApiV1GroupBuyOpenRequestsUrl(),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(postApiV1GroupBuyOpenRequestsBody),
+    },
+  );
+};
 
+export const getPostApiV1GroupBuyOpenRequestsMutationOptions = <
+  TError = BadRequestResponse | UnauthorizedResponse,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiV1GroupBuyOpenRequests>>,
+    TError,
+    { data: PostApiV1GroupBuyOpenRequestsBody },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiV1GroupBuyOpenRequests>>,
+  TError,
+  { data: PostApiV1GroupBuyOpenRequestsBody },
+  TContext
+> => {
+  const mutationKey = ['postApiV1GroupBuyOpenRequests'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiV1GroupBuyOpenRequests>>,
+    { data: PostApiV1GroupBuyOpenRequestsBody }
+  > = (props) => {
+    const { data } = props ?? {};
 
-  return `/api/v1/group-buy-open-requests`
-}
+    return postApiV1GroupBuyOpenRequests(data, requestOptions);
+  };
 
-export const postApiV1GroupBuyOpenRequests = async (postApiV1GroupBuyOpenRequestsBody: PostApiV1GroupBuyOpenRequestsBody, options?: RequestInit): Promise<postApiV1GroupBuyOpenRequestsResponse> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-  return customFetch<postApiV1GroupBuyOpenRequestsResponse>(getPostApiV1GroupBuyOpenRequestsUrl(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      postApiV1GroupBuyOpenRequestsBody,)
-  }
-);}
+export type PostApiV1GroupBuyOpenRequestsMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiV1GroupBuyOpenRequests>>
+>;
+export type PostApiV1GroupBuyOpenRequestsMutationBody =
+  PostApiV1GroupBuyOpenRequestsBody;
+export type PostApiV1GroupBuyOpenRequestsMutationError =
+  | BadRequestResponse
+  | UnauthorizedResponse;
 
-
-
-
-export const getPostApiV1GroupBuyOpenRequestsMutationOptions = <TError = BadRequestResponse | UnauthorizedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiV1GroupBuyOpenRequests>>, TError,{data: PostApiV1GroupBuyOpenRequestsBody}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof postApiV1GroupBuyOpenRequests>>, TError,{data: PostApiV1GroupBuyOpenRequestsBody}, TContext> => {
-
-const mutationKey = ['postApiV1GroupBuyOpenRequests'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postApiV1GroupBuyOpenRequests>>, {data: PostApiV1GroupBuyOpenRequestsBody}> = (props) => {
-          const {data} = props ?? {};
-
-          return  postApiV1GroupBuyOpenRequests(data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type PostApiV1GroupBuyOpenRequestsMutationResult = NonNullable<Awaited<ReturnType<typeof postApiV1GroupBuyOpenRequests>>>
-    export type PostApiV1GroupBuyOpenRequestsMutationBody = PostApiV1GroupBuyOpenRequestsBody
-    export type PostApiV1GroupBuyOpenRequestsMutationError = BadRequestResponse | UnauthorizedResponse
-
-    /**
+/**
  * @summary 공구 개설 알림 신청
  */
-export const usePostApiV1GroupBuyOpenRequests = <TError = BadRequestResponse | UnauthorizedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiV1GroupBuyOpenRequests>>, TError,{data: PostApiV1GroupBuyOpenRequestsBody}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof postApiV1GroupBuyOpenRequests>>,
-        TError,
-        {data: PostApiV1GroupBuyOpenRequestsBody},
-        TContext
-      > => {
-      return useMutation(getPostApiV1GroupBuyOpenRequestsMutationOptions(options), queryClient);
-    }
-    /**
- * 동네와 상품 조건이 확정된 뒤 네이버 Local Search API와 자사 공구 이력을 기반으로
-최대 10개의 매장 후보를 추천한다.
+export const usePostApiV1GroupBuyOpenRequests = <
+  TError = BadRequestResponse | UnauthorizedResponse,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiV1GroupBuyOpenRequests>>,
+      TError,
+      { data: PostApiV1GroupBuyOpenRequestsBody },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiV1GroupBuyOpenRequests>>,
+  TError,
+  { data: PostApiV1GroupBuyOpenRequestsBody },
+  TContext
+> => {
+  return useMutation(
+    getPostApiV1GroupBuyOpenRequestsMutationOptions(options),
+    queryClient,
+  );
+};
+/**
+ * 1.1.4-9 매장 추천 바텀시트용 API.
+
+Case 1~4의 바텀시트에서 동네·상품 조건이 모두 확정된 후 CTA 버튼을 탭하면,
+백엔드는 네이버 Local Search API를 조회하여 해당 조건에 맞는 매장 후보를 검색한다.
+
+매장 후보는 최대 10개까지 반환하며, 추천 매장 후보는 다음 기준을 반영해 정렬한다.
+
+- 네이버 Local Search API의 기본 관련도 순서
+- 매장 주소가 선택한 동네와 일치하거나 포함되는지 여부
+- 매장 카테고리가 상품 조건과 관련 있는지 여부
+- 자사 DB에 등록된 매장인지 여부
+- 해당 매장의 과거 공구 이력이 있는지 여부
 
 네이버 결과가 0건이거나 네이버 API 호출 실패/timeout이 발생하면 `stores=[]`를 반환하며,
 프론트는 기존 공구 개설 요청 플로우로 fallback한다.
 
- * @summary AI 매장 추천 바텀시트용 매장 후보 조회
+중복 매장은 하나로 합쳐 반환하고, 매장명에 포함된 HTML 태그는 제거해서 반환한다.
+
+ * @summary 매장 추천 바텀시트용 네이버 Local Search 매장 후보 조회
  */
 export type postApiV1GroupBuyOpenRequestsStoreRecommendationsResponse200 = {
-  data: ApiResponseStoreRecommendation
-  status: 200
-}
+  data: ApiResponseStoreRecommendation;
+  status: 200;
+};
 
 export type postApiV1GroupBuyOpenRequestsStoreRecommendationsResponse400 = {
-  data: BadRequestResponse
-  status: 400
-}
+  data: BadRequestResponse;
+  status: 400;
+};
 
 export type postApiV1GroupBuyOpenRequestsStoreRecommendationsResponse401 = {
-  data: UnauthorizedResponse
-  status: 401
-}
-
-export type postApiV1GroupBuyOpenRequestsStoreRecommendationsResponseSuccess = (postApiV1GroupBuyOpenRequestsStoreRecommendationsResponse200) & {
-  headers: Headers;
-};
-export type postApiV1GroupBuyOpenRequestsStoreRecommendationsResponseError = (postApiV1GroupBuyOpenRequestsStoreRecommendationsResponse400 | postApiV1GroupBuyOpenRequestsStoreRecommendationsResponse401) & {
-  headers: Headers;
+  data: UnauthorizedResponse;
+  status: 401;
 };
 
-export type postApiV1GroupBuyOpenRequestsStoreRecommendationsResponse = (postApiV1GroupBuyOpenRequestsStoreRecommendationsResponseSuccess | postApiV1GroupBuyOpenRequestsStoreRecommendationsResponseError)
+export type postApiV1GroupBuyOpenRequestsStoreRecommendationsResponseSuccess =
+  postApiV1GroupBuyOpenRequestsStoreRecommendationsResponse200 & {
+    headers: Headers;
+  };
+export type postApiV1GroupBuyOpenRequestsStoreRecommendationsResponseError = (
+  | postApiV1GroupBuyOpenRequestsStoreRecommendationsResponse400
+  | postApiV1GroupBuyOpenRequestsStoreRecommendationsResponse401
+) & {
+  headers: Headers;
+};
+
+export type postApiV1GroupBuyOpenRequestsStoreRecommendationsResponse =
+  | postApiV1GroupBuyOpenRequestsStoreRecommendationsResponseSuccess
+  | postApiV1GroupBuyOpenRequestsStoreRecommendationsResponseError;
 
 export const getPostApiV1GroupBuyOpenRequestsStoreRecommendationsUrl = () => {
+  return `/api/v1/group-buy-open-requests/store-recommendations`;
+};
 
+export const postApiV1GroupBuyOpenRequestsStoreRecommendations = async (
+  storeRecommendationRequest: StoreRecommendationRequest,
+  options?: RequestInit,
+): Promise<postApiV1GroupBuyOpenRequestsStoreRecommendationsResponse> => {
+  return customFetch<postApiV1GroupBuyOpenRequestsStoreRecommendationsResponse>(
+    getPostApiV1GroupBuyOpenRequestsStoreRecommendationsUrl(),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(storeRecommendationRequest),
+    },
+  );
+};
 
+export const getPostApiV1GroupBuyOpenRequestsStoreRecommendationsMutationOptions =
+  <
+    TError = BadRequestResponse | UnauthorizedResponse,
+    TContext = unknown,
+  >(options?: {
+    mutation?: UseMutationOptions<
+      Awaited<
+        ReturnType<typeof postApiV1GroupBuyOpenRequestsStoreRecommendations>
+      >,
+      TError,
+      { data: StoreRecommendationRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  }): UseMutationOptions<
+    Awaited<
+      ReturnType<typeof postApiV1GroupBuyOpenRequestsStoreRecommendations>
+    >,
+    TError,
+    { data: StoreRecommendationRequest },
+    TContext
+  > => {
+    const mutationKey = ['postApiV1GroupBuyOpenRequestsStoreRecommendations'];
+    const { mutation: mutationOptions, request: requestOptions } = options
+      ? options.mutation &&
+        'mutationKey' in options.mutation &&
+        options.mutation.mutationKey
+        ? options
+        : { ...options, mutation: { ...options.mutation, mutationKey } }
+      : { mutation: { mutationKey }, request: undefined };
 
+    const mutationFn: MutationFunction<
+      Awaited<
+        ReturnType<typeof postApiV1GroupBuyOpenRequestsStoreRecommendations>
+      >,
+      { data: StoreRecommendationRequest }
+    > = (props) => {
+      const { data } = props ?? {};
 
-  return `/api/v1/group-buy-open-requests/store-recommendations`
-}
+      return postApiV1GroupBuyOpenRequestsStoreRecommendations(
+        data,
+        requestOptions,
+      );
+    };
 
-export const postApiV1GroupBuyOpenRequestsStoreRecommendations = async (storeRecommendationRequest: StoreRecommendationRequest, options?: RequestInit): Promise<postApiV1GroupBuyOpenRequestsStoreRecommendationsResponse> => {
+    return { mutationFn, ...mutationOptions };
+  };
 
-  return customFetch<postApiV1GroupBuyOpenRequestsStoreRecommendationsResponse>(getPostApiV1GroupBuyOpenRequestsStoreRecommendationsUrl(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      storeRecommendationRequest,)
-  }
-);}
+export type PostApiV1GroupBuyOpenRequestsStoreRecommendationsMutationResult =
+  NonNullable<
+    Awaited<
+      ReturnType<typeof postApiV1GroupBuyOpenRequestsStoreRecommendations>
+    >
+  >;
+export type PostApiV1GroupBuyOpenRequestsStoreRecommendationsMutationBody =
+  StoreRecommendationRequest;
+export type PostApiV1GroupBuyOpenRequestsStoreRecommendationsMutationError =
+  | BadRequestResponse
+  | UnauthorizedResponse;
 
-
-
-
-export const getPostApiV1GroupBuyOpenRequestsStoreRecommendationsMutationOptions = <TError = BadRequestResponse | UnauthorizedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiV1GroupBuyOpenRequestsStoreRecommendations>>, TError,{data: StoreRecommendationRequest}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof postApiV1GroupBuyOpenRequestsStoreRecommendations>>, TError,{data: StoreRecommendationRequest}, TContext> => {
-
-const mutationKey = ['postApiV1GroupBuyOpenRequestsStoreRecommendations'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postApiV1GroupBuyOpenRequestsStoreRecommendations>>, {data: StoreRecommendationRequest}> = (props) => {
-          const {data} = props ?? {};
-
-          return  postApiV1GroupBuyOpenRequestsStoreRecommendations(data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type PostApiV1GroupBuyOpenRequestsStoreRecommendationsMutationResult = NonNullable<Awaited<ReturnType<typeof postApiV1GroupBuyOpenRequestsStoreRecommendations>>>
-    export type PostApiV1GroupBuyOpenRequestsStoreRecommendationsMutationBody = StoreRecommendationRequest
-    export type PostApiV1GroupBuyOpenRequestsStoreRecommendationsMutationError = BadRequestResponse | UnauthorizedResponse
-
-    /**
- * @summary AI 매장 추천 바텀시트용 매장 후보 조회
+/**
+ * @summary 매장 추천 바텀시트용 네이버 Local Search 매장 후보 조회
  */
-export const usePostApiV1GroupBuyOpenRequestsStoreRecommendations = <TError = BadRequestResponse | UnauthorizedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiV1GroupBuyOpenRequestsStoreRecommendations>>, TError,{data: StoreRecommendationRequest}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof postApiV1GroupBuyOpenRequestsStoreRecommendations>>,
-        TError,
-        {data: StoreRecommendationRequest},
-        TContext
-      > => {
-      return useMutation(getPostApiV1GroupBuyOpenRequestsStoreRecommendationsMutationOptions(options), queryClient);
-    }
+export const usePostApiV1GroupBuyOpenRequestsStoreRecommendations = <
+  TError = BadRequestResponse | UnauthorizedResponse,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<
+        ReturnType<typeof postApiV1GroupBuyOpenRequestsStoreRecommendations>
+      >,
+      TError,
+      { data: StoreRecommendationRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiV1GroupBuyOpenRequestsStoreRecommendations>>,
+  TError,
+  { data: StoreRecommendationRequest },
+  TContext
+> => {
+  return useMutation(
+    getPostApiV1GroupBuyOpenRequestsStoreRecommendationsMutationOptions(
+      options,
+    ),
+    queryClient,
+  );
+};

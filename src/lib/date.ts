@@ -13,9 +13,13 @@ export function formatPickupTime(timeStr: string) {
   return timeStr.slice(0, 5);
 }
 
+export function formatTime(timeStr: string) {
+  return timeStr.slice(0, 5);
+}
+
 export function formatPickupDateTime(dateStr: string, timeStr: string) {
   const date = new Date(dateStr);
   if (isNaN(date.getTime())) return timeStr;
   const days = ['일', '월', '화', '수', '목', '금', '토'];
-  return `${date.getMonth() + 1}월 ${date.getDate()}일 (${days[date.getDay()]}) ${timeStr}`;
+  return `${date.getMonth() + 1}월 ${date.getDate()}일 (${days[date.getDay()]}) ${formatTime(timeStr)}`;
 }

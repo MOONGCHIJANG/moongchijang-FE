@@ -241,6 +241,7 @@ export function FeedClient() {
           location={locationDisplayText}
           onLocationClick={() => setIsLocationSheetOpen(true)}
           onQrClick={() => setIsQrModalOpen(true)}
+          onNotificationClick={() => router.push('/notifications')}
         />
         <div className="cursor-pointer" onClick={() => setIsSearchOpen(true)}>
           <SearchBar

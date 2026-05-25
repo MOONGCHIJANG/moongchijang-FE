@@ -39,7 +39,7 @@ function getStatusConfig(status: GroupBuyRequestDetailStatus): {
       status === GroupBuyRequestDetailStatus.IN_CONTACT
         ? '매장 협의 중'
         : '검토 중',
-    badgeClassName: 'bg-[#FFEDE9] text-[#FF502E]',
+    badgeClassName: 'bg-surface-brand-lighter text-text-brand',
   };
 }
 
@@ -55,8 +55,8 @@ export function RequestDetailClient({ requestId }: RequestDetailClientProps) {
     return (
       <div className="flex flex-col h-full">
         <Header text="신청 내역" />
-        <div className="flex-1 overflow-y-auto px-4 py-5">
-          <div className="rounded-[10px] bg-white p-5 flex flex-col gap-6 shadow-[0px_2px_12px_0px_rgba(0,0,0,0.04)]">
+        <div className="flex-1 overflow-y-auto px-p6 py-p7">
+          <div className="rounded-xlarge bg-bg-white p-p7 flex flex-col gap-g7 shadow-[0px_2px_12px_0px_rgba(0,0,0,0.04)]">
             {Array.from({ length: 6 }, (_, i) => (
               <div key={i} className="h-10 rounded animate-pulse bg-gray-200" />
             ))}
@@ -85,11 +85,11 @@ export function RequestDetailClient({ requestId }: RequestDetailClientProps) {
     <div className="flex flex-col h-full">
       <Header text="신청 내역" />
 
-      <div className="flex-1 overflow-y-auto px-4 py-5 flex flex-col gap-5">
-        <div className="rounded-[10px] bg-white p-5 flex flex-col gap-6 shadow-[0px_2px_12px_0px_rgba(0,0,0,0.04)]">
+      <div className="flex-1 overflow-y-auto px-p6 py-p7 flex flex-col gap-g6">
+        <div className="rounded-xlarge bg-bg-white p-p7 flex flex-col gap-g7 shadow-[0px_2px_12px_0px_rgba(0,0,0,0.04)]">
           {/* 요청 현황 + 뱃지 */}
           <div className="flex items-start justify-between">
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-g3">
               <span className="body-md-regular text-text-tertiary">
                 요청 현황
               </span>
@@ -107,7 +107,7 @@ export function RequestDetailClient({ requestId }: RequestDetailClientProps) {
           <hr className="border-t border-dashed border-border-subtle" />
 
           {/* 상세 정보 */}
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-g3">
             <div className="flex items-center justify-between">
               <span className="body-md-regular text-text-tertiary">매장</span>
               <span className="heading-sm-bold text-text-basic">
@@ -140,7 +140,7 @@ export function RequestDetailClient({ requestId }: RequestDetailClientProps) {
 
           {/* 추가 요청사항 */}
           {request.additionalNote && (
-            <div className="flex flex-col gap-1 bg-bg-white-muted rounded-lg px-4 py-5">
+            <div className="flex flex-col gap-g2 bg-bg-white-muted rounded-large px-p6 py-p7">
               <span className="body-md-regular text-text-tertiary">
                 추가 요청사항
               </span>
@@ -167,8 +167,8 @@ export function RequestDetailClient({ requestId }: RequestDetailClientProps) {
 
         {request.status === GroupBuyRequestDetailStatus.REJECTED &&
           request.rejectionReason && (
-            <div className="rounded-[10px] bg-white p-5 shadow-[0px_2px_12px_0px_rgba(0,0,0,0.04)]">
-              <span className="body-md-regular text-text-tertiary block mb-3">
+            <div className="rounded-xlarge bg-bg-white p-p7 shadow-[0px_2px_12px_0px_rgba(0,0,0,0.04)]">
+              <span className="body-md-regular text-text-tertiary block mb-g4">
                 개설 불가 사유
               </span>
               <p className="body-md-regular text-text-basic">

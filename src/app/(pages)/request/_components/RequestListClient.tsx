@@ -31,6 +31,10 @@ export function RequestListClient() {
   const { data, isLoading, isError } = useGetApiV1GroupBuyRequests();
   const requests = data?.status === 200 ? (data.data?.data ?? []) : [];
 
+  if (!isLoading && data !== undefined && data.status !== 200) {
+    throw new Error(`서버 오류: ${data.status}`);
+  }
+
   return (
     <div className="flex flex-col h-full">
       <Header text="공구 요청하기" showBackButton={false} />

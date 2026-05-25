@@ -76,10 +76,8 @@ const NoticeClient = ({ initialData }: NoticeClientProps) => {
     return () => observer.disconnect();
   }, [fetchNextPage]);
 
-  // 필터 변경 시 SSR initialData 무시하고 클라이언트 데이터 사용
-  // ALL + isLoading 상태일 때만 initialData fallback
   const displayItems =
-    filter === GetApiV1NotificationsCategory.ALL && (isLoading || isFetching)
+    filter === GetApiV1NotificationsCategory.ALL && isLoading
       ? initialData.items
       : items;
 

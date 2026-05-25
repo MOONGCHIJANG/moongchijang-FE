@@ -29,7 +29,8 @@ export function formatNotificationTime(
   }
 
   if (section === NotificationSection.YESTERDAY) {
-    if (diffHours >= 24) return formatDate(occurred); // 어제인데 24시간 초과
+    if (diffHours >= 24) return formatDate(occurred);
+    if (diffHours < 1) return `${diffMinutes}분 전`;
     return `${diffHours}시간 전`;
   }
 

@@ -1,14 +1,20 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { useGetApiV1UsersMeTabsCounts } from '@/api/hooks/my-page/my-page';
+import {
+  useGetApiV1ParticipationsParticipationIdPickup,
+  useGetApiV1ParticipationsParticipationIdQr,
+} from '@/api/hooks/pickup/pickup';
+import { useShake } from '@/hooks/useShake';
 import { Icon } from '@iconify/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ProfileSection } from './ProfileSection';
 import { ParticipationTab } from './ParticipationTab';
+import { QrModal } from '@/app/(pages)/(gnb)/feed/_components/QrModal';
 
 type TabKey = 'active' | 'waiting' | 'completed' | 'refunded';
 
@@ -21,9 +27,55 @@ const TAB_LABELS: Record<TabKey, string> = {
 
 // TODO: 백엔드에서 beforeAchievedCount / achievedCount 분리되면 active·waiting 카운트 연결
 
+function formatPickupTime(start: string | null, end: string | null): string {
+  if (!start || !end) return '-';
+  return `${start} ~ ${end}`;
+}
+
+function formatDDay(dDay: number): string {
+  if (dDay === 0) return 'D-day';
+  if (dDay < 0) return `D${dDay}`;
+  return `D-${dDay}`;
+}
+
 const MyPageClient = ({ tab }: { tab: TabKey }) => {
   const router = useRouter();
   const { isLoggedIn, isInitialized } = useAuthStore();
+
+  const [qrParticipationId, setQrParticipationId] = useState<number | null>(
+    null,
+  );
+  const [isQrOpen, setIsQrOpen] = useState(false);
+  const [qrMeta, setQrMeta] = useState<{
+    storeName: string;
+    dDay: number;
+  } | null>(null);
+
+  const { data: qrData } = useGetApiV1ParticipationsParticipationIdQr(
+    qrParticipationId ?? 0,
+    { query: { enabled: isQrOpen && qrParticipationId !== null } },
+  );
+  const { data: pickupData } = useGetApiV1ParticipationsParticipationIdPickup(
+    qrParticipationId ?? 0,
+    { query: { enabled: isQrOpen && qrParticipationId !== null } },
+  );
+
+  const handleQrClose = useCallback(() => setIsQrOpen(false), []);
+  const handleShake = useCallback(() => setIsQrOpen(true), []);
+  const { isEnabled, toggleShake } = useShake(handleShake);
+
+  const handleQrClick = useCallback(
+    (id: number, meta: { storeName: string; dDay: number }) => {
+      setQrParticipationId(id);
+      setQrMeta(meta);
+      setIsQrOpen(true);
+    },
+    [],
+  );
+
+  const qrValue =
+    qrData?.status === 200 ? (qrData.data?.data?.qrCode ?? '') : '';
+  const pickup = pickupData?.status === 200 ? pickupData.data?.data : null;
 
   const { data: countsData } = useGetApiV1UsersMeTabsCounts({
     query: { enabled: isLoggedIn },
@@ -82,8 +134,25 @@ const MyPageClient = ({ tab }: { tab: TabKey }) => {
             </button>
           ))}
         </div>
-        <ParticipationTab tabType={tab} />
+        <ParticipationTab tabType={tab} onQrClick={handleQrClick} />
       </div>
+
+      <QrModal
+        isOpen={isQrOpen}
+        onClose={handleQrClose}
+        isPickupDay={qrMeta?.dDay === 0}
+        orderNumber={String(qrParticipationId ?? '')}
+        pickupLocation={pickup?.storeAddress ?? ''}
+        pickupTime={formatPickupTime(
+          pickup?.pickupTimeStart ?? null,
+          pickup?.pickupTimeEnd ?? null,
+        )}
+        storeName={pickup?.storeName ?? qrMeta?.storeName ?? ''}
+        qrValue={qrValue}
+        dDayText={formatDDay(qrMeta?.dDay ?? 0)}
+        shakeEnabled={isEnabled}
+        onShakeToggle={toggleShake}
+      />
     </div>
   );
 };

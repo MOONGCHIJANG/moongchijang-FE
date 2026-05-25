@@ -149,7 +149,7 @@ export default function PickupPage() {
     pickup.pickupLocation && pickup.pickupLocation !== pickup.storeAddress;
 
   return (
-    <div className="relative min-h-dvh bg-bg-white flex flex-col">
+    <div className="relative h-dvh bg-bg-white flex flex-col">
       <Header text="픽업 안내" showBackButton />
 
       <div

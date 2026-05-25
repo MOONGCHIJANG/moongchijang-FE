@@ -16,14 +16,16 @@ export function formatShortDate(dateStr: string): string {
   return `${yy}.${mm}.${dd}`;
 }
 
-export function formatPickupDate(dateStr: string) {
+export function formatPickupDate(dateStr: string): string {
   const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return '-';
   const days = ['일', '월', '화', '수', '목', '금', '토'];
   return `${date.getMonth() + 1}/${date.getDate()}(${days[date.getDay()]})`;
 }
 
-export function formatDeadline(dateStr: string) {
+export function formatDeadline(dateStr: string): string {
   const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return '-';
   return `${date.getMonth() + 1}월 ${date.getDate()}일`;
 }
 

@@ -33,10 +33,16 @@ export function ParticipationTab({
   const router = useRouter();
 
   const isRefunded = tabType === 'refunded';
-  const isActive = tabType === 'active' || tabType === 'waiting';
+
+  const statusByTab = {
+    active: 'IN_PROGRESS',
+    waiting: 'PICKUP_WAITING',
+    completed: 'PICKUP_COMPLETED',
+    refunded: 'IN_PROGRESS',
+  } as const;
 
   const { data: participationData } = useGetApiV1UsersMeParticipations(
-    { status: isActive ? 'ACTIVE' : 'COMPLETED' },
+    { status: statusByTab[tabType] },
     { query: { enabled: !isRefunded } },
   );
 
@@ -51,23 +57,10 @@ export function ParticipationTab({
     [router],
   );
 
-  const allActiveOrCompleted: ApiResponseMypageParticipationListDataItem[] =
+  const items: ApiResponseMypageParticipationListDataItem[] =
     participationData?.status === 200
       ? (participationData.data?.data ?? [])
       : [];
-
-  const items =
-    tabType === 'active'
-      ? allActiveOrCompleted.filter(
-          (i: ApiResponseMypageParticipationListDataItem) =>
-            i.achievementStatus === 'BEFORE_ACHIEVED',
-        )
-      : tabType === 'waiting'
-        ? allActiveOrCompleted.filter(
-            (i: ApiResponseMypageParticipationListDataItem) =>
-              i.achievementStatus === 'ACHIEVED',
-          )
-        : allActiveOrCompleted;
 
   const refundItems: ApiResponseRefundListDataItem[] =
     refundData?.status === 200 ? (refundData.data?.data ?? []) : [];
@@ -81,13 +74,14 @@ export function ParticipationTab({
           {EMPTY_MESSAGES[tabType]}
         </div>
       ) : isRefunded ? (
-        refundItems.map((item: ApiResponseRefundListDataItem) => (
+        refundItems.map((item) => (
           <ParticipationCard
             key={item.participationId}
             variant="refunded"
             participationId={item.participationId}
             productName={item.productName}
             storeName={item.storeName}
+            imageUrl={item.thumbnailUrl}
             pickupDate={item.pickupDate}
             quantity={item.quantity}
             paymentAmount={item.paymentAmount}
@@ -105,6 +99,7 @@ export function ParticipationTab({
             pickupDate={item.pickupDate}
             quantity={item.quantity}
             paymentAmount={item.paymentAmount}
+            imageUrl={item.thumbnailUrl}
             achievementRate={item.achievementRate}
             dDay={item.dDay}
           />
@@ -120,6 +115,7 @@ export function ParticipationTab({
             pickupDate={item.pickupDate}
             quantity={item.quantity}
             paymentAmount={item.paymentAmount}
+            imageUrl={item.thumbnailUrl}
             onQrClick={() =>
               onQrClick(item.participationId, {
                 storeName: item.storeName,
@@ -140,6 +136,7 @@ export function ParticipationTab({
             pickupDate={item.pickupDate}
             quantity={item.quantity}
             paymentAmount={item.paymentAmount}
+            imageUrl={item.thumbnailUrl}
           />
         ))
       )}

@@ -11,6 +11,7 @@ import {
   ApiResponseRefundListDataItem,
 } from '@/api/generated/api.schemas';
 import { useGetApiV1ParticipationsParticipationIdPickup } from '@/api/hooks/pickup/pickup';
+import Image from 'next/image';
 import Header from '@/components/Header';
 import Tooltip from '@/components/Tooltip';
 import Modal from '@/components/Modal';
@@ -50,6 +51,20 @@ function formatAmount(n: number): string {
   return n.toLocaleString('ko-KR') + '원';
 }
 
+const PAYMENT_METHOD_LABEL: Record<string, string> = {
+  CARD: '카드',
+  TRANSFER: '계좌이체',
+  VIRTUAL_ACCOUNT: '가상계좌',
+  MOBILE: '휴대폰 결제',
+  EASY_PAY: '간편결제',
+  GIFT_CERTIFICATE: '상품권',
+};
+
+function formatPaymentMethod(method: string | null): string | null {
+  if (!method) return null;
+  return PAYMENT_METHOD_LABEL[method] ?? method;
+}
+
 export default function OrderDetailPage({
   params,
 }: {
@@ -60,16 +75,23 @@ export default function OrderDetailPage({
   const router = useRouter();
   const [showCancelModal, setShowCancelModal] = useState(false);
 
-  const { data: activeRes, isPending: isActivePending } =
-    useGetApiV1UsersMeParticipations({ status: 'ACTIVE' });
+  const { data: inProgressRes, isPending: isInProgressPending } =
+    useGetApiV1UsersMeParticipations({ status: 'IN_PROGRESS' });
+  const { data: pickupWaitingRes, isPending: isPickupWaitingPending } =
+    useGetApiV1UsersMeParticipations({ status: 'PICKUP_WAITING' });
   const { data: completedRes, isPending: isCompletedPending } =
-    useGetApiV1UsersMeParticipations({ status: 'COMPLETED' });
+    useGetApiV1UsersMeParticipations({ status: 'PICKUP_COMPLETED' });
   const { data: refundRes, isPending: isRefundPending } =
     useGetApiV1UsersMeRefunds();
   const { data: pickupRes } =
     useGetApiV1ParticipationsParticipationIdPickup(id);
 
-  if (isActivePending || isCompletedPending || isRefundPending) {
+  if (
+    isInProgressPending ||
+    isPickupWaitingPending ||
+    isCompletedPending ||
+    isRefundPending
+  ) {
     return (
       <div className="min-h-dvh bg-bg-white-muted flex flex-col">
         <Header text="주문 상세" showBackButton />
@@ -80,22 +102,28 @@ export default function OrderDetailPage({
     );
   }
 
-  const activeItems: ApiResponseMypageParticipationListDataItem[] =
-    activeRes?.status === 200 ? (activeRes.data?.data ?? []) : [];
+  const inProgressItems: ApiResponseMypageParticipationListDataItem[] =
+    inProgressRes?.status === 200 ? (inProgressRes.data?.data ?? []) : [];
+  const pickupWaitingItems: ApiResponseMypageParticipationListDataItem[] =
+    pickupWaitingRes?.status === 200 ? (pickupWaitingRes.data?.data ?? []) : [];
   const completedItems: ApiResponseMypageParticipationListDataItem[] =
     completedRes?.status === 200 ? (completedRes.data?.data ?? []) : [];
   const refundItems: ApiResponseRefundListDataItem[] =
     refundRes?.status === 200 ? (refundRes.data?.data ?? []) : [];
   const pickup = pickupRes?.status === 200 ? pickupRes.data?.data : null;
 
-  const activeItem = activeItems.find((p) => p.participationId === id);
+  const inProgressItem = inProgressItems.find((p) => p.participationId === id);
+  const pickupWaitingItem = pickupWaitingItems.find(
+    (p) => p.participationId === id,
+  );
   const completedItem = completedItems.find((p) => p.participationId === id);
   const refundItem = refundItems.find((p) => p.participationId === id);
 
   let variant: OrderVariant | null = null;
-  if (activeItem) {
-    variant =
-      activeItem.achievementStatus === 'BEFORE_ACHIEVED' ? 'active' : 'waiting';
+  if (inProgressItem) {
+    variant = 'active';
+  } else if (pickupWaitingItem) {
+    variant = 'waiting';
   } else if (completedItem) {
     variant = 'completed';
   } else if (refundItem) {
@@ -105,7 +133,7 @@ export default function OrderDetailPage({
         : 'refund-completed';
   }
 
-  const item = activeItem ?? completedItem;
+  const item = inProgressItem ?? pickupWaitingItem ?? completedItem;
   const productName =
     pickup?.productName ?? item?.productName ?? refundItem?.productName ?? '-';
   const storeName =
@@ -115,6 +143,10 @@ export default function OrderDetailPage({
   const quantity =
     pickup?.quantity ?? item?.quantity ?? refundItem?.quantity ?? 0;
   const paymentAmount = item?.paymentAmount ?? refundItem?.paymentAmount ?? 0;
+  const paymentMethod =
+    item?.paymentMethod ?? refundItem?.paymentMethod ?? null;
+  const paidAt = item?.paidAt ?? null;
+  const thumbnailUrl = item?.thumbnailUrl ?? refundItem?.thumbnailUrl ?? null;
   const tag = variant ? MINI_TAG[variant] : null;
 
   return (
@@ -125,7 +157,7 @@ export default function OrderDetailPage({
         {/* 주문 상태 */}
         <div className="bg-surface-white px-g5 py-g5">
           <p className="heading-sm-bold text-text-basic mb-g5">
-            {formatCompactDate(pickupDate)} 결제
+            {formatCompactDate(paidAt ?? pickupDate)} 결제
           </p>
           {tag && (
             <span
@@ -135,7 +167,19 @@ export default function OrderDetailPage({
             </span>
           )}
           <div className="flex items-center gap-g4">
-            <div className="w-16 h-16 rounded-2xlarge bg-surface-default shrink-0" />
+            <div className="w-16 h-16 rounded-2xlarge shrink-0 overflow-hidden bg-surface-default">
+              {thumbnailUrl ? (
+                <Image
+                  src={thumbnailUrl}
+                  alt={productName}
+                  width={64}
+                  height={64}
+                  className="object-cover w-full h-full"
+                />
+              ) : (
+                <div className="w-full h-full bg-surface-default" />
+              )}
+            </div>
             <div className="flex flex-col gap-p3">
               <p className="heading-md-bold text-text-basic">{productName}</p>
               <p className="caption-sm-medium text-text-tertiary">
@@ -160,7 +204,11 @@ export default function OrderDetailPage({
               bold
               highlight
             />
-            {/* TODO: 백엔드에서 paymentMethod 필드 추가되면 표시 */}
+            {formatPaymentMethod(paymentMethod) && (
+              <p className="body-md-regular text-text-tertiary mt-g2 text-right">
+                {formatPaymentMethod(paymentMethod)}
+              </p>
+            )}
           </div>
         </div>
 
@@ -170,7 +218,7 @@ export default function OrderDetailPage({
             <div className="relative w-full flex justify-center">
               <Tooltip text="공구가 달성되지 않으면 자동으로 환불돼요" />
             </div>
-            {activeItem?.canCancel && (
+            {inProgressItem?.canCancel && (
               <button
                 className="caption-sm-medium text-text-tertiary underline underline-offset-2"
                 onClick={() => setShowCancelModal(true)}
@@ -185,7 +233,7 @@ export default function OrderDetailPage({
         {(variant === 'refund-pending' || variant === 'refund-completed') &&
           refundItem && (
             <div className="bg-surface-white px-g5 py-g5 mt-g5">
-              <p className="body-md-bold text-text-basic mb-g4">환불 내역</p>
+              <p className="heading-md-bold text-text-basic mb-g4">환불 내역</p>
               <div className="flex flex-col">
                 <PaymentRow
                   label="상품 금액"
@@ -200,7 +248,11 @@ export default function OrderDetailPage({
                   bold
                   highlight
                 />
-                {/* TODO: 백엔드에서 paymentMethod 필드 추가되면 표시 */}
+                {formatPaymentMethod(refundItem.paymentMethod) && (
+                  <p className="body-md-regular text-text-tertiary mt-g2 text-right">
+                    {formatPaymentMethod(refundItem.paymentMethod)}
+                  </p>
+                )}
               </div>
             </div>
           )}

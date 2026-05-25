@@ -13,7 +13,6 @@ interface BaseCardFields {
   pickupDate: string | null;
   quantity: number;
   paymentAmount: number;
-  // TODO: 백엔드에서 참여 목록 API에 thumbnailUrl 추가되면 연결
   imageUrl?: string | null;
 }
 

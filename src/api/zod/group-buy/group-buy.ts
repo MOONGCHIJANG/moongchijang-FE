@@ -625,7 +625,7 @@ export const GetApiV1GroupBuysGroupBuyIdShareResponse = zod.object({
     shareUrl: zod.string(),
     title: zod.string(),
     description: zod.string(),
-    imageUrl: zod.string(),
+    imageUrl: zod.string().nullable(),
     storeName: zod.string(),
     deadline: zod.iso.datetime({ offset: true }),
     pickupDate: zod.iso.date(),

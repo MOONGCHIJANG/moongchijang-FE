@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import StepEmail from './StepEmail/StepEmail';
-import StepProfile from './StepProfile';
+import StepProfile from './StepProfile/StepProfile';
 import StepRole from './StepRole';
 import { useSearchParams } from 'next/navigation';
 
@@ -17,17 +17,11 @@ export default function SignUpClient() {
     setStep((prev) => (prev < 3 ? ((prev + 1) as Step) : prev));
   };
 
-  const handlePrevStep = () => {
-    setStep((prev) => (prev > 1 ? ((prev - 1) as Step) : prev));
-  };
-
   return (
     <div className="p-4">
       {step === 1 && <StepEmail onNext={handleNextStep} />}
-      {step === 2 && (
-        <StepProfile onNext={handleNextStep} onBack={handlePrevStep} />
-      )}
-      {step === 3 && <StepRole onBack={handlePrevStep} />}
+      {step === 2 && <StepProfile onNext={handleNextStep} />}
+      {step === 3 && <StepRole />}
     </div>
   );
 }

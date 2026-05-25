@@ -32,10 +32,7 @@ const StepProfile = ({ onNext }: StepProfileProps) => {
     onSubmit,
   } = useStepProfile(onNext);
 
-  const {
-    register,
-    formState: { errors },
-  } = form;
+  const { register } = form;
 
   return (
     <>

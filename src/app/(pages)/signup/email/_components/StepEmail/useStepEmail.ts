@@ -7,7 +7,6 @@ import { z } from 'zod';
 import { StepEmailFormValues, stepEmailSchema } from '@/schemas/auth';
 import {
   getApiV1AuthEmailAvailability,
-  usePostApiV1AuthEmailSignup,
   usePostApiV1AuthEmailVerificationCodes,
   usePostApiV1AuthEmailVerificationCodesVerify,
 } from '@/api/hooks/auth/auth';
@@ -55,8 +54,7 @@ export const useStepEmail = (onNext: () => void) => {
   const { mutate: verifyCode, isPending: isVerifyingCode } =
     usePostApiV1AuthEmailVerificationCodesVerify();
 
-  const { mutate: signup, isPending: isSigningUp } =
-    usePostApiV1AuthEmailSignup();
+  const [isSigningUp, setIsSigningUp] = useState(false);
 
   // 인증번호 타이머
   const startTimer = (seconds: number) => {
@@ -90,7 +88,6 @@ export const useStepEmail = (onNext: () => void) => {
   const isEmailFormatValid = z.string().email().safeParse(emailValue).success;
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setEmailStatus('idle');
     setEmailError('');
     setCodeStatus('idle');
@@ -185,27 +182,30 @@ export const useStepEmail = (onNext: () => void) => {
   };
 
   // 이메일 회원가입 핸들러
-  const onSubmit = () => {
+  const onSubmit = async () => {
     if (!signupTokenRef.current) return;
+    setIsSigningUp(true);
 
-    signup(
-      {
-        data: {
+    try {
+      const res = await fetch('/api/v1/auth/email/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           email: emailValue,
           password: passwordValue,
           signupToken: signupTokenRef.current,
-        },
-      },
-      {
-        onSuccess: (result) => {
-          if (result.status !== 200) return;
-          onNext();
-        },
-        onError: () => {
-          // TODO: 에러 토스트
-        },
-      },
-    );
+        }),
+      });
+
+      if (res.ok) {
+        onNext();
+      }
+      // TODO: 에러 토스트
+    } catch {
+      // TODO: 에러 토스트
+    } finally {
+      setIsSigningUp(false);
+    }
   };
 
   // 다음 버튼 활성화 조건

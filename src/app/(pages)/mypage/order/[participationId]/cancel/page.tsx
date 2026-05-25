@@ -61,7 +61,7 @@ export default function CancelPage({
   }, [submitError]);
 
   const { data: activeRes } = useGetApiV1UsersMeParticipations({
-    status: 'ACTIVE',
+    status: 'IN_PROGRESS',
   });
   const activeItems: ApiResponseMypageParticipationListDataItem[] =
     activeRes?.status === 200 ? (activeRes.data?.data ?? []) : [];

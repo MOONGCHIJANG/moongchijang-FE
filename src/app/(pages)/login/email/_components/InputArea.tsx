@@ -76,7 +76,7 @@ const InputArea = () => {
           label="비밀번호"
           isPassword
           placeholder="비밀번호를 입력해주세요."
-          helperText="영문, 숫자, 특수문자가 모두 들어간 8자 이상"
+          helperText="영문, 숫자가 모두 들어간 8자 이상"
           value={password}
           onChange={(e) => {
             setPassword(e.target.value);

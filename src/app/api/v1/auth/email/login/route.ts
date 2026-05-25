@@ -11,13 +11,25 @@ export async function POST(req: NextRequest) {
 
   if (result.status === 200) {
     const data = result.data as {
-      data?: { accessToken: string; expiresIn: number };
+      data?: {
+        accessToken: string;
+        expiresIn: number;
+        user?: { signupCompleted: boolean };
+      };
     };
 
-    const accessToken = data?.data?.accessToken ?? 'demo-token';
+    const accessToken = data?.data?.accessToken ?? '';
     const expiresIn = data?.data?.expiresIn ?? 3600;
+    const signupCompleted = data?.data?.user?.signupCompleted ?? true;
 
-    const response = NextResponse.json(result.data, { status: 200 });
+    const response = NextResponse.json(
+      {
+        ...(result.data as object),
+        redirectTo: signupCompleted ? null : '/signup/email?step=profile',
+      },
+      { status: 200 },
+    );
+
     response.cookies.set('accessToken', accessToken, {
       httpOnly: false, // TODO: customFetch 구조 변경 후 httpOnly: true로 전환 필요
       maxAge: expiresIn,

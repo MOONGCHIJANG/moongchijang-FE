@@ -22,7 +22,6 @@ const InputArea = () => {
   const handleLogin = async () => {
     setErrorMessage(null);
 
-    // 정합성 검사 유지
     const isValid = loginSchema.safeParse({ email, password }).success;
     if (!isValid) {
       setErrorMessage('이메일 또는 비밀번호를 확인해주세요.');
@@ -38,6 +37,16 @@ const InputArea = () => {
       });
 
       if (res.ok) {
+        const data = await res.json();
+        const redirectTo = data?.redirectTo as string | null;
+
+        // 회원가입 이어서 진행
+        if (redirectTo) {
+          router.push(redirectTo);
+          return;
+        }
+
+        // signupCompleted: true → 정상 로그인
         setIsLoggedIn(true);
         const redirect = redirectStorage.consume();
         router.push(redirect ?? '/feed');

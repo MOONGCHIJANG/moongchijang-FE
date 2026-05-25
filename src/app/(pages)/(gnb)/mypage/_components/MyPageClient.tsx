@@ -7,6 +7,7 @@ import {
   useGetApiV1ParticipationsParticipationIdPickup,
   useGetApiV1ParticipationsParticipationIdQr,
 } from '@/api/hooks/pickup/pickup';
+import { useGetApiV1UsersMeTabsCounts } from '@/api/hooks/my-page/my-page';
 import { useShake } from '@/hooks/useShake';
 import { Icon } from '@iconify/react';
 import Image from 'next/image';
@@ -24,7 +25,6 @@ const TAB_LABELS: Record<TabKey, string> = {
   refunded: '환불/취소',
 };
 
-// TODO: 백엔드에서 beforeAchievedCount / achievedCount 분리되면 active·waiting 카운트 연결
 
 function formatPickupTime(start: string | null, end: string | null): string {
   if (!start || !end) return '-';
@@ -76,6 +76,16 @@ const MyPageClient = ({ tab }: { tab: TabKey }) => {
     qrData?.status === 200 ? (qrData.data?.data?.qrCode ?? '') : '';
   const pickup = pickupData?.status === 200 ? pickupData.data?.data : null;
 
+  const { data: tabCountsData } = useGetApiV1UsersMeTabsCounts();
+  const tabCounts = tabCountsData?.status === 200 ? tabCountsData.data?.data : null;
+
+  const countByTab: Record<TabKey, number> = {
+    active: tabCounts?.inProgressCount ?? 0,
+    waiting: tabCounts?.pickupWaitingCount ?? 0,
+    completed: tabCounts?.pickupCompletedCount ?? 0,
+    refunded: tabCounts?.cancelledOrRefundedCount ?? 0,
+  };
+
   const handleTabChange = useCallback(
     (next: TabKey) => {
       router.push(`/mypage?tab=${next}`);
@@ -125,6 +135,7 @@ const MyPageClient = ({ tab }: { tab: TabKey }) => {
               onClick={() => handleTabChange(key)}
             >
               {TAB_LABELS[key]}
+              {countByTab[key] > 0 && ` (${countByTab[key]})`}
             </button>
           ))}
         </div>

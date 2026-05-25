@@ -19,17 +19,6 @@ interface ParticipationTabProps {
   onQrClick: (id: number, meta: { storeName: string; dDay: number }) => void;
 }
 
-function formatPickupTime(start: string | null, end: string | null): string {
-  if (!start || !end) return '-';
-  return `${start} ~ ${end}`;
-}
-
-function formatDDay(dDay: number): string {
-  if (dDay === 0) return 'D-day';
-  if (dDay < 0) return `D${dDay}`;
-  return `D-${dDay}`;
-}
-
 const EMPTY_MESSAGES: Record<TabType, string> = {
   active: '진행 중인 공구가 없어요',
   waiting: '픽업 대기 중인 공구가 없어요',

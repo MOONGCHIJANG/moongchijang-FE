@@ -3,7 +3,6 @@
 import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
-import { useGetApiV1UsersMeTabsCounts } from '@/api/hooks/my-page/my-page';
 import {
   useGetApiV1ParticipationsParticipationIdPickup,
   useGetApiV1ParticipationsParticipationIdQr,
@@ -76,11 +75,6 @@ const MyPageClient = ({ tab }: { tab: TabKey }) => {
   const qrValue =
     qrData?.status === 200 ? (qrData.data?.data?.qrCode ?? '') : '';
   const pickup = pickupData?.status === 200 ? pickupData.data?.data : null;
-
-  const { data: countsData } = useGetApiV1UsersMeTabsCounts({
-    query: { enabled: isLoggedIn },
-  });
-  const counts = countsData?.status === 200 ? countsData.data?.data : null;
 
   const handleTabChange = useCallback(
     (next: TabKey) => {

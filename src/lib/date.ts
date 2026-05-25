@@ -1,3 +1,11 @@
+export function formatDate(dateStr: string): string {
+  const d = new Date(dateStr);
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}.${mm}.${dd}`;
+}
+
 export function formatPickupDate(dateStr: string) {
   const date = new Date(dateStr);
   const days = ['일', '월', '화', '수', '목', '금', '토'];

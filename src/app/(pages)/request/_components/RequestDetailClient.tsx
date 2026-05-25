@@ -5,14 +5,7 @@ import Header from '@/components/Header';
 import { Button } from '@/components/Button';
 import { GroupBuyRequestDetailStatus } from '@/api/generated/api.schemas';
 import { useGetApiV1GroupBuyRequestsRequestId } from '@/api/hooks/group-buy-request/group-buy-request';
-
-function formatDate(dateStr: string) {
-  const d = new Date(dateStr);
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  return `${yyyy}.${mm}.${dd}`;
-}
+import { formatDate } from '@/lib/date';
 
 function getStatusConfig(status: GroupBuyRequestDetailStatus): {
   badge: string;

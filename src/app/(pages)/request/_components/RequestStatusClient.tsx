@@ -9,15 +9,7 @@ import {
   GroupBuyRequestDetailStatusHistoryItemStatus,
 } from '@/api/generated/api.schemas';
 import { useGetApiV1GroupBuyRequestsRequestId } from '@/api/hooks/group-buy-request/group-buy-request';
-import { formatPickupDate } from '@/lib/date';
-
-function formatDate(dateStr: string): string {
-  const d = new Date(dateStr);
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  return `${yyyy}.${mm}.${dd}`;
-}
+import { formatDate, formatPickupDate } from '@/lib/date';
 
 type StepState = 'completed' | 'current' | 'pending';
 

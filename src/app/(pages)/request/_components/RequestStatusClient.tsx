@@ -151,7 +151,7 @@ export function RequestStatusClient({ requestId }: RequestStatusClientProps) {
       <div className="flex-1 overflow-y-auto">
         {/* 요청 정보 */}
         <div className="bg-bg-white px-p6 py-p6 flex flex-col gap-g2 border-b border-dashed border-border-subtle">
-          <div className="flex items-center gap-1 flex-wrap">
+          <div className="flex items-center gap-g1 flex-wrap">
             <span className="caption-sm-medium text-text-tertiary">
               {request.storeName}
             </span>

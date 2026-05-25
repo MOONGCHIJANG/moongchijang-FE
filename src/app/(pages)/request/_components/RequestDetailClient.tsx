@@ -88,7 +88,7 @@ export function RequestDetailClient({ requestId }: RequestDetailClientProps) {
               </span>
             </div>
             <span
-              className={`inline-flex items-center rounded-md px-[7px] py-[5px] caption-xs-bold ${statusConfig.badgeClassName}`}
+              className={`inline-flex items-center rounded-medium px-[7px] py-[5px] caption-xs-bold ${statusConfig.badgeClassName}`}
             >
               {statusConfig.badge}
             </span>

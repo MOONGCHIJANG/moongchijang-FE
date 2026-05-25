@@ -5,15 +5,7 @@ import {
   GroupBuyRequestDetail,
   GroupBuyRequestDetailStatus,
 } from '@/api/generated/api.schemas';
-import { formatPickupDate } from '@/lib/date';
-
-function formatCreatedAt(dateStr: string) {
-  const date = new Date(dateStr);
-  const yy = String(date.getFullYear()).slice(2);
-  const mm = String(date.getMonth() + 1).padStart(2, '0');
-  const dd = String(date.getDate()).padStart(2, '0');
-  return `${yy}.${mm}.${dd}`;
-}
+import { formatPickupDate, formatShortDate } from '@/lib/date';
 
 function getStatusConfig(status: GroupBuyRequestDetailStatus): {
   label: string;
@@ -40,7 +32,7 @@ interface RequestCardProps {
 
 export function RequestCard({ request }: RequestCardProps) {
   const statusConfig = getStatusConfig(request.status);
-  const dateLabel = formatCreatedAt(request.createdAt);
+  const dateLabel = formatShortDate(request.createdAt);
   const pickupLabel = formatPickupDate(request.desiredPickupDate);
 
   return (
@@ -64,25 +56,15 @@ export function RequestCard({ request }: RequestCardProps) {
         <div className="flex flex-col gap-g3">
           <Link
             href={`/request/${request.requestId}/detail`}
-            className="w-full"
+            className="flex items-center justify-center w-full h-10 rounded-large bg-surface-inverse body-md-semibold text-text-basic-inverse"
           >
-            <button
-              type="button"
-              className="w-full h-10 rounded-large bg-surface-inverse body-md-semibold text-text-basic-inverse"
-            >
-              신청 내역
-            </button>
+            신청 내역
           </Link>
           <Link
             href={`/request/${request.requestId}/status`}
-            className="w-full"
+            className="flex items-center justify-center w-full h-10 rounded-large border border-border-subtle bg-bg-white body-md-semibold text-text-subtle"
           >
-            <button
-              type="button"
-              className="w-full h-10 rounded-large border border-border-subtle bg-bg-white body-md-semibold text-text-subtle"
-            >
-              요청 현황
-            </button>
+            요청 현황
           </Link>
         </div>
       </div>

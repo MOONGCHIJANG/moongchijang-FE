@@ -42,6 +42,7 @@ export function RequestDetailClient({ requestId }: RequestDetailClientProps) {
   const { data, isLoading, isError } =
     useGetApiV1GroupBuyRequestsRequestId(requestId);
   const request = data?.status === 200 ? data.data?.data : null;
+  const is403 = data?.status === 403;
 
   if (isLoading) {
     return (
@@ -62,7 +63,9 @@ export function RequestDetailClient({ requestId }: RequestDetailClientProps) {
           <span className="body-md-regular text-text-tertiary">
             {isError
               ? '요청 정보를 불러오지 못했어요'
-              : '요청 정보를 찾을 수 없어요'}
+              : is403
+                ? '접근 권한이 없어요'
+                : '요청 정보를 찾을 수 없어요'}
           </span>
         </div>
       </div>

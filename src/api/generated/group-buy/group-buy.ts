@@ -19,7 +19,7 @@ import type {
   NotFoundResponse,
   PostApiV1SearchBody,
   SuccessNoDataResponse,
-  UnauthorizedResponse
+  UnauthorizedResponse,
 } from '../api.schemas';
 
 import { customFetch } from '../../../lib/custom-fetch';
@@ -38,29 +38,31 @@ import { customFetch } from '../../../lib/custom-fetch';
  * @summary 공구 피드 목록 조회
  */
 export type getApiV1GroupBuysResponse200 = {
-  data: ApiResponseGroupBuyFeedPageResponse
-  status: 200
-}
+  data: ApiResponseGroupBuyFeedPageResponse;
+  status: 200;
+};
 
 export type getApiV1GroupBuysResponse400 = {
-  data: ApiResponseError
-  status: 400
-}
-
-export type getApiV1GroupBuysResponseSuccess = (getApiV1GroupBuysResponse200) & {
-  headers: Headers;
-};
-export type getApiV1GroupBuysResponseError = (getApiV1GroupBuysResponse400) & {
-  headers: Headers;
+  data: ApiResponseError;
+  status: 400;
 };
 
-export type getApiV1GroupBuysResponse = (getApiV1GroupBuysResponseSuccess | getApiV1GroupBuysResponseError)
+export type getApiV1GroupBuysResponseSuccess = getApiV1GroupBuysResponse200 & {
+  headers: Headers;
+};
+export type getApiV1GroupBuysResponseError = getApiV1GroupBuysResponse400 & {
+  headers: Headers;
+};
 
-export const getGetApiV1GroupBuysUrl = (params?: GetApiV1GroupBuysParams,) => {
+export type getApiV1GroupBuysResponse =
+  | getApiV1GroupBuysResponseSuccess
+  | getApiV1GroupBuysResponseError;
+
+export const getGetApiV1GroupBuysUrl = (params?: GetApiV1GroupBuysParams) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-    const explodeParameters = ["districts"];
+    const explodeParameters = ['districts'];
 
     if (Array.isArray(value) && explodeParameters.includes(key)) {
       value.forEach((v) => {
@@ -70,104 +72,107 @@ export const getGetApiV1GroupBuysUrl = (params?: GetApiV1GroupBuysParams,) => {
     }
 
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
+      normalizedParams.append(key, value === null ? 'null' : value.toString());
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/v1/group-buys?${stringifiedParams}` : `/api/v1/group-buys`
-}
+  return stringifiedParams.length > 0
+    ? `/api/v1/group-buys?${stringifiedParams}`
+    : `/api/v1/group-buys`;
+};
 
-export const getApiV1GroupBuys = async (params?: GetApiV1GroupBuysParams, options?: RequestInit): Promise<getApiV1GroupBuysResponse> => {
-
-  return customFetch<getApiV1GroupBuysResponse>(getGetApiV1GroupBuysUrl(params),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+export const getApiV1GroupBuys = async (
+  params?: GetApiV1GroupBuysParams,
+  options?: RequestInit,
+): Promise<getApiV1GroupBuysResponse> => {
+  return customFetch<getApiV1GroupBuysResponse>(
+    getGetApiV1GroupBuysUrl(params),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
 
 /**
  * 공구의 상품·매장·픽업·이미지 정보를 조회한다. 비로그인 허용.
  * @summary 공구 상세 조회
  */
 export type getApiV1GroupBuysGroupBuyIdResponse200 = {
-  data: ApiResponseGroupBuyDetailResponse
-  status: 200
-}
+  data: ApiResponseGroupBuyDetailResponse;
+  status: 200;
+};
 
 export type getApiV1GroupBuysGroupBuyIdResponse404 = {
-  data: NotFoundResponse
-  status: 404
-}
-
-export type getApiV1GroupBuysGroupBuyIdResponseSuccess = (getApiV1GroupBuysGroupBuyIdResponse200) & {
-  headers: Headers;
-};
-export type getApiV1GroupBuysGroupBuyIdResponseError = (getApiV1GroupBuysGroupBuyIdResponse404) & {
-  headers: Headers;
+  data: NotFoundResponse;
+  status: 404;
 };
 
-export type getApiV1GroupBuysGroupBuyIdResponse = (getApiV1GroupBuysGroupBuyIdResponseSuccess | getApiV1GroupBuysGroupBuyIdResponseError)
+export type getApiV1GroupBuysGroupBuyIdResponseSuccess =
+  getApiV1GroupBuysGroupBuyIdResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1GroupBuysGroupBuyIdResponseError =
+  getApiV1GroupBuysGroupBuyIdResponse404 & {
+    headers: Headers;
+  };
 
-export const getGetApiV1GroupBuysGroupBuyIdUrl = (groupBuyId: number,) => {
+export type getApiV1GroupBuysGroupBuyIdResponse =
+  | getApiV1GroupBuysGroupBuyIdResponseSuccess
+  | getApiV1GroupBuysGroupBuyIdResponseError;
 
+export const getGetApiV1GroupBuysGroupBuyIdUrl = (groupBuyId: number) => {
+  return `/api/v1/group-buys/${groupBuyId}`;
+};
 
-
-
-  return `/api/v1/group-buys/${groupBuyId}`
-}
-
-export const getApiV1GroupBuysGroupBuyId = async (groupBuyId: number, options?: RequestInit): Promise<getApiV1GroupBuysGroupBuyIdResponse> => {
-
-  return customFetch<getApiV1GroupBuysGroupBuyIdResponse>(getGetApiV1GroupBuysGroupBuyIdUrl(groupBuyId),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+export const getApiV1GroupBuysGroupBuyId = async (
+  groupBuyId: number,
+  options?: RequestInit,
+): Promise<getApiV1GroupBuysGroupBuyIdResponse> => {
+  return customFetch<getApiV1GroupBuysGroupBuyIdResponse>(
+    getGetApiV1GroupBuysGroupBuyIdUrl(groupBuyId),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
 
 /**
  * @summary 단일 공구 달성률 조회 (폴링용)
  */
 export type getApiV1GroupBuysGroupBuyIdProgressResponse200 = {
-  data: ApiResponseGroupBuyProgress
-  status: 200
-}
-
-export type getApiV1GroupBuysGroupBuyIdProgressResponseSuccess = (getApiV1GroupBuysGroupBuyIdProgressResponse200) & {
-  headers: Headers;
+  data: ApiResponseGroupBuyProgress;
+  status: 200;
 };
-;
 
-export type getApiV1GroupBuysGroupBuyIdProgressResponse = (getApiV1GroupBuysGroupBuyIdProgressResponseSuccess)
+export type getApiV1GroupBuysGroupBuyIdProgressResponseSuccess =
+  getApiV1GroupBuysGroupBuyIdProgressResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1GroupBuysGroupBuyIdProgressResponse =
+  getApiV1GroupBuysGroupBuyIdProgressResponseSuccess;
 
-export const getGetApiV1GroupBuysGroupBuyIdProgressUrl = (groupBuyId: number,) => {
+export const getGetApiV1GroupBuysGroupBuyIdProgressUrl = (
+  groupBuyId: number,
+) => {
+  return `/api/v1/group-buys/${groupBuyId}/progress`;
+};
 
-
-
-
-  return `/api/v1/group-buys/${groupBuyId}/progress`
-}
-
-export const getApiV1GroupBuysGroupBuyIdProgress = async (groupBuyId: number, options?: RequestInit): Promise<getApiV1GroupBuysGroupBuyIdProgressResponse> => {
-
-  return customFetch<getApiV1GroupBuysGroupBuyIdProgressResponse>(getGetApiV1GroupBuysGroupBuyIdProgressUrl(groupBuyId),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+export const getApiV1GroupBuysGroupBuyIdProgress = async (
+  groupBuyId: number,
+  options?: RequestInit,
+): Promise<getApiV1GroupBuysGroupBuyIdProgressResponse> => {
+  return customFetch<getApiV1GroupBuysGroupBuyIdProgressResponse>(
+    getGetApiV1GroupBuysGroupBuyIdProgressUrl(groupBuyId),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
 
 /**
  * 공구 상세 화면 진입 시 및 체류 중 일정 주기(예: 20~30초)로 호출한다.
@@ -176,135 +181,157 @@ export const getApiV1GroupBuysGroupBuyIdProgress = async (groupBuyId: number, op
  * @summary 활성 조회자 heartbeat 조회/갱신
  */
 export type postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse200 = {
-  data: ApiResponseGroupBuyViewerCount
-  status: 200
-}
+  data: ApiResponseGroupBuyViewerCount;
+  status: 200;
+};
 
 export type postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse400 = {
-  data: BadRequestResponse
-  status: 400
-}
+  data: BadRequestResponse;
+  status: 400;
+};
 
 export type postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse404 = {
-  data: NotFoundResponse
-  status: 404
-}
-
-export type postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponseSuccess = (postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse200) & {
-  headers: Headers;
-};
-export type postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponseError = (postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse400 | postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse404) & {
-  headers: Headers;
+  data: NotFoundResponse;
+  status: 404;
 };
 
-export type postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse = (postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponseSuccess | postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponseError)
+export type postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponseSuccess =
+  postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse200 & {
+    headers: Headers;
+  };
+export type postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponseError = (
+  | postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse400
+  | postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse404
+) & {
+  headers: Headers;
+};
 
-export const getPostApiV1GroupBuysGroupBuyIdViewersHeartbeatUrl = (groupBuyId: number,) => {
+export type postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse =
+  | postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponseSuccess
+  | postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponseError;
 
+export const getPostApiV1GroupBuysGroupBuyIdViewersHeartbeatUrl = (
+  groupBuyId: number,
+) => {
+  return `/api/v1/group-buys/${groupBuyId}/viewers/heartbeat`;
+};
 
-
-
-  return `/api/v1/group-buys/${groupBuyId}/viewers/heartbeat`
-}
-
-export const postApiV1GroupBuysGroupBuyIdViewersHeartbeat = async (groupBuyId: number,
-    groupBuyViewerHeartbeatRequest: GroupBuyViewerHeartbeatRequest, options?: RequestInit): Promise<postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse> => {
-
-  return customFetch<postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse>(getPostApiV1GroupBuysGroupBuyIdViewersHeartbeatUrl(groupBuyId),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      groupBuyViewerHeartbeatRequest,)
-  }
-);}
-
+export const postApiV1GroupBuysGroupBuyIdViewersHeartbeat = async (
+  groupBuyId: number,
+  groupBuyViewerHeartbeatRequest: GroupBuyViewerHeartbeatRequest,
+  options?: RequestInit,
+): Promise<postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse> => {
+  return customFetch<postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse>(
+    getPostApiV1GroupBuysGroupBuyIdViewersHeartbeatUrl(groupBuyId),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(groupBuyViewerHeartbeatRequest),
+    },
+  );
+};
 
 /**
  * @summary 다건 공구 달성률 조회 (피드 갱신용)
  */
 export type getApiV1GroupBuysProgressResponse200 = {
-  data: ApiResponseGroupBuyProgressList
-  status: 200
-}
+  data: ApiResponseGroupBuyProgressList;
+  status: 200;
+};
 
 export type getApiV1GroupBuysProgressResponse400 = {
-  data: BadRequestResponse
-  status: 400
-}
-
-export type getApiV1GroupBuysProgressResponseSuccess = (getApiV1GroupBuysProgressResponse200) & {
-  headers: Headers;
-};
-export type getApiV1GroupBuysProgressResponseError = (getApiV1GroupBuysProgressResponse400) & {
-  headers: Headers;
+  data: BadRequestResponse;
+  status: 400;
 };
 
-export type getApiV1GroupBuysProgressResponse = (getApiV1GroupBuysProgressResponseSuccess | getApiV1GroupBuysProgressResponseError)
+export type getApiV1GroupBuysProgressResponseSuccess =
+  getApiV1GroupBuysProgressResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1GroupBuysProgressResponseError =
+  getApiV1GroupBuysProgressResponse400 & {
+    headers: Headers;
+  };
 
-export const getGetApiV1GroupBuysProgressUrl = (params: GetApiV1GroupBuysProgressParams,) => {
+export type getApiV1GroupBuysProgressResponse =
+  | getApiV1GroupBuysProgressResponseSuccess
+  | getApiV1GroupBuysProgressResponseError;
+
+export const getGetApiV1GroupBuysProgressUrl = (
+  params: GetApiV1GroupBuysProgressParams,
+) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
+      normalizedParams.append(key, value === null ? 'null' : value.toString());
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/v1/group-buys/progress?${stringifiedParams}` : `/api/v1/group-buys/progress`
-}
+  return stringifiedParams.length > 0
+    ? `/api/v1/group-buys/progress?${stringifiedParams}`
+    : `/api/v1/group-buys/progress`;
+};
 
-export const getApiV1GroupBuysProgress = async (params: GetApiV1GroupBuysProgressParams, options?: RequestInit): Promise<getApiV1GroupBuysProgressResponse> => {
-
-  return customFetch<getApiV1GroupBuysProgressResponse>(getGetApiV1GroupBuysProgressUrl(params),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+export const getApiV1GroupBuysProgress = async (
+  params: GetApiV1GroupBuysProgressParams,
+  options?: RequestInit,
+): Promise<getApiV1GroupBuysProgressResponse> => {
+  return customFetch<getApiV1GroupBuysProgressResponse>(
+    getGetApiV1GroupBuysProgressUrl(params),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
 
 /**
  * SNS 공유용 딥링크 URL 및 카드 메타데이터를 반환한다.
  * @summary 공유 메타데이터 조회
  */
 export type getApiV1GroupBuysGroupBuyIdShareResponse200 = {
-  data: ApiResponseShareMeta
-  status: 200
-}
-
-export type getApiV1GroupBuysGroupBuyIdShareResponseSuccess = (getApiV1GroupBuysGroupBuyIdShareResponse200) & {
-  headers: Headers;
+  data: ApiResponseShareMeta;
+  status: 200;
 };
-;
 
-export type getApiV1GroupBuysGroupBuyIdShareResponse = (getApiV1GroupBuysGroupBuyIdShareResponseSuccess)
+export type getApiV1GroupBuysGroupBuyIdShareResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
 
-export const getGetApiV1GroupBuysGroupBuyIdShareUrl = (groupBuyId: number,) => {
+export type getApiV1GroupBuysGroupBuyIdShareResponseSuccess =
+  getApiV1GroupBuysGroupBuyIdShareResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1GroupBuysGroupBuyIdShareResponseError =
+  getApiV1GroupBuysGroupBuyIdShareResponse404 & {
+    headers: Headers;
+  };
 
+export type getApiV1GroupBuysGroupBuyIdShareResponse =
+  | getApiV1GroupBuysGroupBuyIdShareResponseSuccess
+  | getApiV1GroupBuysGroupBuyIdShareResponseError;
 
+export const getGetApiV1GroupBuysGroupBuyIdShareUrl = (groupBuyId: number) => {
+  return `/api/v1/group-buys/${groupBuyId}/share`;
+};
 
-
-  return `/api/v1/group-buys/${groupBuyId}/share`
-}
-
-export const getApiV1GroupBuysGroupBuyIdShare = async (groupBuyId: number, options?: RequestInit): Promise<getApiV1GroupBuysGroupBuyIdShareResponse> => {
-
-  return customFetch<getApiV1GroupBuysGroupBuyIdShareResponse>(getGetApiV1GroupBuysGroupBuyIdShareUrl(groupBuyId),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+export const getApiV1GroupBuysGroupBuyIdShare = async (
+  groupBuyId: number,
+  options?: RequestInit,
+): Promise<getApiV1GroupBuysGroupBuyIdShareResponse> => {
+  return customFetch<getApiV1GroupBuysGroupBuyIdShareResponse>(
+    getGetApiV1GroupBuysGroupBuyIdShareUrl(groupBuyId),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
 
 /**
  * 검색어를 입력하면 동네/베이커리 키워드를 AI로 분석하고 최근 검색어로 저장한다.
@@ -319,49 +346,49 @@ export const getApiV1GroupBuysGroupBuyIdShare = async (groupBuyId: number, optio
  * @summary 검색 실행 및 AI 키워드 분석 (1.1.4-1)
  */
 export type postApiV1SearchResponse200 = {
-  data: ApiResponseSearchAnalysis
-  status: 200
-}
+  data: ApiResponseSearchAnalysis;
+  status: 200;
+};
 
 export type postApiV1SearchResponse400 = {
-  data: BadRequestResponse
-  status: 400
-}
+  data: BadRequestResponse;
+  status: 400;
+};
 
 export type postApiV1SearchResponse401 = {
-  data: UnauthorizedResponse
-  status: 401
-}
-
-export type postApiV1SearchResponseSuccess = (postApiV1SearchResponse200) & {
-  headers: Headers;
-};
-export type postApiV1SearchResponseError = (postApiV1SearchResponse400 | postApiV1SearchResponse401) & {
-  headers: Headers;
+  data: UnauthorizedResponse;
+  status: 401;
 };
 
-export type postApiV1SearchResponse = (postApiV1SearchResponseSuccess | postApiV1SearchResponseError)
+export type postApiV1SearchResponseSuccess = postApiV1SearchResponse200 & {
+  headers: Headers;
+};
+export type postApiV1SearchResponseError = (
+  | postApiV1SearchResponse400
+  | postApiV1SearchResponse401
+) & {
+  headers: Headers;
+};
+
+export type postApiV1SearchResponse =
+  | postApiV1SearchResponseSuccess
+  | postApiV1SearchResponseError;
 
 export const getPostApiV1SearchUrl = () => {
+  return `/api/v1/search`;
+};
 
-
-
-
-  return `/api/v1/search`
-}
-
-export const postApiV1Search = async (postApiV1SearchBody: PostApiV1SearchBody, options?: RequestInit): Promise<postApiV1SearchResponse> => {
-
-  return customFetch<postApiV1SearchResponse>(getPostApiV1SearchUrl(),
-  {
+export const postApiV1Search = async (
+  postApiV1SearchBody: PostApiV1SearchBody,
+  options?: RequestInit,
+): Promise<postApiV1SearchResponse> => {
+  return customFetch<postApiV1SearchResponse>(getPostApiV1SearchUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      postApiV1SearchBody,)
-  }
-);}
-
+    body: JSON.stringify(postApiV1SearchBody),
+  });
+};
 
 /**
  * 검색창 탭 시 표시할 사용자의 최근 검색어를 최신순으로 반환한다. (1.1.4-10)
@@ -371,111 +398,103 @@ export const postApiV1Search = async (postApiV1SearchBody: PostApiV1SearchBody, 
  * @summary 최근 검색어 목록 조회
  */
 export type getApiV1SearchRecentResponse200 = {
-  data: ApiResponseRecentSearchList
-  status: 200
-}
+  data: ApiResponseRecentSearchList;
+  status: 200;
+};
 
 export type getApiV1SearchRecentResponse401 = {
-  data: UnauthorizedResponse
-  status: 401
-}
-
-export type getApiV1SearchRecentResponseSuccess = (getApiV1SearchRecentResponse200) & {
-  headers: Headers;
-};
-export type getApiV1SearchRecentResponseError = (getApiV1SearchRecentResponse401) & {
-  headers: Headers;
+  data: UnauthorizedResponse;
+  status: 401;
 };
 
-export type getApiV1SearchRecentResponse = (getApiV1SearchRecentResponseSuccess | getApiV1SearchRecentResponseError)
+export type getApiV1SearchRecentResponseSuccess =
+  getApiV1SearchRecentResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1SearchRecentResponseError =
+  getApiV1SearchRecentResponse401 & {
+    headers: Headers;
+  };
+
+export type getApiV1SearchRecentResponse =
+  | getApiV1SearchRecentResponseSuccess
+  | getApiV1SearchRecentResponseError;
 
 export const getGetApiV1SearchRecentUrl = () => {
+  return `/api/v1/search/recent`;
+};
 
-
-
-
-  return `/api/v1/search/recent`
-}
-
-export const getApiV1SearchRecent = async ( options?: RequestInit): Promise<getApiV1SearchRecentResponse> => {
-
-  return customFetch<getApiV1SearchRecentResponse>(getGetApiV1SearchRecentUrl(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+export const getApiV1SearchRecent = async (
+  options?: RequestInit,
+): Promise<getApiV1SearchRecentResponse> => {
+  return customFetch<getApiV1SearchRecentResponse>(
+    getGetApiV1SearchRecentUrl(),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
 
 /**
  * @summary 최근 검색어 전체 삭제
  */
 export type deleteApiV1SearchRecentResponse200 = {
-  data: SuccessNoDataResponse
-  status: 200
-}
-
-export type deleteApiV1SearchRecentResponseSuccess = (deleteApiV1SearchRecentResponse200) & {
-  headers: Headers;
+  data: SuccessNoDataResponse;
+  status: 200;
 };
-;
 
-export type deleteApiV1SearchRecentResponse = (deleteApiV1SearchRecentResponseSuccess)
+export type deleteApiV1SearchRecentResponseSuccess =
+  deleteApiV1SearchRecentResponse200 & {
+    headers: Headers;
+  };
+export type deleteApiV1SearchRecentResponse =
+  deleteApiV1SearchRecentResponseSuccess;
 
 export const getDeleteApiV1SearchRecentUrl = () => {
+  return `/api/v1/search/recent`;
+};
 
-
-
-
-  return `/api/v1/search/recent`
-}
-
-export const deleteApiV1SearchRecent = async ( options?: RequestInit): Promise<deleteApiV1SearchRecentResponse> => {
-
-  return customFetch<deleteApiV1SearchRecentResponse>(getDeleteApiV1SearchRecentUrl(),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
+export const deleteApiV1SearchRecent = async (
+  options?: RequestInit,
+): Promise<deleteApiV1SearchRecentResponse> => {
+  return customFetch<deleteApiV1SearchRecentResponse>(
+    getDeleteApiV1SearchRecentUrl(),
+    {
+      ...options,
+      method: 'DELETE',
+    },
+  );
+};
 
 /**
  * @summary 최근 검색어 단건 삭제
  */
 export type deleteApiV1SearchRecentKeywordResponse200 = {
-  data: SuccessNoDataResponse
-  status: 200
-}
-
-export type deleteApiV1SearchRecentKeywordResponseSuccess = (deleteApiV1SearchRecentKeywordResponse200) & {
-  headers: Headers;
+  data: SuccessNoDataResponse;
+  status: 200;
 };
-;
 
-export type deleteApiV1SearchRecentKeywordResponse = (deleteApiV1SearchRecentKeywordResponseSuccess)
+export type deleteApiV1SearchRecentKeywordResponseSuccess =
+  deleteApiV1SearchRecentKeywordResponse200 & {
+    headers: Headers;
+  };
+export type deleteApiV1SearchRecentKeywordResponse =
+  deleteApiV1SearchRecentKeywordResponseSuccess;
 
-export const getDeleteApiV1SearchRecentKeywordUrl = (keyword: string,) => {
+export const getDeleteApiV1SearchRecentKeywordUrl = (keyword: string) => {
+  return `/api/v1/search/recent/${keyword}`;
+};
 
-
-
-
-  return `/api/v1/search/recent/${keyword}`
-}
-
-export const deleteApiV1SearchRecentKeyword = async (keyword: string, options?: RequestInit): Promise<deleteApiV1SearchRecentKeywordResponse> => {
-
-  return customFetch<deleteApiV1SearchRecentKeywordResponse>(getDeleteApiV1SearchRecentKeywordUrl(keyword),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
-
+export const deleteApiV1SearchRecentKeyword = async (
+  keyword: string,
+  options?: RequestInit,
+): Promise<deleteApiV1SearchRecentKeywordResponse> => {
+  return customFetch<deleteApiV1SearchRecentKeywordResponse>(
+    getDeleteApiV1SearchRecentKeywordUrl(keyword),
+    {
+      ...options,
+      method: 'DELETE',
+    },
+  );
+};

@@ -24,6 +24,12 @@ export async function POST(req: NextRequest) {
       path: '/',
       sameSite: 'strict',
     });
+
+    const setCookie = result.headers?.get('set-cookie');
+    if (setCookie) {
+      response.headers.append('set-cookie', setCookie);
+    }
+
     return response;
   }
 

@@ -28,7 +28,7 @@ function RequestListSkeleton() {
 }
 
 export function RequestListClient() {
-  const { data, isLoading } = useGetApiV1GroupBuyRequests();
+  const { data, isLoading, isError } = useGetApiV1GroupBuyRequests();
   const requests = data?.status === 200 ? (data.data?.data ?? []) : [];
 
   return (
@@ -41,6 +41,12 @@ export function RequestListClient() {
             {Array.from({ length: 3 }, (_, i) => (
               <RequestListSkeleton key={i} />
             ))}
+          </div>
+        ) : isError ? (
+          <div className="flex flex-col items-center justify-center h-full pb-[74px]">
+            <span className="heading-md-semibold text-text-basic">
+              요청 목록을 불러오지 못했어요
+            </span>
           </div>
         ) : requests.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full pb-[74px]">

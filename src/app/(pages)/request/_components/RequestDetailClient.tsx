@@ -41,7 +41,8 @@ interface RequestDetailClientProps {
 }
 
 export function RequestDetailClient({ requestId }: RequestDetailClientProps) {
-  const { data, isLoading } = useGetApiV1GroupBuyRequestsRequestId(requestId);
+  const { data, isLoading, isError } =
+    useGetApiV1GroupBuyRequestsRequestId(requestId);
   const request = data?.status === 200 ? data.data?.data : null;
 
   if (isLoading) {
@@ -59,13 +60,15 @@ export function RequestDetailClient({ requestId }: RequestDetailClientProps) {
     );
   }
 
-  if (!request) {
+  if (isError || !request) {
     return (
       <div className="flex flex-col h-full">
         <Header text="신청 내역" />
         <div className="flex-1 flex items-center justify-center">
           <span className="body-md-regular text-text-tertiary">
-            요청 정보를 불러올 수 없어요
+            {isError
+              ? '요청 정보를 불러오지 못했어요'
+              : '요청 정보를 찾을 수 없어요'}
           </span>
         </div>
       </div>

@@ -15,6 +15,17 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/feed', request.url));
   }
 
+  // 토큰 없이 /signup/email 접근 시 /login으로
+  if (pathname === '/signup/email' && !token) {
+    const step = request.nextUrl.searchParams.get('step');
+    if (step === 'profile') {
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
+  }
+
+  // signupCompleted 체크는 /api/v1/users/me 없이는 미들웨어에서 불가
+  // → 추후 Route Handler 완성 후 SignupEmailClient에서 처리 예정
+
   // 보호 경로 정보
   const protectedPaths = ['/item', '/payment', '/notifications'];
   const isProtected = protectedPaths.some((p) => pathname.startsWith(p));
@@ -37,5 +48,6 @@ export const config = {
     '/notifications',
     '/login',
     '/login/:path*',
+    '/signup/email',
   ],
 };

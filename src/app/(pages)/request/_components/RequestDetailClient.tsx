@@ -155,7 +155,7 @@ export function RequestDetailClient({ requestId }: RequestDetailClientProps) {
         </div>
 
         {request.status === GroupBuyRequestDetailStatus.REJECTED &&
-          request.rejectionReason && (
+          request.rejectionReason != null && (
             <div className="rounded-xlarge bg-bg-white p-p7 shadow-[0px_2px_12px_0px_rgba(0,0,0,0.04)]">
               <span className="body-md-regular text-text-tertiary block mb-g4">
                 개설 불가 사유

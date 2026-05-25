@@ -70,7 +70,7 @@ const StepEmail = ({ onNext }: StepEmailProps) => {
             <div className="flex items-center gap-g2">
               <p className="caption-sm-medium text-text-tertiary">인증 코드</p>
               {code.status !== 'verified' && code.timer > 0 && (
-                <p className="caption-sm-medium text-brand">
+                <p className="caption-sm-medium text-text-brand">
                   {code.formatTimer(code.timer)}
                 </p>
               )}
@@ -78,6 +78,17 @@ const StepEmail = ({ onNext }: StepEmailProps) => {
             <Input
               placeholder="메일로 전송된 코드를 입력해주세요."
               {...register('verificationCode')}
+              helperText={code.helperText}
+              helperTextClassName={code.helperColor}
+              helperAction={
+                code.status !== 'verified'
+                  ? {
+                      label: '재발송하기',
+                      onClick: handlers.handleResend,
+                      disabled: state.isSendingCode,
+                    }
+                  : undefined
+              }
               rightButton={{
                 label: state.isVerifyingCode ? '확인 중...' : '코드확인',
                 onClick: handlers.handleVerifyCode,
@@ -87,21 +98,6 @@ const StepEmail = ({ onNext }: StepEmailProps) => {
                   code.status === 'verified',
               }}
             />
-            <div className="flex items-center justify-between px-g1">
-              <p className={`caption-sm-medium ${code.helperColor}`}>
-                {code.helperText}
-              </p>
-              {code.status !== 'verified' && (
-                <button
-                  type="button"
-                  onClick={handlers.handleResend}
-                  disabled={state.isSendingCode}
-                  className="caption-sm-medium text-text-subtle-inverse underline"
-                >
-                  재발송하기
-                </button>
-              )}
-            </div>
           </div>
         )}
 

@@ -109,7 +109,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           )}
         </div>
         {helperText || helperAction ? (
-          <div className="flex items-center justify-between">
+          <div className="flex items-center gap-g3">
             <p
               className={`caption-sm-medium ${helperTextClassName ?? 'text-text-subtle-inverse'}`}
             >

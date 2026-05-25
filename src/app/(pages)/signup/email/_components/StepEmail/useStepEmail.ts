@@ -13,7 +13,7 @@ import {
 } from '@/api/hooks/auth/auth';
 
 export type EmailStatus = 'idle' | 'checking' | 'available' | 'duplicated';
-export type CodeStatus = 'idle' | 'sent' | 'verified' | 'invalid';
+export type CodeStatus = 'idle' | 'sent' | 'verified' | 'invalid' | 'timeout';
 
 export const useStepEmail = (onNext: () => void) => {
   // 폼 관리
@@ -66,6 +66,7 @@ export const useStepEmail = (onNext: () => void) => {
       setTimer((prev) => {
         if (prev <= 1) {
           clearInterval(timerRef.current!);
+          setCodeStatus((status) => (status === 'sent' ? 'timeout' : status));
           return 0;
         }
         return prev - 1;
@@ -239,10 +240,12 @@ export const useStepEmail = (onNext: () => void) => {
       ? '코드가 일치하지 않아요'
       : codeStatus === 'verified'
         ? '인증되었어요'
-        : '';
+        : codeStatus === 'timeout'
+          ? '시간이 초과되었어요'
+          : '';
 
   const codeHelperColor =
-    codeStatus === 'invalid'
+    codeStatus === 'invalid' || codeStatus === 'timeout'
       ? 'text-text-brand'
       : codeStatus === 'verified'
         ? 'text-text-subtle-inverse'

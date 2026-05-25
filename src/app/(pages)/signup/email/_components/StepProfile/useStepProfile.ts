@@ -16,7 +16,7 @@ import {
   usePostApiV1AuthPhoneVerificationCodesVerify,
 } from '@/api/hooks/auth/auth';
 
-type PhoneStatus = 'idle' | 'sent' | 'verified' | 'invalid';
+type PhoneStatus = 'idle' | 'sent' | 'verified' | 'invalid' | 'timeout';
 
 type ProfileState = {
   phoneStatus: PhoneStatus;
@@ -101,7 +101,12 @@ export const useStepProfile = (onNext: () => void) => {
       setProfileState((prev) => {
         if (prev.timer <= 1) {
           clearInterval(timerRef.current!);
-          return { ...prev, timer: 0 };
+          return {
+            ...prev,
+            timer: 0,
+            phoneStatus:
+              prev.phoneStatus === 'sent' ? 'timeout' : prev.phoneStatus,
+          };
         }
         return { ...prev, timer: prev.timer - 1 };
       });
@@ -222,12 +227,15 @@ export const useStepProfile = (onNext: () => void) => {
 
   const codeHelperText =
     phoneStatus === 'invalid'
-      ? '코드를 다시 확인해주세요'
+      ? '번호를 다시 확인해주세요'
       : phoneStatus === 'verified'
         ? '인증에 성공했어요!'
-        : '';
+        : phoneStatus === 'timeout'
+          ? '시간이 초과되었어요'
+          : '';
+
   const codeHelperClassName =
-    phoneStatus === 'invalid'
+    phoneStatus === 'invalid' || phoneStatus === 'timeout'
       ? 'text-text-brand'
       : phoneStatus === 'verified'
         ? 'text-text-subtle-inverse'

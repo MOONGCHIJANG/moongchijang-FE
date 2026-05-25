@@ -13,6 +13,11 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     onClick?: () => void;
     disabled?: boolean;
   };
+  helperAction?: {
+    label: string;
+    onClick: () => void;
+    disabled?: boolean;
+  };
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
@@ -23,6 +28,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       helperText,
       helperTextClassName,
       rightButton,
+      helperAction,
       onChange,
       value,
       ...rest
@@ -102,12 +108,24 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             </button>
           )}
         </div>
-        {helperText ? (
-          <p
-            className={`caption-sm-medium ${helperTextClassName ?? 'text-text-subtle-inverse'}`}
-          >
-            {helperText}
-          </p>
+        {helperText || helperAction ? (
+          <div className="flex items-center justify-between">
+            <p
+              className={`caption-sm-medium ${helperTextClassName ?? 'text-text-subtle-inverse'}`}
+            >
+              {helperText}
+            </p>
+            {helperAction && (
+              <button
+                type="button"
+                onClick={helperAction.onClick}
+                disabled={helperAction.disabled}
+                className="caption-sm-medium text-text-subtle-inverse underline"
+              >
+                {helperAction.label}
+              </button>
+            )}
+          </div>
         ) : (
           <div className="h-4.5" />
         )}

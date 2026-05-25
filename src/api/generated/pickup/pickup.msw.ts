@@ -61,6 +61,13 @@ export const getGetApiV1ParticipationsParticipationIdPickupResponseMock = (
       ]),
       undefined,
     ]),
+    thumbnailUrl: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        null,
+      ]),
+      null,
+    ]),
     productName: faker.string.alpha({ length: { min: 10, max: 20 } }),
     quantity: faker.number.int(),
     pickupDate: faker.date.past().toISOString().slice(0, 10),
@@ -217,6 +224,15 @@ export const getPostApiV1PickupsQrCodeVerifyResponseMock = (
       'PICKED_UP',
       'NO_SHOW',
     ] as const),
+    userName: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        null,
+      ]),
+      undefined,
+    ]),
+    productName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    quantity: faker.number.int(),
     pickedUpAt: faker.date.past().toISOString().slice(0, 19) + 'Z',
     pickupProcessedByUserId: faker.helpers.arrayElement([
       faker.helpers.arrayElement([faker.number.int(), null]),

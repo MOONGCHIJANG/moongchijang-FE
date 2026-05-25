@@ -9,8 +9,15 @@ import * as zod from 'zod';
  */
 export const GetApiV1UsersMeParticipationsQueryParams = zod.object({
   status: zod
-    .enum(['ACTIVE', 'COMPLETED', 'REFUNDED'])
-    .describe('ACTIVE=참여중 \/ COMPLETED=완료 \/ REFUNDED=환불내역'),
+    .enum([
+      'IN_PROGRESS',
+      'PICKUP_WAITING',
+      'PICKUP_COMPLETED',
+      'CANCELLED_OR_REFUNDED',
+    ])
+    .describe(
+      'IN_PROGRESS=진행 중 \/ PICKUP_WAITING=픽업 대기 \/ PICKUP_COMPLETED=픽업 완료 \/ CANCELLED_OR_REFUNDED=환불·취소',
+    ),
 });
 
 export const getApiV1UsersMeParticipationsResponseDataItemAchievementRateMin = 0;
@@ -22,6 +29,7 @@ export const GetApiV1UsersMeParticipationsResponse = zod.object({
     zod.object({
       participationId: zod.number(),
       groupBuyId: zod.number(),
+      thumbnailUrl: zod.string().nullable().describe('카드 상품 이미지 URL'),
       productName: zod.string(),
       participationStatus: zod.enum([
         'PENDING',
@@ -54,6 +62,11 @@ export const GetApiV1UsersMeParticipationsResponse = zod.object({
       pickupTimeEnd: zod.iso.time({}),
       pickupLocation: zod.string(),
       paymentAmount: zod.number(),
+      paidAt: zod.iso
+        .datetime({ offset: true })
+        .nullable()
+        .describe('주문 상세 결제 날짜'),
+      paymentMethod: zod.string().nullable().describe('결제 내역 결제 수단'),
       quantity: zod.number(),
       pickupStatus: zod.enum(['NOT_READY', 'READY', 'PICKED_UP', 'NO_SHOW']),
       dDay: zod.number().describe('공구 마감일까지 남은 일수'),
@@ -191,186 +204,34 @@ export const GetApiV1UsersMeGroupBuyRequestsResponse = zod.object({
 });
 
 /**
- * 참여중 · 완료 · 환불내역 · 개설요청 건수를 반환한다 (탭 칩 괄호 숫자용).
+ * 진행 중 · 픽업 대기 · 픽업 완료 · 환불/취소 · 개설요청 건수를 반환한다 (탭 칩 괄호 숫자용).
  * @summary 마이페이지 탭별 건수 조회
  */
 export const GetApiV1UsersMeTabsCountsResponse = zod.object({
   success: zod.boolean(),
   data: zod.object({
-    activeCount: zod.number().describe('참여중'),
-    completedCount: zod.number().describe('완료'),
-    refundedCount: zod.number().describe('환불내역'),
+    inProgressCount: zod.number().describe('진행 중'),
+    pickupWaitingCount: zod.number().describe('픽업 대기'),
+    pickupCompletedCount: zod.number().describe('픽업 완료'),
+    cancelledOrRefundedCount: zod.number().describe('환불\/취소'),
     requestCount: zod.number().describe('개설 요청 내역'),
   }),
   error: zod.unknown().nullable(),
 });
 
 /**
- * 참여중 · 완료 · 환불내역 · 개설요청 건수를 반환한다.
+ * 진행 중 · 픽업 대기 · 픽업 완료 · 환불/취소 · 개설요청 건수를 반환한다.
  * @summary 마이페이지 탭별 건수 조회
  */
 export const GetApiV1MypageSummaryResponse = zod.object({
   success: zod.boolean(),
   data: zod.object({
-    activeCount: zod.number().describe('참여중'),
-    completedCount: zod.number().describe('완료'),
-    refundedCount: zod.number().describe('환불내역'),
+    inProgressCount: zod.number().describe('진행 중'),
+    pickupWaitingCount: zod.number().describe('픽업 대기'),
+    pickupCompletedCount: zod.number().describe('픽업 완료'),
+    cancelledOrRefundedCount: zod.number().describe('환불\/취소'),
     requestCount: zod.number().describe('개설 요청 내역'),
   }),
-  error: zod.unknown().nullable(),
-});
-
-/**
- * @summary 내 참여중 공구 내역 조회
- */
-export const getApiV1MypageParticipationsActiveResponseDataItemAchievementRateMin = 0;
-export const getApiV1MypageParticipationsActiveResponseDataItemAchievementRateMax = 100;
-
-export const GetApiV1MypageParticipationsActiveResponse = zod.object({
-  success: zod.boolean(),
-  data: zod.array(
-    zod.object({
-      participationId: zod.number(),
-      groupBuyId: zod.number(),
-      productName: zod.string(),
-      participationStatus: zod.enum([
-        'PENDING',
-        'PAID_WAITING_GOAL',
-        'CONFIRMED',
-        'CANCELLED',
-        'REFUND_PENDING',
-        'REFUNDED',
-      ]),
-      achievementRate: zod
-        .number()
-        .min(
-          getApiV1MypageParticipationsActiveResponseDataItemAchievementRateMin,
-        )
-        .max(
-          getApiV1MypageParticipationsActiveResponseDataItemAchievementRateMax,
-        )
-        .describe('현재 수량 기준 달성률'),
-      achievementStatus: zod.enum(['BEFORE_ACHIEVED', 'ACHIEVED']),
-      displayStatus: zod
-        .enum([
-          'PICKED_UP',
-          'PAID_WAITING_GOAL',
-          'CONFIRMED',
-          'REFUND_PENDING',
-          'REFUNDED',
-          'PENDING',
-          'CANCELLED',
-        ])
-        .describe('픽업\/참여 상태 조합 기반 화면 표시 상태'),
-      storeName: zod.string(),
-      pickupDate: zod.iso.date(),
-      pickupTimeStart: zod.iso.time({}),
-      pickupTimeEnd: zod.iso.time({}),
-      pickupLocation: zod.string(),
-      paymentAmount: zod.number(),
-      quantity: zod.number(),
-      pickupStatus: zod.enum(['NOT_READY', 'READY', 'PICKED_UP', 'NO_SHOW']),
-      dDay: zod.number().describe('공구 마감일까지 남은 일수'),
-      canCancel: zod
-        .boolean()
-        .describe(
-          'PAID_WAITING_GOAL 참여이고 APPROVED 결제 주문이 있으면 true',
-        ),
-      canViewPickup: zod
-        .boolean()
-        .describe(
-          '참여 확정 후 픽업 미완료이면 \/api\/v1\/participations\/{participationId}\/pickup 호출 가능',
-        ),
-      canViewQr: zod
-        .boolean()
-        .describe(
-          '참여 확정 후 픽업 미완료이면 \/api\/v1\/participations\/{participationId}\/qr 호출 가능. 픽업일 전에는 QR API가 LOCKED를 반환',
-        ),
-      qrAvailability: zod.enum([
-        'UNAVAILABLE',
-        'LOCKED',
-        'AVAILABLE',
-        'PICKED_UP',
-      ]),
-    }),
-  ),
-  error: zod.unknown().nullable(),
-});
-
-/**
- * @summary 내 완료 공구 내역 조회
- */
-export const getApiV1MypageParticipationsCompletedResponseDataItemAchievementRateMin = 0;
-export const getApiV1MypageParticipationsCompletedResponseDataItemAchievementRateMax = 100;
-
-export const GetApiV1MypageParticipationsCompletedResponse = zod.object({
-  success: zod.boolean(),
-  data: zod.array(
-    zod.object({
-      participationId: zod.number(),
-      groupBuyId: zod.number(),
-      productName: zod.string(),
-      participationStatus: zod.enum([
-        'PENDING',
-        'PAID_WAITING_GOAL',
-        'CONFIRMED',
-        'CANCELLED',
-        'REFUND_PENDING',
-        'REFUNDED',
-      ]),
-      achievementRate: zod
-        .number()
-        .min(
-          getApiV1MypageParticipationsCompletedResponseDataItemAchievementRateMin,
-        )
-        .max(
-          getApiV1MypageParticipationsCompletedResponseDataItemAchievementRateMax,
-        )
-        .describe('현재 수량 기준 달성률'),
-      achievementStatus: zod.enum(['BEFORE_ACHIEVED', 'ACHIEVED']),
-      displayStatus: zod
-        .enum([
-          'PICKED_UP',
-          'PAID_WAITING_GOAL',
-          'CONFIRMED',
-          'REFUND_PENDING',
-          'REFUNDED',
-          'PENDING',
-          'CANCELLED',
-        ])
-        .describe('픽업\/참여 상태 조합 기반 화면 표시 상태'),
-      storeName: zod.string(),
-      pickupDate: zod.iso.date(),
-      pickupTimeStart: zod.iso.time({}),
-      pickupTimeEnd: zod.iso.time({}),
-      pickupLocation: zod.string(),
-      paymentAmount: zod.number(),
-      quantity: zod.number(),
-      pickupStatus: zod.enum(['NOT_READY', 'READY', 'PICKED_UP', 'NO_SHOW']),
-      dDay: zod.number().describe('공구 마감일까지 남은 일수'),
-      canCancel: zod
-        .boolean()
-        .describe(
-          'PAID_WAITING_GOAL 참여이고 APPROVED 결제 주문이 있으면 true',
-        ),
-      canViewPickup: zod
-        .boolean()
-        .describe(
-          '참여 확정 후 픽업 미완료이면 \/api\/v1\/participations\/{participationId}\/pickup 호출 가능',
-        ),
-      canViewQr: zod
-        .boolean()
-        .describe(
-          '참여 확정 후 픽업 미완료이면 \/api\/v1\/participations\/{participationId}\/qr 호출 가능. 픽업일 전에는 QR API가 LOCKED를 반환',
-        ),
-      qrAvailability: zod.enum([
-        'UNAVAILABLE',
-        'LOCKED',
-        'AVAILABLE',
-        'PICKED_UP',
-      ]),
-    }),
-  ),
   error: zod.unknown().nullable(),
 });
 
@@ -382,6 +243,7 @@ export const GetApiV1MypageRefundsResponse = zod.object({
   data: zod.array(
     zod.object({
       participationId: zod.number(),
+      thumbnailUrl: zod.string().nullable().describe('카드 상품 이미지 URL'),
       productName: zod.string(),
       storeName: zod.string(),
       pickupDate: zod.iso.date().nullable(),
@@ -403,6 +265,7 @@ export const GetApiV1MypageRefundsResponse = zod.object({
         .nullable()
         .describe('취소 사유'),
       cancelReasonDetail: zod.string().nullish().describe('취소 상세 사유'),
+      paymentMethod: zod.string().nullable().describe('결제 수단'),
       refundedAt: zod.iso.datetime({ offset: true }).nullish(),
     }),
   ),
@@ -418,6 +281,7 @@ export const GetApiV1UsersMeRefundsResponse = zod.object({
   data: zod.array(
     zod.object({
       participationId: zod.number(),
+      thumbnailUrl: zod.string().nullable().describe('카드 상품 이미지 URL'),
       productName: zod.string(),
       storeName: zod.string(),
       pickupDate: zod.iso.date().nullable(),
@@ -439,6 +303,7 @@ export const GetApiV1UsersMeRefundsResponse = zod.object({
         .nullable()
         .describe('취소 사유'),
       cancelReasonDetail: zod.string().nullish().describe('취소 상세 사유'),
+      paymentMethod: zod.string().nullable().describe('결제 수단'),
       refundedAt: zod.iso.datetime({ offset: true }).nullish(),
     }),
   ),

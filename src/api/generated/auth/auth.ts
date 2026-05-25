@@ -7,16 +7,20 @@ import type {
   ApiResponseAccessToken,
   ApiResponseAdditionalInfoUpdated,
   ApiResponseAuthLogin,
+  ApiResponseBusinessRegistrationLookup,
   ApiResponseEmailAvailability,
   ApiResponseEmailVerificationCodeSent,
   ApiResponseEmailVerificationVerified,
+  ApiResponseError,
   ApiResponseMyRegions,
   ApiResponseNicknameAvailability,
   ApiResponsePhoneVerificationCodeSent,
   ApiResponsePhoneVerificationVerified,
   ApiResponseProfileUpdated,
+  ApiResponseSellerSignupStatus,
   ApiResponseUserInfo,
   BadRequestResponse,
+  BusinessRegistrationLookupRequest,
   ConflictResponse,
   EmailLoginRequest,
   EmailSignupRequest,
@@ -32,6 +36,8 @@ import type {
   PhoneVerificationCodeSendRequest,
   PhoneVerificationCodeVerifyRequest,
   ProfileUpdateRequest,
+  SellerBusinessInfoUpsertRequest,
+  SellerSettlementInfoUpsertRequest,
   SuccessNoDataResponse,
   TooManyRequestsResponse,
   UnauthorizedResponse,
@@ -358,6 +364,169 @@ export const patchApiV1UsersMeAdditionalInfo = async (
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', ...options?.headers },
       body: JSON.stringify(additionalInfoUpsertRequest),
+    },
+  );
+};
+
+/**
+ * 사업자등록번호를 조회해 상태를 반환한다.
+- `VALID`: 정상 사업자(계속사업자)
+- `CLOSED`: 휴업/폐업
+- `NOT_FOUND`: 조회 불가/미확인
+
+ * @summary 사업자등록번호 조회
+ */
+export type postApiV1UsersMeSellerBusinessRegistrationLookupResponse200 = {
+  data: ApiResponseBusinessRegistrationLookup;
+  status: 200;
+};
+
+export type postApiV1UsersMeSellerBusinessRegistrationLookupResponse400 = {
+  data: ApiResponseError;
+  status: 400;
+};
+
+export type postApiV1UsersMeSellerBusinessRegistrationLookupResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type postApiV1UsersMeSellerBusinessRegistrationLookupResponseSuccess =
+  postApiV1UsersMeSellerBusinessRegistrationLookupResponse200 & {
+    headers: Headers;
+  };
+export type postApiV1UsersMeSellerBusinessRegistrationLookupResponseError = (
+  | postApiV1UsersMeSellerBusinessRegistrationLookupResponse400
+  | postApiV1UsersMeSellerBusinessRegistrationLookupResponse401
+) & {
+  headers: Headers;
+};
+
+export type postApiV1UsersMeSellerBusinessRegistrationLookupResponse =
+  | postApiV1UsersMeSellerBusinessRegistrationLookupResponseSuccess
+  | postApiV1UsersMeSellerBusinessRegistrationLookupResponseError;
+
+export const getPostApiV1UsersMeSellerBusinessRegistrationLookupUrl = () => {
+  return `/api/v1/users/me/seller/business-registration/lookup`;
+};
+
+export const postApiV1UsersMeSellerBusinessRegistrationLookup = async (
+  businessRegistrationLookupRequest: BusinessRegistrationLookupRequest,
+  options?: RequestInit,
+): Promise<postApiV1UsersMeSellerBusinessRegistrationLookupResponse> => {
+  return customFetch<postApiV1UsersMeSellerBusinessRegistrationLookupResponse>(
+    getPostApiV1UsersMeSellerBusinessRegistrationLookupUrl(),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(businessRegistrationLookupRequest),
+    },
+  );
+};
+
+/**
+ * 사장님 가입의 사업자 정보를 저장한다.
+ * @summary 사장님 사업자 정보 저장
+ */
+export type patchApiV1UsersMeSellerBusinessInfoResponse200 = {
+  data: ApiResponseSellerSignupStatus;
+  status: 200;
+};
+
+export type patchApiV1UsersMeSellerBusinessInfoResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type patchApiV1UsersMeSellerBusinessInfoResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type patchApiV1UsersMeSellerBusinessInfoResponseSuccess =
+  patchApiV1UsersMeSellerBusinessInfoResponse200 & {
+    headers: Headers;
+  };
+export type patchApiV1UsersMeSellerBusinessInfoResponseError = (
+  | patchApiV1UsersMeSellerBusinessInfoResponse400
+  | patchApiV1UsersMeSellerBusinessInfoResponse401
+) & {
+  headers: Headers;
+};
+
+export type patchApiV1UsersMeSellerBusinessInfoResponse =
+  | patchApiV1UsersMeSellerBusinessInfoResponseSuccess
+  | patchApiV1UsersMeSellerBusinessInfoResponseError;
+
+export const getPatchApiV1UsersMeSellerBusinessInfoUrl = () => {
+  return `/api/v1/users/me/seller/business-info`;
+};
+
+export const patchApiV1UsersMeSellerBusinessInfo = async (
+  sellerBusinessInfoUpsertRequest: SellerBusinessInfoUpsertRequest,
+  options?: RequestInit,
+): Promise<patchApiV1UsersMeSellerBusinessInfoResponse> => {
+  return customFetch<patchApiV1UsersMeSellerBusinessInfoResponse>(
+    getPatchApiV1UsersMeSellerBusinessInfoUrl(),
+    {
+      ...options,
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(sellerBusinessInfoUpsertRequest),
+    },
+  );
+};
+
+/**
+ * 사장님 정산 정보를 저장하고 사장님 가입 완료 상태를 반영한다.
+ * @summary 사장님 정산 정보 저장
+ */
+export type patchApiV1UsersMeSellerSettlementInfoResponse200 = {
+  data: ApiResponseSellerSignupStatus;
+  status: 200;
+};
+
+export type patchApiV1UsersMeSellerSettlementInfoResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type patchApiV1UsersMeSellerSettlementInfoResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type patchApiV1UsersMeSellerSettlementInfoResponseSuccess =
+  patchApiV1UsersMeSellerSettlementInfoResponse200 & {
+    headers: Headers;
+  };
+export type patchApiV1UsersMeSellerSettlementInfoResponseError = (
+  | patchApiV1UsersMeSellerSettlementInfoResponse400
+  | patchApiV1UsersMeSellerSettlementInfoResponse401
+) & {
+  headers: Headers;
+};
+
+export type patchApiV1UsersMeSellerSettlementInfoResponse =
+  | patchApiV1UsersMeSellerSettlementInfoResponseSuccess
+  | patchApiV1UsersMeSellerSettlementInfoResponseError;
+
+export const getPatchApiV1UsersMeSellerSettlementInfoUrl = () => {
+  return `/api/v1/users/me/seller/settlement-info`;
+};
+
+export const patchApiV1UsersMeSellerSettlementInfo = async (
+  sellerSettlementInfoUpsertRequest: SellerSettlementInfoUpsertRequest,
+  options?: RequestInit,
+): Promise<patchApiV1UsersMeSellerSettlementInfoResponse> => {
+  return customFetch<patchApiV1UsersMeSellerSettlementInfoResponse>(
+    getPatchApiV1UsersMeSellerSettlementInfoUrl(),
+    {
+      ...options,
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(sellerSettlementInfoUpsertRequest),
     },
   );
 };

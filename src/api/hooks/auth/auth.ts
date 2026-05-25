@@ -23,16 +23,20 @@ import type {
   ApiResponseAccessToken,
   ApiResponseAdditionalInfoUpdated,
   ApiResponseAuthLogin,
+  ApiResponseBusinessRegistrationLookup,
   ApiResponseEmailAvailability,
   ApiResponseEmailVerificationCodeSent,
   ApiResponseEmailVerificationVerified,
+  ApiResponseError,
   ApiResponseMyRegions,
   ApiResponseNicknameAvailability,
   ApiResponsePhoneVerificationCodeSent,
   ApiResponsePhoneVerificationVerified,
   ApiResponseProfileUpdated,
+  ApiResponseSellerSignupStatus,
   ApiResponseUserInfo,
   BadRequestResponse,
+  BusinessRegistrationLookupRequest,
   ConflictResponse,
   EmailLoginRequest,
   EmailSignupRequest,
@@ -48,6 +52,8 @@ import type {
   PhoneVerificationCodeSendRequest,
   PhoneVerificationCodeVerifyRequest,
   ProfileUpdateRequest,
+  SellerBusinessInfoUpsertRequest,
+  SellerSettlementInfoUpsertRequest,
   SuccessNoDataResponse,
   TooManyRequestsResponse,
   UnauthorizedResponse,
@@ -1030,6 +1036,407 @@ export const usePatchApiV1UsersMeAdditionalInfo = <
 > => {
   return useMutation(
     getPatchApiV1UsersMeAdditionalInfoMutationOptions(options),
+    queryClient,
+  );
+};
+/**
+ * 사업자등록번호를 조회해 상태를 반환한다.
+- `VALID`: 정상 사업자(계속사업자)
+- `CLOSED`: 휴업/폐업
+- `NOT_FOUND`: 조회 불가/미확인
+
+ * @summary 사업자등록번호 조회
+ */
+export type postApiV1UsersMeSellerBusinessRegistrationLookupResponse200 = {
+  data: ApiResponseBusinessRegistrationLookup;
+  status: 200;
+};
+
+export type postApiV1UsersMeSellerBusinessRegistrationLookupResponse400 = {
+  data: ApiResponseError;
+  status: 400;
+};
+
+export type postApiV1UsersMeSellerBusinessRegistrationLookupResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type postApiV1UsersMeSellerBusinessRegistrationLookupResponseSuccess =
+  postApiV1UsersMeSellerBusinessRegistrationLookupResponse200 & {
+    headers: Headers;
+  };
+export type postApiV1UsersMeSellerBusinessRegistrationLookupResponseError = (
+  | postApiV1UsersMeSellerBusinessRegistrationLookupResponse400
+  | postApiV1UsersMeSellerBusinessRegistrationLookupResponse401
+) & {
+  headers: Headers;
+};
+
+export type postApiV1UsersMeSellerBusinessRegistrationLookupResponse =
+  | postApiV1UsersMeSellerBusinessRegistrationLookupResponseSuccess
+  | postApiV1UsersMeSellerBusinessRegistrationLookupResponseError;
+
+export const getPostApiV1UsersMeSellerBusinessRegistrationLookupUrl = () => {
+  return `/api/v1/users/me/seller/business-registration/lookup`;
+};
+
+export const postApiV1UsersMeSellerBusinessRegistrationLookup = async (
+  businessRegistrationLookupRequest: BusinessRegistrationLookupRequest,
+  options?: RequestInit,
+): Promise<postApiV1UsersMeSellerBusinessRegistrationLookupResponse> => {
+  return customFetch<postApiV1UsersMeSellerBusinessRegistrationLookupResponse>(
+    getPostApiV1UsersMeSellerBusinessRegistrationLookupUrl(),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(businessRegistrationLookupRequest),
+    },
+  );
+};
+
+export const getPostApiV1UsersMeSellerBusinessRegistrationLookupMutationOptions =
+  <
+    TError = ApiResponseError | UnauthorizedResponse,
+    TContext = unknown,
+  >(options?: {
+    mutation?: UseMutationOptions<
+      Awaited<
+        ReturnType<typeof postApiV1UsersMeSellerBusinessRegistrationLookup>
+      >,
+      TError,
+      { data: BusinessRegistrationLookupRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  }): UseMutationOptions<
+    Awaited<
+      ReturnType<typeof postApiV1UsersMeSellerBusinessRegistrationLookup>
+    >,
+    TError,
+    { data: BusinessRegistrationLookupRequest },
+    TContext
+  > => {
+    const mutationKey = ['postApiV1UsersMeSellerBusinessRegistrationLookup'];
+    const { mutation: mutationOptions, request: requestOptions } = options
+      ? options.mutation &&
+        'mutationKey' in options.mutation &&
+        options.mutation.mutationKey
+        ? options
+        : { ...options, mutation: { ...options.mutation, mutationKey } }
+      : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+      Awaited<
+        ReturnType<typeof postApiV1UsersMeSellerBusinessRegistrationLookup>
+      >,
+      { data: BusinessRegistrationLookupRequest }
+    > = (props) => {
+      const { data } = props ?? {};
+
+      return postApiV1UsersMeSellerBusinessRegistrationLookup(
+        data,
+        requestOptions,
+      );
+    };
+
+    return { mutationFn, ...mutationOptions };
+  };
+
+export type PostApiV1UsersMeSellerBusinessRegistrationLookupMutationResult =
+  NonNullable<
+    Awaited<ReturnType<typeof postApiV1UsersMeSellerBusinessRegistrationLookup>>
+  >;
+export type PostApiV1UsersMeSellerBusinessRegistrationLookupMutationBody =
+  BusinessRegistrationLookupRequest;
+export type PostApiV1UsersMeSellerBusinessRegistrationLookupMutationError =
+  | ApiResponseError
+  | UnauthorizedResponse;
+
+/**
+ * @summary 사업자등록번호 조회
+ */
+export const usePostApiV1UsersMeSellerBusinessRegistrationLookup = <
+  TError = ApiResponseError | UnauthorizedResponse,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<
+        ReturnType<typeof postApiV1UsersMeSellerBusinessRegistrationLookup>
+      >,
+      TError,
+      { data: BusinessRegistrationLookupRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiV1UsersMeSellerBusinessRegistrationLookup>>,
+  TError,
+  { data: BusinessRegistrationLookupRequest },
+  TContext
+> => {
+  return useMutation(
+    getPostApiV1UsersMeSellerBusinessRegistrationLookupMutationOptions(options),
+    queryClient,
+  );
+};
+/**
+ * 사장님 가입의 사업자 정보를 저장한다.
+ * @summary 사장님 사업자 정보 저장
+ */
+export type patchApiV1UsersMeSellerBusinessInfoResponse200 = {
+  data: ApiResponseSellerSignupStatus;
+  status: 200;
+};
+
+export type patchApiV1UsersMeSellerBusinessInfoResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type patchApiV1UsersMeSellerBusinessInfoResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type patchApiV1UsersMeSellerBusinessInfoResponseSuccess =
+  patchApiV1UsersMeSellerBusinessInfoResponse200 & {
+    headers: Headers;
+  };
+export type patchApiV1UsersMeSellerBusinessInfoResponseError = (
+  | patchApiV1UsersMeSellerBusinessInfoResponse400
+  | patchApiV1UsersMeSellerBusinessInfoResponse401
+) & {
+  headers: Headers;
+};
+
+export type patchApiV1UsersMeSellerBusinessInfoResponse =
+  | patchApiV1UsersMeSellerBusinessInfoResponseSuccess
+  | patchApiV1UsersMeSellerBusinessInfoResponseError;
+
+export const getPatchApiV1UsersMeSellerBusinessInfoUrl = () => {
+  return `/api/v1/users/me/seller/business-info`;
+};
+
+export const patchApiV1UsersMeSellerBusinessInfo = async (
+  sellerBusinessInfoUpsertRequest: SellerBusinessInfoUpsertRequest,
+  options?: RequestInit,
+): Promise<patchApiV1UsersMeSellerBusinessInfoResponse> => {
+  return customFetch<patchApiV1UsersMeSellerBusinessInfoResponse>(
+    getPatchApiV1UsersMeSellerBusinessInfoUrl(),
+    {
+      ...options,
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(sellerBusinessInfoUpsertRequest),
+    },
+  );
+};
+
+export const getPatchApiV1UsersMeSellerBusinessInfoMutationOptions = <
+  TError = BadRequestResponse | UnauthorizedResponse,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof patchApiV1UsersMeSellerBusinessInfo>>,
+    TError,
+    { data: SellerBusinessInfoUpsertRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof patchApiV1UsersMeSellerBusinessInfo>>,
+  TError,
+  { data: SellerBusinessInfoUpsertRequest },
+  TContext
+> => {
+  const mutationKey = ['patchApiV1UsersMeSellerBusinessInfo'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof patchApiV1UsersMeSellerBusinessInfo>>,
+    { data: SellerBusinessInfoUpsertRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return patchApiV1UsersMeSellerBusinessInfo(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PatchApiV1UsersMeSellerBusinessInfoMutationResult = NonNullable<
+  Awaited<ReturnType<typeof patchApiV1UsersMeSellerBusinessInfo>>
+>;
+export type PatchApiV1UsersMeSellerBusinessInfoMutationBody =
+  SellerBusinessInfoUpsertRequest;
+export type PatchApiV1UsersMeSellerBusinessInfoMutationError =
+  | BadRequestResponse
+  | UnauthorizedResponse;
+
+/**
+ * @summary 사장님 사업자 정보 저장
+ */
+export const usePatchApiV1UsersMeSellerBusinessInfo = <
+  TError = BadRequestResponse | UnauthorizedResponse,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof patchApiV1UsersMeSellerBusinessInfo>>,
+      TError,
+      { data: SellerBusinessInfoUpsertRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof patchApiV1UsersMeSellerBusinessInfo>>,
+  TError,
+  { data: SellerBusinessInfoUpsertRequest },
+  TContext
+> => {
+  return useMutation(
+    getPatchApiV1UsersMeSellerBusinessInfoMutationOptions(options),
+    queryClient,
+  );
+};
+/**
+ * 사장님 정산 정보를 저장하고 사장님 가입 완료 상태를 반영한다.
+ * @summary 사장님 정산 정보 저장
+ */
+export type patchApiV1UsersMeSellerSettlementInfoResponse200 = {
+  data: ApiResponseSellerSignupStatus;
+  status: 200;
+};
+
+export type patchApiV1UsersMeSellerSettlementInfoResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type patchApiV1UsersMeSellerSettlementInfoResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type patchApiV1UsersMeSellerSettlementInfoResponseSuccess =
+  patchApiV1UsersMeSellerSettlementInfoResponse200 & {
+    headers: Headers;
+  };
+export type patchApiV1UsersMeSellerSettlementInfoResponseError = (
+  | patchApiV1UsersMeSellerSettlementInfoResponse400
+  | patchApiV1UsersMeSellerSettlementInfoResponse401
+) & {
+  headers: Headers;
+};
+
+export type patchApiV1UsersMeSellerSettlementInfoResponse =
+  | patchApiV1UsersMeSellerSettlementInfoResponseSuccess
+  | patchApiV1UsersMeSellerSettlementInfoResponseError;
+
+export const getPatchApiV1UsersMeSellerSettlementInfoUrl = () => {
+  return `/api/v1/users/me/seller/settlement-info`;
+};
+
+export const patchApiV1UsersMeSellerSettlementInfo = async (
+  sellerSettlementInfoUpsertRequest: SellerSettlementInfoUpsertRequest,
+  options?: RequestInit,
+): Promise<patchApiV1UsersMeSellerSettlementInfoResponse> => {
+  return customFetch<patchApiV1UsersMeSellerSettlementInfoResponse>(
+    getPatchApiV1UsersMeSellerSettlementInfoUrl(),
+    {
+      ...options,
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(sellerSettlementInfoUpsertRequest),
+    },
+  );
+};
+
+export const getPatchApiV1UsersMeSellerSettlementInfoMutationOptions = <
+  TError = BadRequestResponse | UnauthorizedResponse,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof patchApiV1UsersMeSellerSettlementInfo>>,
+    TError,
+    { data: SellerSettlementInfoUpsertRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof patchApiV1UsersMeSellerSettlementInfo>>,
+  TError,
+  { data: SellerSettlementInfoUpsertRequest },
+  TContext
+> => {
+  const mutationKey = ['patchApiV1UsersMeSellerSettlementInfo'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof patchApiV1UsersMeSellerSettlementInfo>>,
+    { data: SellerSettlementInfoUpsertRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return patchApiV1UsersMeSellerSettlementInfo(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PatchApiV1UsersMeSellerSettlementInfoMutationResult = NonNullable<
+  Awaited<ReturnType<typeof patchApiV1UsersMeSellerSettlementInfo>>
+>;
+export type PatchApiV1UsersMeSellerSettlementInfoMutationBody =
+  SellerSettlementInfoUpsertRequest;
+export type PatchApiV1UsersMeSellerSettlementInfoMutationError =
+  | BadRequestResponse
+  | UnauthorizedResponse;
+
+/**
+ * @summary 사장님 정산 정보 저장
+ */
+export const usePatchApiV1UsersMeSellerSettlementInfo = <
+  TError = BadRequestResponse | UnauthorizedResponse,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof patchApiV1UsersMeSellerSettlementInfo>>,
+      TError,
+      { data: SellerSettlementInfoUpsertRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof patchApiV1UsersMeSellerSettlementInfo>>,
+  TError,
+  { data: SellerSettlementInfoUpsertRequest },
+  TContext
+> => {
+  return useMutation(
+    getPatchApiV1UsersMeSellerSettlementInfoMutationOptions(options),
     queryClient,
   );
 };

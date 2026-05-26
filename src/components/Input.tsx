@@ -62,7 +62,7 @@ const Input = ({
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           placeholder={placeholder}
-          className={`w-full py-g5 border rounded-2xlarge body-md-regular focus:outline-none text-icon-basic placeholder:text-text-subtle-inverse pr-10 ${leftIcon ? 'pl-8' : 'px-g4'} ${isError ? 'border-border-error' : focusVariant === 'brand' ? 'border-border-subtle focus:border-border-brand' : 'border-border-subtle focus:border-text-basic'}`}
+          className={`w-full py-g5 border rounded-2xlarge body-md-regular focus:outline-none text-icon-basic placeholder:text-text-subtle-inverse pr-10 transition-colors duration-200 ${leftIcon ? 'pl-8' : 'px-g4'} ${isError ? 'border-border-error' : focusVariant === 'brand' ? 'border-border-subtle focus:border-border-brand' : 'border-border-subtle focus:border-text-basic'}`}
         />
         <div className="absolute right-g4 top-1/2 -translate-y-1/2 flex items-center gap-g4">
           {showClear && (
@@ -99,7 +99,7 @@ const Input = ({
       </div>
       {helperText ? (
         <p
-          className={`caption-sm-medium ${helperTextClassName ?? 'text-text-subtle-inverse'}`}
+          className={`caption-sm-medium ${helperTextClassName ?? (isError ? 'text-text-error' : 'text-text-subtle-inverse')}`}
         >
           {helperText}
         </p>

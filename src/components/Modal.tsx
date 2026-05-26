@@ -52,7 +52,7 @@ export default function Modal({
               />
             )}
             <div className="flex w-full flex-col items-center gap-1">
-              <p className="heading-lg-bold text-center text-text-basic">
+              <p className="heading-lg-bold whitespace-pre-line text-center text-text-basic">
                 {title}
               </p>
               {description && (

@@ -12,11 +12,13 @@ import { useState } from 'react';
 
 function SettingRow({
   label,
+  value,
   onClick,
   href,
   labelClassName,
 }: {
   label: string;
+  value?: string | null;
   onClick?: () => void;
   href?: string;
   labelClassName?: string;
@@ -28,10 +30,17 @@ function SettingRow({
       >
         {label}
       </span>
-      <Icon
-        icon="lucide:chevron-right"
-        className="w-6 h-6 text-icon-tertiary"
-      />
+      <div className="flex items-center gap-g4">
+        {value && (
+          <span className="heading-sm-regular text-text-subtle-inverse">
+            {value}
+          </span>
+        )}
+        <Icon
+          icon="lucide:chevron-right"
+          className="w-6 h-6 text-icon-tertiary"
+        />
+      </div>
     </div>
   );
 
@@ -111,7 +120,15 @@ export default function SettingsPage() {
           <p className="caption-sm-medium text-text-disabled pt-p6 pb-p3">
             정보
           </p>
-          <SettingRow label="휴대폰 번호" />
+          <SettingRow
+            label="휴대폰 번호"
+            value={
+              user?.phoneNumber
+                ? '+82 ' + user.phoneNumber.replace(/^0/, '')
+                : undefined
+            }
+            href="/mypage/phone-change"
+          />
           <SettingRow label="닉네임 변경" href="/mypage/nickname-change" />
           <SettingRow label="비밀번호 변경" href="/mypage/password-change" />
         </div>

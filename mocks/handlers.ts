@@ -446,6 +446,26 @@ const overrideHandlers = [
       { status: 200 },
     );
   }),
+
+  http.post('*/api/v1/users/me/phone/verification-codes', async () => {
+    await delay(500);
+    return HttpResponse.json(
+      {
+        success: true,
+        data: { expiresInSeconds: 180, resendAvailableInSeconds: 60 },
+        error: null,
+      },
+      { status: 200 },
+    );
+  }),
+
+  http.post('*/api/v1/users/me/phone/verification-codes/verify', async () => {
+    await delay(500);
+    return HttpResponse.json(
+      { success: true, data: null, error: null },
+      { status: 200 },
+    );
+  }),
 ];
 
 export const handlers = [...overrideHandlers, ...generatedHandlers];

@@ -265,6 +265,10 @@ export const GetApiV1MypageRefundsResponse = zod.object({
         .nullable()
         .describe('취소 사유'),
       cancelReasonDetail: zod.string().nullish().describe('취소 상세 사유'),
+      paidAt: zod.iso
+        .datetime({ offset: true })
+        .nullable()
+        .describe('결제 일시'),
       paymentMethod: zod.string().nullable().describe('결제 수단'),
       refundedAt: zod.iso.datetime({ offset: true }).nullish(),
     }),
@@ -303,6 +307,10 @@ export const GetApiV1UsersMeRefundsResponse = zod.object({
         .nullable()
         .describe('취소 사유'),
       cancelReasonDetail: zod.string().nullish().describe('취소 상세 사유'),
+      paidAt: zod.iso
+        .datetime({ offset: true })
+        .nullable()
+        .describe('결제 일시'),
       paymentMethod: zod.string().nullable().describe('결제 수단'),
       refundedAt: zod.iso.datetime({ offset: true }).nullish(),
     }),

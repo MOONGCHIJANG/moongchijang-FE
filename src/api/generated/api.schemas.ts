@@ -234,7 +234,7 @@ export interface SellerBusinessInfoUpsertRequest {
   ownerName: string;
   /** @maxLength 255 */
   storeAddress: string;
-  /** @pattern ^01[0-9]-?\d{3,4}-?\d{4}$ */
+  /** @pattern ^01[0-9]-[0-9]{3,4}-[0-9]{4}$ */
   phoneNumber: string;
 }
 
@@ -428,31 +428,39 @@ export interface EmailLoginRequest {
   password: string;
 }
 
-export interface PasswordResetLinkRequest {
-  email: string;
-}
-
-export interface ProfileUpdateRequest {
+export interface NicknameUpdateRequest {
   /**
    * @minLength 2
    * @maxLength 10
    * @pattern ^[A-Za-z0-9가-힣]{2,10}$
    */
   nickname: string;
+}
+
+export type ApiResponseNicknameUpdatedData = {
+  id: number;
+  nickname: string;
+};
+
+export interface ApiResponseNicknameUpdated {
+  success: boolean;
+  data: ApiResponseNicknameUpdatedData;
+  error: unknown | null;
+}
+
+export interface PhoneNumberUpdateRequest {
   /** @pattern ^01[0-9]-[0-9]{3,4}-[0-9]{4}$ */
   phoneNumber: string;
 }
 
-export type ApiResponseProfileUpdatedData = {
+export type ApiResponsePhoneNumberUpdatedData = {
   id: number;
-  nickname: string;
   phoneNumber: string;
-  updatedAt: string;
 };
 
-export interface ApiResponseProfileUpdated {
+export interface ApiResponsePhoneNumberUpdated {
   success: boolean;
-  data: ApiResponseProfileUpdatedData;
+  data: ApiResponsePhoneNumberUpdatedData;
   error: unknown | null;
 }
 
@@ -492,13 +500,22 @@ export interface ApiResponsePhoneVerificationVerified {
 export interface PasswordChangeRequest {
   currentPassword: string;
   /**
-   * 8~20자, 영문+숫자 포함
+   * 8~20자, 영문+숫자 포함, 이메일 아이디와 동일값 불가
    * @minLength 8
    * @maxLength 20
    * @pattern ^(?=.*[A-Za-z])(?=.*[0-9]).{8,20}$
    */
   newPassword: string;
-  newPasswordConfirm: string;
+}
+
+export type ApiResponsePasswordChangedData = {
+  changed: boolean;
+};
+
+export interface ApiResponsePasswordChanged {
+  success: boolean;
+  data: ApiResponsePasswordChangedData;
+  error: unknown | null;
 }
 
 export type ApiResponseMyRegionsData = {
@@ -1276,6 +1293,11 @@ export type ApiResponseRefundListDataItem = {
    * @nullable
    */
   cancelReasonDetail?: string | null;
+  /**
+   * 결제 일시
+   * @nullable
+   */
+  paidAt: string | null;
   /**
    * 결제 수단
    * @nullable

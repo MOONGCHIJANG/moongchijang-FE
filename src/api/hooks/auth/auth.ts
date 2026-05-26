@@ -30,9 +30,11 @@ import type {
   ApiResponseError,
   ApiResponseMyRegions,
   ApiResponseNicknameAvailability,
+  ApiResponseNicknameUpdated,
+  ApiResponsePasswordChanged,
+  ApiResponsePhoneNumberUpdated,
   ApiResponsePhoneVerificationCodeSent,
   ApiResponsePhoneVerificationVerified,
-  ApiResponseProfileUpdated,
   ApiResponseSellerSignupStatus,
   ApiResponseUserInfo,
   BadRequestResponse,
@@ -46,12 +48,11 @@ import type {
   GetApiV1AuthEmailAvailabilityParams,
   GetApiV1UsersNicknameAvailabilityParams,
   KakaoLoginRequest,
-  NotFoundResponse,
+  NicknameUpdateRequest,
   PasswordChangeRequest,
-  PasswordResetLinkRequest,
+  PhoneNumberUpdateRequest,
   PhoneVerificationCodeSendRequest,
   PhoneVerificationCodeVerifyRequest,
-  ProfileUpdateRequest,
   SellerBusinessInfoUpsertRequest,
   SellerSettlementInfoUpsertRequest,
   SuccessNoDataResponse,
@@ -2398,201 +2399,82 @@ export const usePostApiV1AuthEmailLogin = <
   );
 };
 /**
- * 가입된 이메일로 비밀번호 재설정 링크를 발송한다.
- * @summary 비밀번호 재설정 링크 발송
+ * 인증된 사용자의 닉네임을 변경한다.
+ * @summary 닉네임 변경
  */
-export type postApiV1AuthPasswordResetLinkResponse200 = {
-  data: SuccessNoDataResponse;
+export type patchApiV1UsersMeNicknameResponse200 = {
+  data: ApiResponseNicknameUpdated;
   status: 200;
 };
 
-export type postApiV1AuthPasswordResetLinkResponse404 = {
-  data: NotFoundResponse;
-  status: 404;
-};
-
-export type postApiV1AuthPasswordResetLinkResponseSuccess =
-  postApiV1AuthPasswordResetLinkResponse200 & {
-    headers: Headers;
-  };
-export type postApiV1AuthPasswordResetLinkResponseError =
-  postApiV1AuthPasswordResetLinkResponse404 & {
-    headers: Headers;
-  };
-
-export type postApiV1AuthPasswordResetLinkResponse =
-  | postApiV1AuthPasswordResetLinkResponseSuccess
-  | postApiV1AuthPasswordResetLinkResponseError;
-
-export const getPostApiV1AuthPasswordResetLinkUrl = () => {
-  return `/api/v1/auth/password/reset-link`;
-};
-
-export const postApiV1AuthPasswordResetLink = async (
-  passwordResetLinkRequest: PasswordResetLinkRequest,
-  options?: RequestInit,
-): Promise<postApiV1AuthPasswordResetLinkResponse> => {
-  return customFetch<postApiV1AuthPasswordResetLinkResponse>(
-    getPostApiV1AuthPasswordResetLinkUrl(),
-    {
-      ...options,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...options?.headers },
-      body: JSON.stringify(passwordResetLinkRequest),
-    },
-  );
-};
-
-export const getPostApiV1AuthPasswordResetLinkMutationOptions = <
-  TError = NotFoundResponse,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof postApiV1AuthPasswordResetLink>>,
-    TError,
-    { data: PasswordResetLinkRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof postApiV1AuthPasswordResetLink>>,
-  TError,
-  { data: PasswordResetLinkRequest },
-  TContext
-> => {
-  const mutationKey = ['postApiV1AuthPasswordResetLink'];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      'mutationKey' in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof postApiV1AuthPasswordResetLink>>,
-    { data: PasswordResetLinkRequest }
-  > = (props) => {
-    const { data } = props ?? {};
-
-    return postApiV1AuthPasswordResetLink(data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type PostApiV1AuthPasswordResetLinkMutationResult = NonNullable<
-  Awaited<ReturnType<typeof postApiV1AuthPasswordResetLink>>
->;
-export type PostApiV1AuthPasswordResetLinkMutationBody =
-  PasswordResetLinkRequest;
-export type PostApiV1AuthPasswordResetLinkMutationError = NotFoundResponse;
-
-/**
- * @summary 비밀번호 재설정 링크 발송
- */
-export const usePostApiV1AuthPasswordResetLink = <
-  TError = NotFoundResponse,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof postApiV1AuthPasswordResetLink>>,
-      TError,
-      { data: PasswordResetLinkRequest },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof postApiV1AuthPasswordResetLink>>,
-  TError,
-  { data: PasswordResetLinkRequest },
-  TContext
-> => {
-  return useMutation(
-    getPostApiV1AuthPasswordResetLinkMutationOptions(options),
-    queryClient,
-  );
-};
-/**
- * 닉네임과 전화번호를 수정한다.
- * @summary 프로필 수정
- */
-export type patchApiV1UsersMeProfileResponse200 = {
-  data: ApiResponseProfileUpdated;
-  status: 200;
-};
-
-export type patchApiV1UsersMeProfileResponse400 = {
+export type patchApiV1UsersMeNicknameResponse400 = {
   data: BadRequestResponse;
   status: 400;
 };
 
-export type patchApiV1UsersMeProfileResponse401 = {
+export type patchApiV1UsersMeNicknameResponse401 = {
   data: UnauthorizedResponse;
   status: 401;
 };
 
-export type patchApiV1UsersMeProfileResponse409 = {
+export type patchApiV1UsersMeNicknameResponse409 = {
   data: ConflictResponse;
   status: 409;
 };
 
-export type patchApiV1UsersMeProfileResponseSuccess =
-  patchApiV1UsersMeProfileResponse200 & {
+export type patchApiV1UsersMeNicknameResponseSuccess =
+  patchApiV1UsersMeNicknameResponse200 & {
     headers: Headers;
   };
-export type patchApiV1UsersMeProfileResponseError = (
-  | patchApiV1UsersMeProfileResponse400
-  | patchApiV1UsersMeProfileResponse401
-  | patchApiV1UsersMeProfileResponse409
+export type patchApiV1UsersMeNicknameResponseError = (
+  | patchApiV1UsersMeNicknameResponse400
+  | patchApiV1UsersMeNicknameResponse401
+  | patchApiV1UsersMeNicknameResponse409
 ) & {
   headers: Headers;
 };
 
-export type patchApiV1UsersMeProfileResponse =
-  | patchApiV1UsersMeProfileResponseSuccess
-  | patchApiV1UsersMeProfileResponseError;
+export type patchApiV1UsersMeNicknameResponse =
+  | patchApiV1UsersMeNicknameResponseSuccess
+  | patchApiV1UsersMeNicknameResponseError;
 
-export const getPatchApiV1UsersMeProfileUrl = () => {
-  return `/api/v1/users/me/profile`;
+export const getPatchApiV1UsersMeNicknameUrl = () => {
+  return `/api/v1/users/me/nickname`;
 };
 
-export const patchApiV1UsersMeProfile = async (
-  profileUpdateRequest: ProfileUpdateRequest,
+export const patchApiV1UsersMeNickname = async (
+  nicknameUpdateRequest: NicknameUpdateRequest,
   options?: RequestInit,
-): Promise<patchApiV1UsersMeProfileResponse> => {
-  return customFetch<patchApiV1UsersMeProfileResponse>(
-    getPatchApiV1UsersMeProfileUrl(),
+): Promise<patchApiV1UsersMeNicknameResponse> => {
+  return customFetch<patchApiV1UsersMeNicknameResponse>(
+    getPatchApiV1UsersMeNicknameUrl(),
     {
       ...options,
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', ...options?.headers },
-      body: JSON.stringify(profileUpdateRequest),
+      body: JSON.stringify(nicknameUpdateRequest),
     },
   );
 };
 
-export const getPatchApiV1UsersMeProfileMutationOptions = <
+export const getPatchApiV1UsersMeNicknameMutationOptions = <
   TError = BadRequestResponse | UnauthorizedResponse | ConflictResponse,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof patchApiV1UsersMeProfile>>,
+    Awaited<ReturnType<typeof patchApiV1UsersMeNickname>>,
     TError,
-    { data: ProfileUpdateRequest },
+    { data: NicknameUpdateRequest },
     TContext
   >;
   request?: SecondParameter<typeof customFetch>;
 }): UseMutationOptions<
-  Awaited<ReturnType<typeof patchApiV1UsersMeProfile>>,
+  Awaited<ReturnType<typeof patchApiV1UsersMeNickname>>,
   TError,
-  { data: ProfileUpdateRequest },
+  { data: NicknameUpdateRequest },
   TContext
 > => {
-  const mutationKey = ['patchApiV1UsersMeProfile'];
+  const mutationKey = ['patchApiV1UsersMeNickname'];
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation &&
       'mutationKey' in options.mutation &&
@@ -2602,51 +2484,178 @@ export const getPatchApiV1UsersMeProfileMutationOptions = <
     : { mutation: { mutationKey }, request: undefined };
 
   const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof patchApiV1UsersMeProfile>>,
-    { data: ProfileUpdateRequest }
+    Awaited<ReturnType<typeof patchApiV1UsersMeNickname>>,
+    { data: NicknameUpdateRequest }
   > = (props) => {
     const { data } = props ?? {};
 
-    return patchApiV1UsersMeProfile(data, requestOptions);
+    return patchApiV1UsersMeNickname(data, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
 };
 
-export type PatchApiV1UsersMeProfileMutationResult = NonNullable<
-  Awaited<ReturnType<typeof patchApiV1UsersMeProfile>>
+export type PatchApiV1UsersMeNicknameMutationResult = NonNullable<
+  Awaited<ReturnType<typeof patchApiV1UsersMeNickname>>
 >;
-export type PatchApiV1UsersMeProfileMutationBody = ProfileUpdateRequest;
-export type PatchApiV1UsersMeProfileMutationError =
+export type PatchApiV1UsersMeNicknameMutationBody = NicknameUpdateRequest;
+export type PatchApiV1UsersMeNicknameMutationError =
   | BadRequestResponse
   | UnauthorizedResponse
   | ConflictResponse;
 
 /**
- * @summary 프로필 수정
+ * @summary 닉네임 변경
  */
-export const usePatchApiV1UsersMeProfile = <
+export const usePatchApiV1UsersMeNickname = <
   TError = BadRequestResponse | UnauthorizedResponse | ConflictResponse,
   TContext = unknown,
 >(
   options?: {
     mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof patchApiV1UsersMeProfile>>,
+      Awaited<ReturnType<typeof patchApiV1UsersMeNickname>>,
       TError,
-      { data: ProfileUpdateRequest },
+      { data: NicknameUpdateRequest },
       TContext
     >;
     request?: SecondParameter<typeof customFetch>;
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
-  Awaited<ReturnType<typeof patchApiV1UsersMeProfile>>,
+  Awaited<ReturnType<typeof patchApiV1UsersMeNickname>>,
   TError,
-  { data: ProfileUpdateRequest },
+  { data: NicknameUpdateRequest },
   TContext
 > => {
   return useMutation(
-    getPatchApiV1UsersMeProfileMutationOptions(options),
+    getPatchApiV1UsersMeNicknameMutationOptions(options),
+    queryClient,
+  );
+};
+/**
+ * 인증된 사용자의 전화번호를 변경한다.
+ * @summary 전화번호 변경
+ */
+export type patchApiV1UsersMePhoneNumberResponse200 = {
+  data: ApiResponsePhoneNumberUpdated;
+  status: 200;
+};
+
+export type patchApiV1UsersMePhoneNumberResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type patchApiV1UsersMePhoneNumberResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type patchApiV1UsersMePhoneNumberResponseSuccess =
+  patchApiV1UsersMePhoneNumberResponse200 & {
+    headers: Headers;
+  };
+export type patchApiV1UsersMePhoneNumberResponseError = (
+  | patchApiV1UsersMePhoneNumberResponse400
+  | patchApiV1UsersMePhoneNumberResponse401
+) & {
+  headers: Headers;
+};
+
+export type patchApiV1UsersMePhoneNumberResponse =
+  | patchApiV1UsersMePhoneNumberResponseSuccess
+  | patchApiV1UsersMePhoneNumberResponseError;
+
+export const getPatchApiV1UsersMePhoneNumberUrl = () => {
+  return `/api/v1/users/me/phone-number`;
+};
+
+export const patchApiV1UsersMePhoneNumber = async (
+  phoneNumberUpdateRequest: PhoneNumberUpdateRequest,
+  options?: RequestInit,
+): Promise<patchApiV1UsersMePhoneNumberResponse> => {
+  return customFetch<patchApiV1UsersMePhoneNumberResponse>(
+    getPatchApiV1UsersMePhoneNumberUrl(),
+    {
+      ...options,
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(phoneNumberUpdateRequest),
+    },
+  );
+};
+
+export const getPatchApiV1UsersMePhoneNumberMutationOptions = <
+  TError = BadRequestResponse | UnauthorizedResponse,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof patchApiV1UsersMePhoneNumber>>,
+    TError,
+    { data: PhoneNumberUpdateRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof patchApiV1UsersMePhoneNumber>>,
+  TError,
+  { data: PhoneNumberUpdateRequest },
+  TContext
+> => {
+  const mutationKey = ['patchApiV1UsersMePhoneNumber'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof patchApiV1UsersMePhoneNumber>>,
+    { data: PhoneNumberUpdateRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return patchApiV1UsersMePhoneNumber(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PatchApiV1UsersMePhoneNumberMutationResult = NonNullable<
+  Awaited<ReturnType<typeof patchApiV1UsersMePhoneNumber>>
+>;
+export type PatchApiV1UsersMePhoneNumberMutationBody = PhoneNumberUpdateRequest;
+export type PatchApiV1UsersMePhoneNumberMutationError =
+  | BadRequestResponse
+  | UnauthorizedResponse;
+
+/**
+ * @summary 전화번호 변경
+ */
+export const usePatchApiV1UsersMePhoneNumber = <
+  TError = BadRequestResponse | UnauthorizedResponse,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof patchApiV1UsersMePhoneNumber>>,
+      TError,
+      { data: PhoneNumberUpdateRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof patchApiV1UsersMePhoneNumber>>,
+  TError,
+  { data: PhoneNumberUpdateRequest },
+  TContext
+> => {
+  return useMutation(
+    getPatchApiV1UsersMePhoneNumberMutationOptions(options),
     queryClient,
   );
 };
@@ -2911,79 +2920,79 @@ export const usePostApiV1UsersMePhoneVerificationCodesVerify = <
  * 현재 비밀번호를 확인하고 새 비밀번호로 변경한다. 변경 완료 시 세션을 무효화한다.
  * @summary 비밀번호 변경 (이메일 가입자 전용)
  */
-export type postApiV1AuthPasswordChangeResponse200 = {
-  data: SuccessNoDataResponse;
+export type patchApiV1UsersMePasswordResponse200 = {
+  data: ApiResponsePasswordChanged;
   status: 200;
 };
 
-export type postApiV1AuthPasswordChangeResponse400 = {
+export type patchApiV1UsersMePasswordResponse400 = {
   data: BadRequestResponse;
   status: 400;
 };
 
-export type postApiV1AuthPasswordChangeResponse401 = {
+export type patchApiV1UsersMePasswordResponse401 = {
   data: UnauthorizedResponse;
   status: 401;
 };
 
-export type postApiV1AuthPasswordChangeResponse403 = {
+export type patchApiV1UsersMePasswordResponse403 = {
   data: ForbiddenResponse;
   status: 403;
 };
 
-export type postApiV1AuthPasswordChangeResponseSuccess =
-  postApiV1AuthPasswordChangeResponse200 & {
+export type patchApiV1UsersMePasswordResponseSuccess =
+  patchApiV1UsersMePasswordResponse200 & {
     headers: Headers;
   };
-export type postApiV1AuthPasswordChangeResponseError = (
-  | postApiV1AuthPasswordChangeResponse400
-  | postApiV1AuthPasswordChangeResponse401
-  | postApiV1AuthPasswordChangeResponse403
+export type patchApiV1UsersMePasswordResponseError = (
+  | patchApiV1UsersMePasswordResponse400
+  | patchApiV1UsersMePasswordResponse401
+  | patchApiV1UsersMePasswordResponse403
 ) & {
   headers: Headers;
 };
 
-export type postApiV1AuthPasswordChangeResponse =
-  | postApiV1AuthPasswordChangeResponseSuccess
-  | postApiV1AuthPasswordChangeResponseError;
+export type patchApiV1UsersMePasswordResponse =
+  | patchApiV1UsersMePasswordResponseSuccess
+  | patchApiV1UsersMePasswordResponseError;
 
-export const getPostApiV1AuthPasswordChangeUrl = () => {
-  return `/api/v1/auth/password/change`;
+export const getPatchApiV1UsersMePasswordUrl = () => {
+  return `/api/v1/users/me/password`;
 };
 
-export const postApiV1AuthPasswordChange = async (
+export const patchApiV1UsersMePassword = async (
   passwordChangeRequest: PasswordChangeRequest,
   options?: RequestInit,
-): Promise<postApiV1AuthPasswordChangeResponse> => {
-  return customFetch<postApiV1AuthPasswordChangeResponse>(
-    getPostApiV1AuthPasswordChangeUrl(),
+): Promise<patchApiV1UsersMePasswordResponse> => {
+  return customFetch<patchApiV1UsersMePasswordResponse>(
+    getPatchApiV1UsersMePasswordUrl(),
     {
       ...options,
-      method: 'POST',
+      method: 'PATCH',
       headers: { 'Content-Type': 'application/json', ...options?.headers },
       body: JSON.stringify(passwordChangeRequest),
     },
   );
 };
 
-export const getPostApiV1AuthPasswordChangeMutationOptions = <
+export const getPatchApiV1UsersMePasswordMutationOptions = <
   TError = BadRequestResponse | UnauthorizedResponse | ForbiddenResponse,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof postApiV1AuthPasswordChange>>,
+    Awaited<ReturnType<typeof patchApiV1UsersMePassword>>,
     TError,
     { data: PasswordChangeRequest },
     TContext
   >;
   request?: SecondParameter<typeof customFetch>;
 }): UseMutationOptions<
-  Awaited<ReturnType<typeof postApiV1AuthPasswordChange>>,
+  Awaited<ReturnType<typeof patchApiV1UsersMePassword>>,
   TError,
   { data: PasswordChangeRequest },
   TContext
 > => {
-  const mutationKey = ['postApiV1AuthPasswordChange'];
+  const mutationKey = ['patchApiV1UsersMePassword'];
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation &&
       'mutationKey' in options.mutation &&
@@ -2993,22 +3002,22 @@ export const getPostApiV1AuthPasswordChangeMutationOptions = <
     : { mutation: { mutationKey }, request: undefined };
 
   const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof postApiV1AuthPasswordChange>>,
+    Awaited<ReturnType<typeof patchApiV1UsersMePassword>>,
     { data: PasswordChangeRequest }
   > = (props) => {
     const { data } = props ?? {};
 
-    return postApiV1AuthPasswordChange(data, requestOptions);
+    return patchApiV1UsersMePassword(data, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
 };
 
-export type PostApiV1AuthPasswordChangeMutationResult = NonNullable<
-  Awaited<ReturnType<typeof postApiV1AuthPasswordChange>>
+export type PatchApiV1UsersMePasswordMutationResult = NonNullable<
+  Awaited<ReturnType<typeof patchApiV1UsersMePassword>>
 >;
-export type PostApiV1AuthPasswordChangeMutationBody = PasswordChangeRequest;
-export type PostApiV1AuthPasswordChangeMutationError =
+export type PatchApiV1UsersMePasswordMutationBody = PasswordChangeRequest;
+export type PatchApiV1UsersMePasswordMutationError =
   | BadRequestResponse
   | UnauthorizedResponse
   | ForbiddenResponse;
@@ -3016,13 +3025,13 @@ export type PostApiV1AuthPasswordChangeMutationError =
 /**
  * @summary 비밀번호 변경 (이메일 가입자 전용)
  */
-export const usePostApiV1AuthPasswordChange = <
+export const usePatchApiV1UsersMePassword = <
   TError = BadRequestResponse | UnauthorizedResponse | ForbiddenResponse,
   TContext = unknown,
 >(
   options?: {
     mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof postApiV1AuthPasswordChange>>,
+      Awaited<ReturnType<typeof patchApiV1UsersMePassword>>,
       TError,
       { data: PasswordChangeRequest },
       TContext
@@ -3031,13 +3040,13 @@ export const usePostApiV1AuthPasswordChange = <
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
-  Awaited<ReturnType<typeof postApiV1AuthPasswordChange>>,
+  Awaited<ReturnType<typeof patchApiV1UsersMePassword>>,
   TError,
   { data: PasswordChangeRequest },
   TContext
 > => {
   return useMutation(
-    getPostApiV1AuthPasswordChangeMutationOptions(options),
+    getPatchApiV1UsersMePasswordMutationOptions(options),
     queryClient,
   );
 };

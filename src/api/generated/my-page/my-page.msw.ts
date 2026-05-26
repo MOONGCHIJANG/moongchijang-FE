@@ -276,6 +276,13 @@ export const getGetApiV1MypageRefundsResponseMock = (
       ]),
       undefined,
     ]),
+    paidAt: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.date.past().toISOString().slice(0, 19) + 'Z',
+        null,
+      ]),
+      null,
+    ]),
     paymentMethod: faker.helpers.arrayElement([
       faker.helpers.arrayElement([
         faker.string.alpha({ length: { min: 10, max: 20 } }),
@@ -356,6 +363,13 @@ export const getGetApiV1UsersMeRefundsResponseMock = (
         null,
       ]),
       undefined,
+    ]),
+    paidAt: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.date.past().toISOString().slice(0, 19) + 'Z',
+        null,
+      ]),
+      null,
     ]),
     paymentMethod: faker.helpers.arrayElement([
       faker.helpers.arrayElement([

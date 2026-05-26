@@ -246,7 +246,7 @@ export const patchApiV1UsersMeSellerBusinessInfoBodyOwnerNameMax = 50;
 export const patchApiV1UsersMeSellerBusinessInfoBodyStoreAddressMax = 255;
 
 export const patchApiV1UsersMeSellerBusinessInfoBodyPhoneNumberRegExp =
-  new RegExp('^01[0-9]-?\\d{3,4}-?\\d{4}$');
+  new RegExp('^01[0-9]-[0-9]{3,4}-[0-9]{4}$');
 
 export const PatchApiV1UsersMeSellerBusinessInfoBody = zod.object({
   businessRegistrationNumber: zod
@@ -566,51 +566,52 @@ export const PostApiV1AuthEmailLoginResponse = zod.object({
 });
 
 /**
- * 가입된 이메일로 비밀번호 재설정 링크를 발송한다.
- * @summary 비밀번호 재설정 링크 발송
+ * 인증된 사용자의 닉네임을 변경한다.
+ * @summary 닉네임 변경
  */
-export const PostApiV1AuthPasswordResetLinkBody = zod.object({
-  email: zod.email(),
-});
+export const patchApiV1UsersMeNicknameBodyNicknameMin = 2;
+export const patchApiV1UsersMeNicknameBodyNicknameMax = 10;
 
-export const PostApiV1AuthPasswordResetLinkResponse = zod.object({
-  success: zod.boolean(),
-  data: zod.unknown().nullable(),
-  error: zod.unknown().nullable(),
-});
-
-/**
- * 닉네임과 전화번호를 수정한다.
- * @summary 프로필 수정
- */
-export const patchApiV1UsersMeProfileBodyNicknameMin = 2;
-export const patchApiV1UsersMeProfileBodyNicknameMax = 10;
-
-export const patchApiV1UsersMeProfileBodyNicknameRegExp = new RegExp(
+export const patchApiV1UsersMeNicknameBodyNicknameRegExp = new RegExp(
   '^[A-Za-z0-9가-힣]{2,10}$',
 );
-export const patchApiV1UsersMeProfileBodyPhoneNumberRegExp = new RegExp(
-  '^01[0-9]-[0-9]{3,4}-[0-9]{4}$',
-);
 
-export const PatchApiV1UsersMeProfileBody = zod.object({
+export const PatchApiV1UsersMeNicknameBody = zod.object({
   nickname: zod
     .string()
-    .min(patchApiV1UsersMeProfileBodyNicknameMin)
-    .max(patchApiV1UsersMeProfileBodyNicknameMax)
-    .regex(patchApiV1UsersMeProfileBodyNicknameRegExp),
-  phoneNumber: zod
-    .string()
-    .regex(patchApiV1UsersMeProfileBodyPhoneNumberRegExp),
+    .min(patchApiV1UsersMeNicknameBodyNicknameMin)
+    .max(patchApiV1UsersMeNicknameBodyNicknameMax)
+    .regex(patchApiV1UsersMeNicknameBodyNicknameRegExp),
 });
 
-export const PatchApiV1UsersMeProfileResponse = zod.object({
+export const PatchApiV1UsersMeNicknameResponse = zod.object({
   success: zod.boolean(),
   data: zod.object({
     id: zod.number(),
     nickname: zod.string(),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * 인증된 사용자의 전화번호를 변경한다.
+ * @summary 전화번호 변경
+ */
+export const patchApiV1UsersMePhoneNumberBodyPhoneNumberRegExp = new RegExp(
+  '^01[0-9]-[0-9]{3,4}-[0-9]{4}$',
+);
+
+export const PatchApiV1UsersMePhoneNumberBody = zod.object({
+  phoneNumber: zod
+    .string()
+    .regex(patchApiV1UsersMePhoneNumberBodyPhoneNumberRegExp),
+});
+
+export const PatchApiV1UsersMePhoneNumberResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    id: zod.number(),
     phoneNumber: zod.string(),
-    updatedAt: zod.iso.datetime({ offset: true }),
   }),
   error: zod.unknown().nullable(),
 });
@@ -667,27 +668,28 @@ export const PostApiV1UsersMePhoneVerificationCodesVerifyResponse = zod.object({
  * 현재 비밀번호를 확인하고 새 비밀번호로 변경한다. 변경 완료 시 세션을 무효화한다.
  * @summary 비밀번호 변경 (이메일 가입자 전용)
  */
-export const postApiV1AuthPasswordChangeBodyNewPasswordMin = 8;
-export const postApiV1AuthPasswordChangeBodyNewPasswordMax = 20;
+export const patchApiV1UsersMePasswordBodyNewPasswordMin = 8;
+export const patchApiV1UsersMePasswordBodyNewPasswordMax = 20;
 
-export const postApiV1AuthPasswordChangeBodyNewPasswordRegExp = new RegExp(
+export const patchApiV1UsersMePasswordBodyNewPasswordRegExp = new RegExp(
   '^(?=.\*[A-Za-z])(?=.\*[0-9]).{8,20}$',
 );
 
-export const PostApiV1AuthPasswordChangeBody = zod.object({
+export const PatchApiV1UsersMePasswordBody = zod.object({
   currentPassword: zod.string(),
   newPassword: zod
     .string()
-    .min(postApiV1AuthPasswordChangeBodyNewPasswordMin)
-    .max(postApiV1AuthPasswordChangeBodyNewPasswordMax)
-    .regex(postApiV1AuthPasswordChangeBodyNewPasswordRegExp)
-    .describe('8~20자, 영문+숫자 포함'),
-  newPasswordConfirm: zod.string(),
+    .min(patchApiV1UsersMePasswordBodyNewPasswordMin)
+    .max(patchApiV1UsersMePasswordBodyNewPasswordMax)
+    .regex(patchApiV1UsersMePasswordBodyNewPasswordRegExp)
+    .describe('8~20자, 영문+숫자 포함, 이메일 아이디와 동일값 불가'),
 });
 
-export const PostApiV1AuthPasswordChangeResponse = zod.object({
+export const PatchApiV1UsersMePasswordResponse = zod.object({
   success: zod.boolean(),
-  data: zod.unknown().nullable(),
+  data: zod.object({
+    changed: zod.boolean(),
+  }),
   error: zod.unknown().nullable(),
 });
 

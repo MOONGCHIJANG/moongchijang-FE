@@ -47,7 +47,14 @@ const TopInfo = ({ data }: Props) => {
               <ShareBtn onClick={() => setIsShared(!isShared)}>
                 공유하기
               </ShareBtn>
-              <BottomShare open={isShared} onClose={() => setIsShared(false)} />
+              <BottomShare
+                open={isShared}
+                onClose={() => setIsShared(false)}
+                groupBuyId={data.id}
+                productName={data.productName}
+                imageUrl={data.thumbnailUrl ?? undefined}
+                description={`${data.deadlineDateTimeLabel}까지 · ${data.storeName}`}
+              />
             </div>
           </div>
           <p className="heading-1xl-bold">{data.price.toLocaleString()}원</p>

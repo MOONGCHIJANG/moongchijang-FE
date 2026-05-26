@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
+    unoptimized: process.env.NODE_ENV === 'development',
     remotePatterns: [
       {
         protocol: 'https',
@@ -9,6 +10,10 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: '*.moongchijang.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'dkg5euyknlpa.cloudfront.net',
       },
     ],
   },

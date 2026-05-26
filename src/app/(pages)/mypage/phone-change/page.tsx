@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import {
@@ -68,8 +68,8 @@ export default function PhoneChangePage() {
   const canSend = isPhoneValid && !isSending;
   const canVerify = codeSent && isCodeValid && timeLeft > 0 && !isVerifying;
 
-  function handlePhoneChange(value: string) {
-    setPhone(formatPhone(value));
+  function handlePhoneChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setPhone(formatPhone(e.target.value));
     if (codeSent) {
       setCodeSent(false);
       setCode('');
@@ -200,8 +200,8 @@ export default function PhoneChangePage() {
           <Input
             placeholder="인증번호를 입력해주세요"
             value={code}
-            onChange={(v) => {
-              setCode(v.replace(/\D/g, '').slice(0, 6));
+            onChange={(e) => {
+              setCode(e.target.value.replace(/\D/g, '').slice(0, 6));
               setIsCodeError(false);
             }}
             isError={isCodeError || (codeSent && timeLeft === 0)}

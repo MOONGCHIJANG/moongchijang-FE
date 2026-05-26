@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { usePatchApiV1UsersMePassword } from '@/api/hooks/auth/auth';
 import Header from '@/components/Header';
@@ -60,8 +60,8 @@ export default function PasswordChangePage() {
     ? 'text-text-basic'
     : 'text-text-error';
 
-  function handleCurrentPasswordChange(value: string) {
-    setCurrentPassword(value);
+  function handleCurrentPasswordChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setCurrentPassword(e.target.value);
     setCurrentPasswordError('');
   }
 
@@ -115,7 +115,7 @@ export default function PasswordChangePage() {
             isPassword
             placeholder="변경하실 비밀번호를 입력해주세요"
             value={newPassword}
-            onChange={setNewPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
             isError={newPassword.length > 0 && !isNewPasswordValid}
             helperText={newPasswordHelper}
             helperTextClassName={newPasswordHelperColor}
@@ -126,7 +126,7 @@ export default function PasswordChangePage() {
           isPassword
           placeholder="변경하실 비밀번호를 입력해주세요"
           value={newPasswordConfirm}
-          onChange={setNewPasswordConfirm}
+          onChange={(e) => setNewPasswordConfirm(e.target.value)}
           isError={newPasswordConfirm.length > 0 && !isConfirmMatch}
           helperText={confirmHelper}
           helperTextClassName={confirmHelperColor}

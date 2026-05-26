@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import {
@@ -46,8 +46,8 @@ export default function NicknameChangePage() {
         ? 'text-text-error'
         : 'text-text-subtle-inverse';
 
-  function handleNicknameChange(value: string) {
-    setNickname(value);
+  function handleNicknameChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setNickname(e.target.value);
     setCheckState('idle');
   }
 

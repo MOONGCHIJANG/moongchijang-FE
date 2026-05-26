@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function POST(req: NextRequest) {
   const body = await req.json();
 
-  const result = await serverFetchRaw('/api/v1/auth/email/login', undefined, {
+  const result = await serverFetchRaw('/api/v1/auth/kakao', undefined, {
     method: 'POST',
     body: JSON.stringify(body),
   });
@@ -14,22 +14,15 @@ export async function POST(req: NextRequest) {
       data?: {
         accessToken: string;
         expiresIn: number;
+        isNewUser: boolean;
         user?: { signupCompleted: boolean };
       };
     };
 
     const accessToken = data?.data?.accessToken ?? '';
     const expiresIn = data?.data?.expiresIn ?? 3600;
-    const signupCompleted = data?.data?.user?.signupCompleted ?? true;
 
-    const response = NextResponse.json(
-      {
-        ...(result.data as object),
-        redirectTo: signupCompleted ? null : '/signup/email?step=profile',
-      },
-      { status: 200 },
-    );
-
+    const response = NextResponse.json(result.data, { status: 200 });
     response.cookies.set('accessToken', accessToken, {
       httpOnly: false, // TODO: customFetch 구조 변경 후 httpOnly: true로 전환 필요
       maxAge: expiresIn,

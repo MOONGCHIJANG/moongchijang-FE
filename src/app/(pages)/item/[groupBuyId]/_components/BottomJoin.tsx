@@ -29,13 +29,25 @@ const BottomJoin = ({ data }: Props) => {
         setTimeLeft('00:00:00');
         return;
       }
-      const h = String(Math.floor(diff / 3_600_000)).padStart(2, '0');
+
+      const days = Math.floor(diff / 86_400_000);
+      const h = String(Math.floor((diff % 86_400_000) / 3_600_000)).padStart(
+        2,
+        '0',
+      );
       const m = String(Math.floor((diff % 3_600_000) / 60_000)).padStart(
         2,
         '0',
       );
       const s = String(Math.floor((diff % 60_000) / 1_000)).padStart(2, '0');
-      setTimeLeft(`${h}:${m}:${s}`);
+
+      if (days > 0) {
+        setTimeLeft(
+          `${String(days).padStart(2, '0')}일 ${h}시간 ${m}분 ${s}초`,
+        );
+      } else {
+        setTimeLeft(`${h}:${m}:${s}`);
+      }
     };
 
     tick();

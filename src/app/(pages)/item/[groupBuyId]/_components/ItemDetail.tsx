@@ -11,6 +11,7 @@ import GuideLine from './GuideLine';
 import { ApiResponseGroupBuyDetailResponseData } from '@/api/generated/api.schemas';
 import { formatPickupDate, formatPickupTime } from '@/lib/date';
 import NaverMap from '@/components/NaverMap';
+import Image from 'next/image';
 
 interface Props {
   data: ApiResponseGroupBuyDetailResponseData;
@@ -114,7 +115,21 @@ const ItemDetail = ({ data }: Props) => {
             </div>
           </div>
         </div>
-        {/* TODO: 상품 설명 확정 후 수정 적용 예정 */}
+        {data.imageUrls && data.imageUrls.length > 0 && (
+          <div className="flex flex-col gap-g4 pt-g9">
+            {data.imageUrls.map((url, index) => (
+              <Image
+                key={index}
+                src={url}
+                alt={`상품 이미지 ${index + 1}`}
+                width={400}
+                height={260}
+                className="h-65 w-auto rounded-3xlarge bg-gray-100 object-cover"
+              />
+            ))}
+          </div>
+        )}
+
         <div className="pt-g9 pb-g10 body-md-regular">
           {data.productDescription}
         </div>

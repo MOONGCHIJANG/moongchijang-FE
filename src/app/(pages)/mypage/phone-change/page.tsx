@@ -6,6 +6,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import {
   usePostApiV1UsersMePhoneVerificationCodes,
   usePostApiV1UsersMePhoneVerificationCodesVerify,
+  usePatchApiV1UsersMePhoneNumber,
   getGetApiV1UsersMeQueryKey,
 } from '@/api/hooks/auth/auth';
 import { Icon } from '@iconify/react';
@@ -42,6 +43,7 @@ export default function PhoneChangePage() {
     usePostApiV1UsersMePhoneVerificationCodes();
   const { mutate: verifyCode, isPending: isVerifying } =
     usePostApiV1UsersMePhoneVerificationCodesVerify();
+  const { mutate: updatePhoneNumber } = usePatchApiV1UsersMePhoneNumber();
 
   useEffect(() => {
     if (sendCount === 0) return;
@@ -101,10 +103,17 @@ export default function PhoneChangePage() {
             setIsCodeError(true);
             return;
           }
-          queryClient.invalidateQueries({
-            queryKey: getGetApiV1UsersMeQueryKey(),
-          });
-          setShowSuccessModal(true);
+          updatePhoneNumber(
+            { data: { phoneNumber: phone } },
+            {
+              onSuccess: () => {
+                queryClient.invalidateQueries({
+                  queryKey: getGetApiV1UsersMeQueryKey(),
+                });
+                setShowSuccessModal(true);
+              },
+            },
+          );
         },
         onError: () => setIsCodeError(true),
       },

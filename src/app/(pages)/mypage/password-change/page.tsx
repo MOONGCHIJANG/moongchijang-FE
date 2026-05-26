@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { usePostApiV1AuthPasswordChange } from '@/api/hooks/auth/auth';
+import { usePatchApiV1UsersMePassword } from '@/api/hooks/auth/auth';
 import Header from '@/components/Header';
 import Input from '@/components/Input';
 import { Button } from '@/components/Button';
@@ -26,8 +26,7 @@ export default function PasswordChangePage() {
     return () => clearTimeout(timer);
   }, [networkError]);
 
-  const { mutate: changePassword, isPending } =
-    usePostApiV1AuthPasswordChange();
+  const { mutate: changePassword, isPending } = usePatchApiV1UsersMePassword();
 
   const isNewPasswordValid = PASSWORD_REGEX.test(newPassword);
   const isConfirmMatch =
@@ -69,7 +68,7 @@ export default function PasswordChangePage() {
   function handleSubmit() {
     if (!canSubmit) return;
     changePassword(
-      { data: { currentPassword, newPassword, newPasswordConfirm } },
+      { data: { currentPassword, newPassword } },
       {
         onSuccess: (res) => {
           if (res.status !== 200) {

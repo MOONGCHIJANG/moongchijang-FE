@@ -4,10 +4,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import {
-  useGetApiV1UsersMe,
   getApiV1UsersNicknameAvailability,
   getGetApiV1UsersMeQueryKey,
-  patchApiV1UsersMeProfile,
+  usePatchApiV1UsersMeNickname,
 } from '@/api/hooks/auth/auth';
 import Header from '@/components/Header';
 import Input from '@/components/Input';
@@ -23,11 +22,10 @@ export default function NicknameChangePage() {
   const [nickname, setNickname] = useState('');
   const [checkState, setCheckState] = useState<CheckState>('idle');
   const [isChecking, setIsChecking] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  const { data: meData } = useGetApiV1UsersMe();
-  const currentUser = meData?.status === 200 ? meData.data?.data : null;
+  const { mutate: updateNickname, isPending: isSubmitting } =
+    usePatchApiV1UsersMeNickname();
 
   const isValidFormat = NICKNAME_REGEX.test(nickname);
   const canCheck =
@@ -67,17 +65,20 @@ export default function NicknameChangePage() {
     setCheckState(res.data?.data?.available ? 'available' : 'unavailable');
   }
 
-  async function handleSubmit() {
+  function handleSubmit() {
     if (!canSubmit) return;
-    setIsSubmitting(true);
-    const res = await patchApiV1UsersMeProfile({
-      nickname,
-      phoneNumber: currentUser?.phoneNumber ?? '',
-    }).catch(() => null);
-    setIsSubmitting(false);
-    if (!res || res.status !== 200) return;
-    queryClient.invalidateQueries({ queryKey: getGetApiV1UsersMeQueryKey() });
-    setShowSuccessModal(true);
+    updateNickname(
+      { data: { nickname } },
+      {
+        onSuccess: (res) => {
+          if (res.status !== 200) return;
+          queryClient.invalidateQueries({
+            queryKey: getGetApiV1UsersMeQueryKey(),
+          });
+          setShowSuccessModal(true);
+        },
+      },
+    );
   }
 
   return (

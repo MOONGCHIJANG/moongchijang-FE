@@ -11,14 +11,18 @@ import type {
   ApiResponseAccessToken,
   ApiResponseAdditionalInfoUpdated,
   ApiResponseAuthLogin,
+  ApiResponseBusinessRegistrationLookup,
   ApiResponseEmailAvailability,
   ApiResponseEmailVerificationCodeSent,
   ApiResponseEmailVerificationVerified,
   ApiResponseMyRegions,
   ApiResponseNicknameAvailability,
+  ApiResponseNicknameUpdated,
+  ApiResponsePasswordChanged,
+  ApiResponsePhoneNumberUpdated,
   ApiResponsePhoneVerificationCodeSent,
   ApiResponsePhoneVerificationVerified,
-  ApiResponseProfileUpdated,
+  ApiResponseSellerSignupStatus,
   ApiResponseUserInfo,
   SuccessNoDataResponse,
 } from '../api.schemas';
@@ -69,6 +73,7 @@ export const getPostApiV1AuthKakaoResponseMock = (
         undefined,
       ]),
       signupCompleted: faker.datatype.boolean(),
+      sellerSignupCompleted: faker.datatype.boolean(),
       deletedAt: faker.helpers.arrayElement([
         faker.helpers.arrayElement([
           faker.date.past().toISOString().slice(0, 19) + 'Z',
@@ -147,6 +152,7 @@ export const getGetApiV1UsersMeResponseMock = (
       undefined,
     ]),
     signupCompleted: faker.datatype.boolean(),
+    sellerSignupCompleted: faker.datatype.boolean(),
     deletedAt: faker.helpers.arrayElement([
       faker.helpers.arrayElement([
         faker.date.past().toISOString().slice(0, 19) + 'Z',
@@ -195,6 +201,82 @@ export const getPatchApiV1UsersMeAdditionalInfoResponseMock = (
     nickname: faker.string.alpha({ length: { min: 10, max: 20 } }),
     phoneNumber: faker.string.alpha({ length: { min: 10, max: 20 } }),
     signupCompleted: faker.datatype.boolean(),
+  },
+  error: {},
+  ...overrideResponse,
+});
+
+export const getPostApiV1UsersMeSellerBusinessRegistrationLookupResponseMock = (
+  overrideResponse: Partial<
+    Extract<ApiResponseBusinessRegistrationLookup, object>
+  > = {},
+): ApiResponseBusinessRegistrationLookup => ({
+  success: faker.datatype.boolean(),
+  data: {
+    businessRegistrationNumber: faker.string.alpha({
+      length: { min: 10, max: 20 },
+    }),
+    status: faker.helpers.arrayElement([
+      'VALID',
+      'CLOSED',
+      'NOT_FOUND',
+    ] as const),
+    message: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        null,
+      ]),
+      undefined,
+    ]),
+    storeName: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        null,
+      ]),
+      undefined,
+    ]),
+    ownerName: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        null,
+      ]),
+      undefined,
+    ]),
+    storeAddress: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        null,
+      ]),
+      undefined,
+    ]),
+  },
+  error: {},
+  ...overrideResponse,
+});
+
+export const getPatchApiV1UsersMeSellerBusinessInfoResponseMock = (
+  overrideResponse: Partial<
+    Extract<ApiResponseSellerSignupStatus, object>
+  > = {},
+): ApiResponseSellerSignupStatus => ({
+  success: faker.datatype.boolean(),
+  data: {
+    id: faker.number.int(),
+    sellerSignupCompleted: faker.datatype.boolean(),
+  },
+  error: {},
+  ...overrideResponse,
+});
+
+export const getPatchApiV1UsersMeSellerSettlementInfoResponseMock = (
+  overrideResponse: Partial<
+    Extract<ApiResponseSellerSignupStatus, object>
+  > = {},
+): ApiResponseSellerSignupStatus => ({
+  success: faker.datatype.boolean(),
+  data: {
+    id: faker.number.int(),
+    sellerSignupCompleted: faker.datatype.boolean(),
   },
   error: {},
   ...overrideResponse,
@@ -309,6 +391,7 @@ export const getPostApiV1AuthEmailSignupResponseMock = (
         undefined,
       ]),
       signupCompleted: faker.datatype.boolean(),
+      sellerSignupCompleted: faker.datatype.boolean(),
       deletedAt: faker.helpers.arrayElement([
         faker.helpers.arrayElement([
           faker.date.past().toISOString().slice(0, 19) + 'Z',
@@ -370,6 +453,7 @@ export const getPostApiV1AuthEmailLoginResponseMock = (
         undefined,
       ]),
       signupCompleted: faker.datatype.boolean(),
+      sellerSignupCompleted: faker.datatype.boolean(),
       deletedAt: faker.helpers.arrayElement([
         faker.helpers.arrayElement([
           faker.date.past().toISOString().slice(0, 19) + 'Z',
@@ -385,24 +469,27 @@ export const getPostApiV1AuthEmailLoginResponseMock = (
   ...overrideResponse,
 });
 
-export const getPostApiV1AuthPasswordResetLinkResponseMock = (
-  overrideResponse: Partial<Extract<SuccessNoDataResponse, object>> = {},
-): SuccessNoDataResponse => ({
-  success: faker.datatype.boolean(),
-  data: {},
-  error: {},
-  ...overrideResponse,
-});
-
-export const getPatchApiV1UsersMeProfileResponseMock = (
-  overrideResponse: Partial<Extract<ApiResponseProfileUpdated, object>> = {},
-): ApiResponseProfileUpdated => ({
+export const getPatchApiV1UsersMeNicknameResponseMock = (
+  overrideResponse: Partial<Extract<ApiResponseNicknameUpdated, object>> = {},
+): ApiResponseNicknameUpdated => ({
   success: faker.datatype.boolean(),
   data: {
     id: faker.number.int(),
     nickname: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  },
+  error: {},
+  ...overrideResponse,
+});
+
+export const getPatchApiV1UsersMePhoneNumberResponseMock = (
+  overrideResponse: Partial<
+    Extract<ApiResponsePhoneNumberUpdated, object>
+  > = {},
+): ApiResponsePhoneNumberUpdated => ({
+  success: faker.datatype.boolean(),
+  data: {
+    id: faker.number.int(),
     phoneNumber: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z',
   },
   error: {},
   ...overrideResponse,
@@ -433,11 +520,11 @@ export const getPostApiV1UsersMePhoneVerificationCodesVerifyResponseMock = (
   ...overrideResponse,
 });
 
-export const getPostApiV1AuthPasswordChangeResponseMock = (
-  overrideResponse: Partial<Extract<SuccessNoDataResponse, object>> = {},
-): SuccessNoDataResponse => ({
+export const getPatchApiV1UsersMePasswordResponseMock = (
+  overrideResponse: Partial<Extract<ApiResponsePasswordChanged, object>> = {},
+): ApiResponsePasswordChanged => ({
   success: faker.datatype.boolean(),
-  data: {},
+  data: { changed: faker.datatype.boolean() },
   error: {},
   ...overrideResponse,
 });
@@ -645,6 +732,84 @@ export const getPatchApiV1UsersMeAdditionalInfoMockHandler = (
   );
 };
 
+export const getPostApiV1UsersMeSellerBusinessRegistrationLookupMockHandler = (
+  overrideResponse?:
+    | ApiResponseBusinessRegistrationLookup
+    | ((
+        info: Parameters<Parameters<typeof http.post>[1]>[0],
+      ) =>
+        | Promise<ApiResponseBusinessRegistrationLookup>
+        | ApiResponseBusinessRegistrationLookup),
+  options?: RequestHandlerOptions,
+) => {
+  return http.post(
+    '*/api/v1/users/me/seller/business-registration/lookup',
+    async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getPostApiV1UsersMeSellerBusinessRegistrationLookupResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
+
+export const getPatchApiV1UsersMeSellerBusinessInfoMockHandler = (
+  overrideResponse?:
+    | ApiResponseSellerSignupStatus
+    | ((
+        info: Parameters<Parameters<typeof http.patch>[1]>[0],
+      ) =>
+        | Promise<ApiResponseSellerSignupStatus>
+        | ApiResponseSellerSignupStatus),
+  options?: RequestHandlerOptions,
+) => {
+  return http.patch(
+    '*/api/v1/users/me/seller/business-info',
+    async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getPatchApiV1UsersMeSellerBusinessInfoResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
+
+export const getPatchApiV1UsersMeSellerSettlementInfoMockHandler = (
+  overrideResponse?:
+    | ApiResponseSellerSignupStatus
+    | ((
+        info: Parameters<Parameters<typeof http.patch>[1]>[0],
+      ) =>
+        | Promise<ApiResponseSellerSignupStatus>
+        | ApiResponseSellerSignupStatus),
+  options?: RequestHandlerOptions,
+) => {
+  return http.patch(
+    '*/api/v1/users/me/seller/settlement-info',
+    async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getPatchApiV1UsersMeSellerSettlementInfoResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
+
 export const getGetApiV1AuthEmailAvailabilityMockHandler = (
   overrideResponse?:
     | ApiResponseEmailAvailability
@@ -823,23 +988,23 @@ export const getPostApiV1AuthEmailLoginMockHandler = (
   );
 };
 
-export const getPostApiV1AuthPasswordResetLinkMockHandler = (
+export const getPatchApiV1UsersMeNicknameMockHandler = (
   overrideResponse?:
-    | SuccessNoDataResponse
+    | ApiResponseNicknameUpdated
     | ((
-        info: Parameters<Parameters<typeof http.post>[1]>[0],
-      ) => Promise<SuccessNoDataResponse> | SuccessNoDataResponse),
+        info: Parameters<Parameters<typeof http.patch>[1]>[0],
+      ) => Promise<ApiResponseNicknameUpdated> | ApiResponseNicknameUpdated),
   options?: RequestHandlerOptions,
 ) => {
-  return http.post(
-    '*/api/v1/auth/password/reset-link',
-    async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+  return http.patch(
+    '*/api/v1/users/me/nickname',
+    async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
       return HttpResponse.json(
         overrideResponse !== undefined
           ? typeof overrideResponse === 'function'
             ? await overrideResponse(info)
             : overrideResponse
-          : getPostApiV1AuthPasswordResetLinkResponseMock(),
+          : getPatchApiV1UsersMeNicknameResponseMock(),
         { status: 200 },
       );
     },
@@ -847,23 +1012,25 @@ export const getPostApiV1AuthPasswordResetLinkMockHandler = (
   );
 };
 
-export const getPatchApiV1UsersMeProfileMockHandler = (
+export const getPatchApiV1UsersMePhoneNumberMockHandler = (
   overrideResponse?:
-    | ApiResponseProfileUpdated
+    | ApiResponsePhoneNumberUpdated
     | ((
         info: Parameters<Parameters<typeof http.patch>[1]>[0],
-      ) => Promise<ApiResponseProfileUpdated> | ApiResponseProfileUpdated),
+      ) =>
+        | Promise<ApiResponsePhoneNumberUpdated>
+        | ApiResponsePhoneNumberUpdated),
   options?: RequestHandlerOptions,
 ) => {
   return http.patch(
-    '*/api/v1/users/me/profile',
+    '*/api/v1/users/me/phone-number',
     async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
       return HttpResponse.json(
         overrideResponse !== undefined
           ? typeof overrideResponse === 'function'
             ? await overrideResponse(info)
             : overrideResponse
-          : getPatchApiV1UsersMeProfileResponseMock(),
+          : getPatchApiV1UsersMePhoneNumberResponseMock(),
         { status: 200 },
       );
     },
@@ -923,23 +1090,23 @@ export const getPostApiV1UsersMePhoneVerificationCodesVerifyMockHandler = (
   );
 };
 
-export const getPostApiV1AuthPasswordChangeMockHandler = (
+export const getPatchApiV1UsersMePasswordMockHandler = (
   overrideResponse?:
-    | SuccessNoDataResponse
+    | ApiResponsePasswordChanged
     | ((
-        info: Parameters<Parameters<typeof http.post>[1]>[0],
-      ) => Promise<SuccessNoDataResponse> | SuccessNoDataResponse),
+        info: Parameters<Parameters<typeof http.patch>[1]>[0],
+      ) => Promise<ApiResponsePasswordChanged> | ApiResponsePasswordChanged),
   options?: RequestHandlerOptions,
 ) => {
-  return http.post(
-    '*/api/v1/auth/password/change',
-    async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+  return http.patch(
+    '*/api/v1/users/me/password',
+    async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
       return HttpResponse.json(
         overrideResponse !== undefined
           ? typeof overrideResponse === 'function'
             ? await overrideResponse(info)
             : overrideResponse
-          : getPostApiV1AuthPasswordChangeResponseMock(),
+          : getPatchApiV1UsersMePasswordResponseMock(),
         { status: 200 },
       );
     },
@@ -1002,6 +1169,9 @@ export const getAuthMock = () => [
   getDeleteApiV1UsersMeMockHandler(),
   getGetApiV1UsersNicknameAvailabilityMockHandler(),
   getPatchApiV1UsersMeAdditionalInfoMockHandler(),
+  getPostApiV1UsersMeSellerBusinessRegistrationLookupMockHandler(),
+  getPatchApiV1UsersMeSellerBusinessInfoMockHandler(),
+  getPatchApiV1UsersMeSellerSettlementInfoMockHandler(),
   getGetApiV1AuthEmailAvailabilityMockHandler(),
   getPostApiV1AuthEmailVerificationCodesMockHandler(),
   getPostApiV1AuthEmailVerificationCodesVerifyMockHandler(),
@@ -1009,11 +1179,11 @@ export const getAuthMock = () => [
   getPostApiV1AuthPhoneVerificationCodesVerifyMockHandler(),
   getPostApiV1AuthEmailSignupMockHandler(),
   getPostApiV1AuthEmailLoginMockHandler(),
-  getPostApiV1AuthPasswordResetLinkMockHandler(),
-  getPatchApiV1UsersMeProfileMockHandler(),
+  getPatchApiV1UsersMeNicknameMockHandler(),
+  getPatchApiV1UsersMePhoneNumberMockHandler(),
   getPostApiV1UsersMePhoneVerificationCodesMockHandler(),
   getPostApiV1UsersMePhoneVerificationCodesVerifyMockHandler(),
-  getPostApiV1AuthPasswordChangeMockHandler(),
+  getPatchApiV1UsersMePasswordMockHandler(),
   getGetApiV1UsersMeRegionsMockHandler(),
   getPutApiV1UsersMeRegionsMockHandler(),
 ];

@@ -7,6 +7,7 @@ import type {
   ApiResponsePickupInfo,
   ApiResponsePickupVerify,
   ApiResponseQrCode,
+  BadRequestResponse,
   ConflictResponse,
   ForbiddenResponse,
 } from '../api.schemas';
@@ -136,12 +137,20 @@ export const getApiV1PickupsMeNearestQr = async (
 };
 
 /**
- * ADMIN 또는 SELLER 권한 사용자가 소비자 QR을 스캔하면 대기 → 완료로 자동 전환된다.
+ * SELLER 권한 사용자가 본인 매장 공구의 소비자 QR을 스캔하면 READY → PICKED_UP으로 자동 전환한다.
+ADMIN 권한 사용자는 운영 대리 처리 용도로 매장 소속 검증 없이 처리할 수 있다.
+응답에는 사장님 스캔 결과 화면에 필요한 유저이름, 상품명, 수량, 픽업 상태를 포함한다.
+
  * @summary QR 코드 스캔 검증 및 수령 처리
  */
 export type postApiV1PickupsQrCodeVerifyResponse200 = {
   data: ApiResponsePickupVerify;
   status: 200;
+};
+
+export type postApiV1PickupsQrCodeVerifyResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
 };
 
 export type postApiV1PickupsQrCodeVerifyResponse403 = {
@@ -159,6 +168,7 @@ export type postApiV1PickupsQrCodeVerifyResponseSuccess =
     headers: Headers;
   };
 export type postApiV1PickupsQrCodeVerifyResponseError = (
+  | postApiV1PickupsQrCodeVerifyResponse400
   | postApiV1PickupsQrCodeVerifyResponse403
   | postApiV1PickupsQrCodeVerifyResponse409
 ) & {

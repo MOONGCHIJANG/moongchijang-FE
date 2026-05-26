@@ -148,7 +148,9 @@ export const QrModal = ({
               <div
                 className={cn(
                   'flex flex-col overflow-hidden transition-all duration-300 origin-top',
-                  isExpanded ? 'max-h-0 opacity-0' : 'max-h-[500px] opacity-100',
+                  isExpanded
+                    ? 'max-h-0 opacity-0'
+                    : 'max-h-[500px] opacity-100',
                 )}
               >
                 <div className="px-5 pt-4 pb-5 flex flex-col gap-3.5 border-b border-dashed border-border-default">
@@ -223,7 +225,10 @@ export const QrModal = ({
                       !isPickupDay && 'blur-sm opacity-70',
                     )}
                   >
-                    <QRCodeSVG value={qrCode || ' '} size={isExpanded ? 220 : 128} />
+                    <QRCodeSVG
+                      value={qrCode || ' '}
+                      size={isExpanded ? 220 : 128}
+                    />
                   </div>
                   {!isPickupDay && (
                     <div className="absolute inset-0 flex items-center justify-center">
@@ -246,12 +251,7 @@ export const QrModal = ({
             </>
           ) : (
             <div className="px-5 py-8 flex flex-col items-center gap-4">
-              <Image
-                src="/icons/starpoint.svg"
-                alt=""
-                width={60}
-                height={60}
-              />
+              <Image src="/icons/starpoint.svg" alt="" width={60} height={60} />
               <p className="text-text-basic body-md-bold font-pretendard text-center">
                 아직 픽업 예정인 상품이 없어요
               </p>

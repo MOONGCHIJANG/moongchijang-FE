@@ -7,16 +7,22 @@ import type {
   ApiResponseAccessToken,
   ApiResponseAdditionalInfoUpdated,
   ApiResponseAuthLogin,
+  ApiResponseBusinessRegistrationLookup,
   ApiResponseEmailAvailability,
   ApiResponseEmailVerificationCodeSent,
   ApiResponseEmailVerificationVerified,
+  ApiResponseError,
   ApiResponseMyRegions,
   ApiResponseNicknameAvailability,
+  ApiResponseNicknameUpdated,
+  ApiResponsePasswordChanged,
+  ApiResponsePhoneNumberUpdated,
   ApiResponsePhoneVerificationCodeSent,
   ApiResponsePhoneVerificationVerified,
-  ApiResponseProfileUpdated,
+  ApiResponseSellerSignupStatus,
   ApiResponseUserInfo,
   BadRequestResponse,
+  BusinessRegistrationLookupRequest,
   ConflictResponse,
   EmailLoginRequest,
   EmailSignupRequest,
@@ -26,12 +32,13 @@ import type {
   GetApiV1AuthEmailAvailabilityParams,
   GetApiV1UsersNicknameAvailabilityParams,
   KakaoLoginRequest,
-  NotFoundResponse,
+  NicknameUpdateRequest,
   PasswordChangeRequest,
-  PasswordResetLinkRequest,
+  PhoneNumberUpdateRequest,
   PhoneVerificationCodeSendRequest,
   PhoneVerificationCodeVerifyRequest,
-  ProfileUpdateRequest,
+  SellerBusinessInfoUpsertRequest,
+  SellerSettlementInfoUpsertRequest,
   SuccessNoDataResponse,
   TooManyRequestsResponse,
   UnauthorizedResponse,
@@ -358,6 +365,169 @@ export const patchApiV1UsersMeAdditionalInfo = async (
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', ...options?.headers },
       body: JSON.stringify(additionalInfoUpsertRequest),
+    },
+  );
+};
+
+/**
+ * 사업자등록번호를 조회해 상태를 반환한다.
+- `VALID`: 정상 사업자(계속사업자)
+- `CLOSED`: 휴업/폐업
+- `NOT_FOUND`: 조회 불가/미확인
+
+ * @summary 사업자등록번호 조회
+ */
+export type postApiV1UsersMeSellerBusinessRegistrationLookupResponse200 = {
+  data: ApiResponseBusinessRegistrationLookup;
+  status: 200;
+};
+
+export type postApiV1UsersMeSellerBusinessRegistrationLookupResponse400 = {
+  data: ApiResponseError;
+  status: 400;
+};
+
+export type postApiV1UsersMeSellerBusinessRegistrationLookupResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type postApiV1UsersMeSellerBusinessRegistrationLookupResponseSuccess =
+  postApiV1UsersMeSellerBusinessRegistrationLookupResponse200 & {
+    headers: Headers;
+  };
+export type postApiV1UsersMeSellerBusinessRegistrationLookupResponseError = (
+  | postApiV1UsersMeSellerBusinessRegistrationLookupResponse400
+  | postApiV1UsersMeSellerBusinessRegistrationLookupResponse401
+) & {
+  headers: Headers;
+};
+
+export type postApiV1UsersMeSellerBusinessRegistrationLookupResponse =
+  | postApiV1UsersMeSellerBusinessRegistrationLookupResponseSuccess
+  | postApiV1UsersMeSellerBusinessRegistrationLookupResponseError;
+
+export const getPostApiV1UsersMeSellerBusinessRegistrationLookupUrl = () => {
+  return `/api/v1/users/me/seller/business-registration/lookup`;
+};
+
+export const postApiV1UsersMeSellerBusinessRegistrationLookup = async (
+  businessRegistrationLookupRequest: BusinessRegistrationLookupRequest,
+  options?: RequestInit,
+): Promise<postApiV1UsersMeSellerBusinessRegistrationLookupResponse> => {
+  return customFetch<postApiV1UsersMeSellerBusinessRegistrationLookupResponse>(
+    getPostApiV1UsersMeSellerBusinessRegistrationLookupUrl(),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(businessRegistrationLookupRequest),
+    },
+  );
+};
+
+/**
+ * 사장님 가입의 사업자 정보를 저장한다.
+ * @summary 사장님 사업자 정보 저장
+ */
+export type patchApiV1UsersMeSellerBusinessInfoResponse200 = {
+  data: ApiResponseSellerSignupStatus;
+  status: 200;
+};
+
+export type patchApiV1UsersMeSellerBusinessInfoResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type patchApiV1UsersMeSellerBusinessInfoResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type patchApiV1UsersMeSellerBusinessInfoResponseSuccess =
+  patchApiV1UsersMeSellerBusinessInfoResponse200 & {
+    headers: Headers;
+  };
+export type patchApiV1UsersMeSellerBusinessInfoResponseError = (
+  | patchApiV1UsersMeSellerBusinessInfoResponse400
+  | patchApiV1UsersMeSellerBusinessInfoResponse401
+) & {
+  headers: Headers;
+};
+
+export type patchApiV1UsersMeSellerBusinessInfoResponse =
+  | patchApiV1UsersMeSellerBusinessInfoResponseSuccess
+  | patchApiV1UsersMeSellerBusinessInfoResponseError;
+
+export const getPatchApiV1UsersMeSellerBusinessInfoUrl = () => {
+  return `/api/v1/users/me/seller/business-info`;
+};
+
+export const patchApiV1UsersMeSellerBusinessInfo = async (
+  sellerBusinessInfoUpsertRequest: SellerBusinessInfoUpsertRequest,
+  options?: RequestInit,
+): Promise<patchApiV1UsersMeSellerBusinessInfoResponse> => {
+  return customFetch<patchApiV1UsersMeSellerBusinessInfoResponse>(
+    getPatchApiV1UsersMeSellerBusinessInfoUrl(),
+    {
+      ...options,
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(sellerBusinessInfoUpsertRequest),
+    },
+  );
+};
+
+/**
+ * 사장님 정산 정보를 저장하고 사장님 가입 완료 상태를 반영한다.
+ * @summary 사장님 정산 정보 저장
+ */
+export type patchApiV1UsersMeSellerSettlementInfoResponse200 = {
+  data: ApiResponseSellerSignupStatus;
+  status: 200;
+};
+
+export type patchApiV1UsersMeSellerSettlementInfoResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type patchApiV1UsersMeSellerSettlementInfoResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type patchApiV1UsersMeSellerSettlementInfoResponseSuccess =
+  patchApiV1UsersMeSellerSettlementInfoResponse200 & {
+    headers: Headers;
+  };
+export type patchApiV1UsersMeSellerSettlementInfoResponseError = (
+  | patchApiV1UsersMeSellerSettlementInfoResponse400
+  | patchApiV1UsersMeSellerSettlementInfoResponse401
+) & {
+  headers: Headers;
+};
+
+export type patchApiV1UsersMeSellerSettlementInfoResponse =
+  | patchApiV1UsersMeSellerSettlementInfoResponseSuccess
+  | patchApiV1UsersMeSellerSettlementInfoResponseError;
+
+export const getPatchApiV1UsersMeSellerSettlementInfoUrl = () => {
+  return `/api/v1/users/me/seller/settlement-info`;
+};
+
+export const patchApiV1UsersMeSellerSettlementInfo = async (
+  sellerSettlementInfoUpsertRequest: SellerSettlementInfoUpsertRequest,
+  options?: RequestInit,
+): Promise<patchApiV1UsersMeSellerSettlementInfoResponse> => {
+  return customFetch<patchApiV1UsersMeSellerSettlementInfoResponse>(
+    getPatchApiV1UsersMeSellerSettlementInfoUrl(),
+    {
+      ...options,
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(sellerSettlementInfoUpsertRequest),
     },
   );
 };
@@ -718,106 +888,113 @@ export const postApiV1AuthEmailLogin = async (
 };
 
 /**
- * 가입된 이메일로 비밀번호 재설정 링크를 발송한다.
- * @summary 비밀번호 재설정 링크 발송
+ * 인증된 사용자의 닉네임을 변경한다.
+ * @summary 닉네임 변경
  */
-export type postApiV1AuthPasswordResetLinkResponse200 = {
-  data: SuccessNoDataResponse;
+export type patchApiV1UsersMeNicknameResponse200 = {
+  data: ApiResponseNicknameUpdated;
   status: 200;
 };
 
-export type postApiV1AuthPasswordResetLinkResponse404 = {
-  data: NotFoundResponse;
-  status: 404;
+export type patchApiV1UsersMeNicknameResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
 };
 
-export type postApiV1AuthPasswordResetLinkResponseSuccess =
-  postApiV1AuthPasswordResetLinkResponse200 & {
-    headers: Headers;
-  };
-export type postApiV1AuthPasswordResetLinkResponseError =
-  postApiV1AuthPasswordResetLinkResponse404 & {
-    headers: Headers;
-  };
-
-export type postApiV1AuthPasswordResetLinkResponse =
-  | postApiV1AuthPasswordResetLinkResponseSuccess
-  | postApiV1AuthPasswordResetLinkResponseError;
-
-export const getPostApiV1AuthPasswordResetLinkUrl = () => {
-  return `/api/v1/auth/password/reset-link`;
+export type patchApiV1UsersMeNicknameResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
 };
 
-export const postApiV1AuthPasswordResetLink = async (
-  passwordResetLinkRequest: PasswordResetLinkRequest,
+export type patchApiV1UsersMeNicknameResponse409 = {
+  data: ConflictResponse;
+  status: 409;
+};
+
+export type patchApiV1UsersMeNicknameResponseSuccess =
+  patchApiV1UsersMeNicknameResponse200 & {
+    headers: Headers;
+  };
+export type patchApiV1UsersMeNicknameResponseError = (
+  | patchApiV1UsersMeNicknameResponse400
+  | patchApiV1UsersMeNicknameResponse401
+  | patchApiV1UsersMeNicknameResponse409
+) & {
+  headers: Headers;
+};
+
+export type patchApiV1UsersMeNicknameResponse =
+  | patchApiV1UsersMeNicknameResponseSuccess
+  | patchApiV1UsersMeNicknameResponseError;
+
+export const getPatchApiV1UsersMeNicknameUrl = () => {
+  return `/api/v1/users/me/nickname`;
+};
+
+export const patchApiV1UsersMeNickname = async (
+  nicknameUpdateRequest: NicknameUpdateRequest,
   options?: RequestInit,
-): Promise<postApiV1AuthPasswordResetLinkResponse> => {
-  return customFetch<postApiV1AuthPasswordResetLinkResponse>(
-    getPostApiV1AuthPasswordResetLinkUrl(),
+): Promise<patchApiV1UsersMeNicknameResponse> => {
+  return customFetch<patchApiV1UsersMeNicknameResponse>(
+    getPatchApiV1UsersMeNicknameUrl(),
     {
       ...options,
-      method: 'POST',
+      method: 'PATCH',
       headers: { 'Content-Type': 'application/json', ...options?.headers },
-      body: JSON.stringify(passwordResetLinkRequest),
+      body: JSON.stringify(nicknameUpdateRequest),
     },
   );
 };
 
 /**
- * 닉네임과 전화번호를 수정한다.
- * @summary 프로필 수정
+ * 인증된 사용자의 전화번호를 변경한다.
+ * @summary 전화번호 변경
  */
-export type patchApiV1UsersMeProfileResponse200 = {
-  data: ApiResponseProfileUpdated;
+export type patchApiV1UsersMePhoneNumberResponse200 = {
+  data: ApiResponsePhoneNumberUpdated;
   status: 200;
 };
 
-export type patchApiV1UsersMeProfileResponse400 = {
+export type patchApiV1UsersMePhoneNumberResponse400 = {
   data: BadRequestResponse;
   status: 400;
 };
 
-export type patchApiV1UsersMeProfileResponse401 = {
+export type patchApiV1UsersMePhoneNumberResponse401 = {
   data: UnauthorizedResponse;
   status: 401;
 };
 
-export type patchApiV1UsersMeProfileResponse409 = {
-  data: ConflictResponse;
-  status: 409;
-};
-
-export type patchApiV1UsersMeProfileResponseSuccess =
-  patchApiV1UsersMeProfileResponse200 & {
+export type patchApiV1UsersMePhoneNumberResponseSuccess =
+  patchApiV1UsersMePhoneNumberResponse200 & {
     headers: Headers;
   };
-export type patchApiV1UsersMeProfileResponseError = (
-  | patchApiV1UsersMeProfileResponse400
-  | patchApiV1UsersMeProfileResponse401
-  | patchApiV1UsersMeProfileResponse409
+export type patchApiV1UsersMePhoneNumberResponseError = (
+  | patchApiV1UsersMePhoneNumberResponse400
+  | patchApiV1UsersMePhoneNumberResponse401
 ) & {
   headers: Headers;
 };
 
-export type patchApiV1UsersMeProfileResponse =
-  | patchApiV1UsersMeProfileResponseSuccess
-  | patchApiV1UsersMeProfileResponseError;
+export type patchApiV1UsersMePhoneNumberResponse =
+  | patchApiV1UsersMePhoneNumberResponseSuccess
+  | patchApiV1UsersMePhoneNumberResponseError;
 
-export const getPatchApiV1UsersMeProfileUrl = () => {
-  return `/api/v1/users/me/profile`;
+export const getPatchApiV1UsersMePhoneNumberUrl = () => {
+  return `/api/v1/users/me/phone-number`;
 };
 
-export const patchApiV1UsersMeProfile = async (
-  profileUpdateRequest: ProfileUpdateRequest,
+export const patchApiV1UsersMePhoneNumber = async (
+  phoneNumberUpdateRequest: PhoneNumberUpdateRequest,
   options?: RequestInit,
-): Promise<patchApiV1UsersMeProfileResponse> => {
-  return customFetch<patchApiV1UsersMeProfileResponse>(
-    getPatchApiV1UsersMeProfileUrl(),
+): Promise<patchApiV1UsersMePhoneNumberResponse> => {
+  return customFetch<patchApiV1UsersMePhoneNumberResponse>(
+    getPatchApiV1UsersMePhoneNumberUrl(),
     {
       ...options,
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', ...options?.headers },
-      body: JSON.stringify(profileUpdateRequest),
+      body: JSON.stringify(phoneNumberUpdateRequest),
     },
   );
 };
@@ -932,55 +1109,55 @@ export const postApiV1UsersMePhoneVerificationCodesVerify = async (
  * 현재 비밀번호를 확인하고 새 비밀번호로 변경한다. 변경 완료 시 세션을 무효화한다.
  * @summary 비밀번호 변경 (이메일 가입자 전용)
  */
-export type postApiV1AuthPasswordChangeResponse200 = {
-  data: SuccessNoDataResponse;
+export type patchApiV1UsersMePasswordResponse200 = {
+  data: ApiResponsePasswordChanged;
   status: 200;
 };
 
-export type postApiV1AuthPasswordChangeResponse400 = {
+export type patchApiV1UsersMePasswordResponse400 = {
   data: BadRequestResponse;
   status: 400;
 };
 
-export type postApiV1AuthPasswordChangeResponse401 = {
+export type patchApiV1UsersMePasswordResponse401 = {
   data: UnauthorizedResponse;
   status: 401;
 };
 
-export type postApiV1AuthPasswordChangeResponse403 = {
+export type patchApiV1UsersMePasswordResponse403 = {
   data: ForbiddenResponse;
   status: 403;
 };
 
-export type postApiV1AuthPasswordChangeResponseSuccess =
-  postApiV1AuthPasswordChangeResponse200 & {
+export type patchApiV1UsersMePasswordResponseSuccess =
+  patchApiV1UsersMePasswordResponse200 & {
     headers: Headers;
   };
-export type postApiV1AuthPasswordChangeResponseError = (
-  | postApiV1AuthPasswordChangeResponse400
-  | postApiV1AuthPasswordChangeResponse401
-  | postApiV1AuthPasswordChangeResponse403
+export type patchApiV1UsersMePasswordResponseError = (
+  | patchApiV1UsersMePasswordResponse400
+  | patchApiV1UsersMePasswordResponse401
+  | patchApiV1UsersMePasswordResponse403
 ) & {
   headers: Headers;
 };
 
-export type postApiV1AuthPasswordChangeResponse =
-  | postApiV1AuthPasswordChangeResponseSuccess
-  | postApiV1AuthPasswordChangeResponseError;
+export type patchApiV1UsersMePasswordResponse =
+  | patchApiV1UsersMePasswordResponseSuccess
+  | patchApiV1UsersMePasswordResponseError;
 
-export const getPostApiV1AuthPasswordChangeUrl = () => {
-  return `/api/v1/auth/password/change`;
+export const getPatchApiV1UsersMePasswordUrl = () => {
+  return `/api/v1/users/me/password`;
 };
 
-export const postApiV1AuthPasswordChange = async (
+export const patchApiV1UsersMePassword = async (
   passwordChangeRequest: PasswordChangeRequest,
   options?: RequestInit,
-): Promise<postApiV1AuthPasswordChangeResponse> => {
-  return customFetch<postApiV1AuthPasswordChangeResponse>(
-    getPostApiV1AuthPasswordChangeUrl(),
+): Promise<patchApiV1UsersMePasswordResponse> => {
+  return customFetch<patchApiV1UsersMePasswordResponse>(
+    getPatchApiV1UsersMePasswordUrl(),
     {
       ...options,
-      method: 'POST',
+      method: 'PATCH',
       headers: { 'Content-Type': 'application/json', ...options?.headers },
       body: JSON.stringify(passwordChangeRequest),
     },

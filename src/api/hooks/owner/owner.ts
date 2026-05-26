@@ -2,10 +2,7 @@
 /**
  * // 이 파일은 Orval이 자동 생성합니다. 직접 수정하지 마세요.
  */
-import {
-  useMutation,
-  useQuery
-} from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -18,576 +15,2600 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult
+  UseQueryResult,
 } from '@tanstack/react-query';
 
 import type {
   ApiResponseOwnerGroupBuyList,
-  ApiResponseOwnerSummary,
+  ApiResponseOwnerGroupBuyManageDetail,
+  ApiResponseOwnerGroupBuyManageList,
+  ApiResponseOwnerGroupBuyRequestCreated,
+  ApiResponseOwnerGroupBuyRequestDetail,
+  ApiResponseOwnerGroupBuyRequestList,
+  ApiResponseOwnerGroupBuySummary,
   ApiResponsePickupScheduleList,
   ApiResponseReservationPage,
+  BadRequestResponse,
   ConflictResponse,
   ForbiddenResponse,
+  GetApiV1OwnerGroupBuyRequestsParams,
+  GetApiV1OwnerGroupBuysManageParams,
   GetApiV1OwnerReservationsParams,
-  SuccessNoDataResponse
+  NotFoundResponse,
+  OwnerGroupBuyCloseRequest,
+  OwnerGroupBuyExtensionRequest,
+  OwnerGroupBuyRequestCreate,
+  SuccessNoDataResponse,
+  UnauthorizedResponse,
 } from '../api.schemas';
 
 import { customFetch } from '../../../lib/custom-fetch';
 
-
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
-
-
-
-/**
- * 픽업 대기/완료 건수, 진행 중 공구 수, 다음 픽업 시간을 반환한다.
- * @summary 사장님 홈 요약 정보
- */
-export type getApiV1OwnerHomeSummaryResponse200 = {
-  data: ApiResponseOwnerSummary
-  status: 200
-}
-
-export type getApiV1OwnerHomeSummaryResponse403 = {
-  data: ForbiddenResponse
-  status: 403
-}
-
-export type getApiV1OwnerHomeSummaryResponseSuccess = (getApiV1OwnerHomeSummaryResponse200) & {
-  headers: Headers;
-};
-export type getApiV1OwnerHomeSummaryResponseError = (getApiV1OwnerHomeSummaryResponse403) & {
-  headers: Headers;
-};
-
-export type getApiV1OwnerHomeSummaryResponse = (getApiV1OwnerHomeSummaryResponseSuccess | getApiV1OwnerHomeSummaryResponseError)
-
-export const getGetApiV1OwnerHomeSummaryUrl = () => {
-
-
-
-
-  return `/api/v1/owner/home/summary`
-}
-
-export const getApiV1OwnerHomeSummary = async ( options?: RequestInit): Promise<getApiV1OwnerHomeSummaryResponse> => {
-
-  return customFetch<getApiV1OwnerHomeSummaryResponse>(getGetApiV1OwnerHomeSummaryUrl(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-export const getGetApiV1OwnerHomeSummaryQueryKey = () => {
-    return [
-    `/api/v1/owner/home/summary`
-    ] as const;
-    }
-
-
-export const getGetApiV1OwnerHomeSummaryQueryOptions = <TData = Awaited<ReturnType<typeof getApiV1OwnerHomeSummary>>, TError = ForbiddenResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1OwnerHomeSummary>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getGetApiV1OwnerHomeSummaryQueryKey();
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiV1OwnerHomeSummary>>> = ({ signal }) => getApiV1OwnerHomeSummary({ signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getApiV1OwnerHomeSummary>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetApiV1OwnerHomeSummaryQueryResult = NonNullable<Awaited<ReturnType<typeof getApiV1OwnerHomeSummary>>>
-export type GetApiV1OwnerHomeSummaryQueryError = ForbiddenResponse
-
-
-export function useGetApiV1OwnerHomeSummary<TData = Awaited<ReturnType<typeof getApiV1OwnerHomeSummary>>, TError = ForbiddenResponse>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1OwnerHomeSummary>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getApiV1OwnerHomeSummary>>,
-          TError,
-          Awaited<ReturnType<typeof getApiV1OwnerHomeSummary>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetApiV1OwnerHomeSummary<TData = Awaited<ReturnType<typeof getApiV1OwnerHomeSummary>>, TError = ForbiddenResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1OwnerHomeSummary>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getApiV1OwnerHomeSummary>>,
-          TError,
-          Awaited<ReturnType<typeof getApiV1OwnerHomeSummary>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetApiV1OwnerHomeSummary<TData = Awaited<ReturnType<typeof getApiV1OwnerHomeSummary>>, TError = ForbiddenResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1OwnerHomeSummary>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-/**
- * @summary 사장님 홈 요약 정보
- */
-
-export function useGetApiV1OwnerHomeSummary<TData = Awaited<ReturnType<typeof getApiV1OwnerHomeSummary>>, TError = ForbiddenResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1OwnerHomeSummary>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getGetApiV1OwnerHomeSummaryQueryOptions(options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
-
-
-
-
-
 
 /**
  * @summary 시간대별 픽업 현황 조회
  */
 export type getApiV1OwnerHomePickupScheduleResponse200 = {
-  data: ApiResponsePickupScheduleList
-  status: 200
-}
-
-export type getApiV1OwnerHomePickupScheduleResponseSuccess = (getApiV1OwnerHomePickupScheduleResponse200) & {
-  headers: Headers;
+  data: ApiResponsePickupScheduleList;
+  status: 200;
 };
-;
 
-export type getApiV1OwnerHomePickupScheduleResponse = (getApiV1OwnerHomePickupScheduleResponseSuccess)
+export type getApiV1OwnerHomePickupScheduleResponseSuccess =
+  getApiV1OwnerHomePickupScheduleResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1OwnerHomePickupScheduleResponse =
+  getApiV1OwnerHomePickupScheduleResponseSuccess;
 
 export const getGetApiV1OwnerHomePickupScheduleUrl = () => {
+  return `/api/v1/owner/home/pickup-schedule`;
+};
 
-
-
-
-  return `/api/v1/owner/home/pickup-schedule`
-}
-
-export const getApiV1OwnerHomePickupSchedule = async ( options?: RequestInit): Promise<getApiV1OwnerHomePickupScheduleResponse> => {
-
-  return customFetch<getApiV1OwnerHomePickupScheduleResponse>(getGetApiV1OwnerHomePickupScheduleUrl(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
+export const getApiV1OwnerHomePickupSchedule = async (
+  options?: RequestInit,
+): Promise<getApiV1OwnerHomePickupScheduleResponse> => {
+  return customFetch<getApiV1OwnerHomePickupScheduleResponse>(
+    getGetApiV1OwnerHomePickupScheduleUrl(),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
 
 export const getGetApiV1OwnerHomePickupScheduleQueryKey = () => {
-    return [
-    `/api/v1/owner/home/pickup-schedule`
-    ] as const;
-    }
+  return [`/api/v1/owner/home/pickup-schedule`] as const;
+};
 
+export const getGetApiV1OwnerHomePickupScheduleQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiV1OwnerHomePickupSchedule>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getApiV1OwnerHomePickupSchedule>>,
+      TError,
+      TData
+    >
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-export const getGetApiV1OwnerHomePickupScheduleQueryOptions = <TData = Awaited<ReturnType<typeof getApiV1OwnerHomePickupSchedule>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1OwnerHomePickupSchedule>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
+  const queryKey =
+    queryOptions?.queryKey ?? getGetApiV1OwnerHomePickupScheduleQueryKey();
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiV1OwnerHomePickupSchedule>>
+  > = ({ signal }) =>
+    getApiV1OwnerHomePickupSchedule({ signal, ...requestOptions });
 
-  const queryKey =  queryOptions?.queryKey ?? getGetApiV1OwnerHomePickupScheduleQueryKey();
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiV1OwnerHomePickupSchedule>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
+export type GetApiV1OwnerHomePickupScheduleQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiV1OwnerHomePickupSchedule>>
+>;
+export type GetApiV1OwnerHomePickupScheduleQueryError = unknown;
 
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiV1OwnerHomePickupSchedule>>> = ({ signal }) => getApiV1OwnerHomePickupSchedule({ signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getApiV1OwnerHomePickupSchedule>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetApiV1OwnerHomePickupScheduleQueryResult = NonNullable<Awaited<ReturnType<typeof getApiV1OwnerHomePickupSchedule>>>
-export type GetApiV1OwnerHomePickupScheduleQueryError = unknown
-
-
-export function useGetApiV1OwnerHomePickupSchedule<TData = Awaited<ReturnType<typeof getApiV1OwnerHomePickupSchedule>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1OwnerHomePickupSchedule>>, TError, TData>> & Pick<
+export function useGetApiV1OwnerHomePickupSchedule<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerHomePickupSchedule>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerHomePickupSchedule>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getApiV1OwnerHomePickupSchedule>>,
           TError,
           Awaited<ReturnType<typeof getApiV1OwnerHomePickupSchedule>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetApiV1OwnerHomePickupSchedule<TData = Awaited<ReturnType<typeof getApiV1OwnerHomePickupSchedule>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1OwnerHomePickupSchedule>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1OwnerHomePickupSchedule<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerHomePickupSchedule>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerHomePickupSchedule>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getApiV1OwnerHomePickupSchedule>>,
           TError,
           Awaited<ReturnType<typeof getApiV1OwnerHomePickupSchedule>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetApiV1OwnerHomePickupSchedule<TData = Awaited<ReturnType<typeof getApiV1OwnerHomePickupSchedule>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1OwnerHomePickupSchedule>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1OwnerHomePickupSchedule<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerHomePickupSchedule>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerHomePickupSchedule>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary 시간대별 픽업 현황 조회
  */
 
-export function useGetApiV1OwnerHomePickupSchedule<TData = Awaited<ReturnType<typeof getApiV1OwnerHomePickupSchedule>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1OwnerHomePickupSchedule>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useGetApiV1OwnerHomePickupSchedule<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerHomePickupSchedule>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerHomePickupSchedule>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiV1OwnerHomePickupScheduleQueryOptions(options);
 
-  const queryOptions = getGetApiV1OwnerHomePickupScheduleQueryOptions(options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
 
-
-
-
-
-
 /**
+ * 사장님이 소속된 매장의 공구를 조회한다.
+공구 상태는 진행 중(IN_PROGRESS), 달성(ACHIEVED), 미달(FAILED) 기준으로 반환한다.
+
  * @summary 진행 중인 공구 목록 조회 (사장님용)
  */
 export type getApiV1OwnerGroupBuysResponse200 = {
-  data: ApiResponseOwnerGroupBuyList
-  status: 200
-}
+  data: ApiResponseOwnerGroupBuyList;
+  status: 200;
+};
 
-export type getApiV1OwnerGroupBuysResponseSuccess = (getApiV1OwnerGroupBuysResponse200) & {
+export type getApiV1OwnerGroupBuysResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type getApiV1OwnerGroupBuysResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type getApiV1OwnerGroupBuysResponseSuccess =
+  getApiV1OwnerGroupBuysResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1OwnerGroupBuysResponseError = (
+  | getApiV1OwnerGroupBuysResponse401
+  | getApiV1OwnerGroupBuysResponse403
+) & {
   headers: Headers;
 };
-;
 
-export type getApiV1OwnerGroupBuysResponse = (getApiV1OwnerGroupBuysResponseSuccess)
+export type getApiV1OwnerGroupBuysResponse =
+  | getApiV1OwnerGroupBuysResponseSuccess
+  | getApiV1OwnerGroupBuysResponseError;
 
 export const getGetApiV1OwnerGroupBuysUrl = () => {
+  return `/api/v1/owner/group-buys`;
+};
 
-
-
-
-  return `/api/v1/owner/group-buys`
-}
-
-export const getApiV1OwnerGroupBuys = async ( options?: RequestInit): Promise<getApiV1OwnerGroupBuysResponse> => {
-
-  return customFetch<getApiV1OwnerGroupBuysResponse>(getGetApiV1OwnerGroupBuysUrl(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
+export const getApiV1OwnerGroupBuys = async (
+  options?: RequestInit,
+): Promise<getApiV1OwnerGroupBuysResponse> => {
+  return customFetch<getApiV1OwnerGroupBuysResponse>(
+    getGetApiV1OwnerGroupBuysUrl(),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
 
 export const getGetApiV1OwnerGroupBuysQueryKey = () => {
-    return [
-    `/api/v1/owner/group-buys`
-    ] as const;
-    }
+  return [`/api/v1/owner/group-buys`] as const;
+};
 
+export const getGetApiV1OwnerGroupBuysQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuys>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getApiV1OwnerGroupBuys>>,
+      TError,
+      TData
+    >
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-export const getGetApiV1OwnerGroupBuysQueryOptions = <TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuys>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1OwnerGroupBuys>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
+  const queryKey =
+    queryOptions?.queryKey ?? getGetApiV1OwnerGroupBuysQueryKey();
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiV1OwnerGroupBuys>>
+  > = ({ signal }) => getApiV1OwnerGroupBuys({ signal, ...requestOptions });
 
-  const queryKey =  queryOptions?.queryKey ?? getGetApiV1OwnerGroupBuysQueryKey();
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiV1OwnerGroupBuys>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
+export type GetApiV1OwnerGroupBuysQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiV1OwnerGroupBuys>>
+>;
+export type GetApiV1OwnerGroupBuysQueryError =
+  | UnauthorizedResponse
+  | ForbiddenResponse;
 
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiV1OwnerGroupBuys>>> = ({ signal }) => getApiV1OwnerGroupBuys({ signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getApiV1OwnerGroupBuys>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetApiV1OwnerGroupBuysQueryResult = NonNullable<Awaited<ReturnType<typeof getApiV1OwnerGroupBuys>>>
-export type GetApiV1OwnerGroupBuysQueryError = unknown
-
-
-export function useGetApiV1OwnerGroupBuys<TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuys>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1OwnerGroupBuys>>, TError, TData>> & Pick<
+export function useGetApiV1OwnerGroupBuys<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuys>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerGroupBuys>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getApiV1OwnerGroupBuys>>,
           TError,
           Awaited<ReturnType<typeof getApiV1OwnerGroupBuys>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetApiV1OwnerGroupBuys<TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuys>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1OwnerGroupBuys>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1OwnerGroupBuys<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuys>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerGroupBuys>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getApiV1OwnerGroupBuys>>,
           TError,
           Awaited<ReturnType<typeof getApiV1OwnerGroupBuys>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetApiV1OwnerGroupBuys<TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuys>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1OwnerGroupBuys>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1OwnerGroupBuys<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuys>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerGroupBuys>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary 진행 중인 공구 목록 조회 (사장님용)
  */
 
-export function useGetApiV1OwnerGroupBuys<TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuys>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1OwnerGroupBuys>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useGetApiV1OwnerGroupBuys<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuys>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerGroupBuys>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiV1OwnerGroupBuysQueryOptions(options);
 
-  const queryOptions = getGetApiV1OwnerGroupBuysQueryOptions(options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
 
-
-
-
-
-
 /**
- * @summary 픽업 예약자 목록 조회
- */
-export type getApiV1OwnerReservationsResponse200 = {
-  data: ApiResponseReservationPage
-  status: 200
-}
+ * 사장님이 소속된 매장 기준으로 공구 요약 정보를 조회한다.
+- 진행 중 공구 건수
+- 달성 완료 공구 건수
+- 오늘 픽업 예정 인원 수
+- 정산 예정 금액
 
-export type getApiV1OwnerReservationsResponseSuccess = (getApiV1OwnerReservationsResponse200) & {
+ * @summary 사장님 공구 요약 조회
+ */
+export type getApiV1OwnerGroupBuysSummaryResponse200 = {
+  data: ApiResponseOwnerGroupBuySummary;
+  status: 200;
+};
+
+export type getApiV1OwnerGroupBuysSummaryResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type getApiV1OwnerGroupBuysSummaryResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type getApiV1OwnerGroupBuysSummaryResponseSuccess =
+  getApiV1OwnerGroupBuysSummaryResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1OwnerGroupBuysSummaryResponseError = (
+  | getApiV1OwnerGroupBuysSummaryResponse401
+  | getApiV1OwnerGroupBuysSummaryResponse403
+) & {
   headers: Headers;
 };
-;
 
-export type getApiV1OwnerReservationsResponse = (getApiV1OwnerReservationsResponseSuccess)
+export type getApiV1OwnerGroupBuysSummaryResponse =
+  | getApiV1OwnerGroupBuysSummaryResponseSuccess
+  | getApiV1OwnerGroupBuysSummaryResponseError;
 
-export const getGetApiV1OwnerReservationsUrl = (params?: GetApiV1OwnerReservationsParams,) => {
+export const getGetApiV1OwnerGroupBuysSummaryUrl = () => {
+  return `/api/v1/owner/group-buys/summary`;
+};
+
+export const getApiV1OwnerGroupBuysSummary = async (
+  options?: RequestInit,
+): Promise<getApiV1OwnerGroupBuysSummaryResponse> => {
+  return customFetch<getApiV1OwnerGroupBuysSummaryResponse>(
+    getGetApiV1OwnerGroupBuysSummaryUrl(),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
+
+export const getGetApiV1OwnerGroupBuysSummaryQueryKey = () => {
+  return [`/api/v1/owner/group-buys/summary`] as const;
+};
+
+export const getGetApiV1OwnerGroupBuysSummaryQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuysSummary>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getApiV1OwnerGroupBuysSummary>>,
+      TError,
+      TData
+    >
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetApiV1OwnerGroupBuysSummaryQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiV1OwnerGroupBuysSummary>>
+  > = ({ signal }) =>
+    getApiV1OwnerGroupBuysSummary({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiV1OwnerGroupBuysSummary>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiV1OwnerGroupBuysSummaryQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiV1OwnerGroupBuysSummary>>
+>;
+export type GetApiV1OwnerGroupBuysSummaryQueryError =
+  | UnauthorizedResponse
+  | ForbiddenResponse;
+
+export function useGetApiV1OwnerGroupBuysSummary<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuysSummary>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerGroupBuysSummary>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1OwnerGroupBuysSummary>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1OwnerGroupBuysSummary>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1OwnerGroupBuysSummary<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuysSummary>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerGroupBuysSummary>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1OwnerGroupBuysSummary>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1OwnerGroupBuysSummary>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1OwnerGroupBuysSummary<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuysSummary>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerGroupBuysSummary>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary 사장님 공구 요약 조회
+ */
+
+export function useGetApiV1OwnerGroupBuysSummary<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuysSummary>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerGroupBuysSummary>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiV1OwnerGroupBuysSummaryQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary 사장님 공구 관리 목록 조회
+ */
+export type getApiV1OwnerGroupBuysManageResponse200 = {
+  data: ApiResponseOwnerGroupBuyManageList;
+  status: 200;
+};
+
+export type getApiV1OwnerGroupBuysManageResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type getApiV1OwnerGroupBuysManageResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type getApiV1OwnerGroupBuysManageResponseSuccess =
+  getApiV1OwnerGroupBuysManageResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1OwnerGroupBuysManageResponseError = (
+  | getApiV1OwnerGroupBuysManageResponse401
+  | getApiV1OwnerGroupBuysManageResponse403
+) & {
+  headers: Headers;
+};
+
+export type getApiV1OwnerGroupBuysManageResponse =
+  | getApiV1OwnerGroupBuysManageResponseSuccess
+  | getApiV1OwnerGroupBuysManageResponseError;
+
+export const getGetApiV1OwnerGroupBuysManageUrl = (
+  params?: GetApiV1OwnerGroupBuysManageParams,
+) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
+      normalizedParams.append(key, value === null ? 'null' : value.toString());
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/v1/owner/reservations?${stringifiedParams}` : `/api/v1/owner/reservations`
-}
+  return stringifiedParams.length > 0
+    ? `/api/v1/owner/group-buys/manage?${stringifiedParams}`
+    : `/api/v1/owner/group-buys/manage`;
+};
 
-export const getApiV1OwnerReservations = async (params?: GetApiV1OwnerReservationsParams, options?: RequestInit): Promise<getApiV1OwnerReservationsResponse> => {
+export const getApiV1OwnerGroupBuysManage = async (
+  params?: GetApiV1OwnerGroupBuysManageParams,
+  options?: RequestInit,
+): Promise<getApiV1OwnerGroupBuysManageResponse> => {
+  return customFetch<getApiV1OwnerGroupBuysManageResponse>(
+    getGetApiV1OwnerGroupBuysManageUrl(params),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
 
-  return customFetch<getApiV1OwnerReservationsResponse>(getGetApiV1OwnerReservationsUrl(params),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-export const getGetApiV1OwnerReservationsQueryKey = (params?: GetApiV1OwnerReservationsParams,) => {
-    return [
-    `/api/v1/owner/reservations`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getGetApiV1OwnerReservationsQueryOptions = <TData = Awaited<ReturnType<typeof getApiV1OwnerReservations>>, TError = unknown>(params?: GetApiV1OwnerReservationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1OwnerReservations>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetApiV1OwnerGroupBuysManageQueryKey = (
+  params?: GetApiV1OwnerGroupBuysManageParams,
 ) => {
+  return [
+    `/api/v1/owner/group-buys/manage`,
+    ...(params ? [params] : []),
+  ] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getGetApiV1OwnerGroupBuysManageQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuysManage>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  params?: GetApiV1OwnerGroupBuysManageParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerGroupBuysManage>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetApiV1OwnerReservationsQueryKey(params);
+  const queryKey =
+    queryOptions?.queryKey ?? getGetApiV1OwnerGroupBuysManageQueryKey(params);
 
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiV1OwnerGroupBuysManage>>
+  > = ({ signal }) =>
+    getApiV1OwnerGroupBuysManage(params, { signal, ...requestOptions });
 
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiV1OwnerGroupBuysManage>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiV1OwnerReservations>>> = ({ signal }) => getApiV1OwnerReservations(params, { signal, ...requestOptions });
+export type GetApiV1OwnerGroupBuysManageQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiV1OwnerGroupBuysManage>>
+>;
+export type GetApiV1OwnerGroupBuysManageQueryError =
+  | UnauthorizedResponse
+  | ForbiddenResponse;
 
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getApiV1OwnerReservations>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetApiV1OwnerReservationsQueryResult = NonNullable<Awaited<ReturnType<typeof getApiV1OwnerReservations>>>
-export type GetApiV1OwnerReservationsQueryError = unknown
-
-
-export function useGetApiV1OwnerReservations<TData = Awaited<ReturnType<typeof getApiV1OwnerReservations>>, TError = unknown>(
- params: undefined |  GetApiV1OwnerReservationsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1OwnerReservations>>, TError, TData>> & Pick<
+export function useGetApiV1OwnerGroupBuysManage<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuysManage>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  params: undefined | GetApiV1OwnerGroupBuysManageParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerGroupBuysManage>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getApiV1OwnerReservations>>,
+          Awaited<ReturnType<typeof getApiV1OwnerGroupBuysManage>>,
           TError,
-          Awaited<ReturnType<typeof getApiV1OwnerReservations>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetApiV1OwnerReservations<TData = Awaited<ReturnType<typeof getApiV1OwnerReservations>>, TError = unknown>(
- params?: GetApiV1OwnerReservationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1OwnerReservations>>, TError, TData>> & Pick<
+          Awaited<ReturnType<typeof getApiV1OwnerGroupBuysManage>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1OwnerGroupBuysManage<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuysManage>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  params?: GetApiV1OwnerGroupBuysManageParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerGroupBuysManage>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getApiV1OwnerReservations>>,
+          Awaited<ReturnType<typeof getApiV1OwnerGroupBuysManage>>,
           TError,
-          Awaited<ReturnType<typeof getApiV1OwnerReservations>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetApiV1OwnerReservations<TData = Awaited<ReturnType<typeof getApiV1OwnerReservations>>, TError = unknown>(
- params?: GetApiV1OwnerReservationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1OwnerReservations>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+          Awaited<ReturnType<typeof getApiV1OwnerGroupBuysManage>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1OwnerGroupBuysManage<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuysManage>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  params?: GetApiV1OwnerGroupBuysManageParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerGroupBuysManage>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
- * @summary 픽업 예약자 목록 조회
+ * @summary 사장님 공구 관리 목록 조회
  */
 
-export function useGetApiV1OwnerReservations<TData = Awaited<ReturnType<typeof getApiV1OwnerReservations>>, TError = unknown>(
- params?: GetApiV1OwnerReservationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1OwnerReservations>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useGetApiV1OwnerGroupBuysManage<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuysManage>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  params?: GetApiV1OwnerGroupBuysManageParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerGroupBuysManage>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiV1OwnerGroupBuysManageQueryOptions(
+    params,
+    options,
+  );
 
-  const queryOptions = getGetApiV1OwnerReservationsQueryOptions(params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
 
+/**
+ * @summary 사장님 모집중 공구 상세 조회
+ */
+export type getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse200 = {
+  data: ApiResponseOwnerGroupBuyManageDetail;
+  status: 200;
+};
 
+export type getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
 
+export type getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
 
+export type getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
 
+export type getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponseSuccess =
+  getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponseError = (
+  | getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse401
+  | getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse403
+  | getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse404
+) & {
+  headers: Headers;
+};
+
+export type getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse =
+  | getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponseSuccess
+  | getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponseError;
+
+export const getGetApiV1OwnerGroupBuysGroupBuyIdManageInProgressUrl = (
+  groupBuyId: number,
+) => {
+  return `/api/v1/owner/group-buys/${groupBuyId}/manage/in-progress`;
+};
+
+export const getApiV1OwnerGroupBuysGroupBuyIdManageInProgress = async (
+  groupBuyId: number,
+  options?: RequestInit,
+): Promise<getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse> => {
+  return customFetch<getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse>(
+    getGetApiV1OwnerGroupBuysGroupBuyIdManageInProgressUrl(groupBuyId),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
+
+export const getGetApiV1OwnerGroupBuysGroupBuyIdManageInProgressQueryKey = (
+  groupBuyId: number,
+) => {
+  return [`/api/v1/owner/group-buys/${groupBuyId}/manage/in-progress`] as const;
+};
+
+export const getGetApiV1OwnerGroupBuysGroupBuyIdManageInProgressQueryOptions = <
+  TData = Awaited<
+    ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageInProgress>
+  >,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  groupBuyId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<
+          ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageInProgress>
+        >,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetApiV1OwnerGroupBuysGroupBuyIdManageInProgressQueryKey(groupBuyId);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageInProgress>>
+  > = ({ signal }) =>
+    getApiV1OwnerGroupBuysGroupBuyIdManageInProgress(groupBuyId, {
+      signal,
+      ...requestOptions,
+    });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!groupBuyId,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<
+      ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageInProgress>
+    >,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiV1OwnerGroupBuysGroupBuyIdManageInProgressQueryResult =
+  NonNullable<
+    Awaited<ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageInProgress>>
+  >;
+export type GetApiV1OwnerGroupBuysGroupBuyIdManageInProgressQueryError =
+  | UnauthorizedResponse
+  | ForbiddenResponse
+  | NotFoundResponse;
+
+export function useGetApiV1OwnerGroupBuysGroupBuyIdManageInProgress<
+  TData = Awaited<
+    ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageInProgress>
+  >,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  groupBuyId: number,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<
+          ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageInProgress>
+        >,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<
+            ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageInProgress>
+          >,
+          TError,
+          Awaited<
+            ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageInProgress>
+          >
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1OwnerGroupBuysGroupBuyIdManageInProgress<
+  TData = Awaited<
+    ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageInProgress>
+  >,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  groupBuyId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<
+          ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageInProgress>
+        >,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<
+            ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageInProgress>
+          >,
+          TError,
+          Awaited<
+            ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageInProgress>
+          >
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1OwnerGroupBuysGroupBuyIdManageInProgress<
+  TData = Awaited<
+    ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageInProgress>
+  >,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  groupBuyId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<
+          ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageInProgress>
+        >,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary 사장님 모집중 공구 상세 조회
+ */
+
+export function useGetApiV1OwnerGroupBuysGroupBuyIdManageInProgress<
+  TData = Awaited<
+    ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageInProgress>
+  >,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  groupBuyId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<
+          ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageInProgress>
+        >,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions =
+    getGetApiV1OwnerGroupBuysGroupBuyIdManageInProgressQueryOptions(
+      groupBuyId,
+      options,
+    );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary 사장님 달성 공구 상세 조회
+ */
+export type getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse200 = {
+  data: ApiResponseOwnerGroupBuyManageDetail;
+  status: 200;
+};
+
+export type getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponseSuccess =
+  getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponseError = (
+  | getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse401
+  | getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse403
+  | getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse404
+) & {
+  headers: Headers;
+};
+
+export type getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse =
+  | getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponseSuccess
+  | getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponseError;
+
+export const getGetApiV1OwnerGroupBuysGroupBuyIdManageAchievedUrl = (
+  groupBuyId: number,
+) => {
+  return `/api/v1/owner/group-buys/${groupBuyId}/manage/achieved`;
+};
+
+export const getApiV1OwnerGroupBuysGroupBuyIdManageAchieved = async (
+  groupBuyId: number,
+  options?: RequestInit,
+): Promise<getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse> => {
+  return customFetch<getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse>(
+    getGetApiV1OwnerGroupBuysGroupBuyIdManageAchievedUrl(groupBuyId),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
+
+export const getGetApiV1OwnerGroupBuysGroupBuyIdManageAchievedQueryKey = (
+  groupBuyId: number,
+) => {
+  return [`/api/v1/owner/group-buys/${groupBuyId}/manage/achieved`] as const;
+};
+
+export const getGetApiV1OwnerGroupBuysGroupBuyIdManageAchievedQueryOptions = <
+  TData = Awaited<
+    ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageAchieved>
+  >,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  groupBuyId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<
+          ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageAchieved>
+        >,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetApiV1OwnerGroupBuysGroupBuyIdManageAchievedQueryKey(groupBuyId);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageAchieved>>
+  > = ({ signal }) =>
+    getApiV1OwnerGroupBuysGroupBuyIdManageAchieved(groupBuyId, {
+      signal,
+      ...requestOptions,
+    });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!groupBuyId,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageAchieved>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiV1OwnerGroupBuysGroupBuyIdManageAchievedQueryResult =
+  NonNullable<
+    Awaited<ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageAchieved>>
+  >;
+export type GetApiV1OwnerGroupBuysGroupBuyIdManageAchievedQueryError =
+  | UnauthorizedResponse
+  | ForbiddenResponse
+  | NotFoundResponse;
+
+export function useGetApiV1OwnerGroupBuysGroupBuyIdManageAchieved<
+  TData = Awaited<
+    ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageAchieved>
+  >,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  groupBuyId: number,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<
+          ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageAchieved>
+        >,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<
+            ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageAchieved>
+          >,
+          TError,
+          Awaited<
+            ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageAchieved>
+          >
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1OwnerGroupBuysGroupBuyIdManageAchieved<
+  TData = Awaited<
+    ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageAchieved>
+  >,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  groupBuyId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<
+          ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageAchieved>
+        >,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<
+            ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageAchieved>
+          >,
+          TError,
+          Awaited<
+            ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageAchieved>
+          >
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1OwnerGroupBuysGroupBuyIdManageAchieved<
+  TData = Awaited<
+    ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageAchieved>
+  >,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  groupBuyId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<
+          ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageAchieved>
+        >,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary 사장님 달성 공구 상세 조회
+ */
+
+export function useGetApiV1OwnerGroupBuysGroupBuyIdManageAchieved<
+  TData = Awaited<
+    ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageAchieved>
+  >,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  groupBuyId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<
+          ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageAchieved>
+        >,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions =
+    getGetApiV1OwnerGroupBuysGroupBuyIdManageAchievedQueryOptions(
+      groupBuyId,
+      options,
+    );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary 사장님 공구 기간 연장 요청
+ */
+export type postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse200 = {
+  data: SuccessNoDataResponse;
+  status: 200;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponseSuccess =
+  postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse200 & {
+    headers: Headers;
+  };
+export type postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponseError = (
+  | postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse400
+  | postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse401
+  | postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse403
+  | postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse404
+) & {
+  headers: Headers;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse =
+  | postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponseSuccess
+  | postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponseError;
+
+export const getPostApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsUrl = (
+  groupBuyId: number,
+) => {
+  return `/api/v1/owner/group-buys/${groupBuyId}/extension-requests`;
+};
+
+export const postApiV1OwnerGroupBuysGroupBuyIdExtensionRequests = async (
+  groupBuyId: number,
+  ownerGroupBuyExtensionRequest: OwnerGroupBuyExtensionRequest,
+  options?: RequestInit,
+): Promise<postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse> => {
+  return customFetch<postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse>(
+    getPostApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsUrl(groupBuyId),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(ownerGroupBuyExtensionRequest),
+    },
+  );
+};
+
+export const getPostApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsMutationOptions =
+  <
+    TError =
+      | BadRequestResponse
+      | UnauthorizedResponse
+      | ForbiddenResponse
+      | NotFoundResponse,
+    TContext = unknown,
+  >(options?: {
+    mutation?: UseMutationOptions<
+      Awaited<
+        ReturnType<typeof postApiV1OwnerGroupBuysGroupBuyIdExtensionRequests>
+      >,
+      TError,
+      { groupBuyId: number; data: OwnerGroupBuyExtensionRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  }): UseMutationOptions<
+    Awaited<
+      ReturnType<typeof postApiV1OwnerGroupBuysGroupBuyIdExtensionRequests>
+    >,
+    TError,
+    { groupBuyId: number; data: OwnerGroupBuyExtensionRequest },
+    TContext
+  > => {
+    const mutationKey = ['postApiV1OwnerGroupBuysGroupBuyIdExtensionRequests'];
+    const { mutation: mutationOptions, request: requestOptions } = options
+      ? options.mutation &&
+        'mutationKey' in options.mutation &&
+        options.mutation.mutationKey
+        ? options
+        : { ...options, mutation: { ...options.mutation, mutationKey } }
+      : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+      Awaited<
+        ReturnType<typeof postApiV1OwnerGroupBuysGroupBuyIdExtensionRequests>
+      >,
+      { groupBuyId: number; data: OwnerGroupBuyExtensionRequest }
+    > = (props) => {
+      const { groupBuyId, data } = props ?? {};
+
+      return postApiV1OwnerGroupBuysGroupBuyIdExtensionRequests(
+        groupBuyId,
+        data,
+        requestOptions,
+      );
+    };
+
+    return { mutationFn, ...mutationOptions };
+  };
+
+export type PostApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsMutationResult =
+  NonNullable<
+    Awaited<
+      ReturnType<typeof postApiV1OwnerGroupBuysGroupBuyIdExtensionRequests>
+    >
+  >;
+export type PostApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsMutationBody =
+  OwnerGroupBuyExtensionRequest;
+export type PostApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsMutationError =
+  | BadRequestResponse
+  | UnauthorizedResponse
+  | ForbiddenResponse
+  | NotFoundResponse;
+
+/**
+ * @summary 사장님 공구 기간 연장 요청
+ */
+export const usePostApiV1OwnerGroupBuysGroupBuyIdExtensionRequests = <
+  TError =
+    | BadRequestResponse
+    | UnauthorizedResponse
+    | ForbiddenResponse
+    | NotFoundResponse,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<
+        ReturnType<typeof postApiV1OwnerGroupBuysGroupBuyIdExtensionRequests>
+      >,
+      TError,
+      { groupBuyId: number; data: OwnerGroupBuyExtensionRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<
+    ReturnType<typeof postApiV1OwnerGroupBuysGroupBuyIdExtensionRequests>
+  >,
+  TError,
+  { groupBuyId: number; data: OwnerGroupBuyExtensionRequest },
+  TContext
+> => {
+  return useMutation(
+    getPostApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsMutationOptions(
+      options,
+    ),
+    queryClient,
+  );
+};
+/**
+ * @summary 사장님 공구 마감 요청
+ */
+export type postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse200 = {
+  data: SuccessNoDataResponse;
+  status: 200;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponseSuccess =
+  postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse200 & {
+    headers: Headers;
+  };
+export type postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponseError = (
+  | postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse400
+  | postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse401
+  | postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse403
+  | postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse404
+) & {
+  headers: Headers;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse =
+  | postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponseSuccess
+  | postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponseError;
+
+export const getPostApiV1OwnerGroupBuysGroupBuyIdCloseRequestsUrl = (
+  groupBuyId: number,
+) => {
+  return `/api/v1/owner/group-buys/${groupBuyId}/close-requests`;
+};
+
+export const postApiV1OwnerGroupBuysGroupBuyIdCloseRequests = async (
+  groupBuyId: number,
+  ownerGroupBuyCloseRequest: OwnerGroupBuyCloseRequest,
+  options?: RequestInit,
+): Promise<postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse> => {
+  return customFetch<postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse>(
+    getPostApiV1OwnerGroupBuysGroupBuyIdCloseRequestsUrl(groupBuyId),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(ownerGroupBuyCloseRequest),
+    },
+  );
+};
+
+export const getPostApiV1OwnerGroupBuysGroupBuyIdCloseRequestsMutationOptions =
+  <
+    TError =
+      | BadRequestResponse
+      | UnauthorizedResponse
+      | ForbiddenResponse
+      | NotFoundResponse,
+    TContext = unknown,
+  >(options?: {
+    mutation?: UseMutationOptions<
+      Awaited<
+        ReturnType<typeof postApiV1OwnerGroupBuysGroupBuyIdCloseRequests>
+      >,
+      TError,
+      { groupBuyId: number; data: OwnerGroupBuyCloseRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  }): UseMutationOptions<
+    Awaited<ReturnType<typeof postApiV1OwnerGroupBuysGroupBuyIdCloseRequests>>,
+    TError,
+    { groupBuyId: number; data: OwnerGroupBuyCloseRequest },
+    TContext
+  > => {
+    const mutationKey = ['postApiV1OwnerGroupBuysGroupBuyIdCloseRequests'];
+    const { mutation: mutationOptions, request: requestOptions } = options
+      ? options.mutation &&
+        'mutationKey' in options.mutation &&
+        options.mutation.mutationKey
+        ? options
+        : { ...options, mutation: { ...options.mutation, mutationKey } }
+      : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+      Awaited<
+        ReturnType<typeof postApiV1OwnerGroupBuysGroupBuyIdCloseRequests>
+      >,
+      { groupBuyId: number; data: OwnerGroupBuyCloseRequest }
+    > = (props) => {
+      const { groupBuyId, data } = props ?? {};
+
+      return postApiV1OwnerGroupBuysGroupBuyIdCloseRequests(
+        groupBuyId,
+        data,
+        requestOptions,
+      );
+    };
+
+    return { mutationFn, ...mutationOptions };
+  };
+
+export type PostApiV1OwnerGroupBuysGroupBuyIdCloseRequestsMutationResult =
+  NonNullable<
+    Awaited<ReturnType<typeof postApiV1OwnerGroupBuysGroupBuyIdCloseRequests>>
+  >;
+export type PostApiV1OwnerGroupBuysGroupBuyIdCloseRequestsMutationBody =
+  OwnerGroupBuyCloseRequest;
+export type PostApiV1OwnerGroupBuysGroupBuyIdCloseRequestsMutationError =
+  | BadRequestResponse
+  | UnauthorizedResponse
+  | ForbiddenResponse
+  | NotFoundResponse;
+
+/**
+ * @summary 사장님 공구 마감 요청
+ */
+export const usePostApiV1OwnerGroupBuysGroupBuyIdCloseRequests = <
+  TError =
+    | BadRequestResponse
+    | UnauthorizedResponse
+    | ForbiddenResponse
+    | NotFoundResponse,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<
+        ReturnType<typeof postApiV1OwnerGroupBuysGroupBuyIdCloseRequests>
+      >,
+      TError,
+      { groupBuyId: number; data: OwnerGroupBuyCloseRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiV1OwnerGroupBuysGroupBuyIdCloseRequests>>,
+  TError,
+  { groupBuyId: number; data: OwnerGroupBuyCloseRequest },
+  TContext
+> => {
+  return useMutation(
+    getPostApiV1OwnerGroupBuysGroupBuyIdCloseRequestsMutationOptions(options),
+    queryClient,
+  );
+};
+/**
+ * 사장님이 본인 매장 기준으로 제출한 공구 개설 요청 목록을 조회한다.
+ * @summary 사장님 공구 개설 요청 목록 조회
+ */
+export type getApiV1OwnerGroupBuyRequestsResponse200 = {
+  data: ApiResponseOwnerGroupBuyRequestList;
+  status: 200;
+};
+
+export type getApiV1OwnerGroupBuyRequestsResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type getApiV1OwnerGroupBuyRequestsResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type getApiV1OwnerGroupBuyRequestsResponseSuccess =
+  getApiV1OwnerGroupBuyRequestsResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1OwnerGroupBuyRequestsResponseError = (
+  | getApiV1OwnerGroupBuyRequestsResponse401
+  | getApiV1OwnerGroupBuyRequestsResponse403
+) & {
+  headers: Headers;
+};
+
+export type getApiV1OwnerGroupBuyRequestsResponse =
+  | getApiV1OwnerGroupBuyRequestsResponseSuccess
+  | getApiV1OwnerGroupBuyRequestsResponseError;
+
+export const getGetApiV1OwnerGroupBuyRequestsUrl = (
+  params?: GetApiV1OwnerGroupBuyRequestsParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/owner/group-buy-requests?${stringifiedParams}`
+    : `/api/v1/owner/group-buy-requests`;
+};
+
+export const getApiV1OwnerGroupBuyRequests = async (
+  params?: GetApiV1OwnerGroupBuyRequestsParams,
+  options?: RequestInit,
+): Promise<getApiV1OwnerGroupBuyRequestsResponse> => {
+  return customFetch<getApiV1OwnerGroupBuyRequestsResponse>(
+    getGetApiV1OwnerGroupBuyRequestsUrl(params),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
+
+export const getGetApiV1OwnerGroupBuyRequestsQueryKey = (
+  params?: GetApiV1OwnerGroupBuyRequestsParams,
+) => {
+  return [
+    `/api/v1/owner/group-buy-requests`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetApiV1OwnerGroupBuyRequestsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuyRequests>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  params?: GetApiV1OwnerGroupBuyRequestsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerGroupBuyRequests>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetApiV1OwnerGroupBuyRequestsQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiV1OwnerGroupBuyRequests>>
+  > = ({ signal }) =>
+    getApiV1OwnerGroupBuyRequests(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiV1OwnerGroupBuyRequests>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiV1OwnerGroupBuyRequestsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiV1OwnerGroupBuyRequests>>
+>;
+export type GetApiV1OwnerGroupBuyRequestsQueryError =
+  | UnauthorizedResponse
+  | ForbiddenResponse;
+
+export function useGetApiV1OwnerGroupBuyRequests<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuyRequests>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  params: undefined | GetApiV1OwnerGroupBuyRequestsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerGroupBuyRequests>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1OwnerGroupBuyRequests>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1OwnerGroupBuyRequests>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1OwnerGroupBuyRequests<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuyRequests>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  params?: GetApiV1OwnerGroupBuyRequestsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerGroupBuyRequests>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1OwnerGroupBuyRequests>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1OwnerGroupBuyRequests>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1OwnerGroupBuyRequests<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuyRequests>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  params?: GetApiV1OwnerGroupBuyRequestsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerGroupBuyRequests>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary 사장님 공구 개설 요청 목록 조회
+ */
+
+export function useGetApiV1OwnerGroupBuyRequests<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuyRequests>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  params?: GetApiV1OwnerGroupBuyRequestsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerGroupBuyRequests>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiV1OwnerGroupBuyRequestsQueryOptions(
+    params,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * 사장님이 본인 매장에 대한 공구 개설 요청을 제출한다.
+- SELLER 권한만 요청할 수 있다.
+- storeId는 요청자에게 연결된 매장이어야 한다.
+- imageUrls의 첫 번째 이미지를 대표 이미지(thumbnailUrl)로 저장한다.
+- 희망 공구 기간은 현재 시각 기준 최소 7일 이상이어야 한다.
+
+ * @summary 사장님 공구 개설 요청 제출
+ */
+export type postApiV1OwnerGroupBuyRequestsResponse201 = {
+  data: ApiResponseOwnerGroupBuyRequestCreated;
+  status: 201;
+};
+
+export type postApiV1OwnerGroupBuyRequestsResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type postApiV1OwnerGroupBuyRequestsResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type postApiV1OwnerGroupBuyRequestsResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type postApiV1OwnerGroupBuyRequestsResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type postApiV1OwnerGroupBuyRequestsResponseSuccess =
+  postApiV1OwnerGroupBuyRequestsResponse201 & {
+    headers: Headers;
+  };
+export type postApiV1OwnerGroupBuyRequestsResponseError = (
+  | postApiV1OwnerGroupBuyRequestsResponse400
+  | postApiV1OwnerGroupBuyRequestsResponse401
+  | postApiV1OwnerGroupBuyRequestsResponse403
+  | postApiV1OwnerGroupBuyRequestsResponse404
+) & {
+  headers: Headers;
+};
+
+export type postApiV1OwnerGroupBuyRequestsResponse =
+  | postApiV1OwnerGroupBuyRequestsResponseSuccess
+  | postApiV1OwnerGroupBuyRequestsResponseError;
+
+export const getPostApiV1OwnerGroupBuyRequestsUrl = () => {
+  return `/api/v1/owner/group-buy-requests`;
+};
+
+export const postApiV1OwnerGroupBuyRequests = async (
+  ownerGroupBuyRequestCreate: OwnerGroupBuyRequestCreate,
+  options?: RequestInit,
+): Promise<postApiV1OwnerGroupBuyRequestsResponse> => {
+  return customFetch<postApiV1OwnerGroupBuyRequestsResponse>(
+    getPostApiV1OwnerGroupBuyRequestsUrl(),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(ownerGroupBuyRequestCreate),
+    },
+  );
+};
+
+export const getPostApiV1OwnerGroupBuyRequestsMutationOptions = <
+  TError =
+    | BadRequestResponse
+    | UnauthorizedResponse
+    | ForbiddenResponse
+    | NotFoundResponse,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiV1OwnerGroupBuyRequests>>,
+    TError,
+    { data: OwnerGroupBuyRequestCreate },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiV1OwnerGroupBuyRequests>>,
+  TError,
+  { data: OwnerGroupBuyRequestCreate },
+  TContext
+> => {
+  const mutationKey = ['postApiV1OwnerGroupBuyRequests'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiV1OwnerGroupBuyRequests>>,
+    { data: OwnerGroupBuyRequestCreate }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiV1OwnerGroupBuyRequests(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiV1OwnerGroupBuyRequestsMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiV1OwnerGroupBuyRequests>>
+>;
+export type PostApiV1OwnerGroupBuyRequestsMutationBody =
+  OwnerGroupBuyRequestCreate;
+export type PostApiV1OwnerGroupBuyRequestsMutationError =
+  | BadRequestResponse
+  | UnauthorizedResponse
+  | ForbiddenResponse
+  | NotFoundResponse;
+
+/**
+ * @summary 사장님 공구 개설 요청 제출
+ */
+export const usePostApiV1OwnerGroupBuyRequests = <
+  TError =
+    | BadRequestResponse
+    | UnauthorizedResponse
+    | ForbiddenResponse
+    | NotFoundResponse,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiV1OwnerGroupBuyRequests>>,
+      TError,
+      { data: OwnerGroupBuyRequestCreate },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiV1OwnerGroupBuyRequests>>,
+  TError,
+  { data: OwnerGroupBuyRequestCreate },
+  TContext
+> => {
+  return useMutation(
+    getPostApiV1OwnerGroupBuyRequestsMutationOptions(options),
+    queryClient,
+  );
+};
+/**
+ * 사장님이 본인 매장 기준으로 제출한 공구 개설 요청 상세와 승인/반려 상태를 조회한다.
+ * @summary 사장님 공구 개설 요청 상세 조회
+ */
+export type getApiV1OwnerGroupBuyRequestsRequestIdResponse200 = {
+  data: ApiResponseOwnerGroupBuyRequestDetail;
+  status: 200;
+};
+
+export type getApiV1OwnerGroupBuyRequestsRequestIdResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type getApiV1OwnerGroupBuyRequestsRequestIdResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type getApiV1OwnerGroupBuyRequestsRequestIdResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type getApiV1OwnerGroupBuyRequestsRequestIdResponseSuccess =
+  getApiV1OwnerGroupBuyRequestsRequestIdResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1OwnerGroupBuyRequestsRequestIdResponseError = (
+  | getApiV1OwnerGroupBuyRequestsRequestIdResponse401
+  | getApiV1OwnerGroupBuyRequestsRequestIdResponse403
+  | getApiV1OwnerGroupBuyRequestsRequestIdResponse404
+) & {
+  headers: Headers;
+};
+
+export type getApiV1OwnerGroupBuyRequestsRequestIdResponse =
+  | getApiV1OwnerGroupBuyRequestsRequestIdResponseSuccess
+  | getApiV1OwnerGroupBuyRequestsRequestIdResponseError;
+
+export const getGetApiV1OwnerGroupBuyRequestsRequestIdUrl = (
+  requestId: number,
+) => {
+  return `/api/v1/owner/group-buy-requests/${requestId}`;
+};
+
+export const getApiV1OwnerGroupBuyRequestsRequestId = async (
+  requestId: number,
+  options?: RequestInit,
+): Promise<getApiV1OwnerGroupBuyRequestsRequestIdResponse> => {
+  return customFetch<getApiV1OwnerGroupBuyRequestsRequestIdResponse>(
+    getGetApiV1OwnerGroupBuyRequestsRequestIdUrl(requestId),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
+
+export const getGetApiV1OwnerGroupBuyRequestsRequestIdQueryKey = (
+  requestId: number,
+) => {
+  return [`/api/v1/owner/group-buy-requests/${requestId}`] as const;
+};
+
+export const getGetApiV1OwnerGroupBuyRequestsRequestIdQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuyRequestsRequestId>>,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  requestId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerGroupBuyRequestsRequestId>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetApiV1OwnerGroupBuyRequestsRequestIdQueryKey(requestId);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiV1OwnerGroupBuyRequestsRequestId>>
+  > = ({ signal }) =>
+    getApiV1OwnerGroupBuyRequestsRequestId(requestId, {
+      signal,
+      ...requestOptions,
+    });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!requestId,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiV1OwnerGroupBuyRequestsRequestId>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiV1OwnerGroupBuyRequestsRequestIdQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiV1OwnerGroupBuyRequestsRequestId>>
+>;
+export type GetApiV1OwnerGroupBuyRequestsRequestIdQueryError =
+  | UnauthorizedResponse
+  | ForbiddenResponse
+  | NotFoundResponse;
+
+export function useGetApiV1OwnerGroupBuyRequestsRequestId<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuyRequestsRequestId>>,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  requestId: number,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerGroupBuyRequestsRequestId>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1OwnerGroupBuyRequestsRequestId>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1OwnerGroupBuyRequestsRequestId>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1OwnerGroupBuyRequestsRequestId<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuyRequestsRequestId>>,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  requestId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerGroupBuyRequestsRequestId>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1OwnerGroupBuyRequestsRequestId>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1OwnerGroupBuyRequestsRequestId>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1OwnerGroupBuyRequestsRequestId<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuyRequestsRequestId>>,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  requestId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerGroupBuyRequestsRequestId>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary 사장님 공구 개설 요청 상세 조회
+ */
+
+export function useGetApiV1OwnerGroupBuyRequestsRequestId<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuyRequestsRequestId>>,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  requestId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerGroupBuyRequestsRequestId>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiV1OwnerGroupBuyRequestsRequestIdQueryOptions(
+    requestId,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary 픽업 예약자 목록 조회
+ */
+export type getApiV1OwnerReservationsResponse200 = {
+  data: ApiResponseReservationPage;
+  status: 200;
+};
+
+export type getApiV1OwnerReservationsResponseSuccess =
+  getApiV1OwnerReservationsResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1OwnerReservationsResponse =
+  getApiV1OwnerReservationsResponseSuccess;
+
+export const getGetApiV1OwnerReservationsUrl = (
+  params?: GetApiV1OwnerReservationsParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/owner/reservations?${stringifiedParams}`
+    : `/api/v1/owner/reservations`;
+};
+
+export const getApiV1OwnerReservations = async (
+  params?: GetApiV1OwnerReservationsParams,
+  options?: RequestInit,
+): Promise<getApiV1OwnerReservationsResponse> => {
+  return customFetch<getApiV1OwnerReservationsResponse>(
+    getGetApiV1OwnerReservationsUrl(params),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
+
+export const getGetApiV1OwnerReservationsQueryKey = (
+  params?: GetApiV1OwnerReservationsParams,
+) => {
+  return [`/api/v1/owner/reservations`, ...(params ? [params] : [])] as const;
+};
+
+export const getGetApiV1OwnerReservationsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiV1OwnerReservations>>,
+  TError = unknown,
+>(
+  params?: GetApiV1OwnerReservationsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerReservations>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetApiV1OwnerReservationsQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiV1OwnerReservations>>
+  > = ({ signal }) =>
+    getApiV1OwnerReservations(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiV1OwnerReservations>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiV1OwnerReservationsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiV1OwnerReservations>>
+>;
+export type GetApiV1OwnerReservationsQueryError = unknown;
+
+export function useGetApiV1OwnerReservations<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerReservations>>,
+  TError = unknown,
+>(
+  params: undefined | GetApiV1OwnerReservationsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerReservations>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1OwnerReservations>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1OwnerReservations>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1OwnerReservations<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerReservations>>,
+  TError = unknown,
+>(
+  params?: GetApiV1OwnerReservationsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerReservations>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1OwnerReservations>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1OwnerReservations>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1OwnerReservations<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerReservations>>,
+  TError = unknown,
+>(
+  params?: GetApiV1OwnerReservationsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerReservations>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary 픽업 예약자 목록 조회
+ */
+
+export function useGetApiV1OwnerReservations<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerReservations>>,
+  TError = unknown,
+>(
+  params?: GetApiV1OwnerReservationsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerReservations>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiV1OwnerReservationsQueryOptions(
+    params,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
 
 /**
  * QR 없이 수동으로 수령 완료 처리한다.
  * @summary 수령 처리 (수동)
  */
 export type patchApiV1OwnerReservationsParticipationIdCompleteResponse200 = {
-  data: SuccessNoDataResponse
-  status: 200
-}
+  data: SuccessNoDataResponse;
+  status: 200;
+};
 
 export type patchApiV1OwnerReservationsParticipationIdCompleteResponse409 = {
-  data: ConflictResponse
-  status: 409
-}
-
-export type patchApiV1OwnerReservationsParticipationIdCompleteResponseSuccess = (patchApiV1OwnerReservationsParticipationIdCompleteResponse200) & {
-  headers: Headers;
-};
-export type patchApiV1OwnerReservationsParticipationIdCompleteResponseError = (patchApiV1OwnerReservationsParticipationIdCompleteResponse409) & {
-  headers: Headers;
+  data: ConflictResponse;
+  status: 409;
 };
 
-export type patchApiV1OwnerReservationsParticipationIdCompleteResponse = (patchApiV1OwnerReservationsParticipationIdCompleteResponseSuccess | patchApiV1OwnerReservationsParticipationIdCompleteResponseError)
+export type patchApiV1OwnerReservationsParticipationIdCompleteResponseSuccess =
+  patchApiV1OwnerReservationsParticipationIdCompleteResponse200 & {
+    headers: Headers;
+  };
+export type patchApiV1OwnerReservationsParticipationIdCompleteResponseError =
+  patchApiV1OwnerReservationsParticipationIdCompleteResponse409 & {
+    headers: Headers;
+  };
 
-export const getPatchApiV1OwnerReservationsParticipationIdCompleteUrl = (participationId: number,) => {
+export type patchApiV1OwnerReservationsParticipationIdCompleteResponse =
+  | patchApiV1OwnerReservationsParticipationIdCompleteResponseSuccess
+  | patchApiV1OwnerReservationsParticipationIdCompleteResponseError;
 
+export const getPatchApiV1OwnerReservationsParticipationIdCompleteUrl = (
+  participationId: number,
+) => {
+  return `/api/v1/owner/reservations/${participationId}/complete`;
+};
 
+export const patchApiV1OwnerReservationsParticipationIdComplete = async (
+  participationId: number,
+  options?: RequestInit,
+): Promise<patchApiV1OwnerReservationsParticipationIdCompleteResponse> => {
+  return customFetch<patchApiV1OwnerReservationsParticipationIdCompleteResponse>(
+    getPatchApiV1OwnerReservationsParticipationIdCompleteUrl(participationId),
+    {
+      ...options,
+      method: 'PATCH',
+    },
+  );
+};
 
+export const getPatchApiV1OwnerReservationsParticipationIdCompleteMutationOptions =
+  <TError = ConflictResponse, TContext = unknown>(options?: {
+    mutation?: UseMutationOptions<
+      Awaited<
+        ReturnType<typeof patchApiV1OwnerReservationsParticipationIdComplete>
+      >,
+      TError,
+      { participationId: number },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  }): UseMutationOptions<
+    Awaited<
+      ReturnType<typeof patchApiV1OwnerReservationsParticipationIdComplete>
+    >,
+    TError,
+    { participationId: number },
+    TContext
+  > => {
+    const mutationKey = ['patchApiV1OwnerReservationsParticipationIdComplete'];
+    const { mutation: mutationOptions, request: requestOptions } = options
+      ? options.mutation &&
+        'mutationKey' in options.mutation &&
+        options.mutation.mutationKey
+        ? options
+        : { ...options, mutation: { ...options.mutation, mutationKey } }
+      : { mutation: { mutationKey }, request: undefined };
 
-  return `/api/v1/owner/reservations/${participationId}/complete`
-}
+    const mutationFn: MutationFunction<
+      Awaited<
+        ReturnType<typeof patchApiV1OwnerReservationsParticipationIdComplete>
+      >,
+      { participationId: number }
+    > = (props) => {
+      const { participationId } = props ?? {};
 
-export const patchApiV1OwnerReservationsParticipationIdComplete = async (participationId: number, options?: RequestInit): Promise<patchApiV1OwnerReservationsParticipationIdCompleteResponse> => {
+      return patchApiV1OwnerReservationsParticipationIdComplete(
+        participationId,
+        requestOptions,
+      );
+    };
 
-  return customFetch<patchApiV1OwnerReservationsParticipationIdCompleteResponse>(getPatchApiV1OwnerReservationsParticipationIdCompleteUrl(participationId),
-  {
-    ...options,
-    method: 'PATCH'
+    return { mutationFn, ...mutationOptions };
+  };
 
+export type PatchApiV1OwnerReservationsParticipationIdCompleteMutationResult =
+  NonNullable<
+    Awaited<
+      ReturnType<typeof patchApiV1OwnerReservationsParticipationIdComplete>
+    >
+  >;
 
-  }
-);}
+export type PatchApiV1OwnerReservationsParticipationIdCompleteMutationError =
+  ConflictResponse;
 
-
-
-
-export const getPatchApiV1OwnerReservationsParticipationIdCompleteMutationOptions = <TError = ConflictResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchApiV1OwnerReservationsParticipationIdComplete>>, TError,{participationId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof patchApiV1OwnerReservationsParticipationIdComplete>>, TError,{participationId: number}, TContext> => {
-
-const mutationKey = ['patchApiV1OwnerReservationsParticipationIdComplete'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof patchApiV1OwnerReservationsParticipationIdComplete>>, {participationId: number}> = (props) => {
-          const {participationId} = props ?? {};
-
-          return  patchApiV1OwnerReservationsParticipationIdComplete(participationId,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type PatchApiV1OwnerReservationsParticipationIdCompleteMutationResult = NonNullable<Awaited<ReturnType<typeof patchApiV1OwnerReservationsParticipationIdComplete>>>
-
-    export type PatchApiV1OwnerReservationsParticipationIdCompleteMutationError = ConflictResponse
-
-    /**
+/**
  * @summary 수령 처리 (수동)
  */
-export const usePatchApiV1OwnerReservationsParticipationIdComplete = <TError = ConflictResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchApiV1OwnerReservationsParticipationIdComplete>>, TError,{participationId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof patchApiV1OwnerReservationsParticipationIdComplete>>,
-        TError,
-        {participationId: number},
-        TContext
-      > => {
-      return useMutation(getPatchApiV1OwnerReservationsParticipationIdCompleteMutationOptions(options), queryClient);
-    }
+export const usePatchApiV1OwnerReservationsParticipationIdComplete = <
+  TError = ConflictResponse,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<
+        ReturnType<typeof patchApiV1OwnerReservationsParticipationIdComplete>
+      >,
+      TError,
+      { participationId: number },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<
+    ReturnType<typeof patchApiV1OwnerReservationsParticipationIdComplete>
+  >,
+  TError,
+  { participationId: number },
+  TContext
+> => {
+  return useMutation(
+    getPatchApiV1OwnerReservationsParticipationIdCompleteMutationOptions(
+      options,
+    ),
+    queryClient,
+  );
+};

@@ -8,6 +8,9 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   isPassword?: boolean;
   helperText?: string;
   helperTextClassName?: string;
+  leftIcon?: string;
+  isError?: boolean;
+  focusVariant?: 'default' | 'brand';
   rightButton?: {
     label: string;
     onClick?: () => void;
@@ -27,6 +30,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       isPassword = false,
       helperText,
       helperTextClassName,
+      leftIcon,
+      isError = false,
+      focusVariant = 'default',
       rightButton,
       helperAction,
       onChange,
@@ -35,7 +41,6 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     },
     ref,
   ) => {
-    const [isFocused, setIsFocused] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
     const currentValue = (value as string) ?? '';
@@ -46,6 +51,12 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         : 'password'
       : 'text';
 
+    const borderClass = isError
+      ? 'border-border-error'
+      : focusVariant === 'brand'
+        ? 'border-border-subtle focus:border-border-brand'
+        : 'border-border-subtle focus:border-text-basic';
+
     return (
       <div className="flex flex-col gap-g2 w-full">
         {label && (
@@ -53,17 +64,20 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         )}
         <div className="flex items-center gap-g3 w-full">
           <div className="relative flex-1">
+            {leftIcon && (
+              <div className="absolute left-g4 top-1/2 -translate-y-1/2 pointer-events-none">
+                <Icon icon={leftIcon} className="w-4 h-4 text-icon-subtle" />
+              </div>
+            )}
             <input
               ref={ref}
               type={inputType}
               value={value}
               onChange={onChange}
-              onFocus={() => setIsFocused(true)}
               onBlur={(e) => {
-                setIsFocused(false);
                 rest.onBlur?.(e);
               }}
-              className="w-full px-g4 py-g5 border-border-subtle border rounded-2xlarge body-md-regular focus:outline-none text-icon-basic placeholder:text-text-subtle-inverse pr-10"
+              className={`w-full py-g5 border rounded-2xlarge body-md-regular focus:outline-none text-icon-basic placeholder:text-text-subtle-inverse pr-10 transition-colors duration-200 ${leftIcon ? 'pl-8' : 'px-g4'} ${borderClass}`}
               {...rest}
             />
             <div className="absolute right-g4 top-1/2 -translate-y-1/2 flex items-center gap-g4">
@@ -111,7 +125,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {helperText || helperAction ? (
           <div className="flex items-center gap-g3">
             <p
-              className={`caption-sm-medium ${helperTextClassName ?? 'text-text-subtle-inverse'}`}
+              className={`caption-sm-medium ${helperTextClassName ?? (isError ? 'text-text-error' : 'text-text-subtle-inverse')}`}
             >
               {helperText}
             </p>

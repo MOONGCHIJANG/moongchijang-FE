@@ -15,9 +15,7 @@ const ToastToolTip = ({ text }: ToastToolTipProps) => {
           icon="material-symbols-light:bolt-rounded"
           className="w-6 h-6 text-icon-primary"
         />
-        <span className="text-text-subtle text-xs font-medium leading-4">
-          {text}
-        </span>
+        <span className="text-text-subtle caption-sm-medium">{text}</span>
       </div>
       <div
         className="w-3.5 h-2 bg-surface-white"

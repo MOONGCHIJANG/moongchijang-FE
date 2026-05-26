@@ -37,6 +37,10 @@ import {
   getGetApiV1ParticipationsParticipationIdPickupResponseMock,
   getGetApiV1ParticipationsParticipationIdQrResponseMock,
 } from '../src/api/generated/pickup/pickup.msw';
+import {
+  GroupBuyRequestDetail,
+  GroupBuyRequestDetailStatus,
+} from '../src/api/generated/api.schemas';
 import { koFaker } from './ko-faker';
 
 const MOCK_IMAGES = [
@@ -335,6 +339,136 @@ export function createMyPagePickupInfoMock() {
   };
 }
 
+// 목록·상세·현황 공통 픽스처 (requestId → 고정 데이터)
+// 분기 확인: items 배열 항목 수/순서 조절, 빈 배열이면 empty state
+const REQUEST_FIXTURES: Record<number, GroupBuyRequestDetail> = {
+  1: {
+    requestId: 1,
+    storeName: '모모양과',
+    storeAddress: '서울 성북구 화랑로11길 23',
+    placeId: 'ChIJmockplace001',
+    roadAddress: '서울 성북구 화랑로11길 23',
+    lotAddress: '서울 성북구 월곡동 48-3',
+    latitude: 37.601234,
+    longitude: 127.052345,
+    productName: '두쫀쿠키',
+    desiredQuantity: 3,
+    desiredPickupDate: '2026-06-10',
+    additionalNote: '견과류 알레르기 있어요. 없는 버전으로 부탁드려요!',
+    status: GroupBuyRequestDetailStatus.IN_REVIEW,
+    rejectionReason: null,
+    openedGroupBuyId: null,
+    statusHistory: [
+      {
+        status: GroupBuyRequestDetailStatus.IN_REVIEW,
+        changedAt: '2026-05-25T10:00:00Z',
+      },
+    ],
+    createdAt: '2026-05-25T10:00:00Z',
+  },
+  2: {
+    requestId: 2,
+    storeName: '르뱅쿠키',
+    storeAddress: '서울 마포구 양화로 165',
+    placeId: 'ChIJmockplace002',
+    roadAddress: '서울 마포구 양화로 165',
+    lotAddress: '서울 마포구 서교동 395-166',
+    latitude: 37.554321,
+    longitude: 126.921234,
+    productName: '크림치즈베이글',
+    desiredQuantity: 5,
+    desiredPickupDate: '2026-06-15',
+    additionalNote: null,
+    status: GroupBuyRequestDetailStatus.IN_CONTACT,
+    rejectionReason: null,
+    openedGroupBuyId: null,
+    statusHistory: [
+      {
+        status: GroupBuyRequestDetailStatus.IN_REVIEW,
+        changedAt: '2026-05-22T09:00:00Z',
+      },
+      {
+        status: GroupBuyRequestDetailStatus.IN_CONTACT,
+        changedAt: '2026-05-24T14:30:00Z',
+      },
+    ],
+    createdAt: '2026-05-22T09:00:00Z',
+  },
+  3: {
+    requestId: 3,
+    storeName: '밀도',
+    storeAddress: '서울 강남구 테헤란로 152',
+    placeId: 'ChIJmockplace003',
+    roadAddress: '서울 강남구 테헤란로 152',
+    lotAddress: '서울 강남구 역삼동 823-5',
+    latitude: 37.498765,
+    longitude: 127.028901,
+    productName: '소금빵',
+    desiredQuantity: 2,
+    desiredPickupDate: '2026-06-05',
+    additionalNote: '포장 꼼꼼히 부탁드립니다.',
+    status: GroupBuyRequestDetailStatus.OPENED,
+    rejectionReason: null,
+    openedGroupBuyId: 42,
+    statusHistory: [
+      {
+        status: GroupBuyRequestDetailStatus.IN_REVIEW,
+        changedAt: '2026-05-18T10:00:00Z',
+      },
+      {
+        status: GroupBuyRequestDetailStatus.IN_CONTACT,
+        changedAt: '2026-05-20T11:00:00Z',
+      },
+      {
+        status: GroupBuyRequestDetailStatus.OPENED,
+        changedAt: '2026-05-23T15:00:00Z',
+      },
+    ],
+    createdAt: '2026-05-18T10:00:00Z',
+  },
+  4: {
+    requestId: 4,
+    storeName: '나폴레옹제과',
+    storeAddress: '서울 종로구 인사동10길 11',
+    placeId: 'ChIJmockplace004',
+    roadAddress: '서울 종로구 인사동10길 11',
+    lotAddress: '서울 종로구 관훈동 14-2',
+    latitude: 37.572345,
+    longitude: 126.987654,
+    productName: '말차케이크',
+    desiredQuantity: 1,
+    desiredPickupDate: '2026-05-30',
+    additionalNote: null,
+    status: GroupBuyRequestDetailStatus.REJECTED,
+    rejectionReason:
+      '해당 상품은 매장 사정으로 공구 진행이 어렵습니다. 추후 재오픈 시 안내드릴게요.',
+    openedGroupBuyId: null,
+    statusHistory: [
+      {
+        status: GroupBuyRequestDetailStatus.IN_REVIEW,
+        changedAt: '2026-05-11T10:00:00Z',
+      },
+      {
+        status: GroupBuyRequestDetailStatus.IN_CONTACT,
+        changedAt: '2026-05-13T09:00:00Z',
+      },
+      {
+        status: GroupBuyRequestDetailStatus.REJECTED,
+        changedAt: '2026-05-15T16:00:00Z',
+      },
+    ],
+    createdAt: '2026-05-11T10:00:00Z',
+  },
+};
+
+export function createGroupBuyRequestListMock() {
+  return {
+    success: true,
+    data: Object.values(REQUEST_FIXTURES),
+    error: null,
+  };
+}
+
 // ── 분기 확인용: true(탈퇴 불가) / false(탈퇴 가능) 로 전환 ──────────
 export const MOCK_HAS_PICKUP_WAITING = false;
 
@@ -384,6 +518,16 @@ export function createMyPageQrMock() {
       pickupTimeStart: koFaker.groupBuy.pickupTime(),
       pickupTimeEnd: koFaker.groupBuy.pickupTime(),
     },
+    error: null,
+  };
+}
+
+export function createGroupBuyRequestDetailMock(requestId: number) {
+  const fixture =
+    REQUEST_FIXTURES[requestId] ?? REQUEST_FIXTURES[((requestId - 1) % 4) + 1];
+  return {
+    success: true,
+    data: fixture,
     error: null,
   };
 }

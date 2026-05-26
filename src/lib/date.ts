@@ -1,5 +1,15 @@
-export function formatPickupDate(dateStr: string) {
+export function formatDate(dateStr: string): string {
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return '-';
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}.${mm}.${dd}`;
+}
+
+export function formatPickupDate(dateStr: string): string {
   const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return '-';
   const days = ['일', '월', '화', '수', '목', '금', '토'];
   return `${date.getMonth() + 1}/${date.getDate()}(${days[date.getDay()]})`;
 }
@@ -22,8 +32,9 @@ export function formatCompactDate(
   return `${String(d.getFullYear()).slice(2)}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
 }
 
-export function formatDeadline(dateStr: string) {
+export function formatDeadline(dateStr: string): string {
   const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return '-';
   return `${date.getMonth() + 1}월 ${date.getDate()}일`;
 }
 

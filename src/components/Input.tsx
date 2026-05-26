@@ -73,7 +73,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() =>
                     onChange?.({
-                      target: { value: '' },
+                      target: { name: rest.name, value: '' },
                     } as React.ChangeEvent<HTMLInputElement>)
                   }
                 >

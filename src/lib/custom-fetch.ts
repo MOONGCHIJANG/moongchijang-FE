@@ -75,7 +75,9 @@ export const customFetch = async <T>(
           processQueue(null);
           useAuthStore.getState().setIsLoggedIn(false);
           tokenStorage.remove();
-          window.location.href = '/login';
+          if (typeof window !== 'undefined') {
+            window.location.href = '/login';
+          }
           throw new Error('Unauthorized');
         }
       } finally {
@@ -114,7 +116,9 @@ export const customFetch = async <T>(
             processQueue(null);
             tokenStorage.remove();
             useAuthStore.getState().setIsLoggedIn(false);
-            window.location.href = '/login';
+            if (typeof window !== 'undefined') {
+              window.location.href = '/login';
+            }
           }
         } finally {
           isRefreshing = false;

@@ -12,6 +12,9 @@ export async function GET() {
   try {
     const decoded = jwtDecode<{ exp: number }>(token);
     const expiresIn = decoded.exp - Math.floor(Date.now() / 1000);
+    if (expiresIn <= 0) {
+      return NextResponse.json({ isLoggedIn: false });
+    }
     return NextResponse.json({ isLoggedIn: true, expiresIn });
   } catch {
     return NextResponse.json({ isLoggedIn: false });

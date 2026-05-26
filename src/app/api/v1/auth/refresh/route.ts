@@ -34,11 +34,8 @@ export async function POST(req: NextRequest) {
     // 새 refreshToken도 갱신
     const setCookie = result.headers?.get('set-cookie');
     if (setCookie) {
-      const newRefreshToken = setCookie
-        .split(';')[0]
-        .split('=')
-        .slice(1)
-        .join('=');
+      const match = setCookie.match(/refreshToken=([^;]+)/);
+      const newRefreshToken = match ? match[1] : null;
       if (newRefreshToken) {
         response.cookies.set('refreshToken', newRefreshToken, {
           httpOnly: true,

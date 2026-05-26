@@ -49,6 +49,7 @@ const BottomShare = ({
     : DEFAULT_OG_IMAGE;
 
   const handleX = () => {
+    onClose?.();
     const url = `https://twitter.com/intent/tweet?url=${encodeURIComponent(pageUrl)}&text=${encodeURIComponent(shareText)}`;
     window.open(url, '_blank', 'noopener,noreferrer');
   };
@@ -72,6 +73,7 @@ const BottomShare = ({
       }
       return;
     }
+    onClose?.();
     window.Kakao.Share.sendDefault({
       objectType: 'feed',
       content: {
@@ -93,6 +95,7 @@ const BottomShare = ({
     if (navigator.share) {
       try {
         await navigator.share({ title: shareText, url: pageUrl });
+        onClose?.();
       } catch (e) {
         // 사용자가 공유를 취소한 경우(AbortError)는 무시
         if (e instanceof Error && e.name !== 'AbortError') {

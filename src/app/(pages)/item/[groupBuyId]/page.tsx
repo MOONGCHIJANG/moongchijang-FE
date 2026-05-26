@@ -24,14 +24,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     );
     const data = responseData.data;
     const title = `[뭉치장] ${data.productName} 공구 같이 뭉쳐서 구매하자!`;
-    const description = `${data.deadlineDateTimeLabel}까지 · ${data.districtLabel}`;
+    const description = `${data.deadlineDateTimeLabel}까지 · ${data.storeName}`;
     const ogImage = data.thumbnailUrl
       ? { url: data.thumbnailUrl, alt: data.productName }
-      : { url: '/og/og-1200x630.png', width: 1200, height: 630, alt: data.productName };
+      : {
+          url: '/og/og-1200x630.png',
+          width: 1200,
+          height: 630,
+          alt: data.productName,
+        };
 
     const twitterImage = data.thumbnailUrl
       ? { url: data.thumbnailUrl, alt: data.productName }
-      : { url: '/og/og-1600x800.png', width: 1600, height: 800, alt: data.productName };
+      : {
+          url: '/og/og-1600x800.png',
+          width: 1600,
+          height: 800,
+          alt: data.productName,
+        };
 
     return {
       title: data.productName,

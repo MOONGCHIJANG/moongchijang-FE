@@ -8,8 +8,15 @@ const AuthInitializer = () => {
   useEffect(() => {
     fetch('/api/auth/status')
       .then((res) => res.json())
-      .then(({ isLoggedIn }) => {
+      .then(({ isLoggedIn, expiresIn }) => {
         setIsLoggedIn(isLoggedIn);
+        if (isLoggedIn && expiresIn) {
+          // 30초 여유 만료 시간 저장
+          localStorage.setItem(
+            'accessTokenExpiresAt',
+            String(Date.now() + (expiresIn - 30) * 1000),
+          );
+        }
       })
       .catch(() => setIsLoggedIn(false))
       .finally(() => setInitialized());

@@ -144,10 +144,9 @@ export type WithdrawRequestReason =
   | null;
 
 export const WithdrawRequestReason = {
-  TIME_NOT_AVAILABLE: 'TIME_NOT_AVAILABLE',
-  NO_LONGER_INTERESTED: 'NO_LONGER_INTERESTED',
-  PREFER_DIRECT_VISIT: 'PREFER_DIRECT_VISIT',
-  BUYING_ELSEWHERE: 'BUYING_ELSEWHERE',
+  NO_DESIRED_GROUPBUY: 'NO_DESIRED_GROUPBUY',
+  INCONVENIENT_SERVICE: 'INCONVENIENT_SERVICE',
+  PRIVACY_CONCERN: 'PRIVACY_CONCERN',
   OTHER: 'OTHER',
 } as const;
 
@@ -1941,6 +1940,122 @@ export interface ApiResponseOwnerGroupBuyList {
   error: unknown | null;
 }
 
+export type ApiResponseOwnerGroupBuySummaryData = {
+  /** 진행 중 공구 건수 */
+  ongoingCount: number;
+  /** 달성 완료 공구 건수 */
+  achievedCount: number;
+  /** 오늘 픽업 예정 인원 수 */
+  todayPickupUserCount: number;
+  /** 정산 예정 금액 */
+  settlementExpectedAmount: number;
+  /** 공구 요약 데이터 비어있는지 여부 */
+  isEmpty: boolean;
+};
+
+export interface ApiResponseOwnerGroupBuySummary {
+  success: boolean;
+  data: ApiResponseOwnerGroupBuySummaryData;
+  error: unknown | null;
+}
+
+export type OwnerGroupBuyManageListItemStatus =
+  (typeof OwnerGroupBuyManageListItemStatus)[keyof typeof OwnerGroupBuyManageListItemStatus];
+
+export const OwnerGroupBuyManageListItemStatus = {
+  ALL: 'ALL',
+  IN_PROGRESS: 'IN_PROGRESS',
+  ACHIEVED: 'ACHIEVED',
+  ENDED: 'ENDED',
+  PENDING_APPROVAL: 'PENDING_APPROVAL',
+} as const;
+
+export interface OwnerGroupBuyManageListItem {
+  groupBuyId: number;
+  productName: string;
+  price: number;
+  pickupDate: string;
+  /** @nullable */
+  deadlineDday?: number | null;
+  /** @nullable */
+  achievementRate?: number | null;
+  /** @nullable */
+  currentQuantity?: number | null;
+  /** @nullable */
+  targetQuantity?: number | null;
+  status: OwnerGroupBuyManageListItemStatus;
+}
+
+export interface ApiResponseOwnerGroupBuyManageList {
+  success: boolean;
+  data: OwnerGroupBuyManageListItem[];
+  error: unknown | null;
+}
+
+export type OwnerGroupBuyManageDetailStatus =
+  (typeof OwnerGroupBuyManageDetailStatus)[keyof typeof OwnerGroupBuyManageDetailStatus];
+
+export const OwnerGroupBuyManageDetailStatus = {
+  ALL: 'ALL',
+  IN_PROGRESS: 'IN_PROGRESS',
+  ACHIEVED: 'ACHIEVED',
+  ENDED: 'ENDED',
+  PENDING_APPROVAL: 'PENDING_APPROVAL',
+} as const;
+
+export interface OwnerGroupBuyManageParticipantSummary {
+  totalCount: number;
+  completedCount: number;
+  waitingCount: number;
+}
+
+export interface OwnerGroupBuyParticipantItem {
+  name: string;
+  phoneNumber: string;
+  productName: string;
+  quantity: number;
+  paymentMethod: string;
+  paymentStatus: string;
+  pickupTime: string;
+}
+
+export interface OwnerGroupBuyManageDetail {
+  groupBuyId: number;
+  status: OwnerGroupBuyManageDetailStatus;
+  participantSummary: OwnerGroupBuyManageParticipantSummary;
+  participants: OwnerGroupBuyParticipantItem[];
+}
+
+export interface ApiResponseOwnerGroupBuyManageDetail {
+  success: boolean;
+  data: OwnerGroupBuyManageDetail;
+  error: unknown | null;
+}
+
+export interface OwnerGroupBuyExtensionRequest {
+  /** 연장 희망 마감일시 (기존 마감일 이후) */
+  extendedDeadline: string;
+}
+
+export type OwnerGroupBuyCloseReasonType =
+  (typeof OwnerGroupBuyCloseReasonType)[keyof typeof OwnerGroupBuyCloseReasonType];
+
+export const OwnerGroupBuyCloseReasonType = {
+  SOLD_OUT: 'SOLD_OUT',
+  STORE_CONDITION: 'STORE_CONDITION',
+  OTHER: 'OTHER',
+} as const;
+
+export interface OwnerGroupBuyCloseRequest {
+  reason: OwnerGroupBuyCloseReasonType;
+  /**
+   * reason이 OTHER일 때 필수
+   * @maxLength 100
+   * @nullable
+   */
+  reasonDetail?: string | null;
+}
+
 export interface OwnerGroupBuyRequestCreate {
   /** 요청자가 소속된 매장 ID */
   storeId: number;
@@ -3134,6 +3249,24 @@ export type GetApiV1UsersMeParticipationsPickupWaitingParams = {
    */
   size?: SizeParameter;
 };
+
+export type GetApiV1OwnerGroupBuysManageParams = {
+  /**
+   * 상태 필터 (기본값 ALL)
+   */
+  filter?: GetApiV1OwnerGroupBuysManageFilter;
+};
+
+export type GetApiV1OwnerGroupBuysManageFilter =
+  (typeof GetApiV1OwnerGroupBuysManageFilter)[keyof typeof GetApiV1OwnerGroupBuysManageFilter];
+
+export const GetApiV1OwnerGroupBuysManageFilter = {
+  ALL: 'ALL',
+  IN_PROGRESS: 'IN_PROGRESS',
+  ACHIEVED: 'ACHIEVED',
+  ENDED: 'ENDED',
+  PENDING_APPROVAL: 'PENDING_APPROVAL',
+} as const;
 
 export type GetApiV1OwnerGroupBuyRequestsParams = {
   page?: PageParameter;

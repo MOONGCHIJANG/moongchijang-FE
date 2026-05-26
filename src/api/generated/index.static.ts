@@ -47,9 +47,12 @@ import {
   getGetApiV1NotificationsUnreadCountResponseMock,
 } from './notification/notification.msw';
 import {
-  getGetApiV1OwnerHomeSummaryResponseMock,
   getGetApiV1OwnerHomePickupScheduleResponseMock,
   getGetApiV1OwnerGroupBuysResponseMock,
+  getGetApiV1OwnerGroupBuysSummaryResponseMock,
+  getGetApiV1OwnerGroupBuysManageResponseMock,
+  getGetApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponseMock,
+  getGetApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponseMock,
   getGetApiV1OwnerGroupBuyRequestsResponseMock,
   getGetApiV1OwnerGroupBuyRequestsRequestIdResponseMock,
   getGetApiV1OwnerReservationsResponseMock,
@@ -193,16 +196,30 @@ export const generatedStaticMockEntries: StaticMockEntry[] = [
     getResponseData: getGetApiV1NotificationsUnreadCountResponseMock,
   },
   {
-    urlPattern: '/api/v1/owner/home/summary',
-    getResponseData: getGetApiV1OwnerHomeSummaryResponseMock,
-  },
-  {
     urlPattern: '/api/v1/owner/home/pickup-schedule',
     getResponseData: getGetApiV1OwnerHomePickupScheduleResponseMock,
   },
   {
     urlPattern: '/api/v1/owner/group-buys',
     getResponseData: getGetApiV1OwnerGroupBuysResponseMock,
+  },
+  {
+    urlPattern: '/api/v1/owner/group-buys/summary',
+    getResponseData: getGetApiV1OwnerGroupBuysSummaryResponseMock,
+  },
+  {
+    urlPattern: '/api/v1/owner/group-buys/manage',
+    getResponseData: getGetApiV1OwnerGroupBuysManageResponseMock,
+  },
+  {
+    urlPattern: '/api/v1/owner/group-buys/:groupBuyId/manage/in-progress',
+    getResponseData:
+      getGetApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponseMock,
+  },
+  {
+    urlPattern: '/api/v1/owner/group-buys/:groupBuyId/manage/achieved',
+    getResponseData:
+      getGetApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponseMock,
   },
   {
     urlPattern: '/api/v1/owner/group-buy-requests',

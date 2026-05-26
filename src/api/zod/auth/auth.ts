@@ -109,10 +109,9 @@ export const deleteApiV1UsersMeBodyReasonDetailMax = 500;
 export const DeleteApiV1UsersMeBody = zod.object({
   reason: zod
     .enum([
-      'TIME_NOT_AVAILABLE',
-      'NO_LONGER_INTERESTED',
-      'PREFER_DIRECT_VISIT',
-      'BUYING_ELSEWHERE',
+      'NO_DESIRED_GROUPBUY',
+      'INCONVENIENT_SERVICE',
+      'PRIVACY_CONCERN',
       'OTHER',
     ])
     .nullish()

@@ -9,34 +9,16 @@ import type { RequestHandlerOptions } from 'msw';
 
 import type {
   ApiResponseOwnerGroupBuyList,
+  ApiResponseOwnerGroupBuyManageDetail,
+  ApiResponseOwnerGroupBuyManageList,
   ApiResponseOwnerGroupBuyRequestCreated,
   ApiResponseOwnerGroupBuyRequestDetail,
   ApiResponseOwnerGroupBuyRequestList,
-  ApiResponseOwnerSummary,
+  ApiResponseOwnerGroupBuySummary,
   ApiResponsePickupScheduleList,
   ApiResponseReservationPage,
   SuccessNoDataResponse,
 } from '../api.schemas';
-
-export const getGetApiV1OwnerHomeSummaryResponseMock = (
-  overrideResponse: Partial<Extract<ApiResponseOwnerSummary, object>> = {},
-): ApiResponseOwnerSummary => ({
-  success: faker.datatype.boolean(),
-  data: {
-    pickupWaitingCount: faker.number.int(),
-    pickupCompletedCount: faker.number.int(),
-    activeGroupBuyCount: faker.number.int(),
-    nextPickupTime: faker.helpers.arrayElement([
-      faker.helpers.arrayElement([
-        faker.string.alpha({ length: { min: 10, max: 20 } }),
-        null,
-      ]),
-      null,
-    ]),
-  },
-  error: {},
-  ...overrideResponse,
-});
 
 export const getGetApiV1OwnerHomePickupScheduleResponseMock = (
   overrideResponse: Partial<
@@ -78,6 +60,158 @@ export const getGetApiV1OwnerGroupBuysResponseMock = (
       'FAILED',
     ] as const),
   })),
+  error: {},
+  ...overrideResponse,
+});
+
+export const getGetApiV1OwnerGroupBuysSummaryResponseMock = (
+  overrideResponse: Partial<
+    Extract<ApiResponseOwnerGroupBuySummary, object>
+  > = {},
+): ApiResponseOwnerGroupBuySummary => ({
+  success: faker.datatype.boolean(),
+  data: {
+    ongoingCount: faker.number.int(),
+    achievedCount: faker.number.int(),
+    todayPickupUserCount: faker.number.int(),
+    settlementExpectedAmount: faker.number.int(),
+    isEmpty: faker.datatype.boolean(),
+  },
+  error: {},
+  ...overrideResponse,
+});
+
+export const getGetApiV1OwnerGroupBuysManageResponseMock = (
+  overrideResponse: Partial<
+    Extract<ApiResponseOwnerGroupBuyManageList, object>
+  > = {},
+): ApiResponseOwnerGroupBuyManageList => ({
+  success: faker.datatype.boolean(),
+  data: Array.from(
+    { length: faker.number.int({ min: 1, max: 10 }) },
+    (_, i) => i + 1,
+  ).map(() => ({
+    groupBuyId: faker.number.int(),
+    productName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    price: faker.number.int(),
+    pickupDate: faker.date.past().toISOString().slice(0, 10),
+    deadlineDday: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([faker.number.int(), null]),
+      undefined,
+    ]),
+    achievementRate: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([faker.number.int(), null]),
+      undefined,
+    ]),
+    currentQuantity: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([faker.number.int(), null]),
+      undefined,
+    ]),
+    targetQuantity: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([faker.number.int(), null]),
+      undefined,
+    ]),
+    status: faker.helpers.arrayElement([
+      'ALL',
+      'IN_PROGRESS',
+      'ACHIEVED',
+      'ENDED',
+      'PENDING_APPROVAL',
+    ] as const),
+  })),
+  error: {},
+  ...overrideResponse,
+});
+
+export const getGetApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponseMock = (
+  overrideResponse: Partial<
+    Extract<ApiResponseOwnerGroupBuyManageDetail, object>
+  > = {},
+): ApiResponseOwnerGroupBuyManageDetail => ({
+  success: faker.datatype.boolean(),
+  data: {
+    groupBuyId: faker.number.int(),
+    status: faker.helpers.arrayElement([
+      'ALL',
+      'IN_PROGRESS',
+      'ACHIEVED',
+      'ENDED',
+      'PENDING_APPROVAL',
+    ] as const),
+    participantSummary: {
+      totalCount: faker.number.int(),
+      completedCount: faker.number.int(),
+      waitingCount: faker.number.int(),
+    },
+    participants: Array.from(
+      { length: faker.number.int({ min: 1, max: 10 }) },
+      (_, i) => i + 1,
+    ).map(() => ({
+      name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      phoneNumber: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      productName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      quantity: faker.number.int(),
+      paymentMethod: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      paymentStatus: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      pickupTime: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    })),
+  },
+  error: {},
+  ...overrideResponse,
+});
+
+export const getGetApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponseMock = (
+  overrideResponse: Partial<
+    Extract<ApiResponseOwnerGroupBuyManageDetail, object>
+  > = {},
+): ApiResponseOwnerGroupBuyManageDetail => ({
+  success: faker.datatype.boolean(),
+  data: {
+    groupBuyId: faker.number.int(),
+    status: faker.helpers.arrayElement([
+      'ALL',
+      'IN_PROGRESS',
+      'ACHIEVED',
+      'ENDED',
+      'PENDING_APPROVAL',
+    ] as const),
+    participantSummary: {
+      totalCount: faker.number.int(),
+      completedCount: faker.number.int(),
+      waitingCount: faker.number.int(),
+    },
+    participants: Array.from(
+      { length: faker.number.int({ min: 1, max: 10 }) },
+      (_, i) => i + 1,
+    ).map(() => ({
+      name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      phoneNumber: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      productName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      quantity: faker.number.int(),
+      paymentMethod: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      paymentStatus: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      pickupTime: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    })),
+  },
+  error: {},
+  ...overrideResponse,
+});
+
+export const getPostApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponseMock =
+  (
+    overrideResponse: Partial<Extract<SuccessNoDataResponse, object>> = {},
+  ): SuccessNoDataResponse => ({
+    success: faker.datatype.boolean(),
+    data: {},
+    error: {},
+    ...overrideResponse,
+  });
+
+export const getPostApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponseMock = (
+  overrideResponse: Partial<Extract<SuccessNoDataResponse, object>> = {},
+): SuccessNoDataResponse => ({
+  success: faker.datatype.boolean(),
+  data: {},
   error: {},
   ...overrideResponse,
 });
@@ -266,30 +400,6 @@ export const getPatchApiV1OwnerReservationsParticipationIdCompleteResponseMock =
     ...overrideResponse,
   });
 
-export const getGetApiV1OwnerHomeSummaryMockHandler = (
-  overrideResponse?:
-    | ApiResponseOwnerSummary
-    | ((
-        info: Parameters<Parameters<typeof http.get>[1]>[0],
-      ) => Promise<ApiResponseOwnerSummary> | ApiResponseOwnerSummary),
-  options?: RequestHandlerOptions,
-) => {
-  return http.get(
-    '*/api/v1/owner/home/summary',
-    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
-      return HttpResponse.json(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === 'function'
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getGetApiV1OwnerHomeSummaryResponseMock(),
-        { status: 200 },
-      );
-    },
-    options,
-  );
-};
-
 export const getGetApiV1OwnerHomePickupScheduleMockHandler = (
   overrideResponse?:
     | ApiResponsePickupScheduleList
@@ -335,6 +445,159 @@ export const getGetApiV1OwnerGroupBuysMockHandler = (
             ? await overrideResponse(info)
             : overrideResponse
           : getGetApiV1OwnerGroupBuysResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
+
+export const getGetApiV1OwnerGroupBuysSummaryMockHandler = (
+  overrideResponse?:
+    | ApiResponseOwnerGroupBuySummary
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) =>
+        | Promise<ApiResponseOwnerGroupBuySummary>
+        | ApiResponseOwnerGroupBuySummary),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    '*/api/v1/owner/group-buys/summary',
+    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getGetApiV1OwnerGroupBuysSummaryResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
+
+export const getGetApiV1OwnerGroupBuysManageMockHandler = (
+  overrideResponse?:
+    | ApiResponseOwnerGroupBuyManageList
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) =>
+        | Promise<ApiResponseOwnerGroupBuyManageList>
+        | ApiResponseOwnerGroupBuyManageList),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    '*/api/v1/owner/group-buys/manage',
+    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getGetApiV1OwnerGroupBuysManageResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
+
+export const getGetApiV1OwnerGroupBuysGroupBuyIdManageInProgressMockHandler = (
+  overrideResponse?:
+    | ApiResponseOwnerGroupBuyManageDetail
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) =>
+        | Promise<ApiResponseOwnerGroupBuyManageDetail>
+        | ApiResponseOwnerGroupBuyManageDetail),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    '*/api/v1/owner/group-buys/:groupBuyId/manage/in-progress',
+    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getGetApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
+
+export const getGetApiV1OwnerGroupBuysGroupBuyIdManageAchievedMockHandler = (
+  overrideResponse?:
+    | ApiResponseOwnerGroupBuyManageDetail
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) =>
+        | Promise<ApiResponseOwnerGroupBuyManageDetail>
+        | ApiResponseOwnerGroupBuyManageDetail),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    '*/api/v1/owner/group-buys/:groupBuyId/manage/achieved',
+    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getGetApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
+
+export const getPostApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsMockHandler =
+  (
+    overrideResponse?:
+      | SuccessNoDataResponse
+      | ((
+          info: Parameters<Parameters<typeof http.post>[1]>[0],
+        ) => Promise<SuccessNoDataResponse> | SuccessNoDataResponse),
+    options?: RequestHandlerOptions,
+  ) => {
+    return http.post(
+      '*/api/v1/owner/group-buys/:groupBuyId/extension-requests',
+      async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+        return HttpResponse.json(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === 'function'
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getPostApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponseMock(),
+          { status: 200 },
+        );
+      },
+      options,
+    );
+  };
+
+export const getPostApiV1OwnerGroupBuysGroupBuyIdCloseRequestsMockHandler = (
+  overrideResponse?:
+    | SuccessNoDataResponse
+    | ((
+        info: Parameters<Parameters<typeof http.post>[1]>[0],
+      ) => Promise<SuccessNoDataResponse> | SuccessNoDataResponse),
+  options?: RequestHandlerOptions,
+) => {
+  return http.post(
+    '*/api/v1/owner/group-buys/:groupBuyId/close-requests',
+    async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getPostApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponseMock(),
         { status: 200 },
       );
     },
@@ -469,9 +732,14 @@ export const getPatchApiV1OwnerReservationsParticipationIdCompleteMockHandler =
     );
   };
 export const getOwnerMock = () => [
-  getGetApiV1OwnerHomeSummaryMockHandler(),
   getGetApiV1OwnerHomePickupScheduleMockHandler(),
   getGetApiV1OwnerGroupBuysMockHandler(),
+  getGetApiV1OwnerGroupBuysSummaryMockHandler(),
+  getGetApiV1OwnerGroupBuysManageMockHandler(),
+  getGetApiV1OwnerGroupBuysGroupBuyIdManageInProgressMockHandler(),
+  getGetApiV1OwnerGroupBuysGroupBuyIdManageAchievedMockHandler(),
+  getPostApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsMockHandler(),
+  getPostApiV1OwnerGroupBuysGroupBuyIdCloseRequestsMockHandler(),
   getGetApiV1OwnerGroupBuyRequestsMockHandler(),
   getPostApiV1OwnerGroupBuyRequestsMockHandler(),
   getGetApiV1OwnerGroupBuyRequestsRequestIdMockHandler(),

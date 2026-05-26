@@ -20,18 +20,23 @@ import type {
 
 import type {
   ApiResponseOwnerGroupBuyList,
+  ApiResponseOwnerGroupBuyManageDetail,
+  ApiResponseOwnerGroupBuyManageList,
   ApiResponseOwnerGroupBuyRequestCreated,
   ApiResponseOwnerGroupBuyRequestDetail,
   ApiResponseOwnerGroupBuyRequestList,
-  ApiResponseOwnerSummary,
+  ApiResponseOwnerGroupBuySummary,
   ApiResponsePickupScheduleList,
   ApiResponseReservationPage,
   BadRequestResponse,
   ConflictResponse,
   ForbiddenResponse,
   GetApiV1OwnerGroupBuyRequestsParams,
+  GetApiV1OwnerGroupBuysManageParams,
   GetApiV1OwnerReservationsParams,
   NotFoundResponse,
+  OwnerGroupBuyCloseRequest,
+  OwnerGroupBuyExtensionRequest,
   OwnerGroupBuyRequestCreate,
   SuccessNoDataResponse,
   UnauthorizedResponse,
@@ -40,189 +45,6 @@ import type {
 import { customFetch } from '../../../lib/custom-fetch';
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
-
-/**
- * 픽업 대기/완료 건수, 진행 중 공구 수, 다음 픽업 시간을 반환한다.
- * @summary 사장님 홈 요약 정보
- */
-export type getApiV1OwnerHomeSummaryResponse200 = {
-  data: ApiResponseOwnerSummary;
-  status: 200;
-};
-
-export type getApiV1OwnerHomeSummaryResponse403 = {
-  data: ForbiddenResponse;
-  status: 403;
-};
-
-export type getApiV1OwnerHomeSummaryResponseSuccess =
-  getApiV1OwnerHomeSummaryResponse200 & {
-    headers: Headers;
-  };
-export type getApiV1OwnerHomeSummaryResponseError =
-  getApiV1OwnerHomeSummaryResponse403 & {
-    headers: Headers;
-  };
-
-export type getApiV1OwnerHomeSummaryResponse =
-  | getApiV1OwnerHomeSummaryResponseSuccess
-  | getApiV1OwnerHomeSummaryResponseError;
-
-export const getGetApiV1OwnerHomeSummaryUrl = () => {
-  return `/api/v1/owner/home/summary`;
-};
-
-export const getApiV1OwnerHomeSummary = async (
-  options?: RequestInit,
-): Promise<getApiV1OwnerHomeSummaryResponse> => {
-  return customFetch<getApiV1OwnerHomeSummaryResponse>(
-    getGetApiV1OwnerHomeSummaryUrl(),
-    {
-      ...options,
-      method: 'GET',
-    },
-  );
-};
-
-export const getGetApiV1OwnerHomeSummaryQueryKey = () => {
-  return [`/api/v1/owner/home/summary`] as const;
-};
-
-export const getGetApiV1OwnerHomeSummaryQueryOptions = <
-  TData = Awaited<ReturnType<typeof getApiV1OwnerHomeSummary>>,
-  TError = ForbiddenResponse,
->(options?: {
-  query?: Partial<
-    UseQueryOptions<
-      Awaited<ReturnType<typeof getApiV1OwnerHomeSummary>>,
-      TError,
-      TData
-    >
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-
-  const queryKey =
-    queryOptions?.queryKey ?? getGetApiV1OwnerHomeSummaryQueryKey();
-
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof getApiV1OwnerHomeSummary>>
-  > = ({ signal }) => getApiV1OwnerHomeSummary({ signal, ...requestOptions });
-
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getApiV1OwnerHomeSummary>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
-
-export type GetApiV1OwnerHomeSummaryQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getApiV1OwnerHomeSummary>>
->;
-export type GetApiV1OwnerHomeSummaryQueryError = ForbiddenResponse;
-
-export function useGetApiV1OwnerHomeSummary<
-  TData = Awaited<ReturnType<typeof getApiV1OwnerHomeSummary>>,
-  TError = ForbiddenResponse,
->(
-  options: {
-    query: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getApiV1OwnerHomeSummary>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getApiV1OwnerHomeSummary>>,
-          TError,
-          Awaited<ReturnType<typeof getApiV1OwnerHomeSummary>>
-        >,
-        'initialData'
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useGetApiV1OwnerHomeSummary<
-  TData = Awaited<ReturnType<typeof getApiV1OwnerHomeSummary>>,
-  TError = ForbiddenResponse,
->(
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getApiV1OwnerHomeSummary>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getApiV1OwnerHomeSummary>>,
-          TError,
-          Awaited<ReturnType<typeof getApiV1OwnerHomeSummary>>
-        >,
-        'initialData'
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useGetApiV1OwnerHomeSummary<
-  TData = Awaited<ReturnType<typeof getApiV1OwnerHomeSummary>>,
-  TError = ForbiddenResponse,
->(
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getApiV1OwnerHomeSummary>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-/**
- * @summary 사장님 홈 요약 정보
- */
-
-export function useGetApiV1OwnerHomeSummary<
-  TData = Awaited<ReturnType<typeof getApiV1OwnerHomeSummary>>,
-  TError = ForbiddenResponse,
->(
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getApiV1OwnerHomeSummary>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-} {
-  const queryOptions = getGetApiV1OwnerHomeSummaryQueryOptions(options);
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
 
 /**
  * @summary 시간대별 픽업 현황 조회
@@ -590,6 +412,1270 @@ export function useGetApiV1OwnerGroupBuys<
   return { ...query, queryKey: queryOptions.queryKey };
 }
 
+/**
+ * 사장님이 소속된 매장 기준으로 공구 요약 정보를 조회한다.
+- 진행 중 공구 건수
+- 달성 완료 공구 건수
+- 오늘 픽업 예정 인원 수
+- 정산 예정 금액
+
+ * @summary 사장님 공구 요약 조회
+ */
+export type getApiV1OwnerGroupBuysSummaryResponse200 = {
+  data: ApiResponseOwnerGroupBuySummary;
+  status: 200;
+};
+
+export type getApiV1OwnerGroupBuysSummaryResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type getApiV1OwnerGroupBuysSummaryResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type getApiV1OwnerGroupBuysSummaryResponseSuccess =
+  getApiV1OwnerGroupBuysSummaryResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1OwnerGroupBuysSummaryResponseError = (
+  | getApiV1OwnerGroupBuysSummaryResponse401
+  | getApiV1OwnerGroupBuysSummaryResponse403
+) & {
+  headers: Headers;
+};
+
+export type getApiV1OwnerGroupBuysSummaryResponse =
+  | getApiV1OwnerGroupBuysSummaryResponseSuccess
+  | getApiV1OwnerGroupBuysSummaryResponseError;
+
+export const getGetApiV1OwnerGroupBuysSummaryUrl = () => {
+  return `/api/v1/owner/group-buys/summary`;
+};
+
+export const getApiV1OwnerGroupBuysSummary = async (
+  options?: RequestInit,
+): Promise<getApiV1OwnerGroupBuysSummaryResponse> => {
+  return customFetch<getApiV1OwnerGroupBuysSummaryResponse>(
+    getGetApiV1OwnerGroupBuysSummaryUrl(),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
+
+export const getGetApiV1OwnerGroupBuysSummaryQueryKey = () => {
+  return [`/api/v1/owner/group-buys/summary`] as const;
+};
+
+export const getGetApiV1OwnerGroupBuysSummaryQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuysSummary>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getApiV1OwnerGroupBuysSummary>>,
+      TError,
+      TData
+    >
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetApiV1OwnerGroupBuysSummaryQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiV1OwnerGroupBuysSummary>>
+  > = ({ signal }) =>
+    getApiV1OwnerGroupBuysSummary({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiV1OwnerGroupBuysSummary>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiV1OwnerGroupBuysSummaryQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiV1OwnerGroupBuysSummary>>
+>;
+export type GetApiV1OwnerGroupBuysSummaryQueryError =
+  | UnauthorizedResponse
+  | ForbiddenResponse;
+
+export function useGetApiV1OwnerGroupBuysSummary<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuysSummary>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerGroupBuysSummary>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1OwnerGroupBuysSummary>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1OwnerGroupBuysSummary>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1OwnerGroupBuysSummary<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuysSummary>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerGroupBuysSummary>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1OwnerGroupBuysSummary>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1OwnerGroupBuysSummary>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1OwnerGroupBuysSummary<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuysSummary>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerGroupBuysSummary>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary 사장님 공구 요약 조회
+ */
+
+export function useGetApiV1OwnerGroupBuysSummary<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuysSummary>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerGroupBuysSummary>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiV1OwnerGroupBuysSummaryQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary 사장님 공구 관리 목록 조회
+ */
+export type getApiV1OwnerGroupBuysManageResponse200 = {
+  data: ApiResponseOwnerGroupBuyManageList;
+  status: 200;
+};
+
+export type getApiV1OwnerGroupBuysManageResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type getApiV1OwnerGroupBuysManageResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type getApiV1OwnerGroupBuysManageResponseSuccess =
+  getApiV1OwnerGroupBuysManageResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1OwnerGroupBuysManageResponseError = (
+  | getApiV1OwnerGroupBuysManageResponse401
+  | getApiV1OwnerGroupBuysManageResponse403
+) & {
+  headers: Headers;
+};
+
+export type getApiV1OwnerGroupBuysManageResponse =
+  | getApiV1OwnerGroupBuysManageResponseSuccess
+  | getApiV1OwnerGroupBuysManageResponseError;
+
+export const getGetApiV1OwnerGroupBuysManageUrl = (
+  params?: GetApiV1OwnerGroupBuysManageParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/owner/group-buys/manage?${stringifiedParams}`
+    : `/api/v1/owner/group-buys/manage`;
+};
+
+export const getApiV1OwnerGroupBuysManage = async (
+  params?: GetApiV1OwnerGroupBuysManageParams,
+  options?: RequestInit,
+): Promise<getApiV1OwnerGroupBuysManageResponse> => {
+  return customFetch<getApiV1OwnerGroupBuysManageResponse>(
+    getGetApiV1OwnerGroupBuysManageUrl(params),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
+
+export const getGetApiV1OwnerGroupBuysManageQueryKey = (
+  params?: GetApiV1OwnerGroupBuysManageParams,
+) => {
+  return [
+    `/api/v1/owner/group-buys/manage`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetApiV1OwnerGroupBuysManageQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuysManage>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  params?: GetApiV1OwnerGroupBuysManageParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerGroupBuysManage>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetApiV1OwnerGroupBuysManageQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiV1OwnerGroupBuysManage>>
+  > = ({ signal }) =>
+    getApiV1OwnerGroupBuysManage(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiV1OwnerGroupBuysManage>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiV1OwnerGroupBuysManageQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiV1OwnerGroupBuysManage>>
+>;
+export type GetApiV1OwnerGroupBuysManageQueryError =
+  | UnauthorizedResponse
+  | ForbiddenResponse;
+
+export function useGetApiV1OwnerGroupBuysManage<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuysManage>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  params: undefined | GetApiV1OwnerGroupBuysManageParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerGroupBuysManage>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1OwnerGroupBuysManage>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1OwnerGroupBuysManage>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1OwnerGroupBuysManage<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuysManage>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  params?: GetApiV1OwnerGroupBuysManageParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerGroupBuysManage>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1OwnerGroupBuysManage>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1OwnerGroupBuysManage>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1OwnerGroupBuysManage<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuysManage>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  params?: GetApiV1OwnerGroupBuysManageParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerGroupBuysManage>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary 사장님 공구 관리 목록 조회
+ */
+
+export function useGetApiV1OwnerGroupBuysManage<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerGroupBuysManage>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  params?: GetApiV1OwnerGroupBuysManageParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerGroupBuysManage>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiV1OwnerGroupBuysManageQueryOptions(
+    params,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary 사장님 모집중 공구 상세 조회
+ */
+export type getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse200 = {
+  data: ApiResponseOwnerGroupBuyManageDetail;
+  status: 200;
+};
+
+export type getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponseSuccess =
+  getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponseError = (
+  | getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse401
+  | getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse403
+  | getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse404
+) & {
+  headers: Headers;
+};
+
+export type getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse =
+  | getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponseSuccess
+  | getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponseError;
+
+export const getGetApiV1OwnerGroupBuysGroupBuyIdManageInProgressUrl = (
+  groupBuyId: number,
+) => {
+  return `/api/v1/owner/group-buys/${groupBuyId}/manage/in-progress`;
+};
+
+export const getApiV1OwnerGroupBuysGroupBuyIdManageInProgress = async (
+  groupBuyId: number,
+  options?: RequestInit,
+): Promise<getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse> => {
+  return customFetch<getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse>(
+    getGetApiV1OwnerGroupBuysGroupBuyIdManageInProgressUrl(groupBuyId),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
+
+export const getGetApiV1OwnerGroupBuysGroupBuyIdManageInProgressQueryKey = (
+  groupBuyId: number,
+) => {
+  return [`/api/v1/owner/group-buys/${groupBuyId}/manage/in-progress`] as const;
+};
+
+export const getGetApiV1OwnerGroupBuysGroupBuyIdManageInProgressQueryOptions = <
+  TData = Awaited<
+    ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageInProgress>
+  >,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  groupBuyId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<
+          ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageInProgress>
+        >,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetApiV1OwnerGroupBuysGroupBuyIdManageInProgressQueryKey(groupBuyId);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageInProgress>>
+  > = ({ signal }) =>
+    getApiV1OwnerGroupBuysGroupBuyIdManageInProgress(groupBuyId, {
+      signal,
+      ...requestOptions,
+    });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!groupBuyId,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<
+      ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageInProgress>
+    >,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiV1OwnerGroupBuysGroupBuyIdManageInProgressQueryResult =
+  NonNullable<
+    Awaited<ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageInProgress>>
+  >;
+export type GetApiV1OwnerGroupBuysGroupBuyIdManageInProgressQueryError =
+  | UnauthorizedResponse
+  | ForbiddenResponse
+  | NotFoundResponse;
+
+export function useGetApiV1OwnerGroupBuysGroupBuyIdManageInProgress<
+  TData = Awaited<
+    ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageInProgress>
+  >,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  groupBuyId: number,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<
+          ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageInProgress>
+        >,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<
+            ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageInProgress>
+          >,
+          TError,
+          Awaited<
+            ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageInProgress>
+          >
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1OwnerGroupBuysGroupBuyIdManageInProgress<
+  TData = Awaited<
+    ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageInProgress>
+  >,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  groupBuyId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<
+          ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageInProgress>
+        >,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<
+            ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageInProgress>
+          >,
+          TError,
+          Awaited<
+            ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageInProgress>
+          >
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1OwnerGroupBuysGroupBuyIdManageInProgress<
+  TData = Awaited<
+    ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageInProgress>
+  >,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  groupBuyId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<
+          ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageInProgress>
+        >,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary 사장님 모집중 공구 상세 조회
+ */
+
+export function useGetApiV1OwnerGroupBuysGroupBuyIdManageInProgress<
+  TData = Awaited<
+    ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageInProgress>
+  >,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  groupBuyId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<
+          ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageInProgress>
+        >,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions =
+    getGetApiV1OwnerGroupBuysGroupBuyIdManageInProgressQueryOptions(
+      groupBuyId,
+      options,
+    );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary 사장님 달성 공구 상세 조회
+ */
+export type getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse200 = {
+  data: ApiResponseOwnerGroupBuyManageDetail;
+  status: 200;
+};
+
+export type getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponseSuccess =
+  getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponseError = (
+  | getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse401
+  | getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse403
+  | getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse404
+) & {
+  headers: Headers;
+};
+
+export type getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse =
+  | getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponseSuccess
+  | getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponseError;
+
+export const getGetApiV1OwnerGroupBuysGroupBuyIdManageAchievedUrl = (
+  groupBuyId: number,
+) => {
+  return `/api/v1/owner/group-buys/${groupBuyId}/manage/achieved`;
+};
+
+export const getApiV1OwnerGroupBuysGroupBuyIdManageAchieved = async (
+  groupBuyId: number,
+  options?: RequestInit,
+): Promise<getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse> => {
+  return customFetch<getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse>(
+    getGetApiV1OwnerGroupBuysGroupBuyIdManageAchievedUrl(groupBuyId),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
+
+export const getGetApiV1OwnerGroupBuysGroupBuyIdManageAchievedQueryKey = (
+  groupBuyId: number,
+) => {
+  return [`/api/v1/owner/group-buys/${groupBuyId}/manage/achieved`] as const;
+};
+
+export const getGetApiV1OwnerGroupBuysGroupBuyIdManageAchievedQueryOptions = <
+  TData = Awaited<
+    ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageAchieved>
+  >,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  groupBuyId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<
+          ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageAchieved>
+        >,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetApiV1OwnerGroupBuysGroupBuyIdManageAchievedQueryKey(groupBuyId);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageAchieved>>
+  > = ({ signal }) =>
+    getApiV1OwnerGroupBuysGroupBuyIdManageAchieved(groupBuyId, {
+      signal,
+      ...requestOptions,
+    });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!groupBuyId,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageAchieved>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiV1OwnerGroupBuysGroupBuyIdManageAchievedQueryResult =
+  NonNullable<
+    Awaited<ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageAchieved>>
+  >;
+export type GetApiV1OwnerGroupBuysGroupBuyIdManageAchievedQueryError =
+  | UnauthorizedResponse
+  | ForbiddenResponse
+  | NotFoundResponse;
+
+export function useGetApiV1OwnerGroupBuysGroupBuyIdManageAchieved<
+  TData = Awaited<
+    ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageAchieved>
+  >,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  groupBuyId: number,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<
+          ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageAchieved>
+        >,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<
+            ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageAchieved>
+          >,
+          TError,
+          Awaited<
+            ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageAchieved>
+          >
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1OwnerGroupBuysGroupBuyIdManageAchieved<
+  TData = Awaited<
+    ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageAchieved>
+  >,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  groupBuyId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<
+          ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageAchieved>
+        >,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<
+            ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageAchieved>
+          >,
+          TError,
+          Awaited<
+            ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageAchieved>
+          >
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1OwnerGroupBuysGroupBuyIdManageAchieved<
+  TData = Awaited<
+    ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageAchieved>
+  >,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  groupBuyId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<
+          ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageAchieved>
+        >,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary 사장님 달성 공구 상세 조회
+ */
+
+export function useGetApiV1OwnerGroupBuysGroupBuyIdManageAchieved<
+  TData = Awaited<
+    ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageAchieved>
+  >,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  groupBuyId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<
+          ReturnType<typeof getApiV1OwnerGroupBuysGroupBuyIdManageAchieved>
+        >,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions =
+    getGetApiV1OwnerGroupBuysGroupBuyIdManageAchievedQueryOptions(
+      groupBuyId,
+      options,
+    );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary 사장님 공구 기간 연장 요청
+ */
+export type postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse200 = {
+  data: SuccessNoDataResponse;
+  status: 200;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponseSuccess =
+  postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse200 & {
+    headers: Headers;
+  };
+export type postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponseError = (
+  | postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse400
+  | postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse401
+  | postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse403
+  | postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse404
+) & {
+  headers: Headers;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse =
+  | postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponseSuccess
+  | postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponseError;
+
+export const getPostApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsUrl = (
+  groupBuyId: number,
+) => {
+  return `/api/v1/owner/group-buys/${groupBuyId}/extension-requests`;
+};
+
+export const postApiV1OwnerGroupBuysGroupBuyIdExtensionRequests = async (
+  groupBuyId: number,
+  ownerGroupBuyExtensionRequest: OwnerGroupBuyExtensionRequest,
+  options?: RequestInit,
+): Promise<postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse> => {
+  return customFetch<postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse>(
+    getPostApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsUrl(groupBuyId),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(ownerGroupBuyExtensionRequest),
+    },
+  );
+};
+
+export const getPostApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsMutationOptions =
+  <
+    TError =
+      | BadRequestResponse
+      | UnauthorizedResponse
+      | ForbiddenResponse
+      | NotFoundResponse,
+    TContext = unknown,
+  >(options?: {
+    mutation?: UseMutationOptions<
+      Awaited<
+        ReturnType<typeof postApiV1OwnerGroupBuysGroupBuyIdExtensionRequests>
+      >,
+      TError,
+      { groupBuyId: number; data: OwnerGroupBuyExtensionRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  }): UseMutationOptions<
+    Awaited<
+      ReturnType<typeof postApiV1OwnerGroupBuysGroupBuyIdExtensionRequests>
+    >,
+    TError,
+    { groupBuyId: number; data: OwnerGroupBuyExtensionRequest },
+    TContext
+  > => {
+    const mutationKey = ['postApiV1OwnerGroupBuysGroupBuyIdExtensionRequests'];
+    const { mutation: mutationOptions, request: requestOptions } = options
+      ? options.mutation &&
+        'mutationKey' in options.mutation &&
+        options.mutation.mutationKey
+        ? options
+        : { ...options, mutation: { ...options.mutation, mutationKey } }
+      : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+      Awaited<
+        ReturnType<typeof postApiV1OwnerGroupBuysGroupBuyIdExtensionRequests>
+      >,
+      { groupBuyId: number; data: OwnerGroupBuyExtensionRequest }
+    > = (props) => {
+      const { groupBuyId, data } = props ?? {};
+
+      return postApiV1OwnerGroupBuysGroupBuyIdExtensionRequests(
+        groupBuyId,
+        data,
+        requestOptions,
+      );
+    };
+
+    return { mutationFn, ...mutationOptions };
+  };
+
+export type PostApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsMutationResult =
+  NonNullable<
+    Awaited<
+      ReturnType<typeof postApiV1OwnerGroupBuysGroupBuyIdExtensionRequests>
+    >
+  >;
+export type PostApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsMutationBody =
+  OwnerGroupBuyExtensionRequest;
+export type PostApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsMutationError =
+  | BadRequestResponse
+  | UnauthorizedResponse
+  | ForbiddenResponse
+  | NotFoundResponse;
+
+/**
+ * @summary 사장님 공구 기간 연장 요청
+ */
+export const usePostApiV1OwnerGroupBuysGroupBuyIdExtensionRequests = <
+  TError =
+    | BadRequestResponse
+    | UnauthorizedResponse
+    | ForbiddenResponse
+    | NotFoundResponse,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<
+        ReturnType<typeof postApiV1OwnerGroupBuysGroupBuyIdExtensionRequests>
+      >,
+      TError,
+      { groupBuyId: number; data: OwnerGroupBuyExtensionRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<
+    ReturnType<typeof postApiV1OwnerGroupBuysGroupBuyIdExtensionRequests>
+  >,
+  TError,
+  { groupBuyId: number; data: OwnerGroupBuyExtensionRequest },
+  TContext
+> => {
+  return useMutation(
+    getPostApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsMutationOptions(
+      options,
+    ),
+    queryClient,
+  );
+};
+/**
+ * @summary 사장님 공구 마감 요청
+ */
+export type postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse200 = {
+  data: SuccessNoDataResponse;
+  status: 200;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponseSuccess =
+  postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse200 & {
+    headers: Headers;
+  };
+export type postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponseError = (
+  | postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse400
+  | postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse401
+  | postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse403
+  | postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse404
+) & {
+  headers: Headers;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse =
+  | postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponseSuccess
+  | postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponseError;
+
+export const getPostApiV1OwnerGroupBuysGroupBuyIdCloseRequestsUrl = (
+  groupBuyId: number,
+) => {
+  return `/api/v1/owner/group-buys/${groupBuyId}/close-requests`;
+};
+
+export const postApiV1OwnerGroupBuysGroupBuyIdCloseRequests = async (
+  groupBuyId: number,
+  ownerGroupBuyCloseRequest: OwnerGroupBuyCloseRequest,
+  options?: RequestInit,
+): Promise<postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse> => {
+  return customFetch<postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse>(
+    getPostApiV1OwnerGroupBuysGroupBuyIdCloseRequestsUrl(groupBuyId),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(ownerGroupBuyCloseRequest),
+    },
+  );
+};
+
+export const getPostApiV1OwnerGroupBuysGroupBuyIdCloseRequestsMutationOptions =
+  <
+    TError =
+      | BadRequestResponse
+      | UnauthorizedResponse
+      | ForbiddenResponse
+      | NotFoundResponse,
+    TContext = unknown,
+  >(options?: {
+    mutation?: UseMutationOptions<
+      Awaited<
+        ReturnType<typeof postApiV1OwnerGroupBuysGroupBuyIdCloseRequests>
+      >,
+      TError,
+      { groupBuyId: number; data: OwnerGroupBuyCloseRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  }): UseMutationOptions<
+    Awaited<ReturnType<typeof postApiV1OwnerGroupBuysGroupBuyIdCloseRequests>>,
+    TError,
+    { groupBuyId: number; data: OwnerGroupBuyCloseRequest },
+    TContext
+  > => {
+    const mutationKey = ['postApiV1OwnerGroupBuysGroupBuyIdCloseRequests'];
+    const { mutation: mutationOptions, request: requestOptions } = options
+      ? options.mutation &&
+        'mutationKey' in options.mutation &&
+        options.mutation.mutationKey
+        ? options
+        : { ...options, mutation: { ...options.mutation, mutationKey } }
+      : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+      Awaited<
+        ReturnType<typeof postApiV1OwnerGroupBuysGroupBuyIdCloseRequests>
+      >,
+      { groupBuyId: number; data: OwnerGroupBuyCloseRequest }
+    > = (props) => {
+      const { groupBuyId, data } = props ?? {};
+
+      return postApiV1OwnerGroupBuysGroupBuyIdCloseRequests(
+        groupBuyId,
+        data,
+        requestOptions,
+      );
+    };
+
+    return { mutationFn, ...mutationOptions };
+  };
+
+export type PostApiV1OwnerGroupBuysGroupBuyIdCloseRequestsMutationResult =
+  NonNullable<
+    Awaited<ReturnType<typeof postApiV1OwnerGroupBuysGroupBuyIdCloseRequests>>
+  >;
+export type PostApiV1OwnerGroupBuysGroupBuyIdCloseRequestsMutationBody =
+  OwnerGroupBuyCloseRequest;
+export type PostApiV1OwnerGroupBuysGroupBuyIdCloseRequestsMutationError =
+  | BadRequestResponse
+  | UnauthorizedResponse
+  | ForbiddenResponse
+  | NotFoundResponse;
+
+/**
+ * @summary 사장님 공구 마감 요청
+ */
+export const usePostApiV1OwnerGroupBuysGroupBuyIdCloseRequests = <
+  TError =
+    | BadRequestResponse
+    | UnauthorizedResponse
+    | ForbiddenResponse
+    | NotFoundResponse,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<
+        ReturnType<typeof postApiV1OwnerGroupBuysGroupBuyIdCloseRequests>
+      >,
+      TError,
+      { groupBuyId: number; data: OwnerGroupBuyCloseRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiV1OwnerGroupBuysGroupBuyIdCloseRequests>>,
+  TError,
+  { groupBuyId: number; data: OwnerGroupBuyCloseRequest },
+  TContext
+> => {
+  return useMutation(
+    getPostApiV1OwnerGroupBuysGroupBuyIdCloseRequestsMutationOptions(options),
+    queryClient,
+  );
+};
 /**
  * 사장님이 본인 매장 기준으로 제출한 공구 개설 요청 목록을 조회한다.
  * @summary 사장님 공구 개설 요청 목록 조회

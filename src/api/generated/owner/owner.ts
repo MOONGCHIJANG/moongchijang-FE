@@ -4,67 +4,29 @@
  */
 import type {
   ApiResponseOwnerGroupBuyList,
+  ApiResponseOwnerGroupBuyManageDetail,
+  ApiResponseOwnerGroupBuyManageList,
   ApiResponseOwnerGroupBuyRequestCreated,
   ApiResponseOwnerGroupBuyRequestDetail,
   ApiResponseOwnerGroupBuyRequestList,
-  ApiResponseOwnerSummary,
+  ApiResponseOwnerGroupBuySummary,
   ApiResponsePickupScheduleList,
   ApiResponseReservationPage,
   BadRequestResponse,
   ConflictResponse,
   ForbiddenResponse,
   GetApiV1OwnerGroupBuyRequestsParams,
+  GetApiV1OwnerGroupBuysManageParams,
   GetApiV1OwnerReservationsParams,
   NotFoundResponse,
+  OwnerGroupBuyCloseRequest,
+  OwnerGroupBuyExtensionRequest,
   OwnerGroupBuyRequestCreate,
   SuccessNoDataResponse,
   UnauthorizedResponse,
 } from '../api.schemas';
 
 import { customFetch } from '../../../lib/custom-fetch';
-
-/**
- * 픽업 대기/완료 건수, 진행 중 공구 수, 다음 픽업 시간을 반환한다.
- * @summary 사장님 홈 요약 정보
- */
-export type getApiV1OwnerHomeSummaryResponse200 = {
-  data: ApiResponseOwnerSummary;
-  status: 200;
-};
-
-export type getApiV1OwnerHomeSummaryResponse403 = {
-  data: ForbiddenResponse;
-  status: 403;
-};
-
-export type getApiV1OwnerHomeSummaryResponseSuccess =
-  getApiV1OwnerHomeSummaryResponse200 & {
-    headers: Headers;
-  };
-export type getApiV1OwnerHomeSummaryResponseError =
-  getApiV1OwnerHomeSummaryResponse403 & {
-    headers: Headers;
-  };
-
-export type getApiV1OwnerHomeSummaryResponse =
-  | getApiV1OwnerHomeSummaryResponseSuccess
-  | getApiV1OwnerHomeSummaryResponseError;
-
-export const getGetApiV1OwnerHomeSummaryUrl = () => {
-  return `/api/v1/owner/home/summary`;
-};
-
-export const getApiV1OwnerHomeSummary = async (
-  options?: RequestInit,
-): Promise<getApiV1OwnerHomeSummaryResponse> => {
-  return customFetch<getApiV1OwnerHomeSummaryResponse>(
-    getGetApiV1OwnerHomeSummaryUrl(),
-    {
-      ...options,
-      method: 'GET',
-    },
-  );
-};
 
 /**
  * @summary 시간대별 픽업 현황 조회
@@ -145,6 +107,375 @@ export const getApiV1OwnerGroupBuys = async (
     {
       ...options,
       method: 'GET',
+    },
+  );
+};
+
+/**
+ * 사장님이 소속된 매장 기준으로 공구 요약 정보를 조회한다.
+- 진행 중 공구 건수
+- 달성 완료 공구 건수
+- 오늘 픽업 예정 인원 수
+- 정산 예정 금액
+
+ * @summary 사장님 공구 요약 조회
+ */
+export type getApiV1OwnerGroupBuysSummaryResponse200 = {
+  data: ApiResponseOwnerGroupBuySummary;
+  status: 200;
+};
+
+export type getApiV1OwnerGroupBuysSummaryResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type getApiV1OwnerGroupBuysSummaryResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type getApiV1OwnerGroupBuysSummaryResponseSuccess =
+  getApiV1OwnerGroupBuysSummaryResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1OwnerGroupBuysSummaryResponseError = (
+  | getApiV1OwnerGroupBuysSummaryResponse401
+  | getApiV1OwnerGroupBuysSummaryResponse403
+) & {
+  headers: Headers;
+};
+
+export type getApiV1OwnerGroupBuysSummaryResponse =
+  | getApiV1OwnerGroupBuysSummaryResponseSuccess
+  | getApiV1OwnerGroupBuysSummaryResponseError;
+
+export const getGetApiV1OwnerGroupBuysSummaryUrl = () => {
+  return `/api/v1/owner/group-buys/summary`;
+};
+
+export const getApiV1OwnerGroupBuysSummary = async (
+  options?: RequestInit,
+): Promise<getApiV1OwnerGroupBuysSummaryResponse> => {
+  return customFetch<getApiV1OwnerGroupBuysSummaryResponse>(
+    getGetApiV1OwnerGroupBuysSummaryUrl(),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
+
+/**
+ * @summary 사장님 공구 관리 목록 조회
+ */
+export type getApiV1OwnerGroupBuysManageResponse200 = {
+  data: ApiResponseOwnerGroupBuyManageList;
+  status: 200;
+};
+
+export type getApiV1OwnerGroupBuysManageResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type getApiV1OwnerGroupBuysManageResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type getApiV1OwnerGroupBuysManageResponseSuccess =
+  getApiV1OwnerGroupBuysManageResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1OwnerGroupBuysManageResponseError = (
+  | getApiV1OwnerGroupBuysManageResponse401
+  | getApiV1OwnerGroupBuysManageResponse403
+) & {
+  headers: Headers;
+};
+
+export type getApiV1OwnerGroupBuysManageResponse =
+  | getApiV1OwnerGroupBuysManageResponseSuccess
+  | getApiV1OwnerGroupBuysManageResponseError;
+
+export const getGetApiV1OwnerGroupBuysManageUrl = (
+  params?: GetApiV1OwnerGroupBuysManageParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/owner/group-buys/manage?${stringifiedParams}`
+    : `/api/v1/owner/group-buys/manage`;
+};
+
+export const getApiV1OwnerGroupBuysManage = async (
+  params?: GetApiV1OwnerGroupBuysManageParams,
+  options?: RequestInit,
+): Promise<getApiV1OwnerGroupBuysManageResponse> => {
+  return customFetch<getApiV1OwnerGroupBuysManageResponse>(
+    getGetApiV1OwnerGroupBuysManageUrl(params),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
+
+/**
+ * @summary 사장님 모집중 공구 상세 조회
+ */
+export type getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse200 = {
+  data: ApiResponseOwnerGroupBuyManageDetail;
+  status: 200;
+};
+
+export type getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponseSuccess =
+  getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponseError = (
+  | getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse401
+  | getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse403
+  | getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse404
+) & {
+  headers: Headers;
+};
+
+export type getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse =
+  | getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponseSuccess
+  | getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponseError;
+
+export const getGetApiV1OwnerGroupBuysGroupBuyIdManageInProgressUrl = (
+  groupBuyId: number,
+) => {
+  return `/api/v1/owner/group-buys/${groupBuyId}/manage/in-progress`;
+};
+
+export const getApiV1OwnerGroupBuysGroupBuyIdManageInProgress = async (
+  groupBuyId: number,
+  options?: RequestInit,
+): Promise<getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse> => {
+  return customFetch<getApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse>(
+    getGetApiV1OwnerGroupBuysGroupBuyIdManageInProgressUrl(groupBuyId),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
+
+/**
+ * @summary 사장님 달성 공구 상세 조회
+ */
+export type getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse200 = {
+  data: ApiResponseOwnerGroupBuyManageDetail;
+  status: 200;
+};
+
+export type getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponseSuccess =
+  getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponseError = (
+  | getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse401
+  | getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse403
+  | getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse404
+) & {
+  headers: Headers;
+};
+
+export type getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse =
+  | getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponseSuccess
+  | getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponseError;
+
+export const getGetApiV1OwnerGroupBuysGroupBuyIdManageAchievedUrl = (
+  groupBuyId: number,
+) => {
+  return `/api/v1/owner/group-buys/${groupBuyId}/manage/achieved`;
+};
+
+export const getApiV1OwnerGroupBuysGroupBuyIdManageAchieved = async (
+  groupBuyId: number,
+  options?: RequestInit,
+): Promise<getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse> => {
+  return customFetch<getApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse>(
+    getGetApiV1OwnerGroupBuysGroupBuyIdManageAchievedUrl(groupBuyId),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
+
+/**
+ * @summary 사장님 공구 기간 연장 요청
+ */
+export type postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse200 = {
+  data: SuccessNoDataResponse;
+  status: 200;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponseSuccess =
+  postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse200 & {
+    headers: Headers;
+  };
+export type postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponseError = (
+  | postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse400
+  | postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse401
+  | postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse403
+  | postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse404
+) & {
+  headers: Headers;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse =
+  | postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponseSuccess
+  | postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponseError;
+
+export const getPostApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsUrl = (
+  groupBuyId: number,
+) => {
+  return `/api/v1/owner/group-buys/${groupBuyId}/extension-requests`;
+};
+
+export const postApiV1OwnerGroupBuysGroupBuyIdExtensionRequests = async (
+  groupBuyId: number,
+  ownerGroupBuyExtensionRequest: OwnerGroupBuyExtensionRequest,
+  options?: RequestInit,
+): Promise<postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse> => {
+  return customFetch<postApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse>(
+    getPostApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsUrl(groupBuyId),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(ownerGroupBuyExtensionRequest),
+    },
+  );
+};
+
+/**
+ * @summary 사장님 공구 마감 요청
+ */
+export type postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse200 = {
+  data: SuccessNoDataResponse;
+  status: 200;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponseSuccess =
+  postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse200 & {
+    headers: Headers;
+  };
+export type postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponseError = (
+  | postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse400
+  | postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse401
+  | postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse403
+  | postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse404
+) & {
+  headers: Headers;
+};
+
+export type postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse =
+  | postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponseSuccess
+  | postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponseError;
+
+export const getPostApiV1OwnerGroupBuysGroupBuyIdCloseRequestsUrl = (
+  groupBuyId: number,
+) => {
+  return `/api/v1/owner/group-buys/${groupBuyId}/close-requests`;
+};
+
+export const postApiV1OwnerGroupBuysGroupBuyIdCloseRequests = async (
+  groupBuyId: number,
+  ownerGroupBuyCloseRequest: OwnerGroupBuyCloseRequest,
+  options?: RequestInit,
+): Promise<postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse> => {
+  return customFetch<postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse>(
+    getPostApiV1OwnerGroupBuysGroupBuyIdCloseRequestsUrl(groupBuyId),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(ownerGroupBuyCloseRequest),
     },
   );
 };

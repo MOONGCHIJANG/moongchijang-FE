@@ -5,21 +5,6 @@
 import * as zod from 'zod';
 
 /**
- * 픽업 대기/완료 건수, 진행 중 공구 수, 다음 픽업 시간을 반환한다.
- * @summary 사장님 홈 요약 정보
- */
-export const GetApiV1OwnerHomeSummaryResponse = zod.object({
-  success: zod.boolean(),
-  data: zod.object({
-    pickupWaitingCount: zod.number(),
-    pickupCompletedCount: zod.number(),
-    activeGroupBuyCount: zod.number(),
-    nextPickupTime: zod.iso.time({}).nullable(),
-  }),
-  error: zod.unknown().nullable(),
-});
-
-/**
  * @summary 시간대별 픽업 현황 조회
  */
 export const GetApiV1OwnerHomePickupScheduleResponse = zod.object({
@@ -57,6 +42,189 @@ export const GetApiV1OwnerGroupBuysResponse = zod.object({
   ),
   error: zod.unknown().nullable(),
 });
+
+/**
+ * 사장님이 소속된 매장 기준으로 공구 요약 정보를 조회한다.
+- 진행 중 공구 건수
+- 달성 완료 공구 건수
+- 오늘 픽업 예정 인원 수
+- 정산 예정 금액
+
+ * @summary 사장님 공구 요약 조회
+ */
+export const GetApiV1OwnerGroupBuysSummaryResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    ongoingCount: zod.number().describe('진행 중 공구 건수'),
+    achievedCount: zod.number().describe('달성 완료 공구 건수'),
+    todayPickupUserCount: zod.number().describe('오늘 픽업 예정 인원 수'),
+    settlementExpectedAmount: zod.number().describe('정산 예정 금액'),
+    isEmpty: zod.boolean().describe('공구 요약 데이터 비어있는지 여부'),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * @summary 사장님 공구 관리 목록 조회
+ */
+export const getApiV1OwnerGroupBuysManageQueryFilterDefault = `ALL`;
+
+export const GetApiV1OwnerGroupBuysManageQueryParams = zod.object({
+  filter: zod
+    .enum(['ALL', 'IN_PROGRESS', 'ACHIEVED', 'ENDED', 'PENDING_APPROVAL'])
+    .default(getApiV1OwnerGroupBuysManageQueryFilterDefault)
+    .describe('상태 필터 (기본값 ALL)'),
+});
+
+export const GetApiV1OwnerGroupBuysManageResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.array(
+    zod.object({
+      groupBuyId: zod.number(),
+      productName: zod.string(),
+      price: zod.number(),
+      pickupDate: zod.iso.date(),
+      deadlineDday: zod.number().nullish(),
+      achievementRate: zod.number().nullish(),
+      currentQuantity: zod.number().nullish(),
+      targetQuantity: zod.number().nullish(),
+      status: zod.enum([
+        'ALL',
+        'IN_PROGRESS',
+        'ACHIEVED',
+        'ENDED',
+        'PENDING_APPROVAL',
+      ]),
+    }),
+  ),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * @summary 사장님 모집중 공구 상세 조회
+ */
+export const GetApiV1OwnerGroupBuysGroupBuyIdManageInProgressParams =
+  zod.object({
+    groupBuyId: zod.number(),
+  });
+
+export const GetApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse =
+  zod.object({
+    success: zod.boolean(),
+    data: zod.object({
+      groupBuyId: zod.number(),
+      status: zod.enum([
+        'ALL',
+        'IN_PROGRESS',
+        'ACHIEVED',
+        'ENDED',
+        'PENDING_APPROVAL',
+      ]),
+      participantSummary: zod.object({
+        totalCount: zod.number(),
+        completedCount: zod.number(),
+        waitingCount: zod.number(),
+      }),
+      participants: zod.array(
+        zod.object({
+          name: zod.string(),
+          phoneNumber: zod.string(),
+          productName: zod.string(),
+          quantity: zod.number(),
+          paymentMethod: zod.string(),
+          paymentStatus: zod.string(),
+          pickupTime: zod.iso.time({}),
+        }),
+      ),
+    }),
+    error: zod.unknown().nullable(),
+  });
+
+/**
+ * @summary 사장님 달성 공구 상세 조회
+ */
+export const GetApiV1OwnerGroupBuysGroupBuyIdManageAchievedParams = zod.object({
+  groupBuyId: zod.number(),
+});
+
+export const GetApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse =
+  zod.object({
+    success: zod.boolean(),
+    data: zod.object({
+      groupBuyId: zod.number(),
+      status: zod.enum([
+        'ALL',
+        'IN_PROGRESS',
+        'ACHIEVED',
+        'ENDED',
+        'PENDING_APPROVAL',
+      ]),
+      participantSummary: zod.object({
+        totalCount: zod.number(),
+        completedCount: zod.number(),
+        waitingCount: zod.number(),
+      }),
+      participants: zod.array(
+        zod.object({
+          name: zod.string(),
+          phoneNumber: zod.string(),
+          productName: zod.string(),
+          quantity: zod.number(),
+          paymentMethod: zod.string(),
+          paymentStatus: zod.string(),
+          pickupTime: zod.iso.time({}),
+        }),
+      ),
+    }),
+    error: zod.unknown().nullable(),
+  });
+
+/**
+ * @summary 사장님 공구 기간 연장 요청
+ */
+export const PostApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsParams =
+  zod.object({
+    groupBuyId: zod.number(),
+  });
+
+export const PostApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsBody =
+  zod.object({
+    extendedDeadline: zod.iso
+      .datetime({ offset: true })
+      .describe('연장 희망 마감일시 (기존 마감일 이후)'),
+  });
+
+export const PostApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse =
+  zod.object({
+    success: zod.boolean(),
+    data: zod.unknown().nullable(),
+    error: zod.unknown().nullable(),
+  });
+
+/**
+ * @summary 사장님 공구 마감 요청
+ */
+export const PostApiV1OwnerGroupBuysGroupBuyIdCloseRequestsParams = zod.object({
+  groupBuyId: zod.number(),
+});
+
+export const postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsBodyReasonDetailMax = 100;
+
+export const PostApiV1OwnerGroupBuysGroupBuyIdCloseRequestsBody = zod.object({
+  reason: zod.enum(['SOLD_OUT', 'STORE_CONDITION', 'OTHER']),
+  reasonDetail: zod
+    .string()
+    .max(postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsBodyReasonDetailMax)
+    .nullish()
+    .describe('reason이 OTHER일 때 필수'),
+});
+
+export const PostApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse =
+  zod.object({
+    success: zod.boolean(),
+    data: zod.unknown().nullable(),
+    error: zod.unknown().nullable(),
+  });
 
 /**
  * 사장님이 본인 매장 기준으로 제출한 공구 개설 요청 목록을 조회한다.

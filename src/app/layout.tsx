@@ -4,6 +4,7 @@ import './globals.css';
 import { QueryProvider } from '@/providers/QueryProvider';
 import IconsSetup from '@/components/IconsSetup';
 import AuthInitializer from '@/components/AuthInitializer';
+import KakaoInit from '@/components/KakaoInit';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -79,6 +80,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col mx-auto max-w-110">
         <IconsSetup />
+        <KakaoInit />
         <QueryProvider>
           <AuthInitializer />
           {children}

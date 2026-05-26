@@ -145,7 +145,7 @@ export default function OrderDetailPage({
   const paymentAmount = item?.paymentAmount ?? refundItem?.paymentAmount ?? 0;
   const paymentMethod =
     item?.paymentMethod ?? refundItem?.paymentMethod ?? null;
-  const paidAt = item?.paidAt ?? null;
+  const paidAt = item?.paidAt ?? refundItem?.paidAt ?? null;
   const thumbnailUrl = item?.thumbnailUrl ?? refundItem?.thumbnailUrl ?? null;
   const tag = variant ? MINI_TAG[variant] : null;
 
@@ -157,7 +157,7 @@ export default function OrderDetailPage({
         {/* 주문 상태 */}
         <div className="bg-surface-white px-g5 py-g5">
           <p className="heading-sm-bold text-text-basic mb-g5">
-            {formatCompactDate(paidAt ?? pickupDate)} 결제
+            {paidAt ? formatCompactDate(paidAt) : '-'} 결제
           </p>
           {tag && (
             <span

@@ -1,7 +1,8 @@
 'use client';
 
-import { Icon } from '@iconify/react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/Button';
 
 interface Props {
   error: Error & { digest?: string };
@@ -19,10 +20,7 @@ export default function Error({ reset }: Props) {
   return (
     <div className="flex flex-col items-center justify-center min-h-svh gap-g6 px-5 text-center">
       <div className="flex flex-col items-center gap-g4">
-        <Icon
-          icon="solar:sad-circle-outline"
-          className="w-16 h-16 text-primary-400"
-        />
+        <Image src="/icons/starpoint.svg" alt="" width={91} height={91} />
         <div className="flex flex-col gap-g2">
           <p className="heading-lg-bold">오류가 발생했어요</p>
           <p className="body-md-medium text-text-tertiary">
@@ -30,21 +28,23 @@ export default function Error({ reset }: Props) {
           </p>
         </div>
       </div>
-      <div className="flex flex-col gap-g3 w-full max-w-xs">
-        <button
-          onClick={handleReset}
-          className="w-full py-p4 rounded-2xlarge bg-primary-400 text-white body-md-semibold cursor-pointer"
-        >
-          다시 시도
-        </button>
-        <button
-          onClick={() => {
-            window.location.href = '/';
-          }}
-          className="w-full py-p4 rounded-2xlarge border border-border-default text-text-secondary body-md-medium cursor-pointer"
+      <div className="flex flex-row gap-g3">
+        <Button
+          size="md"
+          variant="outline"
+          className="w-[140px]"
+          onClick={() => router.push('/')}
         >
           홈으로
-        </button>
+        </Button>
+        <Button
+          size="md"
+          variant="primary"
+          className="w-[140px]"
+          onClick={handleReset}
+        >
+          다시 시도
+        </Button>
       </div>
     </div>
   );

@@ -487,7 +487,7 @@ export const GroupBuyRequestPage = ({
           ) : (
             <div className="flex flex-col gap-3">
               <Link
-                href="/request"
+                href="/request/new"
                 className="text-center caption-sm-regular text-text-tertiary font-pretendard"
               >
                 직접 매장 검색하기

@@ -13,7 +13,7 @@ export const tokenStorage = {
     const match = document.cookie
       .split('; ')
       .find((row) => row.startsWith(`${ACCESS_TOKEN_KEY}=`));
-    return match ? match.split('=')[1] : null;
+    return match ? match.split('=').slice(1).join('=') : null;
   },
   set: (token: string, expiresIn: number) => {
     const expires = new Date(Date.now() + expiresIn * 1000).toUTCString();
@@ -34,5 +34,11 @@ export const tokenStorage = {
       document.cookie = `${key}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
     });
     localStorage.removeItem(EXPIRES_AT_KEY);
+  },
+  setExpiration: (expiresIn: number) => {
+    localStorage.setItem(
+      EXPIRES_AT_KEY,
+      String(Date.now() + (expiresIn - 30) * 1000),
+    );
   },
 };

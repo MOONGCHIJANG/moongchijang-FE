@@ -11,7 +11,12 @@ export async function POST(req: NextRequest) {
 
   if (result.status === 200) {
     const data = result.data as {
-      data?: { accessToken: string; expiresIn: number };
+      data?: {
+        accessToken: string;
+        expiresIn: number;
+        isNewUser: boolean;
+        user?: { signupCompleted: boolean };
+      };
     };
 
     const accessToken = data?.data?.accessToken ?? '';
@@ -23,6 +28,7 @@ export async function POST(req: NextRequest) {
       maxAge: expiresIn,
       path: '/',
       sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
     });
 
     const setCookie = result.headers?.get('set-cookie');

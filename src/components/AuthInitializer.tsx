@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useAuthStore } from '@/store/authStore';
+import { tokenStorage } from '@/lib/token';
 
 const AuthInitializer = () => {
   const { setIsLoggedIn, setInitialized } = useAuthStore();
@@ -12,10 +13,7 @@ const AuthInitializer = () => {
         setIsLoggedIn(isLoggedIn);
         if (isLoggedIn && expiresIn) {
           // 30초 여유 만료 시간 저장
-          localStorage.setItem(
-            'accessTokenExpiresAt',
-            String(Date.now() + (expiresIn - 30) * 1000),
-          );
+          tokenStorage.setExpiration(expiresIn);
         }
       })
       .catch(() => setIsLoggedIn(false))

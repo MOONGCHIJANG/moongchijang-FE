@@ -29,6 +29,7 @@ export async function POST(req: NextRequest) {
       maxAge: expiresIn,
       path: '/',
       sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
     });
 
     // 새 refreshToken도 갱신

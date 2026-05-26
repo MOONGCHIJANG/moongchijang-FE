@@ -237,7 +237,7 @@ export const useStepProfile = (onNext: () => void) => {
     );
   };
 
-  const isNicknameValid = /^[A-Za-z0-9가-힣ㄱ-ㅎ]{2,10}$/.test(nicknameValue);
+  const isNicknameValid = /^[A-Za-z0-9가-힣]{2,10}$/.test(nicknameValue);
 
   const canProceed =
     nicknameStatus === 'available' && phoneStatus === 'verified';

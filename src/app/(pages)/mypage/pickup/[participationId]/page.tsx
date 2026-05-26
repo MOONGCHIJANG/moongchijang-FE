@@ -11,6 +11,7 @@ import {
   useGetApiV1ParticipationsParticipationIdQr,
 } from '@/api/hooks/pickup/pickup';
 import { useShake } from '@/hooks/useShake';
+import { formatPickupDate } from '@/lib/date';
 
 const NaverMap = dynamic(() => import('@/components/NaverMap'), { ssr: false });
 
@@ -19,23 +20,12 @@ function formatPickupDateTime(
   timeStart: string,
   timeEnd: string,
 ): string {
-  const d = new Date(date);
+  const d = new Date(date + 'T00:00:00');
   const days = ['일', '월', '화', '수', '목', '금', '토'];
   const yy = String(d.getFullYear()).slice(2);
   const mm = String(d.getMonth() + 1).padStart(2, '0');
   const dd = String(d.getDate()).padStart(2, '0');
-  const day = days[d.getDay()];
-  return `${yy}.${mm}.${dd}(${day}) ${timeStart} ~ ${timeEnd}`;
-}
-
-function formatPickupDate(date: string): string {
-  const d = new Date(date);
-  const days = ['일', '월', '화', '수', '목', '금', '토'];
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  const day = days[d.getDay()];
-  return `${yyyy}.${mm}.${dd}(${day})`;
+  return `${yy}.${mm}.${dd}(${days[d.getDay()]}) ${timeStart} ~ ${timeEnd}`;
 }
 
 function formatCountdown(seconds: number): string {

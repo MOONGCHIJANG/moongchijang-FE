@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Icon } from '@iconify/react';
 import { useGetApiV1UsersMeParticipationsPickupWaiting } from '@/api/hooks/my-page/my-page';
+import { WithdrawRequestReason } from '@/api/generated/api.schemas';
 import { useAuthStore } from '@/store/authStore';
 import Header from '@/components/Header';
 import Modal from '@/components/Modal';
@@ -35,16 +36,26 @@ const NOTICE_ITEMS = [
   },
 ];
 
-const WITHDRAW_REASONS = [
-  '원하는 공구가 없어요',
-  '서비스 이용이 불편해요',
-  '개인정보가 걱정돼요',
-  '기타',
+const WITHDRAW_REASONS: { label: string; value: WithdrawRequestReason }[] = [
+  {
+    label: '원하는 공구가 없어요',
+    value: WithdrawRequestReason.NO_DESIRED_GROUPBUY,
+  },
+  {
+    label: '서비스 이용이 불편해요',
+    value: WithdrawRequestReason.INCONVENIENT_SERVICE,
+  },
+  {
+    label: '개인정보가 걱정돼요',
+    value: WithdrawRequestReason.PRIVACY_CONCERN,
+  },
+  { label: '기타', value: WithdrawRequestReason.OTHER },
 ];
 
 export default function WithdrawPage() {
   const router = useRouter();
-  const [selectedReason, setSelectedReason] = useState<string | null>(null);
+  const [selectedReason, setSelectedReason] =
+    useState<WithdrawRequestReason | null>(null);
   const [reasonDetail, setReasonDetail] = useState('');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showBlockedModal, setShowBlockedModal] = useState(false);
@@ -68,7 +79,13 @@ export default function WithdrawPage() {
 
   async function handleWithdraw() {
     setIsPending(true);
-    const success = await deleteAccount();
+    const success = await deleteAccount({
+      reason: selectedReason ?? undefined,
+      reasonDetail:
+        selectedReason === WithdrawRequestReason.OTHER && reasonDetail
+          ? reasonDetail
+          : undefined,
+    });
     setIsPending(false);
     if (!success) {
       setShowConfirmModal(false);
@@ -113,25 +130,25 @@ export default function WithdrawPage() {
             탈퇴 사유 (선택)
           </p>
           <ul className="flex flex-col gap-g5">
-            {WITHDRAW_REASONS.map((reason) => (
-              <li key={reason}>
+            {WITHDRAW_REASONS.map(({ label, value }) => (
+              <li key={value}>
                 <label className="flex items-center gap-p3 cursor-pointer">
                   <input
                     type="radio"
                     name="withdrawReason"
-                    value={reason}
-                    checked={selectedReason === reason}
-                    onChange={() => setSelectedReason(reason)}
+                    value={value ?? ''}
+                    checked={selectedReason === value}
+                    onChange={() => setSelectedReason(value)}
                     className="w-5 h-5 accent-button-primary-fill"
                   />
                   <span className="body-md-regular text-text-basic">
-                    {reason}
+                    {label}
                   </span>
                 </label>
               </li>
             ))}
           </ul>
-          {selectedReason === '기타' && (
+          {selectedReason === WithdrawRequestReason.OTHER && (
             <textarea
               className="mt-g4 w-full rounded-xl border border-border-default bg-white px-g4 py-g4 body-md-regular text-text-basic placeholder:text-text-disabled resize-none outline-none focus:border-border-focus"
               rows={4}

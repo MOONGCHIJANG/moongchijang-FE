@@ -32,6 +32,9 @@ import {
   ApiResponseSearchAnalysisDataSearchCase,
   ApiResponseSearchAnalysisDataUiState,
 } from '@/api/generated/api.schemas';
+import { useGetApiV1PickupsMeNearestQr } from '@/api/hooks/pickup/pickup';
+import { useAuthStore } from '@/store/authStore';
+import { formatPickupDateTime, formatTime } from '@/lib/date';
 import { useFeedList } from '../_hooks/useFeedList';
 import { useRecentSearches } from '../_hooks/useRecentSearches';
 
@@ -93,7 +96,23 @@ export function FeedClient() {
       },
     });
 
-  const isPickupDay = false;
+  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
+
+  const { data: nearestQrResponse } = useGetApiV1PickupsMeNearestQr({
+    query: { enabled: isLoggedIn },
+  });
+  const nearestQrData =
+    nearestQrResponse?.status === 200 ? nearestQrResponse.data?.data : null;
+  const qrItem = nearestQrData?.item ?? null;
+  const hasCandidate = nearestQrData?.hasCandidate ?? false;
+  const hasMultipleToday = nearestQrData?.hasMultipleToday ?? false;
+  const isPickupDay = qrItem?.availabilityStatus === 'AVAILABLE';
+  const dDayText = qrItem
+    ? qrItem.dDay === 0
+      ? 'D-day'
+      : `D-${qrItem.dDay}`
+    : '';
+
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   const updateUrl = useCallback(
@@ -224,8 +243,9 @@ export function FeedClient() {
   }, [router, searchAnalysis]);
 
   const handleShake = useCallback(() => {
+    if (!isLoggedIn) return;
     setIsQrModalOpen(true);
-  }, []);
+  }, [isLoggedIn]);
 
   const { isEnabled, toggleShake } = useShake(handleShake);
 
@@ -240,9 +260,11 @@ export function FeedClient() {
         <FeedTopBar
           location={locationDisplayText}
           onLocationClick={() => setIsLocationSheetOpen(true)}
-          onQrClick={() => setIsQrModalOpen(true)}
           onNotificationClick={() => router.push('/notifications')}
+          onQrClick={() => setIsQrModalOpen(true)}
+          showQr={isLoggedIn}
         />
+
         <div className="cursor-pointer" onClick={() => setIsSearchOpen(true)}>
           <SearchBar
             value={searchInput}
@@ -359,19 +381,35 @@ export function FeedClient() {
         onClearRecent={clearRecentSearches}
       />
 
-      <QrModal
-        isOpen={isQrModalOpen}
-        onClose={() => setIsQrModalOpen(false)}
-        isPickupDay={isPickupDay}
-        orderNumber="20260419245"
-        pickupLocation="서울 성동구 성동로 32길, 사이드템포"
-        pickupTime="4월 15일 (화) 14:00~18:00"
-        storeName="밤티 말빵"
-        qrValue="https://moongchijang.com/verify/20260419245"
-        dDayText={isPickupDay ? 'D-day' : 'D-7'}
-        shakeEnabled={isEnabled}
-        onShakeToggle={toggleShake}
-      />
+      {isLoggedIn && (
+        <QrModal
+          isOpen={isQrModalOpen}
+          onClose={() => setIsQrModalOpen(false)}
+          isPickupDay={isPickupDay}
+          hasCandidate={hasCandidate}
+          hasMultipleToday={hasMultipleToday}
+          productName={qrItem?.productName ?? ''}
+          reservationNumber={qrItem?.reservationNumber ?? ''}
+          pickupAddress={qrItem?.pickupLocation ?? ''}
+          pickupTimeStart={
+            qrItem
+              ? formatPickupDateTime(qrItem.pickupDate, qrItem.pickupTimeStart)
+              : ''
+          }
+          pickupTimeEnd={qrItem ? formatTime(qrItem.pickupTimeEnd) : ''}
+          qrCode={qrItem?.qrCode ?? ''}
+          dDayText={dDayText}
+          shakeEnabled={isEnabled}
+          onShakeToggle={() => toggleShake()}
+          onDetailClick={() => {
+            if (qrItem) router.push(`/mypage/pickup/${qrItem.participationId}`);
+          }}
+          onMultiplePickupClick={() => {
+            setIsQrModalOpen(false);
+            router.push('/mypage');
+          }}
+        />
+      )}
     </>
   );
 }

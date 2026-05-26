@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { GNB } from './GNB';
 
@@ -6,7 +7,19 @@ const meta = {
   component: GNB,
   parameters: {
     layout: 'fullscreen',
+    nextjs: {
+      navigation: {
+        pathname: '/feed',
+      },
+    },
   },
+  decorators: [
+    (Story) => (
+      <Suspense fallback={null}>
+        <Story />
+      </Suspense>
+    ),
+  ],
   tags: ['autodocs'],
 } satisfies Meta<typeof GNB>;
 

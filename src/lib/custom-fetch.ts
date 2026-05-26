@@ -14,6 +14,19 @@ const processQueue = (token: string | null) => {
   refreshQueue = [];
 };
 
+// 인증 불필요한 URL 목록
+const PUBLIC_URLS = [
+  '/auth/refresh',
+  '/auth/email/login',
+  '/auth/email/signup',
+  '/auth/email/availability',
+  '/auth/email/verification-codes',
+  '/auth/kakao',
+];
+
+const isPublicUrl = (url: string) =>
+  PUBLIC_URLS.some((publicUrl) => url.includes(publicUrl));
+
 export const customFetch = async <T>(
   url: string,
   options: RequestInit,
@@ -35,11 +48,7 @@ export const customFetch = async <T>(
     };
 
     // accessToken 없고 refresh/login URL 아니면 바로 refresh 시도
-    if (
-      !token &&
-      !url.includes('/auth/refresh') &&
-      !url.includes('/auth/email/login')
-    ) {
+    if (!token && !isPublicUrl(url)) {
       if (isRefreshing) {
         // 이미 갱신 중이면 큐에서 대기
         const newToken = await new Promise<string | null>((resolve) => {
@@ -87,11 +96,7 @@ export const customFetch = async <T>(
 
     let response = await fetchWithToken(token);
 
-    if (
-      response.status === 401 &&
-      !url.includes('/auth/refresh') &&
-      !url.includes('/auth/email/login')
-    ) {
+    if (response.status === 401 && !isPublicUrl(url)) {
       if (isRefreshing) {
         const newToken = await new Promise<string | null>((resolve) => {
           refreshQueue.push(resolve);

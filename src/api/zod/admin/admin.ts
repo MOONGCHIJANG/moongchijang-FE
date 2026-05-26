@@ -51,12 +51,15 @@ export const GetApiV1AdminGroupBuyRequestsResponse = zod.object({
         desiredQuantity: zod.number(),
         desiredPickupDate: zod.iso.date(),
         status: zod.enum(['IN_REVIEW', 'IN_CONTACT', 'OPENED', 'REJECTED']),
-        requesterName: zod.string(),
-        createdAt: zod.iso.datetime({ offset: true }),
+        requesterId: zod.number(),
+        requesterName: zod.string().nullish(),
+        createdAt: zod.iso.datetime({ offset: true }).nullable(),
       }),
     ),
     totalElements: zod.number(),
     totalPages: zod.number(),
+    number: zod.number(),
+    size: zod.number(),
   }),
   error: zod.unknown().nullable(),
 });
@@ -72,15 +75,34 @@ export const GetApiV1AdminGroupBuyRequestsRequestIdResponse = zod.object({
   success: zod.boolean(),
   data: zod.object({
     requestId: zod.number(),
+    requester: zod.object({
+      userId: zod.number(),
+      nickname: zod.string().nullish(),
+      phoneNumber: zod.string().nullish(),
+      email: zod.string().nullish(),
+      provider: zod.enum(['KAKAO', 'EMAIL']).nullish(),
+    }),
     storeName: zod.string(),
+    storeAddress: zod.string().nullish(),
+    placeId: zod.string().nullish(),
+    roadAddress: zod.string().nullish(),
+    lotAddress: zod.string().nullish(),
+    latitude: zod.number().nullish(),
+    longitude: zod.number().nullish(),
     productName: zod.string(),
     desiredQuantity: zod.number(),
     desiredPickupDate: zod.iso.date(),
-    additionalNote: zod.string().nullable(),
+    additionalNote: zod.string().nullish(),
     status: zod.enum(['IN_REVIEW', 'IN_CONTACT', 'OPENED', 'REJECTED']),
-    rejectionReason: zod.string().nullable(),
-    requesterName: zod.string(),
-    createdAt: zod.iso.datetime({ offset: true }),
+    rejectionReason: zod.string().nullish(),
+    openedGroupBuyId: zod.number().nullish(),
+    statusHistory: zod.array(
+      zod.object({
+        status: zod.enum(['IN_REVIEW', 'IN_CONTACT', 'OPENED', 'REJECTED']),
+        changedAt: zod.iso.datetime({ offset: true }),
+      }),
+    ),
+    createdAt: zod.iso.datetime({ offset: true }).nullable(),
   }),
   error: zod.unknown().nullable(),
 });
@@ -148,6 +170,116 @@ export const PatchApiV1AdminGroupBuyRequestsRequestIdStatusResponse =
     }),
     error: zod.unknown().nullable(),
   });
+
+/**
+ * @summary 소비자 공구 개설 요청 승인 및 공구 생성
+ */
+export const PostApiV1AdminGroupBuyRequestsRequestIdApproveParams = zod.object({
+  requestId: zod.number(),
+});
+
+export const postApiV1AdminGroupBuyRequestsRequestIdApproveBodyStoreNameMax = 100;
+
+export const postApiV1AdminGroupBuyRequestsRequestIdApproveBodyStoreAddressMax = 200;
+
+export const postApiV1AdminGroupBuyRequestsRequestIdApproveBodyStorePhoneNumberMax = 20;
+
+export const postApiV1AdminGroupBuyRequestsRequestIdApproveBodyProductNameMax = 100;
+
+export const postApiV1AdminGroupBuyRequestsRequestIdApproveBodyProductDescriptionMax = 1000;
+
+export const postApiV1AdminGroupBuyRequestsRequestIdApproveBodyImageUrlsMax = 5;
+
+export const postApiV1AdminGroupBuyRequestsRequestIdApproveBodyPickupLocationMax = 200;
+
+export const postApiV1AdminGroupBuyRequestsRequestIdApproveBodyPickupContactMax = 20;
+
+export const PostApiV1AdminGroupBuyRequestsRequestIdApproveBody = zod.object({
+  storeId: zod
+    .number()
+    .nullish()
+    .describe(
+      '기존 등록 매장을 사용할 때 입력. 없으면 매장명\/주소\/지역 정보로 신규 매장을 생성',
+    ),
+  storeName: zod
+    .string()
+    .max(postApiV1AdminGroupBuyRequestsRequestIdApproveBodyStoreNameMax)
+    .nullish(),
+  storeAddress: zod
+    .string()
+    .max(postApiV1AdminGroupBuyRequestsRequestIdApproveBodyStoreAddressMax)
+    .nullish(),
+  storePhoneNumber: zod
+    .string()
+    .max(postApiV1AdminGroupBuyRequestsRequestIdApproveBodyStorePhoneNumberMax)
+    .nullish(),
+  region: zod.string().nullish().describe('신규 매장 생성 시 필수'),
+  district: zod.string().nullish().describe('신규 매장 생성 시 필수'),
+  latitude: zod.number().nullish(),
+  longitude: zod.number().nullish(),
+  productName: zod
+    .string()
+    .max(postApiV1AdminGroupBuyRequestsRequestIdApproveBodyProductNameMax)
+    .describe('공구 제목'),
+  productDescription: zod
+    .string()
+    .max(
+      postApiV1AdminGroupBuyRequestsRequestIdApproveBodyProductDescriptionMax,
+    )
+    .describe('공구 내용'),
+  originalPrice: zod.number().min(1).nullish().describe('정가'),
+  price: zod.number().min(1).describe('공구가'),
+  targetQuantity: zod.number().min(1).describe('목표 수량'),
+  maxQuantity: zod
+    .number()
+    .min(1)
+    .nullish()
+    .describe('최대 수량. 생략 시 목표 수량과 동일하게 저장'),
+  perUserLimit: zod.number().min(1).nullish().describe('1인 구매 제한'),
+  imageUrls: zod
+    .array(zod.string())
+    .min(1)
+    .max(postApiV1AdminGroupBuyRequestsRequestIdApproveBodyImageUrlsMax),
+  recruitmentStartAt: zod.iso.datetime({ offset: true }),
+  deadline: zod.iso.datetime({ offset: true }).describe('모집 마감일시'),
+  pickupDate: zod.iso.date(),
+  pickupTimeStart: zod.iso.time({}),
+  pickupTimeEnd: zod.iso.time({}),
+  pickupLocation: zod
+    .string()
+    .max(postApiV1AdminGroupBuyRequestsRequestIdApproveBodyPickupLocationMax),
+  pickupContact: zod
+    .string()
+    .max(postApiV1AdminGroupBuyRequestsRequestIdApproveBodyPickupContactMax)
+    .nullish(),
+});
+
+/**
+ * @summary 소비자 공구 개설 요청 반려
+ */
+export const PostApiV1AdminGroupBuyRequestsRequestIdRejectParams = zod.object({
+  requestId: zod.number(),
+});
+
+export const postApiV1AdminGroupBuyRequestsRequestIdRejectBodyRejectionReasonMax = 200;
+
+export const PostApiV1AdminGroupBuyRequestsRequestIdRejectBody = zod.object({
+  rejectionReason: zod
+    .string()
+    .max(postApiV1AdminGroupBuyRequestsRequestIdRejectBodyRejectionReasonMax),
+});
+
+export const PostApiV1AdminGroupBuyRequestsRequestIdRejectResponse = zod.object(
+  {
+    success: zod.boolean(),
+    data: zod.object({
+      requestId: zod.number(),
+      status: zod.enum(['OPENED', 'REJECTED']),
+      groupBuyId: zod.number().nullish(),
+    }),
+    error: zod.unknown().nullable(),
+  },
+);
 
 /**
  * @summary 진행 중인 공구 현황 목록 (운영자)

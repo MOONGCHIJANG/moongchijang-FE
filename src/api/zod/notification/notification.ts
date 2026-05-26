@@ -46,10 +46,34 @@ export const GetApiV1NotificationsResponse = zod.object({
           'MY_APPLYING',
           'REQUEST_STATUS',
         ]),
+        triggerType: zod
+          .enum([
+            'PICKUP_SAME_DAY_MORNING',
+            'PICKUP_DAY_BEFORE_MORNING',
+            'PICKUP_NOT_COMPLETED_AFTER_CUTOFF',
+            'WISH_DEADLINE_MINUS_3_DAYS',
+            'WISH_DEADLINE_MINUS_1_DAY',
+            'WISH_TARGET_ACHIEVED_IMMEDIATE',
+            'APPLY_PAYMENT_SUCCESS_IMMEDIATE',
+            'APPLY_GROUPBUY_ACHIEVED_IMMEDIATE',
+            'APPLY_GROUPBUY_FAILED_IMMEDIATE',
+            'REQUEST_OPENED_IMMEDIATE',
+            'REQUEST_REJECTED_IMMEDIATE',
+            'REQUEST_NEW_PARTICIPANT_IMMEDIATE',
+            'REQUEST_TARGET_ACHIEVED_IMMEDIATE',
+            'REQUEST_DEADLINE_MINUS_3_DAYS',
+          ])
+          .describe(
+            '알림 시나리오 식별자입니다.\n1=PICKUP_SAME_DAY_MORNING\n2=PICKUP_DAY_BEFORE_MORNING\n3=PICKUP_NOT_COMPLETED_AFTER_CUTOFF\n4=WISH_DEADLINE_MINUS_3_DAYS\n5=WISH_DEADLINE_MINUS_1_DAY\n6=WISH_TARGET_ACHIEVED_IMMEDIATE\n7=APPLY_PAYMENT_SUCCESS_IMMEDIATE\n8=APPLY_GROUPBUY_ACHIEVED_IMMEDIATE\n9=APPLY_GROUPBUY_FAILED_IMMEDIATE\n10=REQUEST_OPENED_IMMEDIATE\n11=REQUEST_REJECTED_IMMEDIATE\n12=REQUEST_NEW_PARTICIPANT_IMMEDIATE\n13=REQUEST_TARGET_ACHIEVED_IMMEDIATE\n14=REQUEST_DEADLINE_MINUS_3_DAYS\n',
+          )
+          .nullish()
+          .describe(
+            '알림 트리거 타입(1~14 시나리오 식별). 기존 데이터는 null일 수 있습니다.',
+          ),
         deeplinkParams: zod
           .record(zod.string(), zod.string())
           .describe(
-            '딥링크 파라미터. PICKUP_GUIDE\/GROUPBUY_DETAIL\/MY_APPLYING은 groupBuyId, REQUEST_STATUS는 targetId를 사용합니다.',
+            '딥링크 파라미터. PICKUP_GUIDE는 participationId, GROUPBUY_DETAIL\/MY_APPLYING은 groupBuyId, REQUEST_STATUS는 requestId를 사용합니다.',
           ),
         section: zod.enum(['TODAY', 'YESTERDAY', 'OLDER']),
       }),

@@ -11,11 +11,13 @@ import {
   stepProfileSchema,
 } from '@/schemas/auth';
 import {
+  getApiV1UsersNicknameAvailability,
   usePatchApiV1UsersMeAdditionalInfo,
   usePostApiV1AuthPhoneVerificationCodes,
   usePostApiV1AuthPhoneVerificationCodesVerify,
 } from '@/api/hooks/auth/auth';
 
+type NicknameStatus = 'idle' | 'checking' | 'available' | 'duplicated';
 type PhoneStatus = 'idle' | 'sent' | 'verified' | 'invalid' | 'timeout';
 
 type ProfileState = {
@@ -59,6 +61,8 @@ export const useStepProfile = (onNext: () => void) => {
     defaultValue: '',
   });
 
+  const [nicknameStatus, setNicknameStatus] = useState<NicknameStatus>('idle');
+
   const [profileState, setProfileState] =
     useState<ProfileState>(initialProfileState);
   const { phoneStatus, phoneError, timer } = profileState;
@@ -85,6 +89,11 @@ export const useStepProfile = (onNext: () => void) => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
   }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setNicknameStatus('idle');
+  }, [nicknameValue]);
 
   // 전화번호 변경 시 상태 초기화
   useEffect(() => {
@@ -117,6 +126,28 @@ export const useStepProfile = (onNext: () => void) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return `${m}:${s.toString().padStart(2, '0')}`;
+  };
+
+  // 닉네임 중복확인 핸들러
+  const handleCheckNickname = async () => {
+    if (!isNicknameValid) return;
+    setNicknameStatus('checking');
+
+    const res = await getApiV1UsersNicknameAvailability({
+      nickname: nicknameValue,
+    }).catch(() => null);
+
+    if (!res || res.status !== 200) {
+      setNicknameStatus('idle');
+      return;
+    }
+
+    if (!res.data.data.available) {
+      setNicknameStatus('duplicated');
+      return;
+    }
+
+    setNicknameStatus('available');
   };
 
   const isPhoneFormatValid = /^01[0-9]\d{7,8}$/.test(phoneValue);
@@ -206,15 +237,26 @@ export const useStepProfile = (onNext: () => void) => {
     );
   };
 
-  const isNicknameValid = /^[A-Za-z0-9가-힣]{2,10}$/.test(nicknameValue);
+  const isNicknameValid = /^[A-Za-z0-9가-힣ㄱ-ㅎ]{2,10}$/.test(nicknameValue);
 
-  const canProceed = isNicknameValid && phoneStatus === 'verified';
+  const canProceed =
+    nicknameStatus === 'available' && phoneStatus === 'verified';
 
   const nicknameHelperText =
-    errors.nickname?.message ?? '2~10자, 한글/영문/숫자';
-  const nicknameHelperClassName = errors.nickname
-    ? 'text-text-brand'
-    : 'text-text-subtle-inverse';
+    nicknameStatus === 'duplicated'
+      ? '이미 사용 중인 닉네임이에요'
+      : nicknameStatus === 'available'
+        ? '사용 가능한 닉네임이에요'
+        : (errors.nickname?.message ?? '2~10자, 한글/영문/숫자');
+
+  const nicknameHelperClassName =
+    nicknameStatus === 'duplicated'
+      ? 'text-text-brand'
+      : nicknameStatus === 'available'
+        ? 'text-text-subtle-inverse'
+        : errors.nickname
+          ? 'text-text-brand'
+          : 'text-text-subtle-inverse';
 
   const phoneHelperText =
     phoneError ||
@@ -254,9 +296,11 @@ export const useStepProfile = (onNext: () => void) => {
     // 로딩
     isSendingCode,
     isVerifyingCode,
+    isNicknameValid,
     isSaving,
     // 상태
     phoneStatus,
+    nicknameStatus,
     // 파생 UI
     nicknameHelperText,
     nicknameHelperClassName,
@@ -269,6 +313,7 @@ export const useStepProfile = (onNext: () => void) => {
     handleResend,
     handleVerifyCode,
     handleSubmit,
+    handleCheckNickname,
     onSubmit,
   };
 };

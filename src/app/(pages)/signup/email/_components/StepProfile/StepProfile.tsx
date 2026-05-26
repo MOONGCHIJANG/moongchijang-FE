@@ -14,11 +14,13 @@ const StepProfile = ({ onNext }: StepProfileProps) => {
     timer,
     formatTimer,
     isPhoneFormatValid,
+    isNicknameValid,
     canProceed,
     isSendingCode,
     isVerifyingCode,
     isSaving,
     phoneStatus,
+    nicknameStatus,
     nicknameHelperText,
     nicknameHelperClassName,
     phoneHelperText,
@@ -29,6 +31,7 @@ const StepProfile = ({ onNext }: StepProfileProps) => {
     handleResend,
     handleVerifyCode,
     handleSubmit,
+    handleCheckNickname,
     onSubmit,
   } = useStepProfile(onNext);
 
@@ -57,6 +60,19 @@ const StepProfile = ({ onNext }: StepProfileProps) => {
           helperText={nicknameHelperText}
           helperTextClassName={nicknameHelperClassName}
           {...register('nickname')}
+          rightButton={{
+            label:
+              nicknameStatus === 'checking'
+                ? '확인 중...'
+                : nicknameStatus === 'available'
+                  ? '확인완료'
+                  : '중복확인',
+            onClick: handleCheckNickname,
+            disabled:
+              !isNicknameValid ||
+              nicknameStatus === 'checking' ||
+              nicknameStatus === 'available',
+          }}
         />
 
         {/* 전화번호 */}

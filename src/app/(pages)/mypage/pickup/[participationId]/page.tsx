@@ -11,7 +11,7 @@ import {
   useGetApiV1ParticipationsParticipationIdQr,
 } from '@/api/hooks/pickup/pickup';
 import { useShake } from '@/hooks/useShake';
-import { formatPickupDate } from '@/lib/date';
+import { formatPickupDate, formatPickupDateTime as formatPickupDateTimeLib, formatTime } from '@/lib/date';
 
 const NaverMap = dynamic(() => import('@/components/NaverMap'), { ssr: false });
 
@@ -59,8 +59,7 @@ export default function PickupPage() {
   const { isEnabled, toggleShake } = useShake(handleShake);
 
   const pickup = pickupData?.status === 200 ? pickupData.data?.data : null;
-  const qrValue =
-    qrData?.status === 200 ? (qrData.data?.data?.qrCode ?? '') : '';
+  const qrItem = qrData?.status === 200 ? qrData.data?.data : null;
   const isPickupDay = pickup?.remainingMinutes != null;
 
   const mapMarkers = useMemo(
@@ -286,14 +285,22 @@ export default function PickupPage() {
         isOpen={isQrOpen}
         onClose={handleQrClose}
         isPickupDay={isPickupDay}
-        orderNumber={String(participationId)}
-        pickupLocation={pickup.storeAddress}
-        pickupTime={`${pickup.pickupTimeStart} ~ ${pickup.pickupTimeEnd}`}
-        storeName={pickup.storeName}
-        qrValue={qrValue}
+        hasCandidate={true}
+        hasMultipleToday={false}
+        productName={qrItem?.productName ?? pickup.productName ?? ''}
+        reservationNumber={qrItem?.reservationNumber ?? ''}
+        pickupAddress={pickup.pickupLocation || pickup.storeAddress}
+        pickupTimeStart={
+          qrItem
+            ? formatPickupDateTimeLib(qrItem.pickupDate, qrItem.pickupTimeStart)
+            : formatPickupDateTimeLib(pickup.pickupDate, pickup.pickupTimeStart)
+        }
+        pickupTimeEnd={formatTime(pickup.pickupTimeEnd)}
+        qrCode={qrItem?.qrCode ?? ''}
         dDayText={isPickupDay ? 'D-day' : 'D-?'}
         shakeEnabled={isEnabled}
         onShakeToggle={toggleShake}
+        onDetailClick={() => {}}
       />
     </div>
   );

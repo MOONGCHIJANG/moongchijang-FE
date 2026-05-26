@@ -3,10 +3,8 @@
 import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
-import {
-  useGetApiV1ParticipationsParticipationIdPickup,
-  useGetApiV1ParticipationsParticipationIdQr,
-} from '@/api/hooks/pickup/pickup';
+import { useGetApiV1ParticipationsParticipationIdQr } from '@/api/hooks/pickup/pickup';
+import { formatPickupDateTime, formatTime } from '@/lib/date';
 import { useGetApiV1UsersMeTabsCounts } from '@/api/hooks/my-page/my-page';
 import { useShake } from '@/hooks/useShake';
 import { Icon } from '@iconify/react';
@@ -25,11 +23,6 @@ const TAB_LABELS: Record<TabKey, string> = {
   refunded: '환불/취소',
 };
 
-
-function formatPickupTime(start: string | null, end: string | null): string {
-  if (!start || !end) return '-';
-  return `${start} ~ ${end}`;
-}
 
 function formatDDay(dDay: number): string {
   if (dDay === 0) return 'D-day';
@@ -54,10 +47,6 @@ const MyPageClient = ({ tab }: { tab: TabKey }) => {
     qrParticipationId ?? 0,
     { query: { enabled: isQrOpen && qrParticipationId !== null } },
   );
-  const { data: pickupData } = useGetApiV1ParticipationsParticipationIdPickup(
-    qrParticipationId ?? 0,
-    { query: { enabled: isQrOpen && qrParticipationId !== null } },
-  );
 
   const handleQrClose = useCallback(() => setIsQrOpen(false), []);
   const handleShake = useCallback(() => setIsQrOpen(true), []);
@@ -72,9 +61,7 @@ const MyPageClient = ({ tab }: { tab: TabKey }) => {
     [],
   );
 
-  const qrValue =
-    qrData?.status === 200 ? (qrData.data?.data?.qrCode ?? '') : '';
-  const pickup = pickupData?.status === 200 ? pickupData.data?.data : null;
+  const qrItem = qrData?.status === 200 ? qrData.data?.data : null;
 
   const { data: tabCountsData } = useGetApiV1UsersMeTabsCounts();
   const tabCounts = tabCountsData?.status === 200 ? tabCountsData.data?.data : null;
@@ -145,18 +132,25 @@ const MyPageClient = ({ tab }: { tab: TabKey }) => {
       <QrModal
         isOpen={isQrOpen}
         onClose={handleQrClose}
-        isPickupDay={qrMeta?.dDay === 0}
-        orderNumber={String(qrParticipationId ?? '')}
-        pickupLocation={pickup?.storeAddress ?? ''}
-        pickupTime={formatPickupTime(
-          pickup?.pickupTimeStart ?? null,
-          pickup?.pickupTimeEnd ?? null,
-        )}
-        storeName={pickup?.storeName ?? qrMeta?.storeName ?? ''}
-        qrValue={qrValue}
-        dDayText={formatDDay(qrMeta?.dDay ?? 0)}
+        isPickupDay={qrItem?.availabilityStatus === 'AVAILABLE'}
+        hasCandidate={true}
+        hasMultipleToday={false}
+        productName={qrItem?.productName ?? ''}
+        reservationNumber={qrItem?.reservationNumber ?? ''}
+        pickupAddress={qrItem?.pickupLocation ?? ''}
+        pickupTimeStart={
+          qrItem
+            ? formatPickupDateTime(qrItem.pickupDate, qrItem.pickupTimeStart)
+            : ''
+        }
+        pickupTimeEnd={qrItem ? formatTime(qrItem.pickupTimeEnd) : ''}
+        qrCode={qrItem?.qrCode ?? ''}
+        dDayText={formatDDay(qrItem?.dDay ?? qrMeta?.dDay ?? 0)}
         shakeEnabled={isEnabled}
         onShakeToggle={toggleShake}
+        onDetailClick={() => {
+          if (qrParticipationId) router.push(`/mypage/pickup/${qrParticipationId}`);
+        }}
       />
     </div>
   );

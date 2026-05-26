@@ -21,7 +21,7 @@ const variants = {
 
 const sizes = {
   sm: 'h-10 px-2 caption-sm-bold rounded-large gap-1.5',
-  md: 'h-11 heading-sm-bold rounded-xl gap-2.5',
+  md: 'h-11 px-4 heading-sm-bold rounded-xl gap-2.5',
   lg: 'h-14 px-6 py-2.5 heading-md-semibold rounded-lg gap-1',
 };
 

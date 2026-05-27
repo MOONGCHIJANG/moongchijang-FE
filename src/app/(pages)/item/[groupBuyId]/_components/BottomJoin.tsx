@@ -1,21 +1,22 @@
 'use client';
 import { Button } from '@/components/Button';
 import { Icon } from '@iconify/react';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   postApiV1GroupBuysGroupBuyIdWishlist,
   deleteApiV1GroupBuysGroupBuyIdWishlist,
 } from '@/api/generated/wishlist/wishlist';
 import { ApiResponseGroupBuyDetailResponseData } from '@/api/generated/api.schemas';
 import { useRouter } from 'next/navigation';
-import { tokenStorage } from '@/lib/token';
-import { redirectStorage } from '@/lib/redirect';
 
 interface Props {
   data: ApiResponseGroupBuyDetailResponseData;
 }
 
 const BottomJoin = ({ data }: Props) => {
+  const queryClient = useQueryClient();
+  const router = useRouter();
   const [liked, setLiked] = useState(data.isWishlisted);
   const [timeLeft, setTimeLeft] = useState('');
 
@@ -28,13 +29,25 @@ const BottomJoin = ({ data }: Props) => {
         setTimeLeft('00:00:00');
         return;
       }
-      const h = String(Math.floor(diff / 3_600_000)).padStart(2, '0');
+
+      const days = Math.floor(diff / 86_400_000);
+      const h = String(Math.floor((diff % 86_400_000) / 3_600_000)).padStart(
+        2,
+        '0',
+      );
       const m = String(Math.floor((diff % 3_600_000) / 60_000)).padStart(
         2,
         '0',
       );
       const s = String(Math.floor((diff % 60_000) / 1_000)).padStart(2, '0');
-      setTimeLeft(`${h}:${m}:${s}`);
+
+      if (days > 0) {
+        setTimeLeft(
+          `${String(days).padStart(2, '0')}일 ${h}시간 ${m}분 ${s}초`,
+        );
+      } else {
+        setTimeLeft(`${h}:${m}:${s}`);
+      }
     };
 
     tick();
@@ -51,23 +64,15 @@ const BottomJoin = ({ data }: Props) => {
       } else {
         await deleteApiV1GroupBuysGroupBuyIdWishlist(data.id);
       }
+      queryClient.invalidateQueries({ queryKey: ['/api/v1/wishlists'] });
+      router.refresh();
     } catch {
-      setLiked(!next); // 실패 시 롤백
+      setLiked(!next);
     }
   };
 
-  const router = useRouter();
-
   const handleJoin = () => {
     if (isExpired) return;
-
-    const token = tokenStorage.get();
-    if (!token) {
-      redirectStorage.set(`/item/${data.id}/join`);
-      router.push('/login');
-      return;
-    }
-
     router.push(`/item/${data.id}/join`);
   };
 

@@ -51,12 +51,15 @@ export const GetApiV1AdminGroupBuyRequestsResponse = zod.object({
         desiredQuantity: zod.number(),
         desiredPickupDate: zod.iso.date(),
         status: zod.enum(['IN_REVIEW', 'IN_CONTACT', 'OPENED', 'REJECTED']),
-        requesterName: zod.string(),
-        createdAt: zod.iso.datetime({ offset: true }),
+        requesterId: zod.number(),
+        requesterName: zod.string().nullish(),
+        createdAt: zod.iso.datetime({ offset: true }).nullable(),
       }),
     ),
     totalElements: zod.number(),
     totalPages: zod.number(),
+    number: zod.number(),
+    size: zod.number(),
   }),
   error: zod.unknown().nullable(),
 });
@@ -72,17 +75,34 @@ export const GetApiV1AdminGroupBuyRequestsRequestIdResponse = zod.object({
   success: zod.boolean(),
   data: zod.object({
     requestId: zod.number(),
+    requester: zod.object({
+      userId: zod.number(),
+      nickname: zod.string().nullish(),
+      phoneNumber: zod.string().nullish(),
+      email: zod.string().nullish(),
+      provider: zod.enum(['KAKAO', 'EMAIL']).nullish(),
+    }),
     storeName: zod.string(),
+    storeAddress: zod.string().nullish(),
+    placeId: zod.string().nullish(),
+    roadAddress: zod.string().nullish(),
+    lotAddress: zod.string().nullish(),
+    latitude: zod.number().nullish(),
+    longitude: zod.number().nullish(),
     productName: zod.string(),
     desiredQuantity: zod.number(),
     desiredPickupDate: zod.iso.date(),
-    additionalNote: zod.string().nullable(),
+    additionalNote: zod.string().nullish(),
     status: zod.enum(['IN_REVIEW', 'IN_CONTACT', 'OPENED', 'REJECTED']),
-    contactPhone: zod.string().nullable(),
-    contactInstagram: zod.string().nullable(),
-    rejectionReason: zod.string().nullable(),
-    requesterName: zod.string(),
-    createdAt: zod.iso.datetime({ offset: true }),
+    rejectionReason: zod.string().nullish(),
+    openedGroupBuyId: zod.number().nullish(),
+    statusHistory: zod.array(
+      zod.object({
+        status: zod.enum(['IN_REVIEW', 'IN_CONTACT', 'OPENED', 'REJECTED']),
+        changedAt: zod.iso.datetime({ offset: true }),
+      }),
+    ),
+    createdAt: zod.iso.datetime({ offset: true }).nullable(),
   }),
   error: zod.unknown().nullable(),
 });
@@ -94,35 +114,60 @@ export const PatchApiV1AdminGroupBuyRequestsRequestIdStatusParams = zod.object({
   requestId: zod.number(),
 });
 
-export const patchApiV1AdminGroupBuyRequestsRequestIdStatusBodyContactPhoneRegExp =
-  new RegExp('^\\d{3}-\\d{3,4}-\\d{4}$');
-export const patchApiV1AdminGroupBuyRequestsRequestIdStatusBodyContactInstagramRegExp =
-  new RegExp('^@.+');
-export const patchApiV1AdminGroupBuyRequestsRequestIdStatusBodyRejectionReasonMax = 100;
+export const patchApiV1AdminGroupBuyRequestsRequestIdStatusBodyRejectionReasonMax = 500;
 
 export const PatchApiV1AdminGroupBuyRequestsRequestIdStatusBody = zod.object({
-  status: zod.enum(['IN_REVIEW', 'IN_CONTACT', 'OPENED', 'REJECTED']),
-  contactPhone: zod
-    .string()
-    .regex(patchApiV1AdminGroupBuyRequestsRequestIdStatusBodyContactPhoneRegExp)
-    .nullish(),
-  contactInstagram: zod
-    .string()
-    .regex(
-      patchApiV1AdminGroupBuyRequestsRequestIdStatusBodyContactInstagramRegExp,
-    )
-    .nullish(),
+  targetStatus: zod.enum(['IN_REVIEW', 'IN_CONTACT', 'OPENED', 'REJECTED']),
   rejectionReason: zod
     .string()
     .max(patchApiV1AdminGroupBuyRequestsRequestIdStatusBodyRejectionReasonMax)
     .nullish()
-    .describe('status=REJECTED 시 필수'),
+    .describe('targetStatus=REJECTED 시 필수'),
+  openedGroupBuyId: zod
+    .number()
+    .nullish()
+    .describe(
+      'targetStatus=OPENED 시 필수. 실제 개설된 공구 id이며 존재 검증 후 개설 알림 발송에 사용',
+    ),
 });
 
 export const PatchApiV1AdminGroupBuyRequestsRequestIdStatusResponse =
   zod.object({
     success: zod.boolean(),
-    data: zod.unknown().nullable(),
+    data: zod.object({
+      requestId: zod.number(),
+      storeName: zod.string(),
+      storeAddress: zod.string().nullish(),
+      placeId: zod.string().nullish(),
+      roadAddress: zod.string().nullish(),
+      lotAddress: zod.string().nullish(),
+      latitude: zod.number().nullish(),
+      longitude: zod.number().nullish(),
+      productName: zod.string(),
+      desiredQuantity: zod.number(),
+      desiredPickupDate: zod.iso.date(),
+      additionalNote: zod.string().nullish(),
+      status: zod
+        .enum(['IN_REVIEW', 'IN_CONTACT', 'OPENED', 'REJECTED'])
+        .describe(
+          'IN_REVIEW=검토 중 \/ IN_CONTACT=매장 컨택 중 \/\nOPENED=공구 개설 완료 \/ REJECTED=개설 불가\n',
+        ),
+      rejectionReason: zod
+        .string()
+        .nullable()
+        .describe('status=REJECTED 시 노출'),
+      openedGroupBuyId: zod
+        .number()
+        .nullable()
+        .describe('status=OPENED 시 개설된 공구 id'),
+      statusHistory: zod.array(
+        zod.object({
+          status: zod.enum(['IN_REVIEW', 'IN_CONTACT', 'OPENED', 'REJECTED']),
+          changedAt: zod.iso.datetime({ offset: true }),
+        }),
+      ),
+      createdAt: zod.iso.datetime({ offset: true }),
+    }),
     error: zod.unknown().nullable(),
   });
 

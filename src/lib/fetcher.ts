@@ -33,7 +33,7 @@ function normalizeHeaders(headers?: HeadersInit): Record<string, string> {
 
 function buildAuthHeaders(token?: string): Record<string, string> {
   if (!token) return {};
-  return { Cookie: `accessToken=${token}` };
+  return { Authorization: `Bearer ${token}` };
 }
 
 /**
@@ -212,7 +212,7 @@ export async function serverFetchRaw(
   path: string,
   token?: string,
   init?: RequestInit,
-): Promise<{ status: number; data: unknown }> {
+): Promise<{ status: number; data: unknown; headers?: Headers }> {
   const method = (init?.method ?? 'GET').toUpperCase();
 
   const staticResult = await resolveStaticResponse(path, method, init);
@@ -230,5 +230,5 @@ export async function serverFetchRaw(
   });
 
   const data = await res.json().catch(() => ({}));
-  return { status: res.status, data };
+  return { status: res.status, data, headers: res.headers };
 }

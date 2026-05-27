@@ -19,9 +19,9 @@ const TopInfo = ({ data }: Props) => {
   return (
     <div className="flex flex-col gap-g3 p-4">
       <div className="flex flex-col gap-g5">
-        {data.imageUrls[0] ? (
+        {data.thumbnailUrl ? (
           <Image
-            src={data.imageUrls[0]}
+            src={data.thumbnailUrl}
             alt="상품 이미지"
             width={400}
             height={260}
@@ -47,7 +47,14 @@ const TopInfo = ({ data }: Props) => {
               <ShareBtn onClick={() => setIsShared(!isShared)}>
                 공유하기
               </ShareBtn>
-              <BottomShare open={isShared} onClose={() => setIsShared(false)} />
+              <BottomShare
+                open={isShared}
+                onClose={() => setIsShared(false)}
+                groupBuyId={data.id}
+                productName={data.productName}
+                imageUrl={data.thumbnailUrl ?? undefined}
+                description={`${data.deadlineDateTimeLabel}까지 · ${data.storeName}`}
+              />
             </div>
           </div>
           <p className="heading-1xl-bold">{data.price.toLocaleString()}원</p>

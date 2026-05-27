@@ -21,7 +21,6 @@ import { SearchOverlay } from './SearchOverlay';
 import { QrModal } from './QrModal';
 import { EmptyState } from './EmptyState';
 import { GroupBuyRequestCard } from './GroupBuyRequestCard';
-import { GroupBuyRequestSheet } from './GroupBuyRequestSheet';
 import { REGIONS_DATA, Region } from '@/constants/regions';
 import { useShake } from '@/hooks/useShake';
 import {
@@ -31,7 +30,11 @@ import {
 import {
   type ApiResponseSearchAnalysisData,
   ApiResponseSearchAnalysisDataSearchCase,
+  ApiResponseSearchAnalysisDataUiState,
 } from '@/api/generated/api.schemas';
+import { useGetApiV1PickupsMeNearestQr } from '@/api/hooks/pickup/pickup';
+import { useAuthStore } from '@/store/authStore';
+import { formatPickupDateTime, formatTime } from '@/lib/date';
 import { useFeedList } from '../_hooks/useFeedList';
 import { useRecentSearches } from '../_hooks/useRecentSearches';
 
@@ -75,25 +78,41 @@ export function FeedClient() {
   );
   const [searchAnalysis, setSearchAnalysis] =
     useState<ApiResponseSearchAnalysisData | null>(null);
-  const [isRequestSheetOpen, setIsRequestSheetOpen] = useState(false);
 
   const queryClient = useQueryClient();
   const { recentSearches, removeRecentSearch, clearRecentSearches } =
     useRecentSearches();
-  const { mutate: executeSearch } = usePostApiV1Search({
-    mutation: {
-      onSuccess: (data) => {
-        queryClient.invalidateQueries({
-          queryKey: getGetApiV1SearchRecentQueryKey(),
-        });
-        setSearchAnalysis(
-          data.status === 200 ? (data.data?.data ?? null) : null,
-        );
+  const { mutate: executeSearch, isPending: isSearchPending } =
+    usePostApiV1Search({
+      mutation: {
+        onSuccess: (data) => {
+          queryClient.invalidateQueries({
+            queryKey: getGetApiV1SearchRecentQueryKey(),
+          });
+          setSearchAnalysis(
+            data.status === 200 ? (data.data?.data ?? null) : null,
+          );
+        },
       },
-    },
-  });
+    });
 
-  const isPickupDay = false;
+  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
+
+  const { data: nearestQrResponse } = useGetApiV1PickupsMeNearestQr({
+    query: { enabled: isLoggedIn },
+  });
+  const nearestQrData =
+    nearestQrResponse?.status === 200 ? nearestQrResponse.data?.data : null;
+  const qrItem = nearestQrData?.item ?? null;
+  const hasCandidate = nearestQrData?.hasCandidate ?? false;
+  const hasMultipleToday = nearestQrData?.hasMultipleToday ?? false;
+  const isPickupDay = qrItem?.availabilityStatus === 'AVAILABLE';
+  const dDayText = qrItem
+    ? qrItem.dDay === 0
+      ? 'D-day'
+      : `D-${qrItem.dDay}`
+    : '';
+
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   const updateUrl = useCallback(
@@ -127,7 +146,13 @@ export function FeedClient() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useFeedList(activeFilter, districts, searchKeyword);
+  } = useFeedList(activeFilter, districts, { enabled: !searchKeyword });
+
+  const isSearchMode = !!searchKeyword;
+  const displayItems = isSearchMode ? (searchAnalysis?.results ?? []) : feeds;
+  const isDisplayLoading = isSearchMode
+    ? isSearchPending && !searchAnalysis
+    : isLoading;
 
   // ref로 최신 scroll 상태 유지 → observer는 fetchNextPage가 바뀔 때만 재생성
   const scrollStateRef = useRef({
@@ -208,12 +233,19 @@ export function FeedClient() {
   };
 
   const handleOpenRequestSheet = useCallback(() => {
-    setIsRequestSheetOpen(true);
-  }, []);
+    const params = new URLSearchParams();
+    if (searchAnalysis?.detectedProduct)
+      params.set('bakery', searchAnalysis.detectedProduct);
+    if (searchAnalysis?.detectedRegion)
+      params.set('neighborhood', searchAnalysis.detectedRegion);
+    const qs = params.toString();
+    router.push(`/feed/request${qs ? `?${qs}` : ''}`);
+  }, [router, searchAnalysis]);
 
   const handleShake = useCallback(() => {
+    if (!isLoggedIn) return;
     setIsQrModalOpen(true);
-  }, []);
+  }, [isLoggedIn]);
 
   const { isEnabled, toggleShake } = useShake(handleShake);
 
@@ -228,8 +260,11 @@ export function FeedClient() {
         <FeedTopBar
           location={locationDisplayText}
           onLocationClick={() => setIsLocationSheetOpen(true)}
+          onNotificationClick={() => router.push('/notifications')}
           onQrClick={() => setIsQrModalOpen(true)}
+          showQr={isLoggedIn}
         />
+
         <div className="cursor-pointer" onClick={() => setIsSearchOpen(true)}>
           <SearchBar
             value={searchInput}
@@ -246,9 +281,9 @@ export function FeedClient() {
       </header>
 
       <div className="flex flex-col gap-4 px-5 pb-5">
-        {isLoading ? (
+        {isDisplayLoading ? (
           <FeedSkeletonList />
-        ) : !hasSearchResult ? (
+        ) : !isSearchMode && !hasSearchResult ? (
           <>
             <div className="flex flex-col items-center pt-6 pb-0">
               <div className="px-3 py-1 bg-surface-brand-lighter rounded-lg inline-flex justify-center items-center">
@@ -270,7 +305,7 @@ export function FeedClient() {
               ))}
             </div>
           </>
-        ) : feeds.length === 0 ? (
+        ) : displayItems.length === 0 ? (
           <div className="flex flex-col gap-4">
             <EmptyState
               title={'원하시는 공구가\n아직 없어요'}
@@ -282,42 +317,44 @@ export function FeedClient() {
           </div>
         ) : (
           <>
-            {feeds.map((feed) => (
+            {displayItems.map((feed) => (
               <Link key={feed.id} href={`/item/${feed.id}`}>
                 <FeedCard {...feed} />
               </Link>
             ))}
-            {searchKeyword &&
-              searchAnalysis?.searchCase ===
-                ApiResponseSearchAnalysisDataSearchCase.NUMBER_1 && (
-                <GroupBuyRequestCard
-                  icon="/icons/search.svg"
-                  title={`찾으시는 ${searchAnalysis.detectedBakery ?? searchKeyword} 공구가\n없나요?`}
-                  onRequest={handleOpenRequestSheet}
-                />
-              )}
-            {searchKeyword &&
-              searchAnalysis?.searchCase ===
-                ApiResponseSearchAnalysisDataSearchCase.NUMBER_2 && (
-                <GroupBuyRequestCard
-                  icon="/icons/search.svg"
-                  title={`찾으시는 ${searchAnalysis.detectedNeighborhood ?? searchKeyword} 공구가\n없나요?`}
-                  onRequest={handleOpenRequestSheet}
-                />
-              )}
-            {searchKeyword &&
-              searchAnalysis?.searchCase ===
-                ApiResponseSearchAnalysisDataSearchCase.NUMBER_3 && (
-                <GroupBuyRequestCard
-                  icon="/icons/search.svg"
-                  title={`찾으시는 ${searchAnalysis.detectedBakery ?? searchKeyword} 공구가\n없나요?`}
-                  onRequest={handleOpenRequestSheet}
-                />
-              )}
-            {searchKeyword &&
-              searchAnalysis?.searchCase ===
-                ApiResponseSearchAnalysisDataSearchCase.NUMBER_4 && (
-                <GroupBuyRequestCard onRequest={handleOpenRequestSheet} />
+            {isSearchMode &&
+              searchAnalysis?.uiState ===
+                ApiResponseSearchAnalysisDataUiState.RESULTS && (
+                <>
+                  {searchAnalysis.searchCase ===
+                    ApiResponseSearchAnalysisDataSearchCase.PRODUCT_ONLY && (
+                    <GroupBuyRequestCard
+                      icon="/icons/search.svg"
+                      title={`찾으시는 ${searchAnalysis.detectedProduct ?? searchKeyword} 공구가\n없나요?`}
+                      onRequest={handleOpenRequestSheet}
+                    />
+                  )}
+                  {searchAnalysis.searchCase ===
+                    ApiResponseSearchAnalysisDataSearchCase.NEIGHBORHOOD_ONLY && (
+                    <GroupBuyRequestCard
+                      icon="/icons/search.svg"
+                      title={`찾으시는 ${searchAnalysis.detectedRegion ?? searchKeyword} 공구가\n없나요?`}
+                      onRequest={handleOpenRequestSheet}
+                    />
+                  )}
+                  {searchAnalysis.searchCase ===
+                    ApiResponseSearchAnalysisDataSearchCase.BOTH_DETECTED && (
+                    <GroupBuyRequestCard
+                      icon="/icons/search.svg"
+                      title={`찾으시는 ${searchAnalysis.detectedProduct ?? searchKeyword} 공구가\n없나요?`}
+                      onRequest={handleOpenRequestSheet}
+                    />
+                  )}
+                  {searchAnalysis.searchCase ===
+                    ApiResponseSearchAnalysisDataSearchCase.NONE_DETECTED && (
+                    <GroupBuyRequestCard onRequest={handleOpenRequestSheet} />
+                  )}
+                </>
               )}
           </>
         )}
@@ -344,26 +381,35 @@ export function FeedClient() {
         onClearRecent={clearRecentSearches}
       />
 
-      <GroupBuyRequestSheet
-        isOpen={isRequestSheetOpen}
-        onClose={() => setIsRequestSheetOpen(false)}
-        detectedBakery={searchAnalysis?.detectedBakery}
-        detectedNeighborhood={searchAnalysis?.detectedNeighborhood}
-      />
-
-      <QrModal
-        isOpen={isQrModalOpen}
-        onClose={() => setIsQrModalOpen(false)}
-        isPickupDay={isPickupDay}
-        orderNumber="20260419245"
-        pickupLocation="서울 성동구 성동로 32길, 사이드템포"
-        pickupTime="4월 15일 (화) 14:00~18:00"
-        storeName="밤티 말빵"
-        qrValue="https://moongchijang.com/verify/20260419245"
-        dDayText={isPickupDay ? 'D-day' : 'D-7'}
-        shakeEnabled={isEnabled}
-        onShakeToggle={toggleShake}
-      />
+      {isLoggedIn && (
+        <QrModal
+          isOpen={isQrModalOpen}
+          onClose={() => setIsQrModalOpen(false)}
+          isPickupDay={isPickupDay}
+          hasCandidate={hasCandidate}
+          hasMultipleToday={hasMultipleToday}
+          productName={qrItem?.productName ?? ''}
+          reservationNumber={qrItem?.reservationNumber ?? ''}
+          pickupAddress={qrItem?.pickupLocation ?? ''}
+          pickupTimeStart={
+            qrItem
+              ? formatPickupDateTime(qrItem.pickupDate, qrItem.pickupTimeStart)
+              : ''
+          }
+          pickupTimeEnd={qrItem ? formatTime(qrItem.pickupTimeEnd) : ''}
+          qrCode={qrItem?.qrCode ?? ''}
+          dDayText={dDayText}
+          shakeEnabled={isEnabled}
+          onShakeToggle={() => toggleShake()}
+          onDetailClick={() => {
+            if (qrItem) router.push(`/mypage/pickup/${qrItem.participationId}`);
+          }}
+          onMultiplePickupClick={() => {
+            setIsQrModalOpen(false);
+            router.push('/mypage');
+          }}
+        />
+      )}
     </>
   );
 }

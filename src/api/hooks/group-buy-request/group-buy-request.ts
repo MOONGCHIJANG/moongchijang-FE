@@ -22,12 +22,16 @@ import type {
   ApiResponseGroupBuyRequestDetail,
   ApiResponseGroupBuyRequestList,
   ApiResponseRequestId,
+  ApiResponseStoreRecommendation,
   ApiResponseStoreSearchList,
   BadRequestResponse,
   ForbiddenResponse,
   GetApiV1StoresSearchParams,
   GroupBuyRequestCreate,
   NotFoundResponse,
+  PostApiV1GroupBuyOpenRequestsBody,
+  StoreRecommendationRequest,
+  SuccessNoDataResponse,
   UnauthorizedResponse,
 } from '../api.schemas';
 
@@ -752,3 +756,296 @@ export function useGetApiV1GroupBuyRequestsRequestId<
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+/**
+ * 특정 지역/상품 조합으로 공구가 개설되면 알림을 받기 위해 등록한다.
+검색 결과가 비어 있을 때(EMPTY_CAN_REQUEST 상태) 진입 가능한 진입점이다.
+
+ * @summary 공구 개설 알림 신청
+ */
+export type postApiV1GroupBuyOpenRequestsResponse201 = {
+  data: SuccessNoDataResponse;
+  status: 201;
+};
+
+export type postApiV1GroupBuyOpenRequestsResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type postApiV1GroupBuyOpenRequestsResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type postApiV1GroupBuyOpenRequestsResponseSuccess =
+  postApiV1GroupBuyOpenRequestsResponse201 & {
+    headers: Headers;
+  };
+export type postApiV1GroupBuyOpenRequestsResponseError = (
+  | postApiV1GroupBuyOpenRequestsResponse400
+  | postApiV1GroupBuyOpenRequestsResponse401
+) & {
+  headers: Headers;
+};
+
+export type postApiV1GroupBuyOpenRequestsResponse =
+  | postApiV1GroupBuyOpenRequestsResponseSuccess
+  | postApiV1GroupBuyOpenRequestsResponseError;
+
+export const getPostApiV1GroupBuyOpenRequestsUrl = () => {
+  return `/api/v1/group-buy-open-requests`;
+};
+
+export const postApiV1GroupBuyOpenRequests = async (
+  postApiV1GroupBuyOpenRequestsBody: PostApiV1GroupBuyOpenRequestsBody,
+  options?: RequestInit,
+): Promise<postApiV1GroupBuyOpenRequestsResponse> => {
+  return customFetch<postApiV1GroupBuyOpenRequestsResponse>(
+    getPostApiV1GroupBuyOpenRequestsUrl(),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(postApiV1GroupBuyOpenRequestsBody),
+    },
+  );
+};
+
+export const getPostApiV1GroupBuyOpenRequestsMutationOptions = <
+  TError = BadRequestResponse | UnauthorizedResponse,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiV1GroupBuyOpenRequests>>,
+    TError,
+    { data: PostApiV1GroupBuyOpenRequestsBody },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiV1GroupBuyOpenRequests>>,
+  TError,
+  { data: PostApiV1GroupBuyOpenRequestsBody },
+  TContext
+> => {
+  const mutationKey = ['postApiV1GroupBuyOpenRequests'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiV1GroupBuyOpenRequests>>,
+    { data: PostApiV1GroupBuyOpenRequestsBody }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiV1GroupBuyOpenRequests(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiV1GroupBuyOpenRequestsMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiV1GroupBuyOpenRequests>>
+>;
+export type PostApiV1GroupBuyOpenRequestsMutationBody =
+  PostApiV1GroupBuyOpenRequestsBody;
+export type PostApiV1GroupBuyOpenRequestsMutationError =
+  | BadRequestResponse
+  | UnauthorizedResponse;
+
+/**
+ * @summary 공구 개설 알림 신청
+ */
+export const usePostApiV1GroupBuyOpenRequests = <
+  TError = BadRequestResponse | UnauthorizedResponse,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiV1GroupBuyOpenRequests>>,
+      TError,
+      { data: PostApiV1GroupBuyOpenRequestsBody },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiV1GroupBuyOpenRequests>>,
+  TError,
+  { data: PostApiV1GroupBuyOpenRequestsBody },
+  TContext
+> => {
+  return useMutation(
+    getPostApiV1GroupBuyOpenRequestsMutationOptions(options),
+    queryClient,
+  );
+};
+/**
+ * 1.1.4-9 매장 추천 바텀시트용 API.
+
+Case 1~4의 바텀시트에서 동네·상품 조건이 모두 확정된 후 CTA 버튼을 탭하면,
+백엔드는 네이버 Local Search API를 조회하여 해당 조건에 맞는 매장 후보를 검색한다.
+
+매장 후보는 최대 10개까지 반환하며, 추천 매장 후보는 다음 기준을 반영해 정렬한다.
+
+- 네이버 Local Search API의 기본 관련도 순서
+- 매장 주소가 선택한 동네와 일치하거나 포함되는지 여부
+- 매장 카테고리가 상품 조건과 관련 있는지 여부
+- 자사 DB에 등록된 매장인지 여부
+- 해당 매장의 과거 공구 이력이 있는지 여부
+
+네이버 결과가 0건이거나 네이버 API 호출 실패/timeout이 발생하면 `stores=[]`를 반환하며,
+프론트는 기존 공구 개설 요청 플로우로 fallback한다.
+
+중복 매장은 하나로 합쳐 반환하고, 매장명에 포함된 HTML 태그는 제거해서 반환한다.
+
+ * @summary 매장 추천 바텀시트용 네이버 Local Search 매장 후보 조회
+ */
+export type postApiV1GroupBuyOpenRequestsStoreRecommendationsResponse200 = {
+  data: ApiResponseStoreRecommendation;
+  status: 200;
+};
+
+export type postApiV1GroupBuyOpenRequestsStoreRecommendationsResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type postApiV1GroupBuyOpenRequestsStoreRecommendationsResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type postApiV1GroupBuyOpenRequestsStoreRecommendationsResponseSuccess =
+  postApiV1GroupBuyOpenRequestsStoreRecommendationsResponse200 & {
+    headers: Headers;
+  };
+export type postApiV1GroupBuyOpenRequestsStoreRecommendationsResponseError = (
+  | postApiV1GroupBuyOpenRequestsStoreRecommendationsResponse400
+  | postApiV1GroupBuyOpenRequestsStoreRecommendationsResponse401
+) & {
+  headers: Headers;
+};
+
+export type postApiV1GroupBuyOpenRequestsStoreRecommendationsResponse =
+  | postApiV1GroupBuyOpenRequestsStoreRecommendationsResponseSuccess
+  | postApiV1GroupBuyOpenRequestsStoreRecommendationsResponseError;
+
+export const getPostApiV1GroupBuyOpenRequestsStoreRecommendationsUrl = () => {
+  return `/api/v1/group-buy-open-requests/store-recommendations`;
+};
+
+export const postApiV1GroupBuyOpenRequestsStoreRecommendations = async (
+  storeRecommendationRequest: StoreRecommendationRequest,
+  options?: RequestInit,
+): Promise<postApiV1GroupBuyOpenRequestsStoreRecommendationsResponse> => {
+  return customFetch<postApiV1GroupBuyOpenRequestsStoreRecommendationsResponse>(
+    getPostApiV1GroupBuyOpenRequestsStoreRecommendationsUrl(),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(storeRecommendationRequest),
+    },
+  );
+};
+
+export const getPostApiV1GroupBuyOpenRequestsStoreRecommendationsMutationOptions =
+  <
+    TError = BadRequestResponse | UnauthorizedResponse,
+    TContext = unknown,
+  >(options?: {
+    mutation?: UseMutationOptions<
+      Awaited<
+        ReturnType<typeof postApiV1GroupBuyOpenRequestsStoreRecommendations>
+      >,
+      TError,
+      { data: StoreRecommendationRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  }): UseMutationOptions<
+    Awaited<
+      ReturnType<typeof postApiV1GroupBuyOpenRequestsStoreRecommendations>
+    >,
+    TError,
+    { data: StoreRecommendationRequest },
+    TContext
+  > => {
+    const mutationKey = ['postApiV1GroupBuyOpenRequestsStoreRecommendations'];
+    const { mutation: mutationOptions, request: requestOptions } = options
+      ? options.mutation &&
+        'mutationKey' in options.mutation &&
+        options.mutation.mutationKey
+        ? options
+        : { ...options, mutation: { ...options.mutation, mutationKey } }
+      : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+      Awaited<
+        ReturnType<typeof postApiV1GroupBuyOpenRequestsStoreRecommendations>
+      >,
+      { data: StoreRecommendationRequest }
+    > = (props) => {
+      const { data } = props ?? {};
+
+      return postApiV1GroupBuyOpenRequestsStoreRecommendations(
+        data,
+        requestOptions,
+      );
+    };
+
+    return { mutationFn, ...mutationOptions };
+  };
+
+export type PostApiV1GroupBuyOpenRequestsStoreRecommendationsMutationResult =
+  NonNullable<
+    Awaited<
+      ReturnType<typeof postApiV1GroupBuyOpenRequestsStoreRecommendations>
+    >
+  >;
+export type PostApiV1GroupBuyOpenRequestsStoreRecommendationsMutationBody =
+  StoreRecommendationRequest;
+export type PostApiV1GroupBuyOpenRequestsStoreRecommendationsMutationError =
+  | BadRequestResponse
+  | UnauthorizedResponse;
+
+/**
+ * @summary 매장 추천 바텀시트용 네이버 Local Search 매장 후보 조회
+ */
+export const usePostApiV1GroupBuyOpenRequestsStoreRecommendations = <
+  TError = BadRequestResponse | UnauthorizedResponse,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<
+        ReturnType<typeof postApiV1GroupBuyOpenRequestsStoreRecommendations>
+      >,
+      TError,
+      { data: StoreRecommendationRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiV1GroupBuyOpenRequestsStoreRecommendations>>,
+  TError,
+  { data: StoreRecommendationRequest },
+  TContext
+> => {
+  return useMutation(
+    getPostApiV1GroupBuyOpenRequestsStoreRecommendationsMutationOptions(
+      options,
+    ),
+    queryClient,
+  );
+};

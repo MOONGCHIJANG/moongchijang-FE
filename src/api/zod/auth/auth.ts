@@ -34,7 +34,9 @@ export const PostApiV1AuthKakaoResponse = zod.object({
       nickname: zod.string().nullish(),
       phoneNumber: zod.string().nullish(),
       role: zod.enum(['BUYER', 'SELLER', 'ADMIN']),
+      lastRole: zod.enum(['BUYER', 'SELLER', 'ADMIN']).nullish(),
       signupCompleted: zod.boolean(),
+      sellerSignupCompleted: zod.boolean(),
       deletedAt: zod.iso.datetime({ offset: true }).nullish(),
       createdAt: zod.iso.datetime({ offset: true }),
       updatedAt: zod.iso.datetime({ offset: true }),
@@ -83,7 +85,9 @@ export const GetApiV1UsersMeResponse = zod.object({
     nickname: zod.string().nullish(),
     phoneNumber: zod.string().nullish(),
     role: zod.enum(['BUYER', 'SELLER', 'ADMIN']),
+    lastRole: zod.enum(['BUYER', 'SELLER', 'ADMIN']).nullish(),
     signupCompleted: zod.boolean(),
+    sellerSignupCompleted: zod.boolean(),
     deletedAt: zod.iso.datetime({ offset: true }).nullish(),
     createdAt: zod.iso.datetime({ offset: true }),
     updatedAt: zod.iso.datetime({ offset: true }),
@@ -92,8 +96,33 @@ export const GetApiV1UsersMeResponse = zod.object({
 });
 
 /**
+ * 회원 탈퇴를 처리한다.
+- 수령 예정 공구(달성 완료 + 픽업 미완료)가 있으면 탈퇴할 수 없다.
+- 참여 중 공구(PAID_WAITING_GOAL)는 자동 취소된다.
+- 찜 목록은 모두 삭제된다.
+- 동일 계정은 탈퇴 후 30일 이후 재가입 가능하다.
+
  * @summary 회원 탈퇴
  */
+export const deleteApiV1UsersMeBodyReasonDetailMax = 500;
+
+export const DeleteApiV1UsersMeBody = zod.object({
+  reason: zod
+    .enum([
+      'NO_DESIRED_GROUPBUY',
+      'INCONVENIENT_SERVICE',
+      'PRIVACY_CONCERN',
+      'OTHER',
+    ])
+    .nullish()
+    .describe('탈퇴 사유(선택)'),
+  reasonDetail: zod
+    .string()
+    .max(deleteApiV1UsersMeBodyReasonDetailMax)
+    .nullish()
+    .describe('탈퇴 상세 사유 (reason=OTHER 일 때 입력)'),
+});
+
 export const DeleteApiV1UsersMeResponse = zod.object({
   success: zod.boolean(),
   data: zod.unknown().nullable(),
@@ -165,6 +194,177 @@ export const PatchApiV1UsersMeAdditionalInfoResponse = zod.object({
     nickname: zod.string(),
     phoneNumber: zod.string(),
     signupCompleted: zod.boolean(),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * 사업자등록번호를 조회해 상태를 반환한다.
+- `VALID`: 정상 사업자(계속사업자)
+- `CLOSED`: 휴업/폐업
+- `NOT_FOUND`: 조회 불가/미확인
+
+ * @summary 사업자등록번호 조회
+ */
+export const postApiV1UsersMeSellerBusinessRegistrationLookupBodyBusinessRegistrationNumberRegExp =
+  new RegExp('^\\d{3}-?\\d{2}-?\\d{5}$');
+
+export const PostApiV1UsersMeSellerBusinessRegistrationLookupBody = zod.object({
+  businessRegistrationNumber: zod
+    .string()
+    .regex(
+      postApiV1UsersMeSellerBusinessRegistrationLookupBodyBusinessRegistrationNumberRegExp,
+    )
+    .describe('사업자등록번호(하이픈 포함\/미포함 모두 허용)'),
+});
+
+export const PostApiV1UsersMeSellerBusinessRegistrationLookupResponse =
+  zod.object({
+    success: zod.boolean(),
+    data: zod.object({
+      businessRegistrationNumber: zod.string(),
+      status: zod.enum(['VALID', 'CLOSED', 'NOT_FOUND']),
+      message: zod.string().nullish(),
+      storeName: zod.string().nullish(),
+      ownerName: zod.string().nullish(),
+      storeAddress: zod.string().nullish(),
+    }),
+    error: zod.unknown().nullable(),
+  });
+
+/**
+ * 사장님 가입의 사업자 정보를 저장한다.
+ * @summary 사장님 사업자 정보 저장
+ */
+export const patchApiV1UsersMeSellerBusinessInfoBodyBusinessRegistrationNumberRegExp =
+  new RegExp('^\\d{3}-?\\d{2}-?\\d{5}$');
+export const patchApiV1UsersMeSellerBusinessInfoBodyStoreNameMax = 100;
+
+export const patchApiV1UsersMeSellerBusinessInfoBodyOwnerNameMax = 50;
+
+export const patchApiV1UsersMeSellerBusinessInfoBodyStoreAddressMax = 255;
+
+export const patchApiV1UsersMeSellerBusinessInfoBodyPhoneNumberRegExp =
+  new RegExp('^01[0-9]-[0-9]{3,4}-[0-9]{4}$');
+
+export const PatchApiV1UsersMeSellerBusinessInfoBody = zod.object({
+  businessRegistrationNumber: zod
+    .string()
+    .regex(
+      patchApiV1UsersMeSellerBusinessInfoBodyBusinessRegistrationNumberRegExp,
+    ),
+  storeName: zod
+    .string()
+    .max(patchApiV1UsersMeSellerBusinessInfoBodyStoreNameMax),
+  ownerName: zod
+    .string()
+    .max(patchApiV1UsersMeSellerBusinessInfoBodyOwnerNameMax),
+  storeAddress: zod
+    .string()
+    .max(patchApiV1UsersMeSellerBusinessInfoBodyStoreAddressMax),
+  phoneNumber: zod
+    .string()
+    .regex(patchApiV1UsersMeSellerBusinessInfoBodyPhoneNumberRegExp),
+});
+
+export const PatchApiV1UsersMeSellerBusinessInfoResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    id: zod.number(),
+    sellerSignupCompleted: zod.boolean(),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * 사장님 정산 정보를 저장하고 사장님 가입 완료 상태를 반영한다.
+ * @summary 사장님 정산 정보 저장
+ */
+export const patchApiV1UsersMeSellerSettlementInfoBodyAccountNumberMax = 50;
+
+export const patchApiV1UsersMeSellerSettlementInfoBodyAccountHolderNameMax = 50;
+
+export const PatchApiV1UsersMeSellerSettlementInfoBody = zod.object({
+  bankCode: zod
+    .enum([
+      'NONGHYEOP',
+      'KAKAOBANK',
+      'KOOKMIN',
+      'TOSSBANK',
+      'SHINHAN',
+      'WOORI',
+      'IBK',
+      'HANA',
+      'SAEMAUL',
+      'BUSANBANK',
+      'DAEGUBANK',
+      'KBANK',
+      'SHINHYEOP',
+      'POST',
+      'SC',
+      'KYONGNAMBANK',
+      'GWANGJUBANK',
+      'SUHYEOP',
+      'JEONBUKBANK',
+      'SAVINGBANK',
+      'JEJUBANK',
+      'CITI',
+      'KDBBANK',
+      'SANLIM',
+      'BOA',
+      'HSBC',
+      'SAMSUNG_SECURITIES',
+      'KB_SECURITIES',
+      'NH_INVESTMENT_AND_SECURITIES',
+      'YUANTA_SECURITES',
+      'DAISHIN_SECURITIES',
+      'HANA_INVESTMENT_AND_SECURITIES',
+      'HANHWA_INVESTMENT_AND_SECURITIES',
+      'EUGENE_INVESTMENT_AND_SECURITIES',
+      'HI_INVESTMENT_AND_SECURITIES',
+      'KYOBO_SECURITIES',
+      'MERITZ_SECURITIES',
+      'SK_SECURITIES',
+      'LIG_INVESTMENT_AND_SECURITIES',
+      'HYUNDAI_MOTOR_SECURITIES',
+      'DB_INVESTMENT_AND_SECURITIES',
+      'SHINYOUNG_SECURITIES',
+      'DAOL_INVESTMENT_AND_SECURITIES',
+      'BOOKOOK_SECURITIES',
+      'TOSS_SECURITIES',
+      'KAKAOPAY_SECURITIES',
+      'MIRAE_ASSET_SECURITIES',
+      'KIWOOM',
+      'KOREA_INVESTMENT_AND_SECURITIES',
+      'SHINHAN_SECURITIES',
+      'IBK_INVESTMENT_SECURITIES',
+      'WOORI_SECURITIES',
+      'CAPE_INVESTMENT_SECURITIES',
+      'BNK_INVESTMENT_SECURITIES',
+      'SANGSANGIN_SECURITIES',
+      'ICBC',
+      'DEUTSCHE_BANK',
+      'JPMORGAN_CHASE',
+      'BNP_PARIBAS',
+      'CCB',
+      'BOC',
+    ])
+    .describe(
+      '은행\/증권사 선택값(라벨 또는 코드).\n- 서버 저장 시 표준 코드로 정규화된다.\n- 아래 enum은 저장되는 표준 코드 목록이다.\n- BANK codes:\n  NONGHYEOP, KAKAOBANK, KOOKMIN, TOSSBANK, SHINHAN, WOORI, IBK, HANA, SAEMAUL, BUSANBANK,\n  DAEGUBANK, KBANK, SHINHYEOP, POST, SC, KYONGNAMBANK, GWANGJUBANK, SUHYEOP, JEONBUKBANK,\n  SAVINGBANK, JEJUBANK, CITI, KDBBANK, SANLIM, BOA, HSBC, ICBC, DEUTSCHE_BANK, JPMORGAN_CHASE,\n  BNP_PARIBAS, CCB, BOC\n- SECURITIES codes:\n  SAMSUNG_SECURITIES, KB_SECURITIES, NH_INVESTMENT_AND_SECURITIES, YUANTA_SECURITES, DAISHIN_SECURITIES,\n  HANA_INVESTMENT_AND_SECURITIES, HANHWA_INVESTMENT_AND_SECURITIES, EUGENE_INVESTMENT_AND_SECURITIES,\n  HI_INVESTMENT_AND_SECURITIES, KYOBO_SECURITIES, MERITZ_SECURITIES, SK_SECURITIES,\n  LIG_INVESTMENT_AND_SECURITIES, HYUNDAI_MOTOR_SECURITIES, DB_INVESTMENT_AND_SECURITIES,\n  SHINYOUNG_SECURITIES, DAOL_INVESTMENT_AND_SECURITIES, BOOKOOK_SECURITIES, TOSS_SECURITIES,\n  KAKAOPAY_SECURITIES, MIRAE_ASSET_SECURITIES, KIWOOM, KOREA_INVESTMENT_AND_SECURITIES,\n  SHINHAN_SECURITIES, IBK_INVESTMENT_SECURITIES, WOORI_SECURITIES, CAPE_INVESTMENT_SECURITIES,\n  BNK_INVESTMENT_SECURITIES, SANGSANGIN_SECURITIES\n',
+    ),
+  accountNumber: zod
+    .string()
+    .max(patchApiV1UsersMeSellerSettlementInfoBodyAccountNumberMax),
+  accountHolderName: zod
+    .string()
+    .max(patchApiV1UsersMeSellerSettlementInfoBodyAccountHolderNameMax),
+});
+
+export const PatchApiV1UsersMeSellerSettlementInfoResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    id: zod.number(),
+    sellerSignupCompleted: zod.boolean(),
   }),
   error: zod.unknown().nullable(),
 });
@@ -315,7 +515,9 @@ export const PostApiV1AuthEmailSignupResponse = zod.object({
       nickname: zod.string().nullish(),
       phoneNumber: zod.string().nullish(),
       role: zod.enum(['BUYER', 'SELLER', 'ADMIN']),
+      lastRole: zod.enum(['BUYER', 'SELLER', 'ADMIN']).nullish(),
       signupCompleted: zod.boolean(),
+      sellerSignupCompleted: zod.boolean(),
       deletedAt: zod.iso.datetime({ offset: true }).nullish(),
       createdAt: zod.iso.datetime({ offset: true }),
       updatedAt: zod.iso.datetime({ offset: true }),
@@ -351,7 +553,9 @@ export const PostApiV1AuthEmailLoginResponse = zod.object({
       nickname: zod.string().nullish(),
       phoneNumber: zod.string().nullish(),
       role: zod.enum(['BUYER', 'SELLER', 'ADMIN']),
+      lastRole: zod.enum(['BUYER', 'SELLER', 'ADMIN']).nullish(),
       signupCompleted: zod.boolean(),
+      sellerSignupCompleted: zod.boolean(),
       deletedAt: zod.iso.datetime({ offset: true }).nullish(),
       createdAt: zod.iso.datetime({ offset: true }),
       updatedAt: zod.iso.datetime({ offset: true }),
@@ -361,51 +565,52 @@ export const PostApiV1AuthEmailLoginResponse = zod.object({
 });
 
 /**
- * 가입된 이메일로 비밀번호 재설정 링크를 발송한다.
- * @summary 비밀번호 재설정 링크 발송
+ * 인증된 사용자의 닉네임을 변경한다.
+ * @summary 닉네임 변경
  */
-export const PostApiV1AuthPasswordResetLinkBody = zod.object({
-  email: zod.email(),
-});
+export const patchApiV1UsersMeNicknameBodyNicknameMin = 2;
+export const patchApiV1UsersMeNicknameBodyNicknameMax = 10;
 
-export const PostApiV1AuthPasswordResetLinkResponse = zod.object({
-  success: zod.boolean(),
-  data: zod.unknown().nullable(),
-  error: zod.unknown().nullable(),
-});
-
-/**
- * 닉네임과 전화번호를 수정한다.
- * @summary 프로필 수정
- */
-export const patchApiV1UsersMeProfileBodyNicknameMin = 2;
-export const patchApiV1UsersMeProfileBodyNicknameMax = 10;
-
-export const patchApiV1UsersMeProfileBodyNicknameRegExp = new RegExp(
+export const patchApiV1UsersMeNicknameBodyNicknameRegExp = new RegExp(
   '^[A-Za-z0-9가-힣]{2,10}$',
 );
-export const patchApiV1UsersMeProfileBodyPhoneNumberRegExp = new RegExp(
-  '^01[0-9]-[0-9]{3,4}-[0-9]{4}$',
-);
 
-export const PatchApiV1UsersMeProfileBody = zod.object({
+export const PatchApiV1UsersMeNicknameBody = zod.object({
   nickname: zod
     .string()
-    .min(patchApiV1UsersMeProfileBodyNicknameMin)
-    .max(patchApiV1UsersMeProfileBodyNicknameMax)
-    .regex(patchApiV1UsersMeProfileBodyNicknameRegExp),
-  phoneNumber: zod
-    .string()
-    .regex(patchApiV1UsersMeProfileBodyPhoneNumberRegExp),
+    .min(patchApiV1UsersMeNicknameBodyNicknameMin)
+    .max(patchApiV1UsersMeNicknameBodyNicknameMax)
+    .regex(patchApiV1UsersMeNicknameBodyNicknameRegExp),
 });
 
-export const PatchApiV1UsersMeProfileResponse = zod.object({
+export const PatchApiV1UsersMeNicknameResponse = zod.object({
   success: zod.boolean(),
   data: zod.object({
     id: zod.number(),
     nickname: zod.string(),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * 인증된 사용자의 전화번호를 변경한다.
+ * @summary 전화번호 변경
+ */
+export const patchApiV1UsersMePhoneNumberBodyPhoneNumberRegExp = new RegExp(
+  '^01[0-9]-[0-9]{3,4}-[0-9]{4}$',
+);
+
+export const PatchApiV1UsersMePhoneNumberBody = zod.object({
+  phoneNumber: zod
+    .string()
+    .regex(patchApiV1UsersMePhoneNumberBodyPhoneNumberRegExp),
+});
+
+export const PatchApiV1UsersMePhoneNumberResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    id: zod.number(),
     phoneNumber: zod.string(),
-    updatedAt: zod.iso.datetime({ offset: true }),
   }),
   error: zod.unknown().nullable(),
 });
@@ -462,27 +667,28 @@ export const PostApiV1UsersMePhoneVerificationCodesVerifyResponse = zod.object({
  * 현재 비밀번호를 확인하고 새 비밀번호로 변경한다. 변경 완료 시 세션을 무효화한다.
  * @summary 비밀번호 변경 (이메일 가입자 전용)
  */
-export const postApiV1AuthPasswordChangeBodyNewPasswordMin = 8;
-export const postApiV1AuthPasswordChangeBodyNewPasswordMax = 20;
+export const patchApiV1UsersMePasswordBodyNewPasswordMin = 8;
+export const patchApiV1UsersMePasswordBodyNewPasswordMax = 20;
 
-export const postApiV1AuthPasswordChangeBodyNewPasswordRegExp = new RegExp(
+export const patchApiV1UsersMePasswordBodyNewPasswordRegExp = new RegExp(
   '^(?=.\*[A-Za-z])(?=.\*[0-9]).{8,20}$',
 );
 
-export const PostApiV1AuthPasswordChangeBody = zod.object({
+export const PatchApiV1UsersMePasswordBody = zod.object({
   currentPassword: zod.string(),
   newPassword: zod
     .string()
-    .min(postApiV1AuthPasswordChangeBodyNewPasswordMin)
-    .max(postApiV1AuthPasswordChangeBodyNewPasswordMax)
-    .regex(postApiV1AuthPasswordChangeBodyNewPasswordRegExp)
-    .describe('8~20자, 영문+숫자 포함'),
-  newPasswordConfirm: zod.string(),
+    .min(patchApiV1UsersMePasswordBodyNewPasswordMin)
+    .max(patchApiV1UsersMePasswordBodyNewPasswordMax)
+    .regex(patchApiV1UsersMePasswordBodyNewPasswordRegExp)
+    .describe('8~20자, 영문+숫자 포함, 이메일 아이디와 동일값 불가'),
 });
 
-export const PostApiV1AuthPasswordChangeResponse = zod.object({
+export const PatchApiV1UsersMePasswordResponse = zod.object({
   success: zod.boolean(),
-  data: zod.unknown().nullable(),
+  data: zod.object({
+    changed: zod.boolean(),
+  }),
   error: zod.unknown().nullable(),
 });
 

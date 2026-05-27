@@ -34,7 +34,8 @@ export const GNB = ({ className = '' }: GNBProps) => {
     >
       {TABS.map((tab) => {
         const isActive =
-          pathname === tab.href || pathname.startsWith(`${tab.href}/`);
+          pathname === tab.href ||
+          (pathname?.startsWith(`${tab.href}/`) ?? false);
         const colorClass = isActive ? 'text-icon-basic' : 'text-icon-disabled';
 
         return (

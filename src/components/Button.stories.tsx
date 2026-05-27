@@ -37,3 +37,37 @@ export const Medium: Story = {
     children: '설정하기',
   },
 };
+
+export const Tertiary: Story = {
+  args: {
+    variant: 'tertiary',
+    size: 'md',
+    children: '다시 생각하기',
+  },
+};
+
+export const Black: Story = {
+  args: {
+    variant: 'black',
+    size: 'lg',
+    fullWidth: true,
+    children: '다른 상품 둘러보기',
+  },
+};
+
+export const Small: Story = {
+  args: {
+    variant: 'primary',
+    size: 'sm',
+    children: '중복확인',
+  },
+};
+
+export const SmallDisabled: Story = {
+  args: {
+    variant: 'primary',
+    size: 'sm',
+    children: '중복확인',
+    disabled: true,
+  },
+};

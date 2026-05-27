@@ -41,8 +41,8 @@ export const GroupBuyRequestClient = () => {
       const res = await postApiV1GroupBuyRequests({
         storeName: data.store.storeName,
         storeAddress: data.store.roadAddress,
-        storeLatitude: data.store.latitude,
-        storeLongitude: data.store.longitude,
+        latitude: data.store.latitude,
+        longitude: data.store.longitude,
         productName: data.productName,
         desiredQuantity: data.quantity,
         desiredPickupDate: data.pickupDate,

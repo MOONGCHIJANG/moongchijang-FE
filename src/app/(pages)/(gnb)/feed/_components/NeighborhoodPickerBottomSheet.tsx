@@ -5,16 +5,19 @@ import { Icon } from '@iconify/react';
 import { BottomSheet } from '@/components/BottomSheet';
 import { Button } from '@/components/Button';
 import { cn } from '@/lib/utils';
-import { NEIGHBORHOOD_REGIONS_DATA, type Region } from '@/constants/regions';
+import {
+  REQUEST_REGIONS_DATA,
+  type RequestRegion,
+} from '@/constants/requestRegions';
 
 interface NeighborhoodPickerBottomSheetProps {
   isOpen: boolean;
   onClose: () => void;
-  selectedRegion: Region | null;
-  onSelect: (region: Region) => void;
+  selectedRegion: RequestRegion | null;
+  onSelect: (region: RequestRegion) => void;
 }
 
-const ALL_NEIGHBORHOODS = NEIGHBORHOOD_REGIONS_DATA.flatMap((city) =>
+const ALL_NEIGHBORHOODS = REQUEST_REGIONS_DATA.flatMap((city) =>
   city.regions.map((r) => ({ ...r, cityName: city.name })),
 );
 
@@ -25,7 +28,7 @@ export const NeighborhoodPickerBottomSheet = ({
   onSelect,
 }: NeighborhoodPickerBottomSheetProps) => {
   const [selectedCityType, setSelectedCityType] = useState(
-    NEIGHBORHOOD_REGIONS_DATA[0].regionType,
+    REQUEST_REGIONS_DATA[0].regionType,
   );
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -33,7 +36,7 @@ export const NeighborhoodPickerBottomSheet = ({
   if (prevIsOpen !== isOpen) {
     setPrevIsOpen(isOpen);
     if (isOpen) {
-      setSelectedCityType(NEIGHBORHOOD_REGIONS_DATA[0].regionType);
+      setSelectedCityType(REQUEST_REGIONS_DATA[0].regionType);
       setSearchQuery('');
     }
   }
@@ -45,10 +48,10 @@ export const NeighborhoodPickerBottomSheet = ({
     : null;
 
   const currentCity =
-    NEIGHBORHOOD_REGIONS_DATA.find((c) => c.regionType === selectedCityType) ??
-    NEIGHBORHOOD_REGIONS_DATA[0];
+    REQUEST_REGIONS_DATA.find((c) => c.regionType === selectedCityType) ??
+    REQUEST_REGIONS_DATA[0];
 
-  const handleSelect = (region: Region) => {
+  const handleSelect = (region: RequestRegion) => {
     onSelect(region);
     onClose();
   };
@@ -95,13 +98,12 @@ export const NeighborhoodPickerBottomSheet = ({
             <div className="flex flex-col">
               {filteredNeighborhoods!.map((r) => (
                 <button
-                  key={`${r.districtType}-${r.name}`}
+                  key={r.key}
                   type="button"
                   onClick={() => handleSelect(r)}
                   className={cn(
                     'h-[52px] flex items-center justify-between px-4 rounded-2xl transition-colors body-sm-regular font-pretendard',
-                    selectedRegion?.districtType === r.districtType &&
-                      selectedRegion?.name === r.name
+                    selectedRegion?.key === r.key
                       ? 'bg-primary-25 text-text-brand body-sm-bold'
                       : 'text-text-basic',
                   )}
@@ -118,7 +120,7 @@ export const NeighborhoodPickerBottomSheet = ({
       ) : (
         <div className="flex h-[420px] border-t border-divider-light">
           <div className="h-full w-[110px] overflow-y-auto bg-surface-elevated scrollbar-hide">
-            {NEIGHBORHOOD_REGIONS_DATA.map((city) => (
+            {REQUEST_REGIONS_DATA.map((city) => (
               <button
                 key={city.regionType}
                 type="button"
@@ -137,14 +139,9 @@ export const NeighborhoodPickerBottomSheet = ({
 
           <div className="h-full flex-1 overflow-y-auto bg-bg-white px-4 scrollbar-hide">
             {currentCity.regions.map((region) => {
-              const isSelected =
-                selectedRegion?.districtType === region.districtType &&
-                selectedRegion?.name === region.name;
+              const isSelected = selectedRegion?.key === region.key;
               return (
-                <div
-                  key={`${region.districtType}-${region.name}`}
-                  className="h-[52px] flex items-center"
-                >
+                <div key={region.key} className="h-[52px] flex items-center">
                   <button
                     type="button"
                     onClick={() => handleSelect(region)}

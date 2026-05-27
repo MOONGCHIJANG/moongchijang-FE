@@ -6,8 +6,9 @@ import { loginSchema } from '@/lib/validation';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import Link from 'next/link';
-import Toast from '@/app/(pages)/item/[groupBuyId]/_components/Toast';
 import { redirectStorage } from '@/lib/redirect';
+import { useAuthStore } from '@/store/authStore';
+import { ToastBlack } from '@/components/ToastBlack';
 
 const InputArea = () => {
   const [email, setEmail] = useState('');
@@ -16,10 +17,11 @@ const InputArea = () => {
   const [isPending, setIsPending] = useState(false);
   const router = useRouter();
 
+  const { setIsLoggedIn } = useAuthStore();
+
   const handleLogin = async () => {
     setErrorMessage(null);
 
-    // 정합성 검사 유지
     const isValid = loginSchema.safeParse({ email, password }).success;
     if (!isValid) {
       setErrorMessage('이메일 또는 비밀번호를 확인해주세요.');
@@ -35,6 +37,17 @@ const InputArea = () => {
       });
 
       if (res.ok) {
+        const data = await res.json();
+        const redirectTo = data?.redirectTo as string | null;
+
+        // 회원가입 이어서 진행
+        if (redirectTo) {
+          router.push(redirectTo);
+          return;
+        }
+
+        // signupCompleted: true → 정상 로그인
+        setIsLoggedIn(true);
         const redirect = redirectStorage.consume();
         router.push(redirect ?? '/feed');
       } else {
@@ -54,8 +67,8 @@ const InputArea = () => {
           label="이메일 주소"
           placeholder="이메일 주소를 입력해주세요."
           value={email}
-          onChange={(v) => {
-            setEmail(v);
+          onChange={(e) => {
+            setEmail(e.target.value);
             setErrorMessage(null);
           }}
         />
@@ -63,10 +76,10 @@ const InputArea = () => {
           label="비밀번호"
           isPassword
           placeholder="비밀번호를 입력해주세요."
-          helperText="영문, 숫자, 특수문자가 모두 들어간 8자 이상"
+          helperText="영문, 숫자가 모두 들어간 8자 이상"
           value={password}
-          onChange={(v) => {
-            setPassword(v);
+          onChange={(e) => {
+            setPassword(e.target.value);
             setErrorMessage(null);
           }}
         />
@@ -82,23 +95,18 @@ const InputArea = () => {
           로그인
         </Button>
         <div className="w-full flex items-center justify-center text-text-tertiary body-md-regular">
-          <Link href="/login/email/find" className="text-text-tertiary">
-            아이디/비밀번호 찾기
-          </Link>
+          <Link href="/login/email/find">아이디/비밀번호 찾기</Link>
           <span className="mx-g5 text-border-subtle">|</span>
-          <button
-            type="button"
-            onClick={() => {
-              /* 회원가입 페이지 이동 로직 */
-            }}
-          >
-            회원가입
-          </button>
+          <Link href="/signup/email">회원가입</Link>
         </div>
       </div>
       {errorMessage && (
         <div className="fixed bottom-7 left-4 right-4 z-50 flex justify-center">
-          <Toast>{errorMessage}</Toast>
+          <ToastBlack
+            message={errorMessage}
+            isVisible
+            icon="cuida:alert-outline"
+          />
         </div>
       )}
     </>

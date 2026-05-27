@@ -7,16 +7,22 @@ import type {
   ApiResponseAccessToken,
   ApiResponseAdditionalInfoUpdated,
   ApiResponseAuthLogin,
+  ApiResponseBusinessRegistrationLookup,
   ApiResponseEmailAvailability,
   ApiResponseEmailVerificationCodeSent,
   ApiResponseEmailVerificationVerified,
+  ApiResponseError,
   ApiResponseMyRegions,
   ApiResponseNicknameAvailability,
+  ApiResponseNicknameUpdated,
+  ApiResponsePasswordChanged,
+  ApiResponsePhoneNumberUpdated,
   ApiResponsePhoneVerificationCodeSent,
   ApiResponsePhoneVerificationVerified,
-  ApiResponseProfileUpdated,
+  ApiResponseSellerSignupStatus,
   ApiResponseUserInfo,
   BadRequestResponse,
+  BusinessRegistrationLookupRequest,
   ConflictResponse,
   EmailLoginRequest,
   EmailSignupRequest,
@@ -26,16 +32,18 @@ import type {
   GetApiV1AuthEmailAvailabilityParams,
   GetApiV1UsersNicknameAvailabilityParams,
   KakaoLoginRequest,
-  NotFoundResponse,
+  NicknameUpdateRequest,
   PasswordChangeRequest,
-  PasswordResetLinkRequest,
+  PhoneNumberUpdateRequest,
   PhoneVerificationCodeSendRequest,
   PhoneVerificationCodeVerifyRequest,
-  ProfileUpdateRequest,
+  SellerBusinessInfoUpsertRequest,
+  SellerSettlementInfoUpsertRequest,
   SuccessNoDataResponse,
   TooManyRequestsResponse,
   UnauthorizedResponse,
-  UpdateRegionsRequest
+  UpdateRegionsRequest,
+  WithdrawRequest,
 } from '../api.schemas';
 
 import { customFetch } from '../../../lib/custom-fetch';
@@ -45,241 +53,260 @@ import { customFetch } from '../../../lib/custom-fetch';
  * @summary 카카오 로그인 / 회원가입
  */
 export type postApiV1AuthKakaoResponse200 = {
-  data: ApiResponseAuthLogin
-  status: 200
-}
-
-export type postApiV1AuthKakaoResponseSuccess = (postApiV1AuthKakaoResponse200) & {
-  headers: Headers;
+  data: ApiResponseAuthLogin;
+  status: 200;
 };
-;
 
-export type postApiV1AuthKakaoResponse = (postApiV1AuthKakaoResponseSuccess)
+export type postApiV1AuthKakaoResponseSuccess =
+  postApiV1AuthKakaoResponse200 & {
+    headers: Headers;
+  };
+export type postApiV1AuthKakaoResponse = postApiV1AuthKakaoResponseSuccess;
 
 export const getPostApiV1AuthKakaoUrl = () => {
+  return `/api/v1/auth/kakao`;
+};
 
-
-
-
-  return `/api/v1/auth/kakao`
-}
-
-export const postApiV1AuthKakao = async (kakaoLoginRequest: KakaoLoginRequest, options?: RequestInit): Promise<postApiV1AuthKakaoResponse> => {
-
-  return customFetch<postApiV1AuthKakaoResponse>(getPostApiV1AuthKakaoUrl(),
-  {
+export const postApiV1AuthKakao = async (
+  kakaoLoginRequest: KakaoLoginRequest,
+  options?: RequestInit,
+): Promise<postApiV1AuthKakaoResponse> => {
+  return customFetch<postApiV1AuthKakaoResponse>(getPostApiV1AuthKakaoUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      kakaoLoginRequest,)
-  }
-);}
-
+    body: JSON.stringify(kakaoLoginRequest),
+  });
+};
 
 /**
  * HttpOnly 쿠키의 refreshToken을 검증해 Access Token을 재발급한다.
  * @summary Access Token 갱신
  */
 export type postApiV1AuthRefreshResponse200 = {
-  data: ApiResponseAccessToken
-  status: 200
-}
+  data: ApiResponseAccessToken;
+  status: 200;
+};
 
 export type postApiV1AuthRefreshResponse401 = {
-  data: UnauthorizedResponse
-  status: 401
-}
-
-export type postApiV1AuthRefreshResponseSuccess = (postApiV1AuthRefreshResponse200) & {
-  headers: Headers;
-};
-export type postApiV1AuthRefreshResponseError = (postApiV1AuthRefreshResponse401) & {
-  headers: Headers;
+  data: UnauthorizedResponse;
+  status: 401;
 };
 
-export type postApiV1AuthRefreshResponse = (postApiV1AuthRefreshResponseSuccess | postApiV1AuthRefreshResponseError)
+export type postApiV1AuthRefreshResponseSuccess =
+  postApiV1AuthRefreshResponse200 & {
+    headers: Headers;
+  };
+export type postApiV1AuthRefreshResponseError =
+  postApiV1AuthRefreshResponse401 & {
+    headers: Headers;
+  };
+
+export type postApiV1AuthRefreshResponse =
+  | postApiV1AuthRefreshResponseSuccess
+  | postApiV1AuthRefreshResponseError;
 
 export const getPostApiV1AuthRefreshUrl = () => {
+  return `/api/v1/auth/refresh`;
+};
 
-
-
-
-  return `/api/v1/auth/refresh`
-}
-
-export const postApiV1AuthRefresh = async ( options?: RequestInit): Promise<postApiV1AuthRefreshResponse> => {
-
-  return customFetch<postApiV1AuthRefreshResponse>(getPostApiV1AuthRefreshUrl(),
-  {
-    ...options,
-    method: 'POST'
-
-
-  }
-);}
-
+export const postApiV1AuthRefresh = async (
+  options?: RequestInit,
+): Promise<postApiV1AuthRefreshResponse> => {
+  return customFetch<postApiV1AuthRefreshResponse>(
+    getPostApiV1AuthRefreshUrl(),
+    {
+      ...options,
+      method: 'POST',
+    },
+  );
+};
 
 /**
  * Refresh Token을 무효화한다.
  * @summary 로그아웃
  */
 export type postApiV1AuthLogoutResponse200 = {
-  data: SuccessNoDataResponse
-  status: 200
-}
-
-export type postApiV1AuthLogoutResponseSuccess = (postApiV1AuthLogoutResponse200) & {
-  headers: Headers;
+  data: SuccessNoDataResponse;
+  status: 200;
 };
-;
 
-export type postApiV1AuthLogoutResponse = (postApiV1AuthLogoutResponseSuccess)
+export type postApiV1AuthLogoutResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type postApiV1AuthLogoutResponseSuccess =
+  postApiV1AuthLogoutResponse200 & {
+    headers: Headers;
+  };
+export type postApiV1AuthLogoutResponseError =
+  postApiV1AuthLogoutResponse401 & {
+    headers: Headers;
+  };
+
+export type postApiV1AuthLogoutResponse =
+  | postApiV1AuthLogoutResponseSuccess
+  | postApiV1AuthLogoutResponseError;
 
 export const getPostApiV1AuthLogoutUrl = () => {
+  return `/api/v1/auth/logout`;
+};
 
-
-
-
-  return `/api/v1/auth/logout`
-}
-
-export const postApiV1AuthLogout = async ( options?: RequestInit): Promise<postApiV1AuthLogoutResponse> => {
-
-  return customFetch<postApiV1AuthLogoutResponse>(getPostApiV1AuthLogoutUrl(),
-  {
+export const postApiV1AuthLogout = async (
+  options?: RequestInit,
+): Promise<postApiV1AuthLogoutResponse> => {
+  return customFetch<postApiV1AuthLogoutResponse>(getPostApiV1AuthLogoutUrl(), {
     ...options,
-    method: 'POST'
-
-
-  }
-);}
-
+    method: 'POST',
+  });
+};
 
 /**
  * @summary 내 정보 조회
  */
 export type getApiV1UsersMeResponse200 = {
-  data: ApiResponseUserInfo
-  status: 200
-}
+  data: ApiResponseUserInfo;
+  status: 200;
+};
 
-export type getApiV1UsersMeResponseSuccess = (getApiV1UsersMeResponse200) & {
+export type getApiV1UsersMeResponseSuccess = getApiV1UsersMeResponse200 & {
   headers: Headers;
 };
-;
-
-export type getApiV1UsersMeResponse = (getApiV1UsersMeResponseSuccess)
+export type getApiV1UsersMeResponse = getApiV1UsersMeResponseSuccess;
 
 export const getGetApiV1UsersMeUrl = () => {
+  return `/api/v1/users/me`;
+};
 
-
-
-
-  return `/api/v1/users/me`
-}
-
-export const getApiV1UsersMe = async ( options?: RequestInit): Promise<getApiV1UsersMeResponse> => {
-
-  return customFetch<getApiV1UsersMeResponse>(getGetApiV1UsersMeUrl(),
-  {
+export const getApiV1UsersMe = async (
+  options?: RequestInit,
+): Promise<getApiV1UsersMeResponse> => {
+  return customFetch<getApiV1UsersMeResponse>(getGetApiV1UsersMeUrl(), {
     ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+    method: 'GET',
+  });
+};
 
 /**
+ * 회원 탈퇴를 처리한다.
+- 수령 예정 공구(달성 완료 + 픽업 미완료)가 있으면 탈퇴할 수 없다.
+- 참여 중 공구(PAID_WAITING_GOAL)는 자동 취소된다.
+- 찜 목록은 모두 삭제된다.
+- 동일 계정은 탈퇴 후 30일 이후 재가입 가능하다.
+
  * @summary 회원 탈퇴
  */
 export type deleteApiV1UsersMeResponse200 = {
-  data: SuccessNoDataResponse
-  status: 200
-}
+  data: SuccessNoDataResponse;
+  status: 200;
+};
 
-export type deleteApiV1UsersMeResponseSuccess = (deleteApiV1UsersMeResponse200) & {
+export type deleteApiV1UsersMeResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type deleteApiV1UsersMeResponse409 = {
+  data: ConflictResponse;
+  status: 409;
+};
+
+export type deleteApiV1UsersMeResponseSuccess =
+  deleteApiV1UsersMeResponse200 & {
+    headers: Headers;
+  };
+export type deleteApiV1UsersMeResponseError = (
+  | deleteApiV1UsersMeResponse401
+  | deleteApiV1UsersMeResponse409
+) & {
   headers: Headers;
 };
-;
 
-export type deleteApiV1UsersMeResponse = (deleteApiV1UsersMeResponseSuccess)
+export type deleteApiV1UsersMeResponse =
+  | deleteApiV1UsersMeResponseSuccess
+  | deleteApiV1UsersMeResponseError;
 
 export const getDeleteApiV1UsersMeUrl = () => {
+  return `/api/v1/users/me`;
+};
 
-
-
-
-  return `/api/v1/users/me`
-}
-
-export const deleteApiV1UsersMe = async ( options?: RequestInit): Promise<deleteApiV1UsersMeResponse> => {
-
-  return customFetch<deleteApiV1UsersMeResponse>(getDeleteApiV1UsersMeUrl(),
-  {
+export const deleteApiV1UsersMe = async (
+  withdrawRequest?: WithdrawRequest,
+  options?: RequestInit,
+): Promise<deleteApiV1UsersMeResponse> => {
+  return customFetch<deleteApiV1UsersMeResponse>(getDeleteApiV1UsersMeUrl(), {
     ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(withdrawRequest),
+  });
+};
 
 /**
  * 추가정보 입력(0.5) 단계에서 닉네임 사용 가능 여부를 확인한다.
  * @summary 닉네임 중복 확인
  */
 export type getApiV1UsersNicknameAvailabilityResponse200 = {
-  data: ApiResponseNicknameAvailability
-  status: 200
-}
+  data: ApiResponseNicknameAvailability;
+  status: 200;
+};
 
 export type getApiV1UsersNicknameAvailabilityResponse400 = {
-  data: BadRequestResponse
-  status: 400
-}
+  data: BadRequestResponse;
+  status: 400;
+};
 
 export type getApiV1UsersNicknameAvailabilityResponse401 = {
-  data: UnauthorizedResponse
-  status: 401
-}
-
-export type getApiV1UsersNicknameAvailabilityResponseSuccess = (getApiV1UsersNicknameAvailabilityResponse200) & {
-  headers: Headers;
-};
-export type getApiV1UsersNicknameAvailabilityResponseError = (getApiV1UsersNicknameAvailabilityResponse400 | getApiV1UsersNicknameAvailabilityResponse401) & {
-  headers: Headers;
+  data: UnauthorizedResponse;
+  status: 401;
 };
 
-export type getApiV1UsersNicknameAvailabilityResponse = (getApiV1UsersNicknameAvailabilityResponseSuccess | getApiV1UsersNicknameAvailabilityResponseError)
+export type getApiV1UsersNicknameAvailabilityResponseSuccess =
+  getApiV1UsersNicknameAvailabilityResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1UsersNicknameAvailabilityResponseError = (
+  | getApiV1UsersNicknameAvailabilityResponse400
+  | getApiV1UsersNicknameAvailabilityResponse401
+) & {
+  headers: Headers;
+};
 
-export const getGetApiV1UsersNicknameAvailabilityUrl = (params: GetApiV1UsersNicknameAvailabilityParams,) => {
+export type getApiV1UsersNicknameAvailabilityResponse =
+  | getApiV1UsersNicknameAvailabilityResponseSuccess
+  | getApiV1UsersNicknameAvailabilityResponseError;
+
+export const getGetApiV1UsersNicknameAvailabilityUrl = (
+  params: GetApiV1UsersNicknameAvailabilityParams,
+) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
+      normalizedParams.append(key, value === null ? 'null' : value.toString());
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/v1/users/nickname/availability?${stringifiedParams}` : `/api/v1/users/nickname/availability`
-}
+  return stringifiedParams.length > 0
+    ? `/api/v1/users/nickname/availability?${stringifiedParams}`
+    : `/api/v1/users/nickname/availability`;
+};
 
-export const getApiV1UsersNicknameAvailability = async (params: GetApiV1UsersNicknameAvailabilityParams, options?: RequestInit): Promise<getApiV1UsersNicknameAvailabilityResponse> => {
-
-  return customFetch<getApiV1UsersNicknameAvailabilityResponse>(getGetApiV1UsersNicknameAvailabilityUrl(params),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+export const getApiV1UsersNicknameAvailability = async (
+  params: GetApiV1UsersNicknameAvailabilityParams,
+  options?: RequestInit,
+): Promise<getApiV1UsersNicknameAvailabilityResponse> => {
+  return customFetch<getApiV1UsersNicknameAvailabilityResponse>(
+    getGetApiV1UsersNicknameAvailabilityUrl(params),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
 
 /**
  * 신규 가입 공통(카카오/이메일) 추가 정보 입력을 저장한다.
@@ -288,722 +315,946 @@ export const getApiV1UsersNicknameAvailability = async (params: GetApiV1UsersNic
  * @summary 추가 정보 입력 완료
  */
 export type patchApiV1UsersMeAdditionalInfoResponse200 = {
-  data: ApiResponseAdditionalInfoUpdated
-  status: 200
-}
+  data: ApiResponseAdditionalInfoUpdated;
+  status: 200;
+};
 
 export type patchApiV1UsersMeAdditionalInfoResponse400 = {
-  data: BadRequestResponse
-  status: 400
-}
+  data: BadRequestResponse;
+  status: 400;
+};
 
 export type patchApiV1UsersMeAdditionalInfoResponse401 = {
-  data: UnauthorizedResponse
-  status: 401
-}
+  data: UnauthorizedResponse;
+  status: 401;
+};
 
 export type patchApiV1UsersMeAdditionalInfoResponse409 = {
-  data: ConflictResponse
-  status: 409
-}
-
-export type patchApiV1UsersMeAdditionalInfoResponseSuccess = (patchApiV1UsersMeAdditionalInfoResponse200) & {
-  headers: Headers;
-};
-export type patchApiV1UsersMeAdditionalInfoResponseError = (patchApiV1UsersMeAdditionalInfoResponse400 | patchApiV1UsersMeAdditionalInfoResponse401 | patchApiV1UsersMeAdditionalInfoResponse409) & {
-  headers: Headers;
+  data: ConflictResponse;
+  status: 409;
 };
 
-export type patchApiV1UsersMeAdditionalInfoResponse = (patchApiV1UsersMeAdditionalInfoResponseSuccess | patchApiV1UsersMeAdditionalInfoResponseError)
+export type patchApiV1UsersMeAdditionalInfoResponseSuccess =
+  patchApiV1UsersMeAdditionalInfoResponse200 & {
+    headers: Headers;
+  };
+export type patchApiV1UsersMeAdditionalInfoResponseError = (
+  | patchApiV1UsersMeAdditionalInfoResponse400
+  | patchApiV1UsersMeAdditionalInfoResponse401
+  | patchApiV1UsersMeAdditionalInfoResponse409
+) & {
+  headers: Headers;
+};
+
+export type patchApiV1UsersMeAdditionalInfoResponse =
+  | patchApiV1UsersMeAdditionalInfoResponseSuccess
+  | patchApiV1UsersMeAdditionalInfoResponseError;
 
 export const getPatchApiV1UsersMeAdditionalInfoUrl = () => {
+  return `/api/v1/users/me/additional-info`;
+};
 
+export const patchApiV1UsersMeAdditionalInfo = async (
+  additionalInfoUpsertRequest: AdditionalInfoUpsertRequest,
+  options?: RequestInit,
+): Promise<patchApiV1UsersMeAdditionalInfoResponse> => {
+  return customFetch<patchApiV1UsersMeAdditionalInfoResponse>(
+    getPatchApiV1UsersMeAdditionalInfoUrl(),
+    {
+      ...options,
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(additionalInfoUpsertRequest),
+    },
+  );
+};
 
+/**
+ * 사업자등록번호를 조회해 상태를 반환한다.
+- `VALID`: 정상 사업자(계속사업자)
+- `CLOSED`: 휴업/폐업
+- `NOT_FOUND`: 조회 불가/미확인
 
+ * @summary 사업자등록번호 조회
+ */
+export type postApiV1UsersMeSellerBusinessRegistrationLookupResponse200 = {
+  data: ApiResponseBusinessRegistrationLookup;
+  status: 200;
+};
 
-  return `/api/v1/users/me/additional-info`
-}
+export type postApiV1UsersMeSellerBusinessRegistrationLookupResponse400 = {
+  data: ApiResponseError;
+  status: 400;
+};
 
-export const patchApiV1UsersMeAdditionalInfo = async (additionalInfoUpsertRequest: AdditionalInfoUpsertRequest, options?: RequestInit): Promise<patchApiV1UsersMeAdditionalInfoResponse> => {
+export type postApiV1UsersMeSellerBusinessRegistrationLookupResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
 
-  return customFetch<patchApiV1UsersMeAdditionalInfoResponse>(getPatchApiV1UsersMeAdditionalInfoUrl(),
-  {
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      additionalInfoUpsertRequest,)
-  }
-);}
+export type postApiV1UsersMeSellerBusinessRegistrationLookupResponseSuccess =
+  postApiV1UsersMeSellerBusinessRegistrationLookupResponse200 & {
+    headers: Headers;
+  };
+export type postApiV1UsersMeSellerBusinessRegistrationLookupResponseError = (
+  | postApiV1UsersMeSellerBusinessRegistrationLookupResponse400
+  | postApiV1UsersMeSellerBusinessRegistrationLookupResponse401
+) & {
+  headers: Headers;
+};
 
+export type postApiV1UsersMeSellerBusinessRegistrationLookupResponse =
+  | postApiV1UsersMeSellerBusinessRegistrationLookupResponseSuccess
+  | postApiV1UsersMeSellerBusinessRegistrationLookupResponseError;
+
+export const getPostApiV1UsersMeSellerBusinessRegistrationLookupUrl = () => {
+  return `/api/v1/users/me/seller/business-registration/lookup`;
+};
+
+export const postApiV1UsersMeSellerBusinessRegistrationLookup = async (
+  businessRegistrationLookupRequest: BusinessRegistrationLookupRequest,
+  options?: RequestInit,
+): Promise<postApiV1UsersMeSellerBusinessRegistrationLookupResponse> => {
+  return customFetch<postApiV1UsersMeSellerBusinessRegistrationLookupResponse>(
+    getPostApiV1UsersMeSellerBusinessRegistrationLookupUrl(),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(businessRegistrationLookupRequest),
+    },
+  );
+};
+
+/**
+ * 사장님 가입의 사업자 정보를 저장한다.
+ * @summary 사장님 사업자 정보 저장
+ */
+export type patchApiV1UsersMeSellerBusinessInfoResponse200 = {
+  data: ApiResponseSellerSignupStatus;
+  status: 200;
+};
+
+export type patchApiV1UsersMeSellerBusinessInfoResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type patchApiV1UsersMeSellerBusinessInfoResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type patchApiV1UsersMeSellerBusinessInfoResponseSuccess =
+  patchApiV1UsersMeSellerBusinessInfoResponse200 & {
+    headers: Headers;
+  };
+export type patchApiV1UsersMeSellerBusinessInfoResponseError = (
+  | patchApiV1UsersMeSellerBusinessInfoResponse400
+  | patchApiV1UsersMeSellerBusinessInfoResponse401
+) & {
+  headers: Headers;
+};
+
+export type patchApiV1UsersMeSellerBusinessInfoResponse =
+  | patchApiV1UsersMeSellerBusinessInfoResponseSuccess
+  | patchApiV1UsersMeSellerBusinessInfoResponseError;
+
+export const getPatchApiV1UsersMeSellerBusinessInfoUrl = () => {
+  return `/api/v1/users/me/seller/business-info`;
+};
+
+export const patchApiV1UsersMeSellerBusinessInfo = async (
+  sellerBusinessInfoUpsertRequest: SellerBusinessInfoUpsertRequest,
+  options?: RequestInit,
+): Promise<patchApiV1UsersMeSellerBusinessInfoResponse> => {
+  return customFetch<patchApiV1UsersMeSellerBusinessInfoResponse>(
+    getPatchApiV1UsersMeSellerBusinessInfoUrl(),
+    {
+      ...options,
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(sellerBusinessInfoUpsertRequest),
+    },
+  );
+};
+
+/**
+ * 사장님 정산 정보를 저장하고 사장님 가입 완료 상태를 반영한다.
+ * @summary 사장님 정산 정보 저장
+ */
+export type patchApiV1UsersMeSellerSettlementInfoResponse200 = {
+  data: ApiResponseSellerSignupStatus;
+  status: 200;
+};
+
+export type patchApiV1UsersMeSellerSettlementInfoResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type patchApiV1UsersMeSellerSettlementInfoResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type patchApiV1UsersMeSellerSettlementInfoResponseSuccess =
+  patchApiV1UsersMeSellerSettlementInfoResponse200 & {
+    headers: Headers;
+  };
+export type patchApiV1UsersMeSellerSettlementInfoResponseError = (
+  | patchApiV1UsersMeSellerSettlementInfoResponse400
+  | patchApiV1UsersMeSellerSettlementInfoResponse401
+) & {
+  headers: Headers;
+};
+
+export type patchApiV1UsersMeSellerSettlementInfoResponse =
+  | patchApiV1UsersMeSellerSettlementInfoResponseSuccess
+  | patchApiV1UsersMeSellerSettlementInfoResponseError;
+
+export const getPatchApiV1UsersMeSellerSettlementInfoUrl = () => {
+  return `/api/v1/users/me/seller/settlement-info`;
+};
+
+export const patchApiV1UsersMeSellerSettlementInfo = async (
+  sellerSettlementInfoUpsertRequest: SellerSettlementInfoUpsertRequest,
+  options?: RequestInit,
+): Promise<patchApiV1UsersMeSellerSettlementInfoResponse> => {
+  return customFetch<patchApiV1UsersMeSellerSettlementInfoResponse>(
+    getPatchApiV1UsersMeSellerSettlementInfoUrl(),
+    {
+      ...options,
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(sellerSettlementInfoUpsertRequest),
+    },
+  );
+};
 
 /**
  * 이메일 회원가입 전 가입 가능 이메일인지 확인한다.
  * @summary 이메일 중복 확인
  */
 export type getApiV1AuthEmailAvailabilityResponse200 = {
-  data: ApiResponseEmailAvailability
-  status: 200
-}
+  data: ApiResponseEmailAvailability;
+  status: 200;
+};
 
 export type getApiV1AuthEmailAvailabilityResponse400 = {
-  data: BadRequestResponse
-  status: 400
-}
-
-export type getApiV1AuthEmailAvailabilityResponseSuccess = (getApiV1AuthEmailAvailabilityResponse200) & {
-  headers: Headers;
-};
-export type getApiV1AuthEmailAvailabilityResponseError = (getApiV1AuthEmailAvailabilityResponse400) & {
-  headers: Headers;
+  data: BadRequestResponse;
+  status: 400;
 };
 
-export type getApiV1AuthEmailAvailabilityResponse = (getApiV1AuthEmailAvailabilityResponseSuccess | getApiV1AuthEmailAvailabilityResponseError)
+export type getApiV1AuthEmailAvailabilityResponseSuccess =
+  getApiV1AuthEmailAvailabilityResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1AuthEmailAvailabilityResponseError =
+  getApiV1AuthEmailAvailabilityResponse400 & {
+    headers: Headers;
+  };
 
-export const getGetApiV1AuthEmailAvailabilityUrl = (params: GetApiV1AuthEmailAvailabilityParams,) => {
+export type getApiV1AuthEmailAvailabilityResponse =
+  | getApiV1AuthEmailAvailabilityResponseSuccess
+  | getApiV1AuthEmailAvailabilityResponseError;
+
+export const getGetApiV1AuthEmailAvailabilityUrl = (
+  params: GetApiV1AuthEmailAvailabilityParams,
+) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
+      normalizedParams.append(key, value === null ? 'null' : value.toString());
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/v1/auth/email/availability?${stringifiedParams}` : `/api/v1/auth/email/availability`
-}
+  return stringifiedParams.length > 0
+    ? `/api/v1/auth/email/availability?${stringifiedParams}`
+    : `/api/v1/auth/email/availability`;
+};
 
-export const getApiV1AuthEmailAvailability = async (params: GetApiV1AuthEmailAvailabilityParams, options?: RequestInit): Promise<getApiV1AuthEmailAvailabilityResponse> => {
-
-  return customFetch<getApiV1AuthEmailAvailabilityResponse>(getGetApiV1AuthEmailAvailabilityUrl(params),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+export const getApiV1AuthEmailAvailability = async (
+  params: GetApiV1AuthEmailAvailabilityParams,
+  options?: RequestInit,
+): Promise<getApiV1AuthEmailAvailabilityResponse> => {
+  return customFetch<getApiV1AuthEmailAvailabilityResponse>(
+    getGetApiV1AuthEmailAvailabilityUrl(params),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
 
 /**
  * 6자리 숫자 인증코드를 이메일로 발송한다. (유효시간 3분, 재발송 60초 쿨다운, 1일 5회 제한)
  * @summary 이메일 인증코드 발송
  */
 export type postApiV1AuthEmailVerificationCodesResponse200 = {
-  data: ApiResponseEmailVerificationCodeSent
-  status: 200
-}
+  data: ApiResponseEmailVerificationCodeSent;
+  status: 200;
+};
 
 export type postApiV1AuthEmailVerificationCodesResponse400 = {
-  data: BadRequestResponse
-  status: 400
-}
+  data: BadRequestResponse;
+  status: 400;
+};
 
 export type postApiV1AuthEmailVerificationCodesResponse429 = {
-  data: TooManyRequestsResponse
-  status: 429
-}
-
-export type postApiV1AuthEmailVerificationCodesResponseSuccess = (postApiV1AuthEmailVerificationCodesResponse200) & {
-  headers: Headers;
-};
-export type postApiV1AuthEmailVerificationCodesResponseError = (postApiV1AuthEmailVerificationCodesResponse400 | postApiV1AuthEmailVerificationCodesResponse429) & {
-  headers: Headers;
+  data: TooManyRequestsResponse;
+  status: 429;
 };
 
-export type postApiV1AuthEmailVerificationCodesResponse = (postApiV1AuthEmailVerificationCodesResponseSuccess | postApiV1AuthEmailVerificationCodesResponseError)
+export type postApiV1AuthEmailVerificationCodesResponseSuccess =
+  postApiV1AuthEmailVerificationCodesResponse200 & {
+    headers: Headers;
+  };
+export type postApiV1AuthEmailVerificationCodesResponseError = (
+  | postApiV1AuthEmailVerificationCodesResponse400
+  | postApiV1AuthEmailVerificationCodesResponse429
+) & {
+  headers: Headers;
+};
+
+export type postApiV1AuthEmailVerificationCodesResponse =
+  | postApiV1AuthEmailVerificationCodesResponseSuccess
+  | postApiV1AuthEmailVerificationCodesResponseError;
 
 export const getPostApiV1AuthEmailVerificationCodesUrl = () => {
+  return `/api/v1/auth/email/verification-codes`;
+};
 
-
-
-
-  return `/api/v1/auth/email/verification-codes`
-}
-
-export const postApiV1AuthEmailVerificationCodes = async (emailVerificationCodeSendRequest: EmailVerificationCodeSendRequest, options?: RequestInit): Promise<postApiV1AuthEmailVerificationCodesResponse> => {
-
-  return customFetch<postApiV1AuthEmailVerificationCodesResponse>(getPostApiV1AuthEmailVerificationCodesUrl(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      emailVerificationCodeSendRequest,)
-  }
-);}
-
+export const postApiV1AuthEmailVerificationCodes = async (
+  emailVerificationCodeSendRequest: EmailVerificationCodeSendRequest,
+  options?: RequestInit,
+): Promise<postApiV1AuthEmailVerificationCodesResponse> => {
+  return customFetch<postApiV1AuthEmailVerificationCodesResponse>(
+    getPostApiV1AuthEmailVerificationCodesUrl(),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(emailVerificationCodeSendRequest),
+    },
+  );
+};
 
 /**
  * 인증코드가 일치하면 이메일 인증 완료 상태로 처리한다.
  * @summary 이메일 인증코드 확인
  */
 export type postApiV1AuthEmailVerificationCodesVerifyResponse200 = {
-  data: ApiResponseEmailVerificationVerified
-  status: 200
-}
+  data: ApiResponseEmailVerificationVerified;
+  status: 200;
+};
 
 export type postApiV1AuthEmailVerificationCodesVerifyResponse400 = {
-  data: BadRequestResponse
-  status: 400
-}
-
-export type postApiV1AuthEmailVerificationCodesVerifyResponseSuccess = (postApiV1AuthEmailVerificationCodesVerifyResponse200) & {
-  headers: Headers;
-};
-export type postApiV1AuthEmailVerificationCodesVerifyResponseError = (postApiV1AuthEmailVerificationCodesVerifyResponse400) & {
-  headers: Headers;
+  data: BadRequestResponse;
+  status: 400;
 };
 
-export type postApiV1AuthEmailVerificationCodesVerifyResponse = (postApiV1AuthEmailVerificationCodesVerifyResponseSuccess | postApiV1AuthEmailVerificationCodesVerifyResponseError)
+export type postApiV1AuthEmailVerificationCodesVerifyResponseSuccess =
+  postApiV1AuthEmailVerificationCodesVerifyResponse200 & {
+    headers: Headers;
+  };
+export type postApiV1AuthEmailVerificationCodesVerifyResponseError =
+  postApiV1AuthEmailVerificationCodesVerifyResponse400 & {
+    headers: Headers;
+  };
+
+export type postApiV1AuthEmailVerificationCodesVerifyResponse =
+  | postApiV1AuthEmailVerificationCodesVerifyResponseSuccess
+  | postApiV1AuthEmailVerificationCodesVerifyResponseError;
 
 export const getPostApiV1AuthEmailVerificationCodesVerifyUrl = () => {
+  return `/api/v1/auth/email/verification-codes/verify`;
+};
 
-
-
-
-  return `/api/v1/auth/email/verification-codes/verify`
-}
-
-export const postApiV1AuthEmailVerificationCodesVerify = async (emailVerificationCodeVerifyRequest: EmailVerificationCodeVerifyRequest, options?: RequestInit): Promise<postApiV1AuthEmailVerificationCodesVerifyResponse> => {
-
-  return customFetch<postApiV1AuthEmailVerificationCodesVerifyResponse>(getPostApiV1AuthEmailVerificationCodesVerifyUrl(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      emailVerificationCodeVerifyRequest,)
-  }
-);}
-
+export const postApiV1AuthEmailVerificationCodesVerify = async (
+  emailVerificationCodeVerifyRequest: EmailVerificationCodeVerifyRequest,
+  options?: RequestInit,
+): Promise<postApiV1AuthEmailVerificationCodesVerifyResponse> => {
+  return customFetch<postApiV1AuthEmailVerificationCodesVerifyResponse>(
+    getPostApiV1AuthEmailVerificationCodesVerifyUrl(),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(emailVerificationCodeVerifyRequest),
+    },
+  );
+};
 
 /**
  * 6자리 숫자 인증코드를 전화번호로 발송한다.
  * @summary 전화번호 인증코드 발송
  */
 export type postApiV1AuthPhoneVerificationCodesResponse200 = {
-  data: ApiResponsePhoneVerificationCodeSent
-  status: 200
-}
+  data: ApiResponsePhoneVerificationCodeSent;
+  status: 200;
+};
 
 export type postApiV1AuthPhoneVerificationCodesResponse400 = {
-  data: BadRequestResponse
-  status: 400
-}
+  data: BadRequestResponse;
+  status: 400;
+};
 
 export type postApiV1AuthPhoneVerificationCodesResponse429 = {
-  data: TooManyRequestsResponse
-  status: 429
-}
-
-export type postApiV1AuthPhoneVerificationCodesResponseSuccess = (postApiV1AuthPhoneVerificationCodesResponse200) & {
-  headers: Headers;
-};
-export type postApiV1AuthPhoneVerificationCodesResponseError = (postApiV1AuthPhoneVerificationCodesResponse400 | postApiV1AuthPhoneVerificationCodesResponse429) & {
-  headers: Headers;
+  data: TooManyRequestsResponse;
+  status: 429;
 };
 
-export type postApiV1AuthPhoneVerificationCodesResponse = (postApiV1AuthPhoneVerificationCodesResponseSuccess | postApiV1AuthPhoneVerificationCodesResponseError)
+export type postApiV1AuthPhoneVerificationCodesResponseSuccess =
+  postApiV1AuthPhoneVerificationCodesResponse200 & {
+    headers: Headers;
+  };
+export type postApiV1AuthPhoneVerificationCodesResponseError = (
+  | postApiV1AuthPhoneVerificationCodesResponse400
+  | postApiV1AuthPhoneVerificationCodesResponse429
+) & {
+  headers: Headers;
+};
+
+export type postApiV1AuthPhoneVerificationCodesResponse =
+  | postApiV1AuthPhoneVerificationCodesResponseSuccess
+  | postApiV1AuthPhoneVerificationCodesResponseError;
 
 export const getPostApiV1AuthPhoneVerificationCodesUrl = () => {
+  return `/api/v1/auth/phone/verification-codes`;
+};
 
-
-
-
-  return `/api/v1/auth/phone/verification-codes`
-}
-
-export const postApiV1AuthPhoneVerificationCodes = async (phoneVerificationCodeSendRequest: PhoneVerificationCodeSendRequest, options?: RequestInit): Promise<postApiV1AuthPhoneVerificationCodesResponse> => {
-
-  return customFetch<postApiV1AuthPhoneVerificationCodesResponse>(getPostApiV1AuthPhoneVerificationCodesUrl(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      phoneVerificationCodeSendRequest,)
-  }
-);}
-
+export const postApiV1AuthPhoneVerificationCodes = async (
+  phoneVerificationCodeSendRequest: PhoneVerificationCodeSendRequest,
+  options?: RequestInit,
+): Promise<postApiV1AuthPhoneVerificationCodesResponse> => {
+  return customFetch<postApiV1AuthPhoneVerificationCodesResponse>(
+    getPostApiV1AuthPhoneVerificationCodesUrl(),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(phoneVerificationCodeSendRequest),
+    },
+  );
+};
 
 /**
  * 인증코드가 일치하면 전화번호 인증 완료 상태로 처리한다.
  * @summary 전화번호 인증코드 확인
  */
 export type postApiV1AuthPhoneVerificationCodesVerifyResponse200 = {
-  data: ApiResponsePhoneVerificationVerified
-  status: 200
-}
+  data: ApiResponsePhoneVerificationVerified;
+  status: 200;
+};
 
 export type postApiV1AuthPhoneVerificationCodesVerifyResponse400 = {
-  data: BadRequestResponse
-  status: 400
-}
-
-export type postApiV1AuthPhoneVerificationCodesVerifyResponseSuccess = (postApiV1AuthPhoneVerificationCodesVerifyResponse200) & {
-  headers: Headers;
-};
-export type postApiV1AuthPhoneVerificationCodesVerifyResponseError = (postApiV1AuthPhoneVerificationCodesVerifyResponse400) & {
-  headers: Headers;
+  data: BadRequestResponse;
+  status: 400;
 };
 
-export type postApiV1AuthPhoneVerificationCodesVerifyResponse = (postApiV1AuthPhoneVerificationCodesVerifyResponseSuccess | postApiV1AuthPhoneVerificationCodesVerifyResponseError)
+export type postApiV1AuthPhoneVerificationCodesVerifyResponseSuccess =
+  postApiV1AuthPhoneVerificationCodesVerifyResponse200 & {
+    headers: Headers;
+  };
+export type postApiV1AuthPhoneVerificationCodesVerifyResponseError =
+  postApiV1AuthPhoneVerificationCodesVerifyResponse400 & {
+    headers: Headers;
+  };
+
+export type postApiV1AuthPhoneVerificationCodesVerifyResponse =
+  | postApiV1AuthPhoneVerificationCodesVerifyResponseSuccess
+  | postApiV1AuthPhoneVerificationCodesVerifyResponseError;
 
 export const getPostApiV1AuthPhoneVerificationCodesVerifyUrl = () => {
+  return `/api/v1/auth/phone/verification-codes/verify`;
+};
 
-
-
-
-  return `/api/v1/auth/phone/verification-codes/verify`
-}
-
-export const postApiV1AuthPhoneVerificationCodesVerify = async (phoneVerificationCodeVerifyRequest: PhoneVerificationCodeVerifyRequest, options?: RequestInit): Promise<postApiV1AuthPhoneVerificationCodesVerifyResponse> => {
-
-  return customFetch<postApiV1AuthPhoneVerificationCodesVerifyResponse>(getPostApiV1AuthPhoneVerificationCodesVerifyUrl(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      phoneVerificationCodeVerifyRequest,)
-  }
-);}
-
+export const postApiV1AuthPhoneVerificationCodesVerify = async (
+  phoneVerificationCodeVerifyRequest: PhoneVerificationCodeVerifyRequest,
+  options?: RequestInit,
+): Promise<postApiV1AuthPhoneVerificationCodesVerifyResponse> => {
+  return customFetch<postApiV1AuthPhoneVerificationCodesVerifyResponse>(
+    getPostApiV1AuthPhoneVerificationCodesVerifyUrl(),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(phoneVerificationCodeVerifyRequest),
+    },
+  );
+};
 
 /**
  * 이메일 인증 완료 후 비밀번호를 설정해 계정을 생성하고 로그인 처리한다.
  * @summary 이메일 회원가입
  */
 export type postApiV1AuthEmailSignupResponse200 = {
-  data: ApiResponseAuthLogin
-  status: 200
-}
+  data: ApiResponseAuthLogin;
+  status: 200;
+};
 
 export type postApiV1AuthEmailSignupResponse400 = {
-  data: BadRequestResponse
-  status: 400
-}
+  data: BadRequestResponse;
+  status: 400;
+};
 
 export type postApiV1AuthEmailSignupResponse409 = {
-  data: ConflictResponse
-  status: 409
-}
-
-export type postApiV1AuthEmailSignupResponseSuccess = (postApiV1AuthEmailSignupResponse200) & {
-  headers: Headers;
-};
-export type postApiV1AuthEmailSignupResponseError = (postApiV1AuthEmailSignupResponse400 | postApiV1AuthEmailSignupResponse409) & {
-  headers: Headers;
+  data: ConflictResponse;
+  status: 409;
 };
 
-export type postApiV1AuthEmailSignupResponse = (postApiV1AuthEmailSignupResponseSuccess | postApiV1AuthEmailSignupResponseError)
+export type postApiV1AuthEmailSignupResponseSuccess =
+  postApiV1AuthEmailSignupResponse200 & {
+    headers: Headers;
+  };
+export type postApiV1AuthEmailSignupResponseError = (
+  | postApiV1AuthEmailSignupResponse400
+  | postApiV1AuthEmailSignupResponse409
+) & {
+  headers: Headers;
+};
+
+export type postApiV1AuthEmailSignupResponse =
+  | postApiV1AuthEmailSignupResponseSuccess
+  | postApiV1AuthEmailSignupResponseError;
 
 export const getPostApiV1AuthEmailSignupUrl = () => {
+  return `/api/v1/auth/email/signup`;
+};
 
-
-
-
-  return `/api/v1/auth/email/signup`
-}
-
-export const postApiV1AuthEmailSignup = async (emailSignupRequest: EmailSignupRequest, options?: RequestInit): Promise<postApiV1AuthEmailSignupResponse> => {
-
-  return customFetch<postApiV1AuthEmailSignupResponse>(getPostApiV1AuthEmailSignupUrl(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      emailSignupRequest,)
-  }
-);}
-
+export const postApiV1AuthEmailSignup = async (
+  emailSignupRequest: EmailSignupRequest,
+  options?: RequestInit,
+): Promise<postApiV1AuthEmailSignupResponse> => {
+  return customFetch<postApiV1AuthEmailSignupResponse>(
+    getPostApiV1AuthEmailSignupUrl(),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(emailSignupRequest),
+    },
+  );
+};
 
 /**
  * 이메일과 비밀번호를 검증하고 로그인 처리한다.
  * @summary 이메일 로그인
  */
 export type postApiV1AuthEmailLoginResponse200 = {
-  data: ApiResponseAuthLogin
-  status: 200
-}
+  data: ApiResponseAuthLogin;
+  status: 200;
+};
 
 export type postApiV1AuthEmailLoginResponse401 = {
-  data: UnauthorizedResponse
-  status: 401
-}
-
-export type postApiV1AuthEmailLoginResponseSuccess = (postApiV1AuthEmailLoginResponse200) & {
-  headers: Headers;
-};
-export type postApiV1AuthEmailLoginResponseError = (postApiV1AuthEmailLoginResponse401) & {
-  headers: Headers;
+  data: UnauthorizedResponse;
+  status: 401;
 };
 
-export type postApiV1AuthEmailLoginResponse = (postApiV1AuthEmailLoginResponseSuccess | postApiV1AuthEmailLoginResponseError)
+export type postApiV1AuthEmailLoginResponseSuccess =
+  postApiV1AuthEmailLoginResponse200 & {
+    headers: Headers;
+  };
+export type postApiV1AuthEmailLoginResponseError =
+  postApiV1AuthEmailLoginResponse401 & {
+    headers: Headers;
+  };
+
+export type postApiV1AuthEmailLoginResponse =
+  | postApiV1AuthEmailLoginResponseSuccess
+  | postApiV1AuthEmailLoginResponseError;
 
 export const getPostApiV1AuthEmailLoginUrl = () => {
+  return `/api/v1/auth/email/login`;
+};
 
-
-
-
-  return `/api/v1/auth/email/login`
-}
-
-export const postApiV1AuthEmailLogin = async (emailLoginRequest: EmailLoginRequest, options?: RequestInit): Promise<postApiV1AuthEmailLoginResponse> => {
-
-  return customFetch<postApiV1AuthEmailLoginResponse>(getPostApiV1AuthEmailLoginUrl(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      emailLoginRequest,)
-  }
-);}
-
+export const postApiV1AuthEmailLogin = async (
+  emailLoginRequest: EmailLoginRequest,
+  options?: RequestInit,
+): Promise<postApiV1AuthEmailLoginResponse> => {
+  return customFetch<postApiV1AuthEmailLoginResponse>(
+    getPostApiV1AuthEmailLoginUrl(),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(emailLoginRequest),
+    },
+  );
+};
 
 /**
- * 가입된 이메일로 비밀번호 재설정 링크를 발송한다.
- * @summary 비밀번호 재설정 링크 발송
+ * 인증된 사용자의 닉네임을 변경한다.
+ * @summary 닉네임 변경
  */
-export type postApiV1AuthPasswordResetLinkResponse200 = {
-  data: SuccessNoDataResponse
-  status: 200
-}
-
-export type postApiV1AuthPasswordResetLinkResponse404 = {
-  data: NotFoundResponse
-  status: 404
-}
-
-export type postApiV1AuthPasswordResetLinkResponseSuccess = (postApiV1AuthPasswordResetLinkResponse200) & {
-  headers: Headers;
-};
-export type postApiV1AuthPasswordResetLinkResponseError = (postApiV1AuthPasswordResetLinkResponse404) & {
-  headers: Headers;
+export type patchApiV1UsersMeNicknameResponse200 = {
+  data: ApiResponseNicknameUpdated;
+  status: 200;
 };
 
-export type postApiV1AuthPasswordResetLinkResponse = (postApiV1AuthPasswordResetLinkResponseSuccess | postApiV1AuthPasswordResetLinkResponseError)
+export type patchApiV1UsersMeNicknameResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
 
-export const getPostApiV1AuthPasswordResetLinkUrl = () => {
+export type patchApiV1UsersMeNicknameResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
 
+export type patchApiV1UsersMeNicknameResponse409 = {
+  data: ConflictResponse;
+  status: 409;
+};
 
+export type patchApiV1UsersMeNicknameResponseSuccess =
+  patchApiV1UsersMeNicknameResponse200 & {
+    headers: Headers;
+  };
+export type patchApiV1UsersMeNicknameResponseError = (
+  | patchApiV1UsersMeNicknameResponse400
+  | patchApiV1UsersMeNicknameResponse401
+  | patchApiV1UsersMeNicknameResponse409
+) & {
+  headers: Headers;
+};
 
+export type patchApiV1UsersMeNicknameResponse =
+  | patchApiV1UsersMeNicknameResponseSuccess
+  | patchApiV1UsersMeNicknameResponseError;
 
-  return `/api/v1/auth/password/reset-link`
-}
+export const getPatchApiV1UsersMeNicknameUrl = () => {
+  return `/api/v1/users/me/nickname`;
+};
 
-export const postApiV1AuthPasswordResetLink = async (passwordResetLinkRequest: PasswordResetLinkRequest, options?: RequestInit): Promise<postApiV1AuthPasswordResetLinkResponse> => {
-
-  return customFetch<postApiV1AuthPasswordResetLinkResponse>(getPostApiV1AuthPasswordResetLinkUrl(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      passwordResetLinkRequest,)
-  }
-);}
-
+export const patchApiV1UsersMeNickname = async (
+  nicknameUpdateRequest: NicknameUpdateRequest,
+  options?: RequestInit,
+): Promise<patchApiV1UsersMeNicknameResponse> => {
+  return customFetch<patchApiV1UsersMeNicknameResponse>(
+    getPatchApiV1UsersMeNicknameUrl(),
+    {
+      ...options,
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(nicknameUpdateRequest),
+    },
+  );
+};
 
 /**
- * 닉네임과 전화번호를 수정한다.
- * @summary 프로필 수정
+ * 인증된 사용자의 전화번호를 변경한다.
+ * @summary 전화번호 변경
  */
-export type patchApiV1UsersMeProfileResponse200 = {
-  data: ApiResponseProfileUpdated
-  status: 200
-}
-
-export type patchApiV1UsersMeProfileResponse400 = {
-  data: BadRequestResponse
-  status: 400
-}
-
-export type patchApiV1UsersMeProfileResponse401 = {
-  data: UnauthorizedResponse
-  status: 401
-}
-
-export type patchApiV1UsersMeProfileResponse409 = {
-  data: ConflictResponse
-  status: 409
-}
-
-export type patchApiV1UsersMeProfileResponseSuccess = (patchApiV1UsersMeProfileResponse200) & {
-  headers: Headers;
-};
-export type patchApiV1UsersMeProfileResponseError = (patchApiV1UsersMeProfileResponse400 | patchApiV1UsersMeProfileResponse401 | patchApiV1UsersMeProfileResponse409) & {
-  headers: Headers;
+export type patchApiV1UsersMePhoneNumberResponse200 = {
+  data: ApiResponsePhoneNumberUpdated;
+  status: 200;
 };
 
-export type patchApiV1UsersMeProfileResponse = (patchApiV1UsersMeProfileResponseSuccess | patchApiV1UsersMeProfileResponseError)
+export type patchApiV1UsersMePhoneNumberResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
 
-export const getPatchApiV1UsersMeProfileUrl = () => {
+export type patchApiV1UsersMePhoneNumberResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
 
+export type patchApiV1UsersMePhoneNumberResponseSuccess =
+  patchApiV1UsersMePhoneNumberResponse200 & {
+    headers: Headers;
+  };
+export type patchApiV1UsersMePhoneNumberResponseError = (
+  | patchApiV1UsersMePhoneNumberResponse400
+  | patchApiV1UsersMePhoneNumberResponse401
+) & {
+  headers: Headers;
+};
 
+export type patchApiV1UsersMePhoneNumberResponse =
+  | patchApiV1UsersMePhoneNumberResponseSuccess
+  | patchApiV1UsersMePhoneNumberResponseError;
 
+export const getPatchApiV1UsersMePhoneNumberUrl = () => {
+  return `/api/v1/users/me/phone-number`;
+};
 
-  return `/api/v1/users/me/profile`
-}
-
-export const patchApiV1UsersMeProfile = async (profileUpdateRequest: ProfileUpdateRequest, options?: RequestInit): Promise<patchApiV1UsersMeProfileResponse> => {
-
-  return customFetch<patchApiV1UsersMeProfileResponse>(getPatchApiV1UsersMeProfileUrl(),
-  {
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      profileUpdateRequest,)
-  }
-);}
-
+export const patchApiV1UsersMePhoneNumber = async (
+  phoneNumberUpdateRequest: PhoneNumberUpdateRequest,
+  options?: RequestInit,
+): Promise<patchApiV1UsersMePhoneNumberResponse> => {
+  return customFetch<patchApiV1UsersMePhoneNumberResponse>(
+    getPatchApiV1UsersMePhoneNumberUrl(),
+    {
+      ...options,
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(phoneNumberUpdateRequest),
+    },
+  );
+};
 
 /**
  * 새 전화번호 검증을 위한 6자리 인증코드를 발송한다.
  * @summary 전화번호 변경 인증코드 발송
  */
 export type postApiV1UsersMePhoneVerificationCodesResponse200 = {
-  data: ApiResponsePhoneVerificationCodeSent
-  status: 200
-}
+  data: ApiResponsePhoneVerificationCodeSent;
+  status: 200;
+};
 
 export type postApiV1UsersMePhoneVerificationCodesResponse400 = {
-  data: BadRequestResponse
-  status: 400
-}
+  data: BadRequestResponse;
+  status: 400;
+};
 
 export type postApiV1UsersMePhoneVerificationCodesResponse401 = {
-  data: UnauthorizedResponse
-  status: 401
-}
-
-export type postApiV1UsersMePhoneVerificationCodesResponseSuccess = (postApiV1UsersMePhoneVerificationCodesResponse200) & {
-  headers: Headers;
-};
-export type postApiV1UsersMePhoneVerificationCodesResponseError = (postApiV1UsersMePhoneVerificationCodesResponse400 | postApiV1UsersMePhoneVerificationCodesResponse401) & {
-  headers: Headers;
+  data: UnauthorizedResponse;
+  status: 401;
 };
 
-export type postApiV1UsersMePhoneVerificationCodesResponse = (postApiV1UsersMePhoneVerificationCodesResponseSuccess | postApiV1UsersMePhoneVerificationCodesResponseError)
+export type postApiV1UsersMePhoneVerificationCodesResponseSuccess =
+  postApiV1UsersMePhoneVerificationCodesResponse200 & {
+    headers: Headers;
+  };
+export type postApiV1UsersMePhoneVerificationCodesResponseError = (
+  | postApiV1UsersMePhoneVerificationCodesResponse400
+  | postApiV1UsersMePhoneVerificationCodesResponse401
+) & {
+  headers: Headers;
+};
+
+export type postApiV1UsersMePhoneVerificationCodesResponse =
+  | postApiV1UsersMePhoneVerificationCodesResponseSuccess
+  | postApiV1UsersMePhoneVerificationCodesResponseError;
 
 export const getPostApiV1UsersMePhoneVerificationCodesUrl = () => {
+  return `/api/v1/users/me/phone/verification-codes`;
+};
 
-
-
-
-  return `/api/v1/users/me/phone/verification-codes`
-}
-
-export const postApiV1UsersMePhoneVerificationCodes = async (phoneVerificationCodeSendRequest: PhoneVerificationCodeSendRequest, options?: RequestInit): Promise<postApiV1UsersMePhoneVerificationCodesResponse> => {
-
-  return customFetch<postApiV1UsersMePhoneVerificationCodesResponse>(getPostApiV1UsersMePhoneVerificationCodesUrl(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      phoneVerificationCodeSendRequest,)
-  }
-);}
-
+export const postApiV1UsersMePhoneVerificationCodes = async (
+  phoneVerificationCodeSendRequest: PhoneVerificationCodeSendRequest,
+  options?: RequestInit,
+): Promise<postApiV1UsersMePhoneVerificationCodesResponse> => {
+  return customFetch<postApiV1UsersMePhoneVerificationCodesResponse>(
+    getPostApiV1UsersMePhoneVerificationCodesUrl(),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(phoneVerificationCodeSendRequest),
+    },
+  );
+};
 
 /**
  * 인증코드 확인 후 전화번호 변경 가능 상태를 확정한다.
  * @summary 전화번호 변경 인증코드 확인
  */
 export type postApiV1UsersMePhoneVerificationCodesVerifyResponse200 = {
-  data: ApiResponsePhoneVerificationVerified
-  status: 200
-}
+  data: ApiResponsePhoneVerificationVerified;
+  status: 200;
+};
 
 export type postApiV1UsersMePhoneVerificationCodesVerifyResponse400 = {
-  data: BadRequestResponse
-  status: 400
-}
+  data: BadRequestResponse;
+  status: 400;
+};
 
 export type postApiV1UsersMePhoneVerificationCodesVerifyResponse401 = {
-  data: UnauthorizedResponse
-  status: 401
-}
-
-export type postApiV1UsersMePhoneVerificationCodesVerifyResponseSuccess = (postApiV1UsersMePhoneVerificationCodesVerifyResponse200) & {
-  headers: Headers;
-};
-export type postApiV1UsersMePhoneVerificationCodesVerifyResponseError = (postApiV1UsersMePhoneVerificationCodesVerifyResponse400 | postApiV1UsersMePhoneVerificationCodesVerifyResponse401) & {
-  headers: Headers;
+  data: UnauthorizedResponse;
+  status: 401;
 };
 
-export type postApiV1UsersMePhoneVerificationCodesVerifyResponse = (postApiV1UsersMePhoneVerificationCodesVerifyResponseSuccess | postApiV1UsersMePhoneVerificationCodesVerifyResponseError)
+export type postApiV1UsersMePhoneVerificationCodesVerifyResponseSuccess =
+  postApiV1UsersMePhoneVerificationCodesVerifyResponse200 & {
+    headers: Headers;
+  };
+export type postApiV1UsersMePhoneVerificationCodesVerifyResponseError = (
+  | postApiV1UsersMePhoneVerificationCodesVerifyResponse400
+  | postApiV1UsersMePhoneVerificationCodesVerifyResponse401
+) & {
+  headers: Headers;
+};
+
+export type postApiV1UsersMePhoneVerificationCodesVerifyResponse =
+  | postApiV1UsersMePhoneVerificationCodesVerifyResponseSuccess
+  | postApiV1UsersMePhoneVerificationCodesVerifyResponseError;
 
 export const getPostApiV1UsersMePhoneVerificationCodesVerifyUrl = () => {
+  return `/api/v1/users/me/phone/verification-codes/verify`;
+};
 
-
-
-
-  return `/api/v1/users/me/phone/verification-codes/verify`
-}
-
-export const postApiV1UsersMePhoneVerificationCodesVerify = async (phoneVerificationCodeVerifyRequest: PhoneVerificationCodeVerifyRequest, options?: RequestInit): Promise<postApiV1UsersMePhoneVerificationCodesVerifyResponse> => {
-
-  return customFetch<postApiV1UsersMePhoneVerificationCodesVerifyResponse>(getPostApiV1UsersMePhoneVerificationCodesVerifyUrl(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      phoneVerificationCodeVerifyRequest,)
-  }
-);}
-
+export const postApiV1UsersMePhoneVerificationCodesVerify = async (
+  phoneVerificationCodeVerifyRequest: PhoneVerificationCodeVerifyRequest,
+  options?: RequestInit,
+): Promise<postApiV1UsersMePhoneVerificationCodesVerifyResponse> => {
+  return customFetch<postApiV1UsersMePhoneVerificationCodesVerifyResponse>(
+    getPostApiV1UsersMePhoneVerificationCodesVerifyUrl(),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(phoneVerificationCodeVerifyRequest),
+    },
+  );
+};
 
 /**
  * 현재 비밀번호를 확인하고 새 비밀번호로 변경한다. 변경 완료 시 세션을 무효화한다.
  * @summary 비밀번호 변경 (이메일 가입자 전용)
  */
-export type postApiV1AuthPasswordChangeResponse200 = {
-  data: SuccessNoDataResponse
-  status: 200
-}
-
-export type postApiV1AuthPasswordChangeResponse400 = {
-  data: BadRequestResponse
-  status: 400
-}
-
-export type postApiV1AuthPasswordChangeResponse401 = {
-  data: UnauthorizedResponse
-  status: 401
-}
-
-export type postApiV1AuthPasswordChangeResponse403 = {
-  data: ForbiddenResponse
-  status: 403
-}
-
-export type postApiV1AuthPasswordChangeResponseSuccess = (postApiV1AuthPasswordChangeResponse200) & {
-  headers: Headers;
-};
-export type postApiV1AuthPasswordChangeResponseError = (postApiV1AuthPasswordChangeResponse400 | postApiV1AuthPasswordChangeResponse401 | postApiV1AuthPasswordChangeResponse403) & {
-  headers: Headers;
+export type patchApiV1UsersMePasswordResponse200 = {
+  data: ApiResponsePasswordChanged;
+  status: 200;
 };
 
-export type postApiV1AuthPasswordChangeResponse = (postApiV1AuthPasswordChangeResponseSuccess | postApiV1AuthPasswordChangeResponseError)
+export type patchApiV1UsersMePasswordResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
 
-export const getPostApiV1AuthPasswordChangeUrl = () => {
+export type patchApiV1UsersMePasswordResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
 
+export type patchApiV1UsersMePasswordResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
 
+export type patchApiV1UsersMePasswordResponseSuccess =
+  patchApiV1UsersMePasswordResponse200 & {
+    headers: Headers;
+  };
+export type patchApiV1UsersMePasswordResponseError = (
+  | patchApiV1UsersMePasswordResponse400
+  | patchApiV1UsersMePasswordResponse401
+  | patchApiV1UsersMePasswordResponse403
+) & {
+  headers: Headers;
+};
 
+export type patchApiV1UsersMePasswordResponse =
+  | patchApiV1UsersMePasswordResponseSuccess
+  | patchApiV1UsersMePasswordResponseError;
 
-  return `/api/v1/auth/password/change`
-}
+export const getPatchApiV1UsersMePasswordUrl = () => {
+  return `/api/v1/users/me/password`;
+};
 
-export const postApiV1AuthPasswordChange = async (passwordChangeRequest: PasswordChangeRequest, options?: RequestInit): Promise<postApiV1AuthPasswordChangeResponse> => {
-
-  return customFetch<postApiV1AuthPasswordChangeResponse>(getPostApiV1AuthPasswordChangeUrl(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      passwordChangeRequest,)
-  }
-);}
-
+export const patchApiV1UsersMePassword = async (
+  passwordChangeRequest: PasswordChangeRequest,
+  options?: RequestInit,
+): Promise<patchApiV1UsersMePasswordResponse> => {
+  return customFetch<patchApiV1UsersMePasswordResponse>(
+    getPatchApiV1UsersMePasswordUrl(),
+    {
+      ...options,
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(passwordChangeRequest),
+    },
+  );
+};
 
 /**
  * @summary 내 관심 지역 조회
  */
 export type getApiV1UsersMeRegionsResponse200 = {
-  data: ApiResponseMyRegions
-  status: 200
-}
+  data: ApiResponseMyRegions;
+  status: 200;
+};
 
 export type getApiV1UsersMeRegionsResponse401 = {
-  data: UnauthorizedResponse
-  status: 401
-}
-
-export type getApiV1UsersMeRegionsResponseSuccess = (getApiV1UsersMeRegionsResponse200) & {
-  headers: Headers;
-};
-export type getApiV1UsersMeRegionsResponseError = (getApiV1UsersMeRegionsResponse401) & {
-  headers: Headers;
+  data: UnauthorizedResponse;
+  status: 401;
 };
 
-export type getApiV1UsersMeRegionsResponse = (getApiV1UsersMeRegionsResponseSuccess | getApiV1UsersMeRegionsResponseError)
+export type getApiV1UsersMeRegionsResponseSuccess =
+  getApiV1UsersMeRegionsResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1UsersMeRegionsResponseError =
+  getApiV1UsersMeRegionsResponse401 & {
+    headers: Headers;
+  };
+
+export type getApiV1UsersMeRegionsResponse =
+  | getApiV1UsersMeRegionsResponseSuccess
+  | getApiV1UsersMeRegionsResponseError;
 
 export const getGetApiV1UsersMeRegionsUrl = () => {
+  return `/api/v1/users/me/regions`;
+};
 
-
-
-
-  return `/api/v1/users/me/regions`
-}
-
-export const getApiV1UsersMeRegions = async ( options?: RequestInit): Promise<getApiV1UsersMeRegionsResponse> => {
-
-  return customFetch<getApiV1UsersMeRegionsResponse>(getGetApiV1UsersMeRegionsUrl(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
+export const getApiV1UsersMeRegions = async (
+  options?: RequestInit,
+): Promise<getApiV1UsersMeRegionsResponse> => {
+  return customFetch<getApiV1UsersMeRegionsResponse>(
+    getGetApiV1UsersMeRegionsUrl(),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
 
 /**
  * 기존 관심 지역을 모두 삭제하고 요청 목록으로 새로 저장한다. 빈 배열이면 전체 해제.
  * @summary 관심 지역 저장/수정 (전체 교체)
  */
 export type putApiV1UsersMeRegionsResponse200 = {
-  data: SuccessNoDataResponse
-  status: 200
-}
+  data: SuccessNoDataResponse;
+  status: 200;
+};
 
 export type putApiV1UsersMeRegionsResponse400 = {
-  data: BadRequestResponse
-  status: 400
-}
+  data: BadRequestResponse;
+  status: 400;
+};
 
 export type putApiV1UsersMeRegionsResponse401 = {
-  data: UnauthorizedResponse
-  status: 401
-}
-
-export type putApiV1UsersMeRegionsResponseSuccess = (putApiV1UsersMeRegionsResponse200) & {
-  headers: Headers;
-};
-export type putApiV1UsersMeRegionsResponseError = (putApiV1UsersMeRegionsResponse400 | putApiV1UsersMeRegionsResponse401) & {
-  headers: Headers;
+  data: UnauthorizedResponse;
+  status: 401;
 };
 
-export type putApiV1UsersMeRegionsResponse = (putApiV1UsersMeRegionsResponseSuccess | putApiV1UsersMeRegionsResponseError)
+export type putApiV1UsersMeRegionsResponseSuccess =
+  putApiV1UsersMeRegionsResponse200 & {
+    headers: Headers;
+  };
+export type putApiV1UsersMeRegionsResponseError = (
+  | putApiV1UsersMeRegionsResponse400
+  | putApiV1UsersMeRegionsResponse401
+) & {
+  headers: Headers;
+};
+
+export type putApiV1UsersMeRegionsResponse =
+  | putApiV1UsersMeRegionsResponseSuccess
+  | putApiV1UsersMeRegionsResponseError;
 
 export const getPutApiV1UsersMeRegionsUrl = () => {
+  return `/api/v1/users/me/regions`;
+};
 
-
-
-
-  return `/api/v1/users/me/regions`
-}
-
-export const putApiV1UsersMeRegions = async (updateRegionsRequest: UpdateRegionsRequest, options?: RequestInit): Promise<putApiV1UsersMeRegionsResponse> => {
-
-  return customFetch<putApiV1UsersMeRegionsResponse>(getPutApiV1UsersMeRegionsUrl(),
-  {
-    ...options,
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      updateRegionsRequest,)
-  }
-);}
-
-
+export const putApiV1UsersMeRegions = async (
+  updateRegionsRequest: UpdateRegionsRequest,
+  options?: RequestInit,
+): Promise<putApiV1UsersMeRegionsResponse> => {
+  return customFetch<putApiV1UsersMeRegionsResponse>(
+    getPutApiV1UsersMeRegionsUrl(),
+    {
+      ...options,
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(updateRegionsRequest),
+    },
+  );
+};

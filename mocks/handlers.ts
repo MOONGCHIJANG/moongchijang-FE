@@ -21,6 +21,16 @@ import {
   createGroupBuyDetailMock,
   createStoreSearchMock,
   createGroupBuyRequestMock,
+  createMyPageUserMeMock,
+  createMyPageTabCountsMock,
+  createMyPageParticipationsMock,
+  createMyPageRefundsMock,
+  createMyPagePickupInfoMock,
+  createMyPagePickupWaitingMock,
+  createMyPageQrMock,
+  MOCK_HAS_PICKUP_WAITING,
+  createGroupBuyRequestListMock,
+  createGroupBuyRequestDetailMock,
 } from './mock-helpers';
 import { formatDeadline } from '@/lib/date';
 
@@ -109,7 +119,7 @@ const overrideHandlers = [
         totalPages,
         totalElements: TOTAL_ITEMS,
         hasNext: page < totalPages,
-        hasSearchResult,
+        hasRegionalResult: hasSearchResult,
       },
       error: null,
     });
@@ -121,6 +131,15 @@ const overrideHandlers = [
   http.get('*/api/v1/stores/search', async () => {
     await delay(800);
     return HttpResponse.json(createStoreSearchMock());
+  }),
+  http.get('*/api/v1/group-buy-requests', async () => {
+    await delay(600);
+    return HttpResponse.json(createGroupBuyRequestListMock());
+  }),
+  http.get('*/api/v1/group-buy-requests/:requestId', async ({ params }) => {
+    await delay(600);
+    const requestId = Number(params.requestId);
+    return HttpResponse.json(createGroupBuyRequestDetailMock(requestId));
   }),
   http.post('*/api/v1/group-buy-requests', async () => {
     await delay(800);
@@ -155,7 +174,7 @@ const overrideHandlers = [
   http.get('*/api/v1/search/recent', async () => {
     return HttpResponse.json({
       success: true,
-      data: { keywords: recentKeywords },
+      data: recentKeywords.map((k) => k.keyword),
       error: null,
     });
   }),
@@ -166,25 +185,32 @@ const overrideHandlers = [
       success: true,
       data: {
         // ── 분기 확인용: 하나만 주석 해제해서 확인 ───────────────────────
-
-        // case 1: 베이커리 인식, 동네 미인식
-        // searchCase: 1,
-        // detectedBakery: '두쫀쿠',
-        // detectedNeighborhood: null,
-
-        // case 2: 동네 인식, 베이커리 미인식
-        // searchCase: 2,
-        // detectedBakery: null,
-        // detectedNeighborhood: '성수',
-
-        // case 3: 동네 + 베이커리 모두 인식
-        // searchCase: 3, detectedBakery: '두쫀쿠', detectedNeighborhood: '성수',
-
+        // case 1: 상품 인식, 동네 미인식
+        // searchCase: 'PRODUCT_ONLY',
+        // detectedProduct: '두쫀쿠',
+        // detectedRegion: null,
+        // uiState: 'RESULTS',
+        // results: [],
+        // case 2: 동네 인식, 상품 미인식
+        // searchCase: 'NEIGHBORHOOD_ONLY',
+        // detectedProduct: null,
+        // detectedRegion: '성수',
+        // uiState: 'RESULTS',
+        // results: [],
+        // case 3: 동네 + 상품 모두 인식
+        // searchCase: 'BOTH_DETECTED',
+        // detectedProduct: '두쫀쿠',
+        // detectedRegion: '분당',
+        // uiState: 'RESULTS',
+        // results: [],
         // case 4: 모두 인식 불가 (현재 활성)
-        searchCase: 4,
-        detectedBakery: null,
-        detectedNeighborhood: null,
-
+        searchCase: 'NONE_DETECTED',
+        detectedProduct: null,
+        detectedRegion: null,
+        uiState: 'RESULTS',
+        results: [],
+        totalCount: 0,
+        confidence: 0.9,
         // ─────────────────────────────────────────────────────────────────
       },
       error: null,
@@ -193,6 +219,65 @@ const overrideHandlers = [
   http.delete('*/api/v1/search/recent', async () => {
     recentKeywords = [];
     return HttpResponse.json({ success: true, data: {}, error: null });
+  }),
+  http.get('*/api/v1/wishlists', async ({ request }) => {
+    await delay(600);
+    const url = new URL(request.url);
+    const filter = url.searchParams.get('filter') ?? 'ALL';
+    const excludeClosed = url.searchParams.get('excludeClosed') === 'true';
+
+    // filter별 dDay 세트: ALL=전 상태 혼합, OPEN=마감 여유, CLOSING_SOON=마감임박
+    const dDayByFilter: Record<string, number[]> = {
+      ALL: [-1, 0, 1, 3, 7], // 마감(-1), D-0, D-1, D-3, D-7 혼합
+      OPEN: [5, 7, 10, 14, 20], // 여유 있는 모집중
+      CLOSING_SOON: [0, 1, 2, 3], // D-0 ~ D-3 마감임박
+    };
+    const rawDDays = dDayByFilter[filter] ?? dDayByFilter['ALL'];
+    const dDays = excludeClosed ? rawDDays.filter((d) => d >= 0) : rawDDays;
+
+    const content = dDays.map((dDay, i) => {
+      const { id, currentQuantity, targetQuantity, ...rest } = createFeedItem(
+        i + 1,
+      );
+      const dDayLabel = dDay === 0 ? 'D-day' : dDay < 0 ? '마감' : `D-${dDay}`;
+      return {
+        ...rest,
+        groupBuyId: id,
+        currentParticipantCount: currentQuantity,
+        targetParticipantCount: targetQuantity,
+        pickupDate: rest.deadline,
+        dDay,
+        dDayLabel,
+        deadlineLabel: dDayLabel,
+        isWishlisted: true,
+      };
+    });
+    const urgentCount = content.filter(
+      (item) => item.dDay >= 0 && item.dDay <= 2,
+    ).length;
+    return HttpResponse.json({
+      success: true,
+      data: {
+        content,
+        totalElements: content.length,
+        totalPages: 1,
+        number: 0,
+        size: 20,
+        urgentCount,
+      },
+      error: null,
+    });
+  }),
+  http.post('*/api/v1/group-buys/:groupBuyId/wishlist', async () => {
+    await delay(200);
+    return HttpResponse.json(
+      { success: true, data: null, error: null },
+      { status: 201 },
+    );
+  }),
+  http.delete('*/api/v1/group-buys/:groupBuyId/wishlist', async () => {
+    await delay(200);
+    return HttpResponse.json({ success: true, data: null, error: null });
   }),
   http.delete('*/api/v1/search/recent/:keyword', async ({ params }) => {
     const keyword = decodeURIComponent(params.keyword as string);
@@ -235,6 +320,232 @@ const overrideHandlers = [
         },
         error: null,
       },
+      { status: 200 },
+    );
+  }),
+  // 피드용 가장 가까운 픽업 QR 조회
+  http.get('*/api/v1/pickups/me/nearest-qr', async () => {
+    await delay(300);
+    return HttpResponse.json({
+      success: true,
+      data: {
+        // ── 분기 확인용: 하나만 주석 해제해서 확인 ───────────────────────
+        // 후보 없음
+        // hasCandidate: false,
+        // hasMultipleToday: false,
+        // reason: 'NO_AVAILABLE_PICKUP',
+        // item: null,
+
+        // 향후 픽업 예정 (LOCKED)
+        hasCandidate: false,
+        hasMultipleToday: false,
+        reason: 'ONLY_FUTURE_PICKUP',
+        item: {
+          participationId: 1,
+          reservationNumber: 'MCJ-P000001',
+          availabilityStatus: 'LOCKED',
+          pickupStatus: 'READY',
+          productName: '밤티 말빵',
+          quantity: 2,
+          storeName: '밤티',
+          storeAddress: '서울 성동구 성동로 32길',
+          pickupLocation: '서울 성동구 성동로 32길, 사이드템포',
+          qrCode: null,
+          pickupDate: '2026-06-01',
+          pickupTimeStart: '14:00',
+          pickupTimeEnd: '18:00',
+          dDay: 8,
+          pickedUpAt: null,
+        },
+
+        // 당일 픽업 (AVAILABLE, 현재 활성)
+        // hasCandidate: true,
+        // hasMultipleToday: false,
+        // reason: null,
+        // item: {
+        //   participationId: 1,
+        //   reservationNumber: 'MCJ-P000001',
+        //   availabilityStatus: 'AVAILABLE',
+        //   pickupStatus: 'READY',
+        //   productName: '밤티 말빵',
+        //   quantity: 2,
+        //   storeName: '밤티',
+        //   storeAddress: '서울 성동구 성동로 32길',
+        //   pickupLocation: '서울 성동구 성동로 32길, 사이드템포',
+        //   qrCode: 'https://moongchijang.com/verify/MCJ-P000001',
+        //   pickupDate: '2026-05-24',
+        //   pickupTimeStart: '14:00',
+        //   pickupTimeEnd: '18:00',
+        //   dDay: 0,
+        //   pickedUpAt: null,
+        // },
+        // ─────────────────────────────────────────────────────────────────
+      },
+      error: null,
+    });
+  }),
+
+  // checkout
+  http.get('*/api/v1/group-buys/:groupBuyId/checkout', async ({ request }) => {
+    await delay(300);
+    const url = new URL(request.url);
+    const quantity = parseInt(url.searchParams.get('quantity') ?? '1', 10);
+    const unitPrice = 18000;
+    const productAmount = unitPrice * quantity;
+    return HttpResponse.json({
+      success: true,
+      data: {
+        groupBuyId: 1,
+        storeName: koFaker.store.name(),
+        productName: koFaker.product.name(),
+        thumbnailUrl: '/images/img1.jpg',
+        pickupDate: '2026-05-30',
+        pickupTimeStart: '14:00',
+        pickupTimeEnd: '18:00',
+        unitPrice,
+        quantity,
+        productAmount,
+        feeAmount: 0,
+        totalAmount: productAmount,
+        remainingQuantity: 10,
+      },
+      error: null,
+    });
+  }),
+
+  // payment-orders
+  http.post(
+    '*/api/v1/group-buys/:groupBuyId/payment-orders',
+    async ({ request }) => {
+      await delay(500);
+      const body = (await request.json()) as { quantity?: number };
+      const quantity = body.quantity ?? 1;
+      return HttpResponse.json({
+        success: true,
+        data: {
+          paymentId: `MOCK-${crypto.randomUUID()}`,
+          storeId: process.env.NEXT_PUBLIC_PORTONE_STORE_ID ?? 'mock-store-id',
+          channelKey:
+            process.env.NEXT_PUBLIC_PORTONE_CHANNEL_KEY ?? 'mock-channel-key',
+          orderName: `${koFaker.product.name()} ${quantity}개`,
+          amount: 18000 * quantity,
+          customerName: null,
+        },
+        error: null,
+      });
+    },
+  ),
+
+  // portone/complete
+  http.post('*/api/v1/payments/portone/complete', async () => {
+    await delay(300);
+    return HttpResponse.json({
+      success: true,
+      data: {
+        paymentId: `MOCK-${crypto.randomUUID()}`,
+        participationId: faker.number.int({ min: 1, max: 999 }),
+        participationStatus: 'PAID_WAITING_GOAL',
+        displayStatus: '참여중',
+        amount: 18000,
+        method: 'card',
+        approvedAt: new Date().toISOString(),
+      },
+      error: null,
+    });
+  }),
+
+  // 마이페이지
+  http.get('*/api/v1/users/me', async () => {
+    await delay(300);
+    return HttpResponse.json(createMyPageUserMeMock());
+  }),
+  http.get('*/api/v1/users/me/tabs/counts', async () => {
+    await delay(300);
+    return HttpResponse.json(createMyPageTabCountsMock());
+  }),
+  http.get('*/api/v1/users/me/participations', async ({ request }) => {
+    await delay(500);
+    const url = new URL(request.url);
+    const status = (url.searchParams.get('status') ?? 'ACTIVE') as
+      | 'ACTIVE'
+      | 'COMPLETED';
+    return HttpResponse.json(createMyPageParticipationsMock(status));
+  }),
+  http.get('*/api/v1/users/me/refunds', async () => {
+    await delay(300);
+    return HttpResponse.json(createMyPageRefundsMock());
+  }),
+  http.post('*/api/v1/participations/:participationId/cancel', async () => {
+    await delay(500);
+    return HttpResponse.json({ success: true, data: {}, error: null });
+  }),
+  http.get('*/api/v1/users/me/participations/pickup-waiting', async () => {
+    await delay(300);
+    return HttpResponse.json(createMyPagePickupWaitingMock());
+  }),
+  http.get('*/api/v1/participations/:participationId/pickup', async () => {
+    await delay(300);
+    return HttpResponse.json(createMyPagePickupInfoMock());
+  }),
+  http.get('*/api/v1/participations/:participationId/qr', async () => {
+    await delay(300);
+    return HttpResponse.json(createMyPageQrMock());
+  }),
+  // 닉네임 중복 확인 — available: true 고정 (false로 바꿔 중복 케이스 확인 가능)
+  http.get('*/api/v1/users/nickname/availability', async () => {
+    await delay(300);
+    return HttpResponse.json({
+      success: true,
+      data: { available: true },
+      error: null,
+    });
+  }),
+  // 프로필(닉네임) 업데이트
+  http.patch('*/api/v1/users/me/profile', async () => {
+    await delay(400);
+    return HttpResponse.json(
+      { success: true, data: {}, error: null },
+      { status: 200 },
+    );
+  }),
+  http.post('*/api/v1/auth/logout', async () => {
+    await delay(300);
+    return HttpResponse.json({ success: true, data: {}, error: null });
+  }),
+  http.delete('*/api/v1/users/me', async () => {
+    await delay(500);
+    if (MOCK_HAS_PICKUP_WAITING) {
+      return HttpResponse.json(
+        {
+          success: false,
+          data: null,
+          error: { message: '수령 예정인 공구가 있어요.' },
+        },
+        { status: 400 },
+      );
+    }
+    return HttpResponse.json(
+      { success: true, data: {}, error: null },
+      { status: 200 },
+    );
+  }),
+
+  http.post('*/api/v1/users/me/phone/verification-codes', async () => {
+    await delay(500);
+    return HttpResponse.json(
+      {
+        success: true,
+        data: { expiresInSeconds: 180, resendAvailableInSeconds: 60 },
+        error: null,
+      },
+      { status: 200 },
+    );
+  }),
+
+  http.post('*/api/v1/users/me/phone/verification-codes/verify', async () => {
+    await delay(500);
+    return HttpResponse.json(
+      { success: true, data: null, error: null },
       { status: 200 },
     );
   }),

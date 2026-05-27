@@ -24,12 +24,14 @@ import type {
   ApiResponseGroupBuyFeedPageResponse,
   ApiResponseGroupBuyProgress,
   ApiResponseGroupBuyProgressList,
+  ApiResponseGroupBuyViewerCount,
   ApiResponseRecentSearchList,
   ApiResponseSearchAnalysis,
   ApiResponseShareMeta,
   BadRequestResponse,
   GetApiV1GroupBuysParams,
   GetApiV1GroupBuysProgressParams,
+  GroupBuyViewerHeartbeatRequest,
   NotFoundResponse,
   PostApiV1SearchBody,
   SuccessNoDataResponse,
@@ -659,6 +661,144 @@ export function useGetApiV1GroupBuysGroupBuyIdProgress<
 }
 
 /**
+ * 공구 상세 화면 진입 시 및 체류 중 일정 주기(예: 20~30초)로 호출한다.
+서버는 세션 TTL을 연장하고 최신 활성 조회자 수를 반환한다.
+
+ * @summary 활성 조회자 heartbeat 조회/갱신
+ */
+export type postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse200 = {
+  data: ApiResponseGroupBuyViewerCount;
+  status: 200;
+};
+
+export type postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponseSuccess =
+  postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse200 & {
+    headers: Headers;
+  };
+export type postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponseError = (
+  | postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse400
+  | postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse404
+) & {
+  headers: Headers;
+};
+
+export type postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse =
+  | postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponseSuccess
+  | postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponseError;
+
+export const getPostApiV1GroupBuysGroupBuyIdViewersHeartbeatUrl = (
+  groupBuyId: number,
+) => {
+  return `/api/v1/group-buys/${groupBuyId}/viewers/heartbeat`;
+};
+
+export const postApiV1GroupBuysGroupBuyIdViewersHeartbeat = async (
+  groupBuyId: number,
+  groupBuyViewerHeartbeatRequest: GroupBuyViewerHeartbeatRequest,
+  options?: RequestInit,
+): Promise<postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse> => {
+  return customFetch<postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse>(
+    getPostApiV1GroupBuysGroupBuyIdViewersHeartbeatUrl(groupBuyId),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(groupBuyViewerHeartbeatRequest),
+    },
+  );
+};
+
+export const getPostApiV1GroupBuysGroupBuyIdViewersHeartbeatMutationOptions = <
+  TError = BadRequestResponse | NotFoundResponse,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiV1GroupBuysGroupBuyIdViewersHeartbeat>>,
+    TError,
+    { groupBuyId: number; data: GroupBuyViewerHeartbeatRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiV1GroupBuysGroupBuyIdViewersHeartbeat>>,
+  TError,
+  { groupBuyId: number; data: GroupBuyViewerHeartbeatRequest },
+  TContext
+> => {
+  const mutationKey = ['postApiV1GroupBuysGroupBuyIdViewersHeartbeat'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiV1GroupBuysGroupBuyIdViewersHeartbeat>>,
+    { groupBuyId: number; data: GroupBuyViewerHeartbeatRequest }
+  > = (props) => {
+    const { groupBuyId, data } = props ?? {};
+
+    return postApiV1GroupBuysGroupBuyIdViewersHeartbeat(
+      groupBuyId,
+      data,
+      requestOptions,
+    );
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiV1GroupBuysGroupBuyIdViewersHeartbeatMutationResult =
+  NonNullable<
+    Awaited<ReturnType<typeof postApiV1GroupBuysGroupBuyIdViewersHeartbeat>>
+  >;
+export type PostApiV1GroupBuysGroupBuyIdViewersHeartbeatMutationBody =
+  GroupBuyViewerHeartbeatRequest;
+export type PostApiV1GroupBuysGroupBuyIdViewersHeartbeatMutationError =
+  | BadRequestResponse
+  | NotFoundResponse;
+
+/**
+ * @summary 활성 조회자 heartbeat 조회/갱신
+ */
+export const usePostApiV1GroupBuysGroupBuyIdViewersHeartbeat = <
+  TError = BadRequestResponse | NotFoundResponse,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiV1GroupBuysGroupBuyIdViewersHeartbeat>>,
+      TError,
+      { groupBuyId: number; data: GroupBuyViewerHeartbeatRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiV1GroupBuysGroupBuyIdViewersHeartbeat>>,
+  TError,
+  { groupBuyId: number; data: GroupBuyViewerHeartbeatRequest },
+  TContext
+> => {
+  return useMutation(
+    getPostApiV1GroupBuysGroupBuyIdViewersHeartbeatMutationOptions(options),
+    queryClient,
+  );
+};
+/**
  * @summary 다건 공구 달성률 조회 (피드 갱신용)
  */
 export type getApiV1GroupBuysProgressResponse200 = {
@@ -877,12 +1017,23 @@ export type getApiV1GroupBuysGroupBuyIdShareResponse200 = {
   status: 200;
 };
 
+export type getApiV1GroupBuysGroupBuyIdShareResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
 export type getApiV1GroupBuysGroupBuyIdShareResponseSuccess =
   getApiV1GroupBuysGroupBuyIdShareResponse200 & {
     headers: Headers;
   };
+export type getApiV1GroupBuysGroupBuyIdShareResponseError =
+  getApiV1GroupBuysGroupBuyIdShareResponse404 & {
+    headers: Headers;
+  };
+
 export type getApiV1GroupBuysGroupBuyIdShareResponse =
-  getApiV1GroupBuysGroupBuyIdShareResponseSuccess;
+  | getApiV1GroupBuysGroupBuyIdShareResponseSuccess
+  | getApiV1GroupBuysGroupBuyIdShareResponseError;
 
 export const getGetApiV1GroupBuysGroupBuyIdShareUrl = (groupBuyId: number) => {
   return `/api/v1/group-buys/${groupBuyId}/share`;
@@ -909,7 +1060,7 @@ export const getGetApiV1GroupBuysGroupBuyIdShareQueryKey = (
 
 export const getGetApiV1GroupBuysGroupBuyIdShareQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiV1GroupBuysGroupBuyIdShare>>,
-  TError = unknown,
+  TError = NotFoundResponse,
 >(
   groupBuyId: number,
   options?: {
@@ -949,11 +1100,11 @@ export const getGetApiV1GroupBuysGroupBuyIdShareQueryOptions = <
 export type GetApiV1GroupBuysGroupBuyIdShareQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiV1GroupBuysGroupBuyIdShare>>
 >;
-export type GetApiV1GroupBuysGroupBuyIdShareQueryError = unknown;
+export type GetApiV1GroupBuysGroupBuyIdShareQueryError = NotFoundResponse;
 
 export function useGetApiV1GroupBuysGroupBuyIdShare<
   TData = Awaited<ReturnType<typeof getApiV1GroupBuysGroupBuyIdShare>>,
-  TError = unknown,
+  TError = NotFoundResponse,
 >(
   groupBuyId: number,
   options: {
@@ -980,7 +1131,7 @@ export function useGetApiV1GroupBuysGroupBuyIdShare<
 };
 export function useGetApiV1GroupBuysGroupBuyIdShare<
   TData = Awaited<ReturnType<typeof getApiV1GroupBuysGroupBuyIdShare>>,
-  TError = unknown,
+  TError = NotFoundResponse,
 >(
   groupBuyId: number,
   options?: {
@@ -1007,7 +1158,7 @@ export function useGetApiV1GroupBuysGroupBuyIdShare<
 };
 export function useGetApiV1GroupBuysGroupBuyIdShare<
   TData = Awaited<ReturnType<typeof getApiV1GroupBuysGroupBuyIdShare>>,
-  TError = unknown,
+  TError = NotFoundResponse,
 >(
   groupBuyId: number,
   options?: {
@@ -1030,7 +1181,7 @@ export function useGetApiV1GroupBuysGroupBuyIdShare<
 
 export function useGetApiV1GroupBuysGroupBuyIdShare<
   TData = Awaited<ReturnType<typeof getApiV1GroupBuysGroupBuyIdShare>>,
-  TError = unknown,
+  TError = NotFoundResponse,
 >(
   groupBuyId: number,
   options?: {
@@ -1063,6 +1214,8 @@ export function useGetApiV1GroupBuysGroupBuyIdShare<
 /**
  * 검색어를 입력하면 동네/베이커리 키워드를 AI로 분석하고 최근 검색어로 저장한다.
 분석 결과에 따라 4가지 케이스로 분기한다.
+자체 검색 결과가 없을 때 제공되는 recommendedStores는 Naver Local Search 결과 중
+베이커리/디저트 도메인으로 분류된 매장만 반환한다.
 - case 1: 베이커리 인식, 동네 미인식
 - case 2: 동네 인식, 베이커리 미인식
 - case 3: 동네+베이커리 모두 인식
@@ -1188,7 +1341,8 @@ export const usePostApiV1Search = <
 };
 /**
  * 검색창 탭 시 표시할 사용자의 최근 검색어를 최신순으로 반환한다. (1.1.4-10)
-검색 이력이 없으면 빈 배열 반환.
+동일 검색어는 중복 저장하지 않고 가장 최근 검색 위치로 이동한다.
+최근 검색어는 최대 10개까지 반환하며, 검색 이력이 없으면 빈 배열을 반환한다.
 
  * @summary 최근 검색어 목록 조회
  */

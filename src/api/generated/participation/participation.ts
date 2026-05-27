@@ -3,100 +3,177 @@
  * // 이 파일은 Orval이 자동 생성합니다. 직접 수정하지 마세요.
  */
 import type {
-  ApiResponseParticipationCreated,
-  ApiResponseRefundList,
+  ApiResponseCancelParticipation,
+  ApiResponseCheckoutInfo,
+  ApiResponsePaymentConfirmed,
+  ApiResponsePaymentOrderCreated,
+  ApiResponsePortOneWebhook,
   BadRequestResponse,
+  CancelParticipationRequest,
   ConflictResponse,
   ForbiddenResponse,
-  ParticipationCreate,
+  GetApiV1GroupBuysGroupBuyIdCheckoutParams,
   PaymentConfirm,
-  PaymentFail,
-  SuccessNoDataResponse,
+  PaymentOrderCreate,
+  PortOneWebhook,
   UnauthorizedResponse
 } from '../api.schemas';
 
 import { customFetch } from '../../../lib/custom-fetch';
 
 /**
- * @summary 공구 참여 (결제 요청 생성)
+ * @summary 참여하기 화면 결제 정보 조회
  */
-export type postApiV1GroupBuysGroupBuyIdParticipationsResponse201 = {
-  data: ApiResponseParticipationCreated
-  status: 201
+export type getApiV1GroupBuysGroupBuyIdCheckoutResponse200 = {
+  data: ApiResponseCheckoutInfo
+  status: 200
 }
 
-export type postApiV1GroupBuysGroupBuyIdParticipationsResponse400 = {
+export type getApiV1GroupBuysGroupBuyIdCheckoutResponse400 = {
   data: BadRequestResponse
   status: 400
 }
 
-export type postApiV1GroupBuysGroupBuyIdParticipationsResponse401 = {
-  data: UnauthorizedResponse
-  status: 401
-}
-
-export type postApiV1GroupBuysGroupBuyIdParticipationsResponse409 = {
+export type getApiV1GroupBuysGroupBuyIdCheckoutResponse409 = {
   data: ConflictResponse
   status: 409
 }
 
-export type postApiV1GroupBuysGroupBuyIdParticipationsResponseSuccess = (postApiV1GroupBuysGroupBuyIdParticipationsResponse201) & {
+export type getApiV1GroupBuysGroupBuyIdCheckoutResponseSuccess = (getApiV1GroupBuysGroupBuyIdCheckoutResponse200) & {
   headers: Headers;
 };
-export type postApiV1GroupBuysGroupBuyIdParticipationsResponseError = (postApiV1GroupBuysGroupBuyIdParticipationsResponse400 | postApiV1GroupBuysGroupBuyIdParticipationsResponse401 | postApiV1GroupBuysGroupBuyIdParticipationsResponse409) & {
+export type getApiV1GroupBuysGroupBuyIdCheckoutResponseError = (getApiV1GroupBuysGroupBuyIdCheckoutResponse400 | getApiV1GroupBuysGroupBuyIdCheckoutResponse409) & {
   headers: Headers;
 };
 
-export type postApiV1GroupBuysGroupBuyIdParticipationsResponse = (postApiV1GroupBuysGroupBuyIdParticipationsResponseSuccess | postApiV1GroupBuysGroupBuyIdParticipationsResponseError)
+export type getApiV1GroupBuysGroupBuyIdCheckoutResponse = (getApiV1GroupBuysGroupBuyIdCheckoutResponseSuccess | getApiV1GroupBuysGroupBuyIdCheckoutResponseError)
 
-export const getPostApiV1GroupBuysGroupBuyIdParticipationsUrl = (groupBuyId: number,) => {
+export const getGetApiV1GroupBuysGroupBuyIdCheckoutUrl = (groupBuyId: number,
+    params: GetApiV1GroupBuysGroupBuyIdCheckoutParams,) => {
+  const normalizedParams = new URLSearchParams();
 
+  Object.entries(params || {}).forEach(([key, value]) => {
 
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
 
+  const stringifiedParams = normalizedParams.toString();
 
-  return `/api/v1/group-buys/${groupBuyId}/participations`
+  return stringifiedParams.length > 0 ? `/api/v1/group-buys/${groupBuyId}/checkout?${stringifiedParams}` : `/api/v1/group-buys/${groupBuyId}/checkout`
 }
 
-export const postApiV1GroupBuysGroupBuyIdParticipations = async (groupBuyId: number,
-    participationCreate: ParticipationCreate, options?: RequestInit): Promise<postApiV1GroupBuysGroupBuyIdParticipationsResponse> => {
+export const getApiV1GroupBuysGroupBuyIdCheckout = async (groupBuyId: number,
+    params: GetApiV1GroupBuysGroupBuyIdCheckoutParams, options?: RequestInit): Promise<getApiV1GroupBuysGroupBuyIdCheckoutResponse> => {
 
-  return customFetch<postApiV1GroupBuysGroupBuyIdParticipationsResponse>(getPostApiV1GroupBuysGroupBuyIdParticipationsUrl(groupBuyId),
+  return customFetch<getApiV1GroupBuysGroupBuyIdCheckoutResponse>(getGetApiV1GroupBuysGroupBuyIdCheckoutUrl(groupBuyId,params),
   {
     ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      participationCreate,)
+    method: 'GET'
+
+
   }
 );}
 
 
 /**
- * @summary PG 결제 성공 콜백 처리
+ * @summary PortOne 결제 주문 생성
  */
-export type postApiV1PaymentsConfirmResponse200 = {
-  data: SuccessNoDataResponse
+export type postApiV1GroupBuysGroupBuyIdPaymentOrdersResponse200 = {
+  data: ApiResponsePaymentOrderCreated
   status: 200
 }
 
-export type postApiV1PaymentsConfirmResponseSuccess = (postApiV1PaymentsConfirmResponse200) & {
-  headers: Headers;
-};
-;
-
-export type postApiV1PaymentsConfirmResponse = (postApiV1PaymentsConfirmResponseSuccess)
-
-export const getPostApiV1PaymentsConfirmUrl = () => {
-
-
-
-
-  return `/api/v1/payments/confirm`
+export type postApiV1GroupBuysGroupBuyIdPaymentOrdersResponse400 = {
+  data: BadRequestResponse
+  status: 400
 }
 
-export const postApiV1PaymentsConfirm = async (paymentConfirm: PaymentConfirm, options?: RequestInit): Promise<postApiV1PaymentsConfirmResponse> => {
+export type postApiV1GroupBuysGroupBuyIdPaymentOrdersResponse401 = {
+  data: UnauthorizedResponse
+  status: 401
+}
 
-  return customFetch<postApiV1PaymentsConfirmResponse>(getPostApiV1PaymentsConfirmUrl(),
+export type postApiV1GroupBuysGroupBuyIdPaymentOrdersResponse409 = {
+  data: ConflictResponse
+  status: 409
+}
+
+export type postApiV1GroupBuysGroupBuyIdPaymentOrdersResponseSuccess = (postApiV1GroupBuysGroupBuyIdPaymentOrdersResponse200) & {
+  headers: Headers;
+};
+export type postApiV1GroupBuysGroupBuyIdPaymentOrdersResponseError = (postApiV1GroupBuysGroupBuyIdPaymentOrdersResponse400 | postApiV1GroupBuysGroupBuyIdPaymentOrdersResponse401 | postApiV1GroupBuysGroupBuyIdPaymentOrdersResponse409) & {
+  headers: Headers;
+};
+
+export type postApiV1GroupBuysGroupBuyIdPaymentOrdersResponse = (postApiV1GroupBuysGroupBuyIdPaymentOrdersResponseSuccess | postApiV1GroupBuysGroupBuyIdPaymentOrdersResponseError)
+
+export const getPostApiV1GroupBuysGroupBuyIdPaymentOrdersUrl = (groupBuyId: number,) => {
+
+
+
+
+  return `/api/v1/group-buys/${groupBuyId}/payment-orders`
+}
+
+export const postApiV1GroupBuysGroupBuyIdPaymentOrders = async (groupBuyId: number,
+    paymentOrderCreate: PaymentOrderCreate, options?: RequestInit): Promise<postApiV1GroupBuysGroupBuyIdPaymentOrdersResponse> => {
+
+  return customFetch<postApiV1GroupBuysGroupBuyIdPaymentOrdersResponse>(getPostApiV1GroupBuysGroupBuyIdPaymentOrdersUrl(groupBuyId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      paymentOrderCreate,)
+  }
+);}
+
+
+/**
+ * @summary PortOne 결제 완료 서버 검증
+ */
+export type postApiV1PaymentsPortoneCompleteResponse200 = {
+  data: ApiResponsePaymentConfirmed
+  status: 200
+}
+
+export type postApiV1PaymentsPortoneCompleteResponse400 = {
+  data: BadRequestResponse
+  status: 400
+}
+
+export type postApiV1PaymentsPortoneCompleteResponse401 = {
+  data: UnauthorizedResponse
+  status: 401
+}
+
+export type postApiV1PaymentsPortoneCompleteResponse409 = {
+  data: ConflictResponse
+  status: 409
+}
+
+export type postApiV1PaymentsPortoneCompleteResponseSuccess = (postApiV1PaymentsPortoneCompleteResponse200) & {
+  headers: Headers;
+};
+export type postApiV1PaymentsPortoneCompleteResponseError = (postApiV1PaymentsPortoneCompleteResponse400 | postApiV1PaymentsPortoneCompleteResponse401 | postApiV1PaymentsPortoneCompleteResponse409) & {
+  headers: Headers;
+};
+
+export type postApiV1PaymentsPortoneCompleteResponse = (postApiV1PaymentsPortoneCompleteResponseSuccess | postApiV1PaymentsPortoneCompleteResponseError)
+
+export const getPostApiV1PaymentsPortoneCompleteUrl = () => {
+
+
+
+
+  return `/api/v1/payments/portone/complete`
+}
+
+export const postApiV1PaymentsPortoneComplete = async (paymentConfirm: PaymentConfirm, options?: RequestInit): Promise<postApiV1PaymentsPortoneCompleteResponse> => {
+
+  return customFetch<postApiV1PaymentsPortoneCompleteResponse>(getPostApiV1PaymentsPortoneCompleteUrl(),
   {
     ...options,
     method: 'POST',
@@ -108,37 +185,38 @@ export const postApiV1PaymentsConfirm = async (paymentConfirm: PaymentConfirm, o
 
 
 /**
- * @summary PG 결제 실패 콜백 처리
+ * 웹훅 본문만 신뢰하지 않고 서버에서 PortOne 결제 단건 조회 후 상태를 동기화한다.
+ * @summary PortOne 결제 웹훅 수신
  */
-export type postApiV1PaymentsFailResponse200 = {
-  data: SuccessNoDataResponse
+export type postApiV1PaymentsPortoneWebhookResponse200 = {
+  data: ApiResponsePortOneWebhook
   status: 200
 }
 
-export type postApiV1PaymentsFailResponseSuccess = (postApiV1PaymentsFailResponse200) & {
+export type postApiV1PaymentsPortoneWebhookResponseSuccess = (postApiV1PaymentsPortoneWebhookResponse200) & {
   headers: Headers;
 };
 ;
 
-export type postApiV1PaymentsFailResponse = (postApiV1PaymentsFailResponseSuccess)
+export type postApiV1PaymentsPortoneWebhookResponse = (postApiV1PaymentsPortoneWebhookResponseSuccess)
 
-export const getPostApiV1PaymentsFailUrl = () => {
-
-
+export const getPostApiV1PaymentsPortoneWebhookUrl = () => {
 
 
-  return `/api/v1/payments/fail`
+
+
+  return `/api/v1/payments/portone/webhook`
 }
 
-export const postApiV1PaymentsFail = async (paymentFail: PaymentFail, options?: RequestInit): Promise<postApiV1PaymentsFailResponse> => {
+export const postApiV1PaymentsPortoneWebhook = async (portOneWebhook: PortOneWebhook, options?: RequestInit): Promise<postApiV1PaymentsPortoneWebhookResponse> => {
 
-  return customFetch<postApiV1PaymentsFailResponse>(getPostApiV1PaymentsFailUrl(),
+  return customFetch<postApiV1PaymentsPortoneWebhookResponse>(getPostApiV1PaymentsPortoneWebhookUrl(),
   {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
     body: JSON.stringify(
-      paymentFail,)
+      portOneWebhook,)
   }
 );}
 
@@ -148,8 +226,13 @@ export const postApiV1PaymentsFail = async (paymentFail: PaymentFail, options?: 
  * @summary 참여 취소 (달성 전 이탈)
  */
 export type postApiV1ParticipationsParticipationIdCancelResponse200 = {
-  data: SuccessNoDataResponse
+  data: ApiResponseCancelParticipation
   status: 200
+}
+
+export type postApiV1ParticipationsParticipationIdCancelResponse401 = {
+  data: UnauthorizedResponse
+  status: 401
 }
 
 export type postApiV1ParticipationsParticipationIdCancelResponse403 = {
@@ -165,7 +248,7 @@ export type postApiV1ParticipationsParticipationIdCancelResponse409 = {
 export type postApiV1ParticipationsParticipationIdCancelResponseSuccess = (postApiV1ParticipationsParticipationIdCancelResponse200) & {
   headers: Headers;
 };
-export type postApiV1ParticipationsParticipationIdCancelResponseError = (postApiV1ParticipationsParticipationIdCancelResponse403 | postApiV1ParticipationsParticipationIdCancelResponse409) & {
+export type postApiV1ParticipationsParticipationIdCancelResponseError = (postApiV1ParticipationsParticipationIdCancelResponse401 | postApiV1ParticipationsParticipationIdCancelResponse403 | postApiV1ParticipationsParticipationIdCancelResponse409) & {
   headers: Headers;
 };
 
@@ -179,49 +262,16 @@ export const getPostApiV1ParticipationsParticipationIdCancelUrl = (participation
   return `/api/v1/participations/${participationId}/cancel`
 }
 
-export const postApiV1ParticipationsParticipationIdCancel = async (participationId: number, options?: RequestInit): Promise<postApiV1ParticipationsParticipationIdCancelResponse> => {
+export const postApiV1ParticipationsParticipationIdCancel = async (participationId: number,
+    cancelParticipationRequest: CancelParticipationRequest, options?: RequestInit): Promise<postApiV1ParticipationsParticipationIdCancelResponse> => {
 
   return customFetch<postApiV1ParticipationsParticipationIdCancelResponse>(getPostApiV1ParticipationsParticipationIdCancelUrl(participationId),
   {
     ...options,
-    method: 'POST'
-
-
-  }
-);}
-
-
-/**
- * @summary 내 환불 내역 조회
- */
-export type getApiV1RefundsResponse200 = {
-  data: ApiResponseRefundList
-  status: 200
-}
-
-export type getApiV1RefundsResponseSuccess = (getApiV1RefundsResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getApiV1RefundsResponse = (getApiV1RefundsResponseSuccess)
-
-export const getGetApiV1RefundsUrl = () => {
-
-
-
-
-  return `/api/v1/refunds`
-}
-
-export const getApiV1Refunds = async ( options?: RequestInit): Promise<getApiV1RefundsResponse> => {
-
-  return customFetch<getApiV1RefundsResponse>(getGetApiV1RefundsUrl(),
-  {
-    ...options,
-    method: 'GET'
-
-
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      cancelParticipationRequest,)
   }
 );}
 

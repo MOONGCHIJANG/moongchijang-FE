@@ -19,9 +19,11 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  ApiResponseNearestPickupQr,
   ApiResponsePickupInfo,
   ApiResponsePickupVerify,
   ApiResponseQrCode,
+  BadRequestResponse,
   ConflictResponse,
   ForbiddenResponse,
 } from '../api.schemas';
@@ -463,12 +465,196 @@ export function useGetApiV1ParticipationsParticipationIdQr<
 }
 
 /**
- * 소비자 QR을 매장(사장님)이 스캔하면 대기 → 완료로 자동 전환된다.
+ * 피드 진입 시 사용자의 가장 가까운 픽업 QR 후보를 조회한다.
+당일 픽업 예정 건이 있으면 픽업 시작 시간이 가장 빠른 건을 반환하고,
+당일 건이 여러 개면 hasMultipleToday=true로 내려준다.
+당일 픽업 건이 없고 향후 픽업 예정 건만 있으면 LOCKED 상태와 qrCode=null로 반환한다.
+
+ * @summary 피드용 가장 가까운 픽업 QR 조회
+ */
+export type getApiV1PickupsMeNearestQrResponse200 = {
+  data: ApiResponseNearestPickupQr;
+  status: 200;
+};
+
+export type getApiV1PickupsMeNearestQrResponseSuccess =
+  getApiV1PickupsMeNearestQrResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1PickupsMeNearestQrResponse =
+  getApiV1PickupsMeNearestQrResponseSuccess;
+
+export const getGetApiV1PickupsMeNearestQrUrl = () => {
+  return `/api/v1/pickups/me/nearest-qr`;
+};
+
+export const getApiV1PickupsMeNearestQr = async (
+  options?: RequestInit,
+): Promise<getApiV1PickupsMeNearestQrResponse> => {
+  return customFetch<getApiV1PickupsMeNearestQrResponse>(
+    getGetApiV1PickupsMeNearestQrUrl(),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
+
+export const getGetApiV1PickupsMeNearestQrQueryKey = () => {
+  return [`/api/v1/pickups/me/nearest-qr`] as const;
+};
+
+export const getGetApiV1PickupsMeNearestQrQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiV1PickupsMeNearestQr>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getApiV1PickupsMeNearestQr>>,
+      TError,
+      TData
+    >
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetApiV1PickupsMeNearestQrQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiV1PickupsMeNearestQr>>
+  > = ({ signal }) => getApiV1PickupsMeNearestQr({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiV1PickupsMeNearestQr>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiV1PickupsMeNearestQrQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiV1PickupsMeNearestQr>>
+>;
+export type GetApiV1PickupsMeNearestQrQueryError = unknown;
+
+export function useGetApiV1PickupsMeNearestQr<
+  TData = Awaited<ReturnType<typeof getApiV1PickupsMeNearestQr>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1PickupsMeNearestQr>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1PickupsMeNearestQr>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1PickupsMeNearestQr>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1PickupsMeNearestQr<
+  TData = Awaited<ReturnType<typeof getApiV1PickupsMeNearestQr>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1PickupsMeNearestQr>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1PickupsMeNearestQr>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1PickupsMeNearestQr>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1PickupsMeNearestQr<
+  TData = Awaited<ReturnType<typeof getApiV1PickupsMeNearestQr>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1PickupsMeNearestQr>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary 피드용 가장 가까운 픽업 QR 조회
+ */
+
+export function useGetApiV1PickupsMeNearestQr<
+  TData = Awaited<ReturnType<typeof getApiV1PickupsMeNearestQr>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1PickupsMeNearestQr>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiV1PickupsMeNearestQrQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * SELLER 권한 사용자가 본인 매장 공구의 소비자 QR을 스캔하면 READY → PICKED_UP으로 자동 전환한다.
+ADMIN 권한 사용자는 운영 대리 처리 용도로 매장 소속 검증 없이 처리할 수 있다.
+응답에는 사장님 스캔 결과 화면에 필요한 유저이름, 상품명, 수량, 픽업 상태를 포함한다.
+
  * @summary QR 코드 스캔 검증 및 수령 처리
  */
 export type postApiV1PickupsQrCodeVerifyResponse200 = {
   data: ApiResponsePickupVerify;
   status: 200;
+};
+
+export type postApiV1PickupsQrCodeVerifyResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
 };
 
 export type postApiV1PickupsQrCodeVerifyResponse403 = {
@@ -486,6 +672,7 @@ export type postApiV1PickupsQrCodeVerifyResponseSuccess =
     headers: Headers;
   };
 export type postApiV1PickupsQrCodeVerifyResponseError = (
+  | postApiV1PickupsQrCodeVerifyResponse400
   | postApiV1PickupsQrCodeVerifyResponse403
   | postApiV1PickupsQrCodeVerifyResponse409
 ) & {
@@ -514,7 +701,7 @@ export const postApiV1PickupsQrCodeVerify = async (
 };
 
 export const getPostApiV1PickupsQrCodeVerifyMutationOptions = <
-  TError = ForbiddenResponse | ConflictResponse,
+  TError = BadRequestResponse | ForbiddenResponse | ConflictResponse,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -556,6 +743,7 @@ export type PostApiV1PickupsQrCodeVerifyMutationResult = NonNullable<
 >;
 
 export type PostApiV1PickupsQrCodeVerifyMutationError =
+  | BadRequestResponse
   | ForbiddenResponse
   | ConflictResponse;
 
@@ -563,7 +751,7 @@ export type PostApiV1PickupsQrCodeVerifyMutationError =
  * @summary QR 코드 스캔 검증 및 수령 처리
  */
 export const usePostApiV1PickupsQrCodeVerify = <
-  TError = ForbiddenResponse | ConflictResponse,
+  TError = BadRequestResponse | ForbiddenResponse | ConflictResponse,
   TContext = unknown,
 >(
   options?: {

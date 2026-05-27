@@ -157,7 +157,6 @@ export const GetApiV1GroupBuysQueryParams = zod.object({
     .describe(
       '지역\/세부지역 통합 필터 (복수 선택, 최대 10개, 예: SEOUL_ALL \/ SEOUL_GANGNAM_YEOKSAM_SAMSEONG)',
     ),
-  keyword: zod.string().optional().describe('매장명 또는 상품명 검색어'),
   page: zod.number().default(getApiV1GroupBuysQueryPageDefault),
   size: zod
     .number()
@@ -336,6 +335,9 @@ export const GetApiV1GroupBuysResponse = zod.object({
     totalPages: zod.number().describe('전체 페이지 수'),
     totalElements: zod.number(),
     hasNext: zod.boolean().describe('다음 페이지 존재 여부'),
+    hasRegionalResult: zod
+      .boolean()
+      .describe('지역 설정 조건에 맞는 공구 존재 여부 (없으면 false)'),
   }),
   error: zod.unknown().nullable(),
 });
@@ -544,15 +546,55 @@ export const GetApiV1GroupBuysGroupBuyIdProgressResponse = zod.object({
 });
 
 /**
+ * 공구 상세 화면 진입 시 및 체류 중 일정 주기(예: 20~30초)로 호출한다.
+서버는 세션 TTL을 연장하고 최신 활성 조회자 수를 반환한다.
+
+ * @summary 활성 조회자 heartbeat 조회/갱신
+ */
+export const PostApiV1GroupBuysGroupBuyIdViewersHeartbeatParams = zod.object({
+  groupBuyId: zod.number(),
+});
+
+export const postApiV1GroupBuysGroupBuyIdViewersHeartbeatBodyViewerSessionIdMin = 8;
+export const postApiV1GroupBuysGroupBuyIdViewersHeartbeatBodyViewerSessionIdMax = 128;
+
+export const PostApiV1GroupBuysGroupBuyIdViewersHeartbeatBody = zod.object({
+  viewerSessionId: zod
+    .string()
+    .min(postApiV1GroupBuysGroupBuyIdViewersHeartbeatBodyViewerSessionIdMin)
+    .max(postApiV1GroupBuysGroupBuyIdViewersHeartbeatBodyViewerSessionIdMax)
+    .describe('클라이언트가 생성\/보관하는 조회 세션 식별자(UUID 권장)'),
+});
+
+export const postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponseDataActiveViewerCountMin = 0;
+
+export const PostApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    activeViewerCount: zod
+      .number()
+      .min(
+        postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponseDataActiveViewerCountMin,
+      ),
+    showFomoBadge: zod
+      .boolean()
+      .describe('FOMO 문구\/뱃지 노출 여부 (activeViewerCount >= threshold)'),
+    threshold: zod.number().describe('노출 기준 인원 수'),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
  * @summary 다건 공구 달성률 조회 (피드 갱신용)
  */
+
 export const getApiV1GroupBuysProgressQueryIdsMax = 20;
 
 export const GetApiV1GroupBuysProgressQueryParams = zod.object({
   ids: zod
-    .array(zod.number())
+    .array(zod.number().min(1))
     .max(getApiV1GroupBuysProgressQueryIdsMax)
-    .describe('조회할 공구 ID 목록 (최대 20개)'),
+    .describe('조회할 공구 ID 목록 (양수 ID만 허용, 최대 20개)'),
 });
 
 export const GetApiV1GroupBuysProgressResponse = zod.object({
@@ -583,7 +625,7 @@ export const GetApiV1GroupBuysGroupBuyIdShareResponse = zod.object({
     shareUrl: zod.string(),
     title: zod.string(),
     description: zod.string(),
-    imageUrl: zod.string(),
+    imageUrl: zod.string().nullable(),
     storeName: zod.string(),
     deadline: zod.iso.datetime({ offset: true }),
     pickupDate: zod.iso.date(),
@@ -596,6 +638,8 @@ export const GetApiV1GroupBuysGroupBuyIdShareResponse = zod.object({
 /**
  * 검색어를 입력하면 동네/베이커리 키워드를 AI로 분석하고 최근 검색어로 저장한다.
 분석 결과에 따라 4가지 케이스로 분기한다.
+자체 검색 결과가 없을 때 제공되는 recommendedStores는 Naver Local Search 결과 중
+베이커리/디저트 도메인으로 분류된 매장만 반환한다.
 - case 1: 베이커리 인식, 동네 미인식
 - case 2: 동네 인식, 베이커리 미인식
 - case 3: 동네+베이커리 모두 인식
@@ -612,22 +656,37 @@ export const PostApiV1SearchResponse = zod.object({
   success: zod.boolean().optional(),
   data: zod
     .object({
-      keyword: zod.string().optional().describe('원본 검색어'),
-      detectedNeighborhood: zod
+      searchCase: zod
+        .enum([
+          'BOTH_DETECTED',
+          'PRODUCT_ONLY',
+          'NEIGHBORHOOD_ONLY',
+          'NONE_DETECTED',
+        ])
+        .describe('AI 키워드 분류 케이스'),
+      detectedRegion: zod
         .string()
         .nullish()
         .describe('AI가 감지한 동네 키워드'),
-      detectedBakery: zod
+      detectedProduct: zod
         .string()
         .nullish()
-        .describe('AI가 감지한 베이커리\/상품 키워드'),
-      searchCase: zod
-        .union([zod.literal(1), zod.literal(2), zod.literal(3), zod.literal(4)])
-        .optional()
+        .describe('AI가 감지한 상품\/베이커리 키워드'),
+      confidence: zod.number().describe('AI 분류 신뢰도(0.0~1.0)'),
+      uiState: zod
+        .enum([
+          'RESULTS',
+          'EMPTY_CAN_REQUEST',
+          'NEED_REGION',
+          'NEED_PRODUCT',
+          'NEED_BOTH',
+          'AMBIGUOUS_CONFIRMATION',
+        ])
         .describe(
-          '1=베이커리 인식·동네 미인식 \/ 2=동네 인식·베이커리 미인식 \/\n3=동네+베이커리 모두 인식 \/ 4=모두 인식 불가\n',
+          '프론트 화면 분기 상태.\nRESULTS=공구 결과 노출 \/\nEMPTY_CAN_REQUEST=검색 결과 없음, 공구 개설 요청 진입점 \/\nNEED_REGION\/NEED_PRODUCT\/NEED_BOTH=추가 키워드 입력 안내 \/\nAMBIGUOUS_CONFIRMATION=AI 인식 결과 재확인 필요\n',
         ),
-      groupBuys: zod
+      totalCount: zod.number().describe('전체 공구 결과 개수'),
+      results: zod
         .array(
           zod.object({
             id: zod.number(),
@@ -791,8 +850,22 @@ export const PostApiV1SearchResponse = zod.object({
               .describe('마감 일시 원본 값'),
           }),
         )
-        .optional()
-        .describe('case 3 또는 검색 결과가 있을 때 반환되는 공구 목록'),
+        .describe('검색된 공구 카드 목록'),
+      recommendedStores: zod
+        .array(
+          zod.object({
+            placeId: zod.string().describe('외부 장소 ID(예: 네이버 Local)'),
+            storeName: zod.string(),
+            roadAddress: zod.string(),
+            lotAddress: zod.string().nullish(),
+            latitude: zod.number(),
+            longitude: zod.number(),
+          }),
+        )
+        .nullish()
+        .describe(
+          '검색 결과 0건(EMPTY_CAN_REQUEST) 일 때 동봉되는 동네 매장 추천 목록',
+        ),
     })
     .optional(),
   error: zod.unknown().nullish(),
@@ -800,26 +873,17 @@ export const PostApiV1SearchResponse = zod.object({
 
 /**
  * 검색창 탭 시 표시할 사용자의 최근 검색어를 최신순으로 반환한다. (1.1.4-10)
-검색 이력이 없으면 빈 배열 반환.
+동일 검색어는 중복 저장하지 않고 가장 최근 검색 위치로 이동한다.
+최근 검색어는 최대 10개까지 반환하며, 검색 이력이 없으면 빈 배열을 반환한다.
 
  * @summary 최근 검색어 목록 조회
  */
 export const GetApiV1SearchRecentResponse = zod.object({
-  success: zod.boolean().optional(),
+  success: zod.boolean(),
   data: zod
-    .object({
-      keywords: zod
-        .array(
-          zod.object({
-            keyword: zod.string().optional(),
-            searchedAt: zod.iso.datetime({ offset: true }).optional(),
-          }),
-        )
-        .optional()
-        .describe('최근 검색어 목록 (최신순). 이력 없으면 빈 배열.'),
-    })
-    .optional(),
-  error: zod.unknown().nullish(),
+    .array(zod.string())
+    .describe('최근 검색어 목록 (최신순). 이력 없으면 빈 배열.'),
+  error: zod.unknown().nullable(),
 });
 
 /**

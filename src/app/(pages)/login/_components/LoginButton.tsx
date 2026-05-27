@@ -1,12 +1,15 @@
 'use client';
 import { Button } from '@/components/Button';
+import { getKakaoAuthUrl } from '@/lib/kakao';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 
 const LoginButton = () => {
   const router = useRouter();
-  const handleKakaoLogin = () => {};
+  const handleKakaoLogin = () => {
+    window.location.href = getKakaoAuthUrl();
+  };
   const handleEmailLogin = () => {
     router.push('/login/email');
   };

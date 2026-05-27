@@ -118,7 +118,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               type="button"
               onClick={rightButton.onClick}
               disabled={rightButton.disabled}
-              className="shrink-0 px-g3 h-10 rounded-large caption-sm-bold text-text-basic-inverse bg-button-primary-fill disabled:bg-button-tertiary-fill-pressed"
+              className="shrink-0 px-g3 h-10 rounded-large caption-sm-bold text-text-basic-inverse bg-button-primary-fill disabled:bg-button-tertiary-fill-pressed min-w-14.5"
             >
               {rightButton.label}
             </button>

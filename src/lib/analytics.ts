@@ -116,20 +116,18 @@ export const logEvent = <K extends keyof EventParams>(
   eventName: K,
   params?: EventParams[K],
 ): void => {
-  const p = params as Record<string, unknown> | undefined;
-
   if (process.env.NODE_ENV === 'development') {
-    // console.log('[analytics]', eventName, p);
+    // console.log('[analytics]', eventName, params);
     return;
   }
 
   if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', eventName, p);
+    window.gtag('event', eventName, params as Record<string, unknown>);
   }
 
   if (typeof window !== 'undefined') {
     import('posthog-js').then(({ default: posthog }) => {
-      posthog.capture(eventName, p);
+      posthog.capture(eventName, params);
     });
   }
 };

@@ -24,7 +24,6 @@ const TAB_LABELS: Record<TabKey, string> = {
   refunded: '환불/취소',
 };
 
-
 function formatDDay(dDay: number): string {
   if (dDay === 0) return 'D-day';
   if (dDay < 0) return `D${dDay}`;
@@ -65,7 +64,8 @@ const MyPageClient = ({ tab }: { tab: TabKey }) => {
   const qrItem = qrData?.status === 200 ? qrData.data?.data : null;
 
   const { data: tabCountsData } = useGetApiV1UsersMeTabsCounts();
-  const tabCounts = tabCountsData?.status === 200 ? tabCountsData.data?.data : null;
+  const tabCounts =
+    tabCountsData?.status === 200 ? tabCountsData.data?.data : null;
 
   const countByTab: Record<TabKey, number> = {
     active: tabCounts?.inProgressCount ?? 0,
@@ -82,8 +82,11 @@ const MyPageClient = ({ tab }: { tab: TabKey }) => {
   );
 
   useEffect(() => {
-    if (isInitialized && isLoggedIn) {
+    if (!isInitialized) return;
+    if (isLoggedIn) {
       logEvent('mypage_view');
+    } else {
+      logEvent('unauthorized_access', { target_screen: 'mypage' });
     }
   }, [isInitialized, isLoggedIn]);
 
@@ -156,7 +159,8 @@ const MyPageClient = ({ tab }: { tab: TabKey }) => {
         shakeEnabled={isEnabled}
         onShakeToggle={toggleShake}
         onDetailClick={() => {
-          if (qrParticipationId) router.push(`/mypage/pickup/${qrParticipationId}`);
+          if (qrParticipationId)
+            router.push(`/mypage/pickup/${qrParticipationId}`);
         }}
       />
     </div>

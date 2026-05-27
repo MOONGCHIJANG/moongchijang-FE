@@ -8,10 +8,14 @@ import { useState } from 'react';
 
 const StepRole = () => {
   const router = useRouter();
-  const [selected, setSelected] = useState<'guest' | null>(null);
+  const [selected, setSelected] = useState<'guest' | 'seller'>();
 
   const handleComplete = () => {
-    router.push('/feed');
+    if (selected === 'guest') {
+      router.push('/feed');
+    } else if (selected === 'seller') {
+      router.push('/signup/seller');
+    }
   };
 
   return (
@@ -57,11 +61,13 @@ const StepRole = () => {
             className="text-icon-basic"
           />
         </button>
-
-        {/* 사장님 - 현재는 비활성*/}
         <button
-          disabled
-          className="px-3.75 flex rounded-[17.6px] h-26.75 border border-border-subtle items-center opacity-40 cursor-not-allowed"
+          onClick={() => setSelected('seller')}
+          className={`px-3.75 flex rounded-[17.6px] h-26.75 border border-border-subtle items-center opacity-40 cursor-not-allowed ${
+            selected === 'seller'
+              ? 'border-border-brand bg-surface-brand-lighter'
+              : 'border-border-subtle'
+          }`}
         >
           <Image src="/images/owner.svg" alt="owner" width={61} height={52} />
           <div className="flex flex-col gap-g2 px-p5 flex-1 items-start">

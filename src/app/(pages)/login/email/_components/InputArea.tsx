@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { redirectStorage } from '@/lib/redirect';
 import { useAuthStore } from '@/store/authStore';
 import { ToastBlack } from '@/components/ToastBlack';
+import { logEvent } from '@/lib/analytics';
 
 const InputArea = () => {
   const [email, setEmail] = useState('');
@@ -47,10 +48,12 @@ const InputArea = () => {
         }
 
         // signupCompleted: true → 정상 로그인
+        logEvent('login', { method: 'email' });
         setIsLoggedIn(true);
         const redirect = redirectStorage.consume();
         router.push(redirect ?? '/feed');
       } else {
+        logEvent('login_fail', { reason: 'wrong_password' });
         setErrorMessage('이메일 또는 비밀번호를 확인해주세요.');
       }
     } catch {

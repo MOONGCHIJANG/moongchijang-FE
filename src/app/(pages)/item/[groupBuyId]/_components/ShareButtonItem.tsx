@@ -3,11 +3,15 @@ import React from 'react';
 
 type ShareButtonItemProps = {
   platform: 'kakao' | 'instagram' | 'x' | 'etc';
+  onClick?: () => void;
 };
 
-const ShareButtonItem = ({ platform }: ShareButtonItemProps) => {
+const ShareButtonItem = ({ platform, onClick }: ShareButtonItemProps) => {
   return (
-    <button className="flex flex-col gap-g2 items-center caption-sm-medium">
+    <button
+      className="flex flex-col gap-g2 items-center caption-sm-medium"
+      onClick={onClick}
+    >
       <Image
         src={`/icons/${platform}.svg`}
         alt="공유하기"

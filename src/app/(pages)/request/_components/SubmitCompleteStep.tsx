@@ -54,7 +54,7 @@ export const SubmitCompleteStep = () => {
           size="md"
           fullWidth
           className="w-full text-text-basic-inverse cursor-pointer"
-          onClick={() => router.push('/')}
+          onClick={() => router.push('/feed')}
         >
           다른 공구 상품 보러가기 →
         </Button>

@@ -22,6 +22,9 @@ const PUBLIC_URLS = [
   '/auth/email/availability',
   '/auth/email/verification-codes',
   '/auth/kakao',
+  '/group-buys',
+  '/search',
+  '/stores/search',
 ];
 
 const isPublicUrl = (url: string) =>

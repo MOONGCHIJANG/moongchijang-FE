@@ -4,6 +4,7 @@ import './globals.css';
 import { QueryProvider } from '@/providers/QueryProvider';
 import IconsSetup from '@/components/IconsSetup';
 import AuthInitializer from '@/components/AuthInitializer';
+import KakaoInit from '@/components/KakaoInit';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -16,8 +17,62 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: '뭉치장',
-  description: '뭉치장',
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? 'https://moongchijang.com',
+  ),
+  title: {
+    default: '뭉치장',
+    template: '%s | 뭉치장',
+  },
+  description: '동네 공구 플랫폼 뭉치장에서 주변 공구를 찾아보세요.',
+  icons: {
+    icon: [
+      { url: '/favicon/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon/favicon-96x96.png', sizes: '96x96', type: 'image/png' },
+    ],
+  },
+  openGraph: {
+    title: '뭉치장',
+    description: '동네 공구 플랫폼 뭉치장에서 주변 공구를 찾아보세요.',
+    siteName: '뭉치장',
+    type: 'website',
+    locale: 'ko_KR',
+    url: '/',
+    images: [
+      {
+        url: '/og/og-1200x630.png',
+        width: 1200,
+        height: 630,
+        alt: '뭉치장 - 동네 공구 플랫폼',
+      },
+      {
+        url: '/og/og-1200x675.png',
+        width: 1200,
+        height: 675,
+        alt: '뭉치장 - 동네 공구 플랫폼',
+      },
+      {
+        url: '/og/og-1600x800.png',
+        width: 1600,
+        height: 800,
+        alt: '뭉치장 - 동네 공구 플랫폼',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: '뭉치장',
+    description: '동네 공구 플랫폼 뭉치장에서 주변 공구를 찾아보세요.',
+    images: [
+      {
+        url: '/og/og-1600x800.png',
+        width: 1600,
+        height: 800,
+        alt: '뭉치장 - 동네 공구 플랫폼',
+      },
+    ],
+  },
 };
 
 export default function RootLayout({
@@ -32,6 +87,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col mx-auto max-w-110">
         <IconsSetup />
+        <KakaoInit />
         <QueryProvider>
           <AuthInitializer />
           {children}

@@ -8,12 +8,18 @@ interface BadgeProps {
   label: string;
   onDelete?: () => void;
   className?: string;
+  textClassName?: string;
 }
 
 /**
  * 선택된 정보나 상태를 보여주기 위한 뱃지 컴포넌트
  */
-export const Badge = ({ label, onDelete, className }: BadgeProps) => {
+export const Badge = ({
+  label,
+  onDelete,
+  className,
+  textClassName,
+}: BadgeProps) => {
   return (
     <div
       className={cn(
@@ -21,7 +27,12 @@ export const Badge = ({ label, onDelete, className }: BadgeProps) => {
         className,
       )}
     >
-      <span className="text-center body-md-regular text-text-tertiary">
+      <span
+        className={cn(
+          'text-center body-md-regular text-text-tertiary',
+          textClassName,
+        )}
+      >
         {label}
       </span>
       {onDelete && (

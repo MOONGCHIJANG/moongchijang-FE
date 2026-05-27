@@ -1,9 +1,11 @@
+import Link from 'next/link';
 import { Icon } from '@iconify/react';
 import type {
   ApiResponseOwnerGroupBuyListDataItem,
   ApiResponseOwnerGroupBuyListDataItemStatus,
 } from '@/api/generated/api.schemas';
 import { ApiResponseOwnerGroupBuyListDataItemStatus as Status } from '@/api/generated/api.schemas';
+import { Badge } from '@/components/Badge';
 
 const STATUS_LABEL: Record<ApiResponseOwnerGroupBuyListDataItemStatus, string> =
   {
@@ -37,16 +39,23 @@ export function GroupBuyItem({ item }: Props) {
   const clampedRate = Math.min(Math.max(item.achievementRate, 0), 100);
 
   return (
-    <div className="flex flex-col gap-2.5 rounded-2xl bg-white px-4 py-4 shadow-sm">
+    <Link
+      href={`/seller/management/${item.groupBuyId}`}
+      className="flex flex-col gap-2.5 rounded-2xl bg-white px-4 py-4 shadow-sm"
+    >
       {/* 배지 행 */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5">
-          <span className="rounded-full bg-surface-brand-lighter px-2.5 py-0.5 text-xs font-medium text-text-brand">
-            {STATUS_LABEL[item.status]}
-          </span>
-          <span className="rounded-full border border-border-gray-200 px-2.5 py-0.5 text-xs font-medium text-text-secondary">
-            {dDayLabel}
-          </span>
+          <Badge
+            label={STATUS_LABEL[item.status]}
+            className="bg-surface-brand-lighter"
+            textClassName="text-text-brand caption-xs-bold"
+          />
+          <Badge
+            label={dDayLabel}
+            className="bg-surface-brand-lighter"
+            textClassName="text-text-brand caption-xs-bold"
+          />
         </div>
         <Icon
           icon="lucide:chevron-right"
@@ -55,26 +64,26 @@ export function GroupBuyItem({ item }: Props) {
       </div>
 
       {/* 상품명 */}
-      <p className="body-md-bold text-text-basic">{item.productName}</p>
+      <p className="heading-md-bold text-text-basic">{item.productName}</p>
 
       {/* 가격 · 픽업일 */}
-      <p className="body-sm-regular text-text-secondary">
+      <p className="body-md-regular text-text-tertiary">
         {item.price.toLocaleString('ko-KR')}원 · 픽업{' '}
         {formatDeadlineDate(item.deadline)}
       </p>
 
       {/* 프로그레스바 + 달성률 */}
       <div className="flex items-center gap-2">
-        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-bg-gray-100">
+        <div className="h-2 flex-1 overflow-hidden rounded-full bg-bg-gray-100">
           <div
             className="h-full rounded-full bg-brand-primary transition-all"
             style={{ width: `${clampedRate}%` }}
           />
         </div>
-        <span className="w-9 shrink-0 text-right text-xs font-medium text-text-brand">
+        <span className="w-9 shrink-0 text-right caption-sm-semibold font-medium text-text-brand">
           {item.achievementRate}%
         </span>
       </div>
-    </div>
+    </Link>
   );
 }

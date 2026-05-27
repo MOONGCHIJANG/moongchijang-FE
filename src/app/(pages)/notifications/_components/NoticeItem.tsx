@@ -1,7 +1,10 @@
 import Image from 'next/image';
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { NotificationItemResponse } from '@/api/generated/api.schemas';
+import {
+  NotificationDeeplinkType,
+  NotificationItemResponse,
+} from '@/api/generated/api.schemas';
 import {
   formatNotificationTime,
   resolveDeeplinkPath,
@@ -9,6 +12,17 @@ import {
 } from '@/lib/notice';
 import { usePatchApiV1NotificationsNotificationIdRead } from '@/api/hooks/notification/notification';
 import { useQueryClient } from '@tanstack/react-query';
+import { logEvent } from '@/lib/analytics';
+
+function resolveNotificationType(
+  deeplinkType: NotificationDeeplinkType,
+): 'group_open' | 'pickup_reminder' | 'request_result' {
+  if (deeplinkType === NotificationDeeplinkType.PICKUP_GUIDE)
+    return 'pickup_reminder';
+  if (deeplinkType === NotificationDeeplinkType.REQUEST_STATUS)
+    return 'request_result';
+  return 'group_open';
+}
 
 type NoticeItemProps = {
   item: NotificationItemResponse;
@@ -36,6 +50,9 @@ const NoticeItem = ({ item }: NoticeItemProps) => {
       item.deeplinkType,
       item.deeplinkParams,
     );
+    logEvent('notification_click', {
+      notification_type: resolveNotificationType(item.deeplinkType),
+    });
     if (!isRead) {
       markAsRead({ notificationId: id });
     }

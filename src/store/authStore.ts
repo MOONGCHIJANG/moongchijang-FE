@@ -1,5 +1,8 @@
 import { create } from 'zustand';
-import { postApiV1AuthLogout, deleteApiV1UsersMe } from '@/api/generated/auth/auth';
+import {
+  postApiV1AuthLogout,
+  deleteApiV1UsersMeRole,
+} from '@/api/generated/auth/auth';
 import { WithdrawRequest } from '@/api/generated/api.schemas';
 import { tokenStorage } from '@/lib/token';
 
@@ -23,7 +26,7 @@ export const useAuthStore = create<AuthState>()((set) => ({
     set({ isLoggedIn: false });
   },
   deleteAccount: async (withdrawRequest?: WithdrawRequest) => {
-    const res = await deleteApiV1UsersMe(withdrawRequest).catch(() => null);
+    const res = await deleteApiV1UsersMeRole(withdrawRequest).catch(() => null);
     if (!res || res.status !== 200) return false;
     tokenStorage.remove();
     set({ isLoggedIn: false });

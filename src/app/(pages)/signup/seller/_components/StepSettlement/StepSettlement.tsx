@@ -61,7 +61,7 @@ const StepSettlement = () => {
               {selectedBankLabel || '은행을 선택해주세요'}
             </button>
             {errors.bankCode && (
-              <p className="caption-sm-medium text-brand">
+              <p className="caption-sm-medium text-text-brand">
                 {errors.bankCode.message}
               </p>
             )}
@@ -72,7 +72,11 @@ const StepSettlement = () => {
             label="계좌번호"
             placeholder="계좌번호를 입력해주세요"
             helperText={errors.accountNumber?.message ?? ''}
-            helperTextClassName={errors.accountNumber ? 'text-brand' : ''}
+            helperTextClassName={
+              errors.accountNumber
+                ? 'text-text-brand'
+                : 'text-text-subtle-inverse'
+            }
             {...register('accountNumber')}
             noHelperSpace
           />
@@ -82,7 +86,11 @@ const StepSettlement = () => {
             label="예금주명"
             placeholder="홍길동"
             helperText={errors.accountHolderName?.message ?? ''}
-            helperTextClassName={errors.accountHolderName ? 'text-brand' : ''}
+            helperTextClassName={
+              errors.accountHolderName
+                ? 'text-text-brand'
+                : 'text-text-subtle-inverse'
+            }
             {...register('accountHolderName')}
             noHelperSpace
           />

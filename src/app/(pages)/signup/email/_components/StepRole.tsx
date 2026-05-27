@@ -5,12 +5,14 @@ import { Icon } from '@iconify/react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { logEvent } from '@/lib/analytics';
 
 const StepRole = () => {
   const router = useRouter();
   const [selected, setSelected] = useState<'guest' | null>(null);
 
   const handleComplete = () => {
+    logEvent('sign_up', { method: 'email' });
     router.push('/feed');
   };
 

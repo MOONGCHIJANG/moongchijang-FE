@@ -47,7 +47,7 @@ const StepSettlement = () => {
 
   return (
     <>
-      <div className="flex flex-col gap-g4 pb-g8">
+      <div className="flex flex-col gap-g4 pb-20">
         <p className="heading-lg-bold">정산 정보를 입력해주세요</p>
         <div className="flex flex-col gap-g5">
           {/* 은행 선택 */}

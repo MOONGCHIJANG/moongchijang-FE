@@ -35,6 +35,26 @@ export const PostApiV1AuthKakaoResponse = zod.object({
       phoneNumber: zod.string().nullish(),
       role: zod.enum(['BUYER', 'SELLER', 'ADMIN']),
       lastRole: zod.enum(['BUYER', 'SELLER', 'ADMIN']).nullish(),
+      hasBuyerRole: zod
+        .boolean()
+        .optional()
+        .describe('BUYER 역할 assignment 보유 여부'),
+      hasSellerRole: zod
+        .boolean()
+        .optional()
+        .describe('SELLER 역할 assignment 보유 여부'),
+      canSwitchToBuyer: zod
+        .boolean()
+        .optional()
+        .describe(
+          'BUYER 역할 assignment를 보유했고 현재 역할이 BUYER가 아닐 때 true',
+        ),
+      canSwitchToSeller: zod
+        .boolean()
+        .optional()
+        .describe(
+          'SELLER 역할 assignment를 보유했고 현재 역할이 SELLER가 아닐 때 true',
+        ),
       signupCompleted: zod.boolean(),
       sellerSignupCompleted: zod.boolean(),
       deletedAt: zod.iso.datetime({ offset: true }).nullish(),
@@ -86,6 +106,77 @@ export const GetApiV1UsersMeResponse = zod.object({
     phoneNumber: zod.string().nullish(),
     role: zod.enum(['BUYER', 'SELLER', 'ADMIN']),
     lastRole: zod.enum(['BUYER', 'SELLER', 'ADMIN']).nullish(),
+    hasBuyerRole: zod
+      .boolean()
+      .optional()
+      .describe('BUYER 역할 assignment 보유 여부'),
+    hasSellerRole: zod
+      .boolean()
+      .optional()
+      .describe('SELLER 역할 assignment 보유 여부'),
+    canSwitchToBuyer: zod
+      .boolean()
+      .optional()
+      .describe(
+        'BUYER 역할 assignment를 보유했고 현재 역할이 BUYER가 아닐 때 true',
+      ),
+    canSwitchToSeller: zod
+      .boolean()
+      .optional()
+      .describe(
+        'SELLER 역할 assignment를 보유했고 현재 역할이 SELLER가 아닐 때 true',
+      ),
+    signupCompleted: zod.boolean(),
+    sellerSignupCompleted: zod.boolean(),
+    deletedAt: zod.iso.datetime({ offset: true }).nullish(),
+    createdAt: zod.iso.datetime({ offset: true }),
+    updatedAt: zod.iso.datetime({ offset: true }),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * 소비자/사장님 모드를 전환한다.
+ * @summary 마이페이지 역할 전환
+ */
+export const PatchApiV1UsersMeRoleBody = zod.object({
+  role: zod.enum(['BUYER', 'SELLER']).describe('전환할 역할'),
+});
+
+export const PatchApiV1UsersMeRoleResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    id: zod.number(),
+    provider: zod.enum(['KAKAO', 'EMAIL']),
+    providerId: zod
+      .string()
+      .nullish()
+      .describe('소셜 제공자 아이디 (카카오 고유 ID 등)'),
+    email: zod.email().nullish(),
+    nickname: zod.string().nullish(),
+    phoneNumber: zod.string().nullish(),
+    role: zod.enum(['BUYER', 'SELLER', 'ADMIN']),
+    lastRole: zod.enum(['BUYER', 'SELLER', 'ADMIN']).nullish(),
+    hasBuyerRole: zod
+      .boolean()
+      .optional()
+      .describe('BUYER 역할 assignment 보유 여부'),
+    hasSellerRole: zod
+      .boolean()
+      .optional()
+      .describe('SELLER 역할 assignment 보유 여부'),
+    canSwitchToBuyer: zod
+      .boolean()
+      .optional()
+      .describe(
+        'BUYER 역할 assignment를 보유했고 현재 역할이 BUYER가 아닐 때 true',
+      ),
+    canSwitchToSeller: zod
+      .boolean()
+      .optional()
+      .describe(
+        'SELLER 역할 assignment를 보유했고 현재 역할이 SELLER가 아닐 때 true',
+      ),
     signupCompleted: zod.boolean(),
     sellerSignupCompleted: zod.boolean(),
     deletedAt: zod.iso.datetime({ offset: true }).nullish(),
@@ -97,16 +188,18 @@ export const GetApiV1UsersMeResponse = zod.object({
 
 /**
  * 회원 탈퇴를 처리한다.
+- 탈퇴 진입 컨텍스트 조회 결과와 무관하게 실행 시점 최종 검증을 다시 수행한다.
 - 수령 예정 공구(달성 완료 + 픽업 미완료)가 있으면 탈퇴할 수 없다.
 - 참여 중 공구(PAID_WAITING_GOAL)는 자동 취소된다.
 - 찜 목록은 모두 삭제된다.
 - 동일 계정은 탈퇴 후 30일 이후 재가입 가능하다.
+- 최종 검증 실패 시 409 에러를 반환한다. (예: WITHDRAWAL_BLOCKED_PENDING_PICKUP)
 
  * @summary 회원 탈퇴
  */
-export const deleteApiV1UsersMeBodyReasonDetailMax = 500;
+export const deleteApiV1UsersMeRoleBodyReasonDetailMax = 500;
 
-export const DeleteApiV1UsersMeBody = zod.object({
+export const DeleteApiV1UsersMeRoleBody = zod.object({
   reason: zod
     .enum([
       'NO_DESIRED_GROUPBUY',
@@ -118,14 +211,61 @@ export const DeleteApiV1UsersMeBody = zod.object({
     .describe('탈퇴 사유(선택)'),
   reasonDetail: zod
     .string()
-    .max(deleteApiV1UsersMeBodyReasonDetailMax)
+    .max(deleteApiV1UsersMeRoleBodyReasonDetailMax)
     .nullish()
     .describe('탈퇴 상세 사유 (reason=OTHER 일 때 입력)'),
 });
 
-export const DeleteApiV1UsersMeResponse = zod.object({
+export const DeleteApiV1UsersMeRoleResponse = zod.object({
   success: zod.boolean(),
   data: zod.unknown().nullable(),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * 소비자/사장님 탈퇴 가능 상태와 권장 탈퇴 화면 정보를 조회한다.
+이 응답은 진입/라우팅 가이드 용도이며, 실제 탈퇴 실행 시점에는 최종 검증이 다시 수행된다.
+
+ * @summary 탈퇴 진입 컨텍스트 조회
+ */
+export const GetApiV1UsersMeWithdrawalContextResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    currentRole: zod
+      .enum(['BUYER', 'SELLER', 'ADMIN'])
+      .describe('현재 사용자 활성 역할'),
+    buyer: zod.object({
+      canProceed: zod.boolean().describe('소비자 탈퇴 진행 가능 여부'),
+      hasPendingPickup: zod.boolean().describe('수령 예정 공구 존재 여부'),
+      hasActiveParticipation: zod
+        .boolean()
+        .describe('참여 중 공구(PAID_WAITING_GOAL) 존재 여부'),
+      blockingReason: zod
+        .enum(['NONE', 'PENDING_PICKUP'])
+        .describe('소비자 탈퇴 차단 사유'),
+    }),
+    seller: zod.object({
+      canProceed: zod.boolean().describe('사장님 탈퇴 진행 가능 여부'),
+      hasOpenGroupBuy: zod.boolean().describe('개설된 진행중 공구 존재 여부'),
+      hasPendingCustomerPickup: zod
+        .boolean()
+        .describe('달성\/완료 공구 고객 미픽업 존재 여부'),
+      blockingReason: zod
+        .enum(['NONE', 'OPEN_GROUPBUY', 'PENDING_CUSTOMER_PICKUP'])
+        .describe('사장님 탈퇴 차단 사유'),
+    }),
+    recommendedScreen: zod
+      .enum(['BUYER_WITHDRAWAL', 'SELLER_WITHDRAWAL'])
+      .describe('탈퇴 화면 타입'),
+    forceRedirect: zod
+      .boolean()
+      .describe('현재 역할 화면에서 강제 이동 필요 여부'),
+    forceRedirectTarget: zod
+      .enum(['BUYER_WITHDRAWAL', 'SELLER_WITHDRAWAL'])
+      .describe('탈퇴 화면 타입')
+      .nullish()
+      .describe('강제 이동 대상 화면 타입(forceRedirect=true일 때만 존재)'),
+  }),
   error: zod.unknown().nullable(),
 });
 
@@ -370,6 +510,213 @@ export const PatchApiV1UsersMeSellerSettlementInfoResponse = zod.object({
 });
 
 /**
+ * 사장님의 현재 입금 계좌 정보를 조회한다.
+ * @summary 사장님 입금 계좌 조회
+ */
+export const GetApiV1UsersMeSellerSettlementAccountResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    bankCode: zod.string(),
+    accountNumber: zod.string(),
+    accountHolderName: zod.string(),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * 사장님의 입금 계좌 정보를 변경한다.
+ * @summary 사장님 입금 계좌 변경
+ */
+export const patchApiV1UsersMeSellerSettlementAccountBodyAccountNumberMax = 50;
+
+export const patchApiV1UsersMeSellerSettlementAccountBodyAccountHolderNameMax = 50;
+
+export const PatchApiV1UsersMeSellerSettlementAccountBody = zod.object({
+  bankCode: zod
+    .enum([
+      'NONGHYEOP',
+      'KAKAOBANK',
+      'KOOKMIN',
+      'TOSSBANK',
+      'SHINHAN',
+      'WOORI',
+      'IBK',
+      'HANA',
+      'SAEMAUL',
+      'BUSANBANK',
+      'DAEGUBANK',
+      'KBANK',
+      'SHINHYEOP',
+      'POST',
+      'SC',
+      'KYONGNAMBANK',
+      'GWANGJUBANK',
+      'SUHYEOP',
+      'JEONBUKBANK',
+      'SAVINGBANK',
+      'JEJUBANK',
+      'CITI',
+      'KDBBANK',
+      'SANLIM',
+      'BOA',
+      'HSBC',
+      'SAMSUNG_SECURITIES',
+      'KB_SECURITIES',
+      'NH_INVESTMENT_AND_SECURITIES',
+      'YUANTA_SECURITES',
+      'DAISHIN_SECURITIES',
+      'HANA_INVESTMENT_AND_SECURITIES',
+      'HANHWA_INVESTMENT_AND_SECURITIES',
+      'EUGENE_INVESTMENT_AND_SECURITIES',
+      'HI_INVESTMENT_AND_SECURITIES',
+      'KYOBO_SECURITIES',
+      'MERITZ_SECURITIES',
+      'SK_SECURITIES',
+      'LIG_INVESTMENT_AND_SECURITIES',
+      'HYUNDAI_MOTOR_SECURITIES',
+      'DB_INVESTMENT_AND_SECURITIES',
+      'SHINYOUNG_SECURITIES',
+      'DAOL_INVESTMENT_AND_SECURITIES',
+      'BOOKOOK_SECURITIES',
+      'TOSS_SECURITIES',
+      'KAKAOPAY_SECURITIES',
+      'MIRAE_ASSET_SECURITIES',
+      'KIWOOM',
+      'KOREA_INVESTMENT_AND_SECURITIES',
+      'SHINHAN_SECURITIES',
+      'IBK_INVESTMENT_SECURITIES',
+      'WOORI_SECURITIES',
+      'CAPE_INVESTMENT_SECURITIES',
+      'BNK_INVESTMENT_SECURITIES',
+      'SANGSANGIN_SECURITIES',
+      'ICBC',
+      'DEUTSCHE_BANK',
+      'JPMORGAN_CHASE',
+      'BNP_PARIBAS',
+      'CCB',
+      'BOC',
+    ])
+    .describe(
+      '은행\/증권사 선택값(라벨 또는 코드).\n- 서버 저장 시 표준 코드로 정규화된다.\n- 아래 enum은 저장되는 표준 코드 목록이다.\n- BANK codes:\n  NONGHYEOP, KAKAOBANK, KOOKMIN, TOSSBANK, SHINHAN, WOORI, IBK, HANA, SAEMAUL, BUSANBANK,\n  DAEGUBANK, KBANK, SHINHYEOP, POST, SC, KYONGNAMBANK, GWANGJUBANK, SUHYEOP, JEONBUKBANK,\n  SAVINGBANK, JEJUBANK, CITI, KDBBANK, SANLIM, BOA, HSBC, ICBC, DEUTSCHE_BANK, JPMORGAN_CHASE,\n  BNP_PARIBAS, CCB, BOC\n- SECURITIES codes:\n  SAMSUNG_SECURITIES, KB_SECURITIES, NH_INVESTMENT_AND_SECURITIES, YUANTA_SECURITES, DAISHIN_SECURITIES,\n  HANA_INVESTMENT_AND_SECURITIES, HANHWA_INVESTMENT_AND_SECURITIES, EUGENE_INVESTMENT_AND_SECURITIES,\n  HI_INVESTMENT_AND_SECURITIES, KYOBO_SECURITIES, MERITZ_SECURITIES, SK_SECURITIES,\n  LIG_INVESTMENT_AND_SECURITIES, HYUNDAI_MOTOR_SECURITIES, DB_INVESTMENT_AND_SECURITIES,\n  SHINYOUNG_SECURITIES, DAOL_INVESTMENT_AND_SECURITIES, BOOKOOK_SECURITIES, TOSS_SECURITIES,\n  KAKAOPAY_SECURITIES, MIRAE_ASSET_SECURITIES, KIWOOM, KOREA_INVESTMENT_AND_SECURITIES,\n  SHINHAN_SECURITIES, IBK_INVESTMENT_SECURITIES, WOORI_SECURITIES, CAPE_INVESTMENT_SECURITIES,\n  BNK_INVESTMENT_SECURITIES, SANGSANGIN_SECURITIES\n',
+    ),
+  accountNumber: zod
+    .string()
+    .max(patchApiV1UsersMeSellerSettlementAccountBodyAccountNumberMax),
+  accountHolderName: zod
+    .string()
+    .max(patchApiV1UsersMeSellerSettlementAccountBodyAccountHolderNameMax),
+});
+
+export const PatchApiV1UsersMeSellerSettlementAccountResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    bankCode: zod.string(),
+    accountNumber: zod.string(),
+    accountHolderName: zod.string(),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * 사장님의 현재 사업자 정보를 조회한다.
+ * @summary 사장님 사업자 정보 조회
+ */
+export const GetApiV1UsersMeSellerBusinessProfileResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    businessRegistrationNumber: zod.string(),
+    storeName: zod.string(),
+    ownerName: zod.string(),
+    storeAddress: zod.string(),
+    phoneNumber: zod.string(),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * 사장님의 사업자 정보를 변경한다.
+ * @summary 사장님 사업자 정보 변경
+ */
+export const patchApiV1UsersMeSellerBusinessProfileBodyBusinessRegistrationNumberRegExp =
+  new RegExp('^\\d{3}-?\\d{2}-?\\d{5}$');
+export const patchApiV1UsersMeSellerBusinessProfileBodyStoreNameMax = 100;
+
+export const patchApiV1UsersMeSellerBusinessProfileBodyOwnerNameMax = 50;
+
+export const patchApiV1UsersMeSellerBusinessProfileBodyStoreAddressMax = 255;
+
+export const patchApiV1UsersMeSellerBusinessProfileBodyPhoneNumberRegExp =
+  new RegExp('^01[0-9]-[0-9]{3,4}-[0-9]{4}$');
+
+export const PatchApiV1UsersMeSellerBusinessProfileBody = zod.object({
+  businessRegistrationNumber: zod
+    .string()
+    .regex(
+      patchApiV1UsersMeSellerBusinessProfileBodyBusinessRegistrationNumberRegExp,
+    ),
+  storeName: zod
+    .string()
+    .max(patchApiV1UsersMeSellerBusinessProfileBodyStoreNameMax),
+  ownerName: zod
+    .string()
+    .max(patchApiV1UsersMeSellerBusinessProfileBodyOwnerNameMax),
+  storeAddress: zod
+    .string()
+    .max(patchApiV1UsersMeSellerBusinessProfileBodyStoreAddressMax),
+  phoneNumber: zod
+    .string()
+    .regex(patchApiV1UsersMeSellerBusinessProfileBodyPhoneNumberRegExp),
+});
+
+export const PatchApiV1UsersMeSellerBusinessProfileResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    businessRegistrationNumber: zod.string(),
+    storeName: zod.string(),
+    ownerName: zod.string(),
+    storeAddress: zod.string(),
+    phoneNumber: zod.string(),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * 사장님 회원 탈퇴를 처리한다.
+- 탈퇴 진입 컨텍스트 조회 결과와 무관하게 실행 시점 최종 검증을 다시 수행한다.
+- 개설된 공구(IN_PROGRESS)가 있으면 탈퇴할 수 없다.
+- 달성 완료/완료 공구(ACHIEVED, COMPLETED)에 픽업 미완료 참여가 있으면 탈퇴할 수 없다.
+- 소비자 수령 예정 공구가 있으면 탈퇴할 수 없다.
+- 동일 계정은 탈퇴 후 30일 이후 재가입 가능하다.
+- 최종 검증 실패 시 409 에러를 반환한다. (예: OWNER_WITHDRAWAL_BLOCKED_OPEN_GROUPBUY, OWNER_WITHDRAWAL_BLOCKED_PENDING_CUSTOMER_PICKUP, WITHDRAWAL_BLOCKED_PENDING_PICKUP)
+
+ * @summary 사장님 회원 탈퇴
+ */
+export const deleteApiV1UsersMeSellerBodyReasonDetailMax = 500;
+
+export const DeleteApiV1UsersMeSellerBody = zod.object({
+  reason: zod
+    .enum([
+      'INCONVENIENT_SERVICE',
+      'NO_LONGER_NEEDED',
+      'PRIVACY_CONCERN',
+      'OTHER',
+    ])
+    .nullish()
+    .describe('사장님 탈퇴 사유(선택)'),
+  reasonDetail: zod
+    .string()
+    .max(deleteApiV1UsersMeSellerBodyReasonDetailMax)
+    .nullish()
+    .describe('사장님 탈퇴 상세 사유 (reason=OTHER 일 때 입력)'),
+});
+
+export const DeleteApiV1UsersMeSellerResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.unknown().nullable(),
+  error: zod.unknown().nullable(),
+});
+
+/**
  * 이메일 회원가입 전 가입 가능 이메일인지 확인한다.
  * @summary 이메일 중복 확인
  */
@@ -516,6 +863,26 @@ export const PostApiV1AuthEmailSignupResponse = zod.object({
       phoneNumber: zod.string().nullish(),
       role: zod.enum(['BUYER', 'SELLER', 'ADMIN']),
       lastRole: zod.enum(['BUYER', 'SELLER', 'ADMIN']).nullish(),
+      hasBuyerRole: zod
+        .boolean()
+        .optional()
+        .describe('BUYER 역할 assignment 보유 여부'),
+      hasSellerRole: zod
+        .boolean()
+        .optional()
+        .describe('SELLER 역할 assignment 보유 여부'),
+      canSwitchToBuyer: zod
+        .boolean()
+        .optional()
+        .describe(
+          'BUYER 역할 assignment를 보유했고 현재 역할이 BUYER가 아닐 때 true',
+        ),
+      canSwitchToSeller: zod
+        .boolean()
+        .optional()
+        .describe(
+          'SELLER 역할 assignment를 보유했고 현재 역할이 SELLER가 아닐 때 true',
+        ),
       signupCompleted: zod.boolean(),
       sellerSignupCompleted: zod.boolean(),
       deletedAt: zod.iso.datetime({ offset: true }).nullish(),
@@ -554,6 +921,26 @@ export const PostApiV1AuthEmailLoginResponse = zod.object({
       phoneNumber: zod.string().nullish(),
       role: zod.enum(['BUYER', 'SELLER', 'ADMIN']),
       lastRole: zod.enum(['BUYER', 'SELLER', 'ADMIN']).nullish(),
+      hasBuyerRole: zod
+        .boolean()
+        .optional()
+        .describe('BUYER 역할 assignment 보유 여부'),
+      hasSellerRole: zod
+        .boolean()
+        .optional()
+        .describe('SELLER 역할 assignment 보유 여부'),
+      canSwitchToBuyer: zod
+        .boolean()
+        .optional()
+        .describe(
+          'BUYER 역할 assignment를 보유했고 현재 역할이 BUYER가 아닐 때 true',
+        ),
+      canSwitchToSeller: zod
+        .boolean()
+        .optional()
+        .describe(
+          'SELLER 역할 assignment를 보유했고 현재 역할이 SELLER가 아닐 때 true',
+        ),
       signupCompleted: zod.boolean(),
       sellerSignupCompleted: zod.boolean(),
       deletedAt: zod.iso.datetime({ offset: true }).nullish(),

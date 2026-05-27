@@ -548,22 +548,13 @@ export const GetApiV1GroupBuysGroupBuyIdProgressResponse = zod.object({
 /**
  * 공구 상세 화면 진입 시 및 체류 중 일정 주기(예: 20~30초)로 호출한다.
 서버는 세션 TTL을 연장하고 최신 활성 조회자 수를 반환한다.
+비로그인 사용자는 viewerSessionId 쿠키가 없으면 서버에서 자동 발급한다.
+로그인 사용자는 userId 기준으로 집계한다.
 
  * @summary 활성 조회자 heartbeat 조회/갱신
  */
 export const PostApiV1GroupBuysGroupBuyIdViewersHeartbeatParams = zod.object({
   groupBuyId: zod.number(),
-});
-
-export const postApiV1GroupBuysGroupBuyIdViewersHeartbeatBodyViewerSessionIdMin = 8;
-export const postApiV1GroupBuysGroupBuyIdViewersHeartbeatBodyViewerSessionIdMax = 128;
-
-export const PostApiV1GroupBuysGroupBuyIdViewersHeartbeatBody = zod.object({
-  viewerSessionId: zod
-    .string()
-    .min(postApiV1GroupBuysGroupBuyIdViewersHeartbeatBodyViewerSessionIdMin)
-    .max(postApiV1GroupBuysGroupBuyIdViewersHeartbeatBodyViewerSessionIdMax)
-    .describe('클라이언트가 생성\/보관하는 조회 세션 식별자(UUID 권장)'),
 });
 
 export const postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponseDataActiveViewerCountMin = 0;

@@ -118,6 +118,11 @@ export const logEvent = <K extends keyof EventParams>(
 ): void => {
   const p = params as Record<string, unknown> | undefined;
 
+  if (process.env.NODE_ENV === 'development') {
+    // console.log('[analytics]', eventName, p);
+    return;
+  }
+
   if (typeof window !== 'undefined' && window.gtag) {
     window.gtag('event', eventName, p);
   }

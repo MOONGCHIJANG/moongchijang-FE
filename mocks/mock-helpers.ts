@@ -30,6 +30,7 @@ import { getGetApiV1UsersMeResponseMock } from '../src/api/generated/auth/auth.m
 import {
   getGetApiV1OwnerGroupBuysResponseMock,
   getGetApiV1OwnerGroupBuysSummaryResponseMock,
+  getGetApiV1OwnerGroupBuysManageResponseMock,
 } from '../src/api/generated/owner/owner.msw';
 import {
   getGetApiV1UsersMeTabsCountsResponseMock,
@@ -532,6 +533,72 @@ export function createGroupBuyRequestDetailMock(requestId: number) {
   return {
     success: true,
     data: fixture,
+    error: null,
+  };
+}
+
+export function createOwnerGroupBuysManageMock() {
+  const base = getGetApiV1OwnerGroupBuysManageResponseMock();
+  return {
+    ...base,
+    success: true,
+    data: [
+      {
+        groupBuyId: 1,
+        productName: koFaker.product.name(),
+        price: koFaker.product.price(),
+        pickupDate: koFaker.groupBuy.pickupDate(),
+        deadlineDday: 3,
+        achievementRate: 72,
+        currentQuantity: 7,
+        targetQuantity: 10,
+        status: 'IN_PROGRESS' as const,
+      },
+      {
+        groupBuyId: 2,
+        productName: koFaker.product.name(),
+        price: koFaker.product.price(),
+        pickupDate: koFaker.groupBuy.pickupDate(),
+        deadlineDday: 7,
+        achievementRate: 72,
+        currentQuantity: 7,
+        targetQuantity: 10,
+        status: 'IN_PROGRESS' as const,
+      },
+      {
+        groupBuyId: 3,
+        productName: koFaker.product.name(),
+        price: koFaker.product.price(),
+        pickupDate: koFaker.groupBuy.pickupDate(),
+        deadlineDday: 2,
+        achievementRate: 100,
+        currentQuantity: 10,
+        targetQuantity: 10,
+        status: 'ACHIEVED' as const,
+      },
+      {
+        groupBuyId: 4,
+        productName: koFaker.product.name(),
+        price: koFaker.product.price(),
+        pickupDate: koFaker.groupBuy.pickupDate(),
+        deadlineDday: null,
+        achievementRate: null,
+        currentQuantity: null,
+        targetQuantity: null,
+        status: 'PENDING_APPROVAL' as const,
+      },
+      {
+        groupBuyId: 5,
+        productName: koFaker.product.name(),
+        price: koFaker.product.price(),
+        pickupDate: koFaker.groupBuy.pickupDate(),
+        deadlineDday: null,
+        achievementRate: null,
+        currentQuantity: null,
+        targetQuantity: null,
+        status: 'ENDED' as const,
+      },
+    ],
     error: null,
   };
 }

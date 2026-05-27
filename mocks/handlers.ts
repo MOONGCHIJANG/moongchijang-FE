@@ -33,6 +33,7 @@ import {
   createGroupBuyRequestDetailMock,
   createOwnerGroupBuysMock,
   createOwnerGroupBuysSummaryMock,
+  createOwnerGroupBuysManageMock,
 } from './mock-helpers';
 import { formatDeadline } from '@/lib/date';
 
@@ -561,6 +562,11 @@ const overrideHandlers = [
   http.get('*/api/v1/owner/group-buys/summary', async () => {
     await delay(500);
     return HttpResponse.json(createOwnerGroupBuysSummaryMock(), { status: 200 });
+  }),
+
+  http.get('*/api/v1/owner/group-buys/manage', async () => {
+    await delay(500);
+    return HttpResponse.json(createOwnerGroupBuysManageMock(), { status: 200 });
   }),
 ];
 

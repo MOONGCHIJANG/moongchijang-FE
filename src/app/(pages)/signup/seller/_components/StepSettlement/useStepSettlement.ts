@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { SellerSettlementInfoUpsertRequestBankCode } from '@/api/generated/api.schemas';
 import {
   usePatchApiV1UsersMeSellerSettlementInfo,
-  usePatchApiV1UsersMeSellerBusinessProfile,
+  usePatchApiV1UsersMeSellerBusinessInfo,
 } from '@/api/hooks/auth/auth';
 import { SELLER_BUSINESS_INFO_KEY } from '../StepBusiness/useStepBusiness';
 import type { SellerBusinessInfoUpsertRequest } from '@/api/generated/api.schemas';
@@ -54,7 +54,7 @@ export const useStepSettlement = () => {
     usePatchApiV1UsersMeSellerSettlementInfo();
 
   const { mutate: saveBusinessProfile, isPending: isSavingBusiness } =
-    usePatchApiV1UsersMeSellerBusinessProfile();
+    usePatchApiV1UsersMeSellerBusinessInfo();
 
   // 은행 선택
   const handleSelectBank = (

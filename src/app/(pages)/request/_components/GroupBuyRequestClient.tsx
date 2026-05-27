@@ -41,6 +41,10 @@ export const GroupBuyRequestClient = () => {
     const source =
       (searchParams.get('source') as 'search_empty' | 'gnb' | 'mypage') ??
       'gnb';
+    logEvent('screen_view', {
+      screen_name: 'group_request_form',
+      entry_source: source,
+    });
     logEvent('group_request_start', { source });
     logEvent('groupbuy_request_form_start', { entry_source: source });
     logEvent('group_request_step', STEP_META.form);
@@ -69,11 +73,13 @@ export const GroupBuyRequestClient = () => {
       });
 
       if (res.status === 201) {
+        const requestId = res.data?.data?.requestId;
         logEvent('group_request_submit_success', {
           store_name: data.store.storeName,
           product_name: data.productName,
         });
         logEvent('groupbuy_request_submit_success', {
+          request_id: requestId!,
           store_id: data.store.placeId,
           quantity: data.quantity,
         });

@@ -33,6 +33,7 @@ export function RequestListClient() {
   const { data, isLoading, isError } = useGetApiV1GroupBuyRequests();
 
   useEffect(() => {
+    logEvent('screen_view', { screen_name: 'group_request_history' });
     logEvent('group_request_history_view');
   }, []);
   const requests = data?.status === 200 ? (data.data?.data ?? []) : [];

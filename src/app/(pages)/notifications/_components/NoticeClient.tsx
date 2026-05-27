@@ -48,7 +48,8 @@ const NoticeClient = ({ initialData }: NoticeClientProps) => {
   );
 
   useEffect(() => {
-    logEvent('notification_view', {});
+    const unreadCount = initialData.items.filter((item) => !item.isRead).length;
+    logEvent('notification_view', { unread_count: unreadCount });
   }, []);
 
   const {

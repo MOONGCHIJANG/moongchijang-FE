@@ -2,11 +2,17 @@
 
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import { Icon } from '@iconify/react';
 import { Button } from '@/components/Button';
+import { logEvent } from '@/lib/analytics';
 
 export const SubmitCompleteStep = () => {
   const router = useRouter();
+
+  useEffect(() => {
+    logEvent('screen_view', { screen_name: 'group_request_complete' });
+  }, []);
 
   return (
     <div className="flex flex-col min-h-full bg-white">

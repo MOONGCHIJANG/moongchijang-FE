@@ -1,5 +1,19 @@
 import type { ApiResponseOwnerGroupBuySummaryData } from '@/api/generated/api.schemas';
 
+type SummaryCardProps = {
+  label: string;
+  value: string;
+};
+
+function SummaryCard({ label, value }: SummaryCardProps) {
+  return (
+    <div className="flex flex-col gap-1 rounded-2xl bg-white px-4 py-4 shadow-sm">
+      <p className="body-md-regular text-text-tertiary">{label}</p>
+      <p className="heading-1xl-semibold text-text-basic">{value}</p>
+    </div>
+  );
+}
+
 type Props = { summary: ApiResponseOwnerGroupBuySummaryData };
 
 const CARDS = [
@@ -29,15 +43,7 @@ export function SummaryCards({ summary }: Props) {
   return (
     <div className="grid grid-cols-2 gap-3">
       {CARDS.map(({ key, label, format }) => (
-        <div
-          key={key}
-          className="flex flex-col gap-1 rounded-2xl bg-white px-4 py-4 shadow-sm"
-        >
-          <p className="body-sm-medium text-text-secondary">{label}</p>
-          <p className="heading-sm-bold text-text-basic">
-            {format(summary[key])}
-          </p>
-        </div>
+        <SummaryCard key={key} label={label} value={format(summary[key])} />
       ))}
     </div>
   );

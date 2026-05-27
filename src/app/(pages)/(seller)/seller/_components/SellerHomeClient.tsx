@@ -4,16 +4,23 @@ import {
   useGetApiV1OwnerGroupBuysSummary,
   useGetApiV1OwnerGroupBuys,
 } from '@/api/hooks/owner/owner';
+import { useGetApiV1UsersMe } from '@/api/hooks/auth/auth';
 import { SellerTopBar } from './SellerTopBar';
 import { SummaryCards } from './SummaryCards';
-import { GroupBuyItem } from './GroupBuyItem';
+import { GroupBuyList } from './GroupBuyList';
 import { EmptyHome } from './EmptyHome';
 
 export function SellerHomeClient() {
+  const { data: meResponse } = useGetApiV1UsersMe();
   const { data: summaryResponse, isLoading: summaryLoading } =
     useGetApiV1OwnerGroupBuysSummary();
   const { data: groupBuysResponse, isLoading: listLoading } =
     useGetApiV1OwnerGroupBuys();
+
+  const nickname =
+    meResponse?.status === 200
+      ? (meResponse.data.data.nickname ?? undefined)
+      : undefined;
 
   const summary =
     summaryResponse?.status === 200 ? summaryResponse.data.data : null;
@@ -26,7 +33,7 @@ export function SellerHomeClient() {
     <div className="flex min-h-full flex-col bg-bg-white-muted">
       {/* 상단 바 */}
       <header className="sticky top-0 z-10 shrink-0 bg-surface-white px-5">
-        <SellerTopBar />
+        <SellerTopBar storeName={nickname} />
       </header>
 
       {isLoading ? (
@@ -59,18 +66,7 @@ export function SellerHomeClient() {
         <div className="flex flex-col gap-4 px-5 pb-5 pt-4">
           {summary && <SummaryCards summary={summary} />}
 
-          <section className="flex flex-col gap-3">
-            <h2 className="heading-sm-bold text-text-basic">진행 중 공구</h2>
-            {groupBuys.length === 0 ? (
-              <p className="body-sm-regular py-6 text-center text-text-secondary">
-                진행 중인 공구가 없어요
-              </p>
-            ) : (
-              groupBuys.map((item) => (
-                <GroupBuyItem key={item.groupBuyId} item={item} />
-              ))
-            )}
-          </section>
+          <GroupBuyList groupBuys={groupBuys} />
         </div>
       )}
     </div>

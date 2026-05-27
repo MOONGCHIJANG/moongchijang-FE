@@ -26,7 +26,7 @@ export function ManagementClient() {
   return (
     <>
       {/* 탭 */}
-      <div className="flex gap-0 border-b border-border-gray-100 bg-surface-white px-5">
+      <div className="flex gap-0 bg-surface-white px-5">
         {TABS.map(({ label, filter }) => (
           <button
             key={filter}

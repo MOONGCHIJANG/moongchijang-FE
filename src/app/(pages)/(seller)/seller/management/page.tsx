@@ -5,7 +5,7 @@ export default function SellerManagementPage() {
   return (
     <div className="flex min-h-full flex-col bg-bg-white-muted">
       {/* 헤더 */}
-      <header className="sticky top-0 z-10 flex items-center justify-between bg-surface-white px-5 py-4">
+      <header className="sticky top-0 z-10 flex items-center justify-between border-b border-border-subtle bg-surface-white px-5 py-4">
         <h1 className="heading-sm-bold text-text-basic">공구 관리</h1>
         <Link
           href="/seller/management/create"

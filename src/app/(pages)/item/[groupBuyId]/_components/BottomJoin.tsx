@@ -42,9 +42,7 @@ const BottomJoin = ({ data }: Props) => {
       const s = String(Math.floor((diff % 60_000) / 1_000)).padStart(2, '0');
 
       if (days > 0) {
-        setTimeLeft(
-          `${String(days).padStart(2, '0')}일 ${h}시간 ${m}분 ${s}초`,
-        );
+        setTimeLeft(`${String(days).padStart(2, '0')}일 ${h}:${m}:${s}`);
       } else {
         setTimeLeft(`${h}:${m}:${s}`);
       }

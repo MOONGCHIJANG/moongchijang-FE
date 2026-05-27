@@ -44,21 +44,21 @@ const StepBusiness = ({ onNext }: StepBusinessProps) => {
           <Input
             label="가게명"
             placeholder="예) 뭉치장 베이커리"
-            readOnly
+            readOnly={!lookupState.editableFields?.storeName}
             noHelperSpace
             {...register('storeName')}
           />
           <Input
             label="대표자명"
             placeholder="홍길동"
-            readOnly
+            readOnly={!lookupState.editableFields?.ownerName}
             noHelperSpace
             {...register('ownerName')}
           />
           <Input
             label="가게 주소"
             placeholder="예) 서울특별시 강남구 테헤란로 123"
-            readOnly
+            readOnly={!lookupState.editableFields?.storeAddress}
             noHelperSpace
             {...register('storeAddress')}
           />
@@ -80,7 +80,7 @@ const StepBusiness = ({ onNext }: StepBusinessProps) => {
           disabled={!canProceed}
           onClick={handleSubmit(onSubmit)}
         >
-          다음
+          완료
         </Button>
       </div>
     </>

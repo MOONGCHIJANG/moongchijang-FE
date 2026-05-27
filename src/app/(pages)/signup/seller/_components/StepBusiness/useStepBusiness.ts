@@ -36,12 +36,22 @@ type LookupState = {
   status: LookupStatus;
   helperText: string;
   helperClassName: string;
+  editableFields?: {
+    storeName: boolean;
+    ownerName: boolean;
+    storeAddress: boolean;
+  };
 };
 
 const initialLookupState: LookupState = {
   status: 'idle',
   helperText: '',
   helperClassName: '',
+  editableFields: {
+    storeName: false,
+    ownerName: false,
+    storeAddress: false,
+  },
 };
 
 export const useStepBusiness = (onNext: () => void) => {
@@ -134,6 +144,11 @@ export const useStepBusiness = (onNext: () => void) => {
               status: 'valid',
               helperText: '사업자등록번호가 확인되었어요.',
               helperClassName: 'text-text-subtle-inverse',
+              editableFields: {
+                storeName: !storeName,
+                ownerName: !ownerName,
+                storeAddress: !storeAddress,
+              },
             });
           } else if (
             status === ApiResponseBusinessRegistrationLookupDataStatus.CLOSED

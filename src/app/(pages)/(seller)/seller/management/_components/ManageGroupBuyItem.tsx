@@ -24,7 +24,7 @@ const STATUS_CONFIG: Record<
   },
   [Status.ACHIEVED]: {
     label: '달성',
-    badgeClassName: 'bg-[var(--color-success-25)]',
+    badgeClassName: 'bg-success-25',
     textClassName: 'text-text-success caption-xs-bold',
   },
   [Status.ENDED]: {
@@ -34,8 +34,8 @@ const STATUS_CONFIG: Record<
   },
   [Status.PENDING_APPROVAL]: {
     label: '승인대기',
-    badgeClassName: 'bg-[#FFFAEB]',
-    textClassName: 'text-[#B54708] caption-xs-bold',
+    badgeClassName: 'bg-secondary-50',
+    textClassName: 'text-secondary-600 caption-xs-bold',
   },
 };
 
@@ -81,8 +81,8 @@ export function ManageGroupBuyItem({ item }: Props) {
           {item.status === Status.ACHIEVED && pickupDDayLabel && (
             <Badge
               label={pickupDDayLabel}
-              className="bg-[var(--color-success-25)]"
-              textClassName="text-text-success caption-xs-bold"
+              className="bg-success-50"
+              textClassName="text-success-600 caption-xs-bold"
             />
           )}
         </div>

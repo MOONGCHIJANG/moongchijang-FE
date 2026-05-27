@@ -7,11 +7,16 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { logEvent } from '@/lib/analytics';
 
-const StepRole = () => {
+type StepRoleProps = {
+  onComplete?: () => void;
+};
+
+const StepRole = ({ onComplete }: StepRoleProps) => {
   const router = useRouter();
   const [selected, setSelected] = useState<'guest' | null>(null);
 
   const handleComplete = () => {
+    onComplete?.();
     logEvent('sign_up', { method: 'email' });
     router.push('/feed');
   };

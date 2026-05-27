@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import StepEmail from './StepEmail/StepEmail';
 import StepProfile from './StepProfile/StepProfile';
 import StepRole from './StepRole';
@@ -23,20 +23,41 @@ export default function SignUpClient() {
   const [step, setStep] = useState<Step>(
     searchParams.get('step') === 'profile' ? 2 : 1,
   );
+  const stepRef = useRef(step);
+  const completedRef = useRef(false);
+
+  useEffect(() => {
+    stepRef.current = step;
+  }, [step]);
 
   useEffect(() => {
     logEvent('sign_up_step', { step, step_name: STEP_NAMES[step] });
   }, [step]);
 
+  useEffect(() => {
+    return () => {
+      if (!completedRef.current) {
+        logEvent('sign_up_abandon', {
+          step: stepRef.current,
+          step_name: STEP_NAMES[stepRef.current],
+        });
+      }
+    };
+  }, []);
+
   const handleNextStep = () => {
     setStep((prev) => (prev < 3 ? ((prev + 1) as Step) : prev));
+  };
+
+  const handleComplete = () => {
+    completedRef.current = true;
   };
 
   return (
     <div className="p-4">
       {step === 1 && <StepEmail onNext={handleNextStep} />}
       {step === 2 && <StepProfile onNext={handleNextStep} />}
-      {step === 3 && <StepRole />}
+      {step === 3 && <StepRole onComplete={handleComplete} />}
     </div>
   );
 }

@@ -26,6 +26,21 @@ import {
   getGetApiV1StoresSearchResponseMock,
   getPostApiV1GroupBuyRequestsResponseMock,
 } from '../src/api/generated/group-buy-request/group-buy-request.msw';
+import { getGetApiV1UsersMeResponseMock } from '../src/api/generated/auth/auth.msw';
+import {
+  getGetApiV1UsersMeTabsCountsResponseMock,
+  getGetApiV1UsersMeParticipationsResponseMock,
+  getGetApiV1UsersMeParticipationsPickupWaitingResponseMock,
+  getGetApiV1UsersMeRefundsResponseMock,
+} from '../src/api/generated/my-page/my-page.msw';
+import {
+  getGetApiV1ParticipationsParticipationIdPickupResponseMock,
+  getGetApiV1ParticipationsParticipationIdQrResponseMock,
+} from '../src/api/generated/pickup/pickup.msw';
+import {
+  GroupBuyRequestDetail,
+  GroupBuyRequestDetailStatus,
+} from '../src/api/generated/api.schemas';
 import { koFaker } from './ko-faker';
 
 const MOCK_IMAGES = [
@@ -69,6 +84,14 @@ const LOT_ADDRESSES = [
   null,
   null,
 ];
+
+function pastDate(minDays: number, maxDays: number): string {
+  const date = new Date();
+  date.setDate(
+    date.getDate() - faker.number.int({ min: minDays, max: maxDays }),
+  );
+  return date.toISOString().slice(0, 10);
+}
 
 export { koFaker } from './ko-faker';
 
@@ -142,6 +165,370 @@ export function createGroupBuyDetailMock() {
       pickupTimeEnd: koFaker.groupBuy.pickupTime(),
       dDay: koFaker.groupBuy.dDay(),
     },
+  };
+}
+
+export function createMyPageUserMeMock() {
+  const base = getGetApiV1UsersMeResponseMock();
+  return {
+    ...base,
+    success: true,
+    data: {
+      ...base.data,
+      provider: 'EMAIL' as const,
+      email: koFaker.user.email(),
+      nickname: koFaker.user.nickname(),
+      role: 'BUYER' as const,
+      signupCompleted: true,
+      deletedAt: null,
+    },
+    error: null,
+  };
+}
+
+export function createMyPageTabCountsMock() {
+  const base = getGetApiV1UsersMeTabsCountsResponseMock();
+  return {
+    ...base,
+    success: true,
+    data: {
+      activeCount: 3,
+      completedCount: 2,
+      refundedCount: 2,
+      requestCount: 1,
+    },
+    error: null,
+  };
+}
+
+function participationBase(id: number, pickupDate: string) {
+  return {
+    participationId: id,
+    groupBuyId: id,
+    productName: koFaker.product.name(),
+    storeName: koFaker.store.name(),
+    pickupDate,
+    pickupTimeStart: koFaker.groupBuy.pickupTime(),
+    pickupTimeEnd: koFaker.groupBuy.pickupTime(),
+    paymentAmount: 18000,
+    quantity: 1,
+  };
+}
+
+export function createMyPageParticipationsMock(status: 'ACTIVE' | 'COMPLETED') {
+  const base = getGetApiV1UsersMeParticipationsResponseMock();
+
+  const activeContent = [
+    {
+      ...participationBase(1, koFaker.groupBuy.pickupDate()),
+      achievementRate: koFaker.groupBuy.achievementRate(),
+      achievementStatus: 'BEFORE_ACHIEVED' as const,
+      dDay: koFaker.groupBuy.dDay(),
+      canCancel: true,
+      canViewPickup: false,
+      canViewQr: false,
+    },
+    {
+      ...participationBase(2, koFaker.groupBuy.pickupDate()),
+      achievementRate: koFaker.groupBuy.achievementRate(),
+      achievementStatus: 'BEFORE_ACHIEVED' as const,
+      dDay: koFaker.groupBuy.dDay(),
+      canCancel: false,
+      canViewPickup: false,
+      canViewQr: false,
+    },
+    {
+      ...participationBase(3, koFaker.groupBuy.pickupDate()),
+      achievementRate: 100,
+      achievementStatus: 'ACHIEVED' as const,
+      dDay: koFaker.groupBuy.dDay(),
+      canCancel: false,
+      canViewPickup: true,
+      canViewQr: true,
+    },
+  ];
+
+  const completedContent = [
+    {
+      ...participationBase(4, pastDate(1, 30)),
+      achievementRate: 100,
+      achievementStatus: 'ACHIEVED' as const,
+      dDay: 0,
+      canCancel: false,
+      canViewPickup: true,
+      canViewQr: true,
+    },
+    {
+      ...participationBase(5, pastDate(1, 30)),
+      achievementRate: 100,
+      achievementStatus: 'ACHIEVED' as const,
+      dDay: 0,
+      canCancel: false,
+      canViewPickup: true,
+      canViewQr: true,
+    },
+  ];
+
+  const content = status === 'ACTIVE' ? activeContent : completedContent;
+
+  return {
+    ...base,
+    success: true,
+    data: content,
+    error: null,
+  };
+}
+
+export function createMyPageRefundsMock() {
+  const base = getGetApiV1UsersMeRefundsResponseMock();
+  return {
+    ...base,
+    success: true,
+    data: [
+      {
+        participationId: 6,
+        productName: koFaker.product.name(),
+        storeName: koFaker.store.name(),
+        pickupDate: pastDate(1, 30),
+        pickupTimeStart: koFaker.groupBuy.pickupTime(),
+        pickupTimeEnd: koFaker.groupBuy.pickupTime(),
+        paymentAmount: 18000,
+        quantity: 1,
+        refundStatus: 'PENDING' as const,
+        cancelReason: 'NOT_ACHIEVED' as const,
+      },
+      {
+        participationId: 7,
+        productName: koFaker.product.name(),
+        storeName: koFaker.store.name(),
+        pickupDate: pastDate(1, 30),
+        pickupTimeStart: koFaker.groupBuy.pickupTime(),
+        pickupTimeEnd: koFaker.groupBuy.pickupTime(),
+        paymentAmount: 18000,
+        quantity: 1,
+        refundStatus: 'COMPLETED' as const,
+        cancelReason: 'EARLY_EXIT' as const,
+      },
+    ],
+    error: null,
+  };
+}
+
+export function createMyPagePickupInfoMock() {
+  const base = getGetApiV1ParticipationsParticipationIdPickupResponseMock();
+  return {
+    ...base,
+    success: true,
+    data: {
+      ...base.data,
+      participationId: 3,
+      storeName: koFaker.store.name(),
+      storePhone: '02-1234-5678',
+      storeAddress: koFaker.location.address(),
+      latitude: koFaker.location.lat(),
+      longitude: koFaker.location.lng(),
+      transitInfo: null,
+      pickupDate: koFaker.groupBuy.pickupDate(),
+      pickupTimeStart: koFaker.groupBuy.pickupTime(),
+      pickupTimeEnd: koFaker.groupBuy.pickupTime(),
+      productName: koFaker.product.name(),
+      quantity: 1,
+      remainingMinutes: faker.number.int({ min: 10, max: 120 }),
+    },
+    error: null,
+  };
+}
+
+// 목록·상세·현황 공통 픽스처 (requestId → 고정 데이터)
+// 분기 확인: items 배열 항목 수/순서 조절, 빈 배열이면 empty state
+const REQUEST_FIXTURES: Record<number, GroupBuyRequestDetail> = {
+  1: {
+    requestId: 1,
+    storeName: '모모양과',
+    storeAddress: '서울 성북구 화랑로11길 23',
+    placeId: 'ChIJmockplace001',
+    roadAddress: '서울 성북구 화랑로11길 23',
+    lotAddress: '서울 성북구 월곡동 48-3',
+    latitude: 37.601234,
+    longitude: 127.052345,
+    productName: '두쫀쿠키',
+    desiredQuantity: 3,
+    desiredPickupDate: '2026-06-10',
+    additionalNote: '견과류 알레르기 있어요. 없는 버전으로 부탁드려요!',
+    status: GroupBuyRequestDetailStatus.IN_REVIEW,
+    rejectionReason: null,
+    openedGroupBuyId: null,
+    statusHistory: [
+      {
+        status: GroupBuyRequestDetailStatus.IN_REVIEW,
+        changedAt: '2026-05-25T10:00:00Z',
+      },
+    ],
+    createdAt: '2026-05-25T10:00:00Z',
+  },
+  2: {
+    requestId: 2,
+    storeName: '르뱅쿠키',
+    storeAddress: '서울 마포구 양화로 165',
+    placeId: 'ChIJmockplace002',
+    roadAddress: '서울 마포구 양화로 165',
+    lotAddress: '서울 마포구 서교동 395-166',
+    latitude: 37.554321,
+    longitude: 126.921234,
+    productName: '크림치즈베이글',
+    desiredQuantity: 5,
+    desiredPickupDate: '2026-06-15',
+    additionalNote: null,
+    status: GroupBuyRequestDetailStatus.IN_CONTACT,
+    rejectionReason: null,
+    openedGroupBuyId: null,
+    statusHistory: [
+      {
+        status: GroupBuyRequestDetailStatus.IN_REVIEW,
+        changedAt: '2026-05-22T09:00:00Z',
+      },
+      {
+        status: GroupBuyRequestDetailStatus.IN_CONTACT,
+        changedAt: '2026-05-24T14:30:00Z',
+      },
+    ],
+    createdAt: '2026-05-22T09:00:00Z',
+  },
+  3: {
+    requestId: 3,
+    storeName: '밀도',
+    storeAddress: '서울 강남구 테헤란로 152',
+    placeId: 'ChIJmockplace003',
+    roadAddress: '서울 강남구 테헤란로 152',
+    lotAddress: '서울 강남구 역삼동 823-5',
+    latitude: 37.498765,
+    longitude: 127.028901,
+    productName: '소금빵',
+    desiredQuantity: 2,
+    desiredPickupDate: '2026-06-05',
+    additionalNote: '포장 꼼꼼히 부탁드립니다.',
+    status: GroupBuyRequestDetailStatus.OPENED,
+    rejectionReason: null,
+    openedGroupBuyId: 42,
+    statusHistory: [
+      {
+        status: GroupBuyRequestDetailStatus.IN_REVIEW,
+        changedAt: '2026-05-18T10:00:00Z',
+      },
+      {
+        status: GroupBuyRequestDetailStatus.IN_CONTACT,
+        changedAt: '2026-05-20T11:00:00Z',
+      },
+      {
+        status: GroupBuyRequestDetailStatus.OPENED,
+        changedAt: '2026-05-23T15:00:00Z',
+      },
+    ],
+    createdAt: '2026-05-18T10:00:00Z',
+  },
+  4: {
+    requestId: 4,
+    storeName: '나폴레옹제과',
+    storeAddress: '서울 종로구 인사동10길 11',
+    placeId: 'ChIJmockplace004',
+    roadAddress: '서울 종로구 인사동10길 11',
+    lotAddress: '서울 종로구 관훈동 14-2',
+    latitude: 37.572345,
+    longitude: 126.987654,
+    productName: '말차케이크',
+    desiredQuantity: 1,
+    desiredPickupDate: '2026-05-30',
+    additionalNote: null,
+    status: GroupBuyRequestDetailStatus.REJECTED,
+    rejectionReason:
+      '해당 상품은 매장 사정으로 공구 진행이 어렵습니다. 추후 재오픈 시 안내드릴게요.',
+    openedGroupBuyId: null,
+    statusHistory: [
+      {
+        status: GroupBuyRequestDetailStatus.IN_REVIEW,
+        changedAt: '2026-05-11T10:00:00Z',
+      },
+      {
+        status: GroupBuyRequestDetailStatus.IN_CONTACT,
+        changedAt: '2026-05-13T09:00:00Z',
+      },
+      {
+        status: GroupBuyRequestDetailStatus.REJECTED,
+        changedAt: '2026-05-15T16:00:00Z',
+      },
+    ],
+    createdAt: '2026-05-11T10:00:00Z',
+  },
+};
+
+export function createGroupBuyRequestListMock() {
+  return {
+    success: true,
+    data: Object.values(REQUEST_FIXTURES),
+    error: null,
+  };
+}
+
+// ── 분기 확인용: true(탈퇴 불가) / false(탈퇴 가능) 로 전환 ──────────
+export const MOCK_HAS_PICKUP_WAITING = false;
+
+export function createMyPagePickupWaitingMock() {
+  const base = getGetApiV1UsersMeParticipationsPickupWaitingResponseMock();
+  const content = MOCK_HAS_PICKUP_WAITING
+    ? [
+        {
+          participationId: 3,
+          groupBuyId: 3,
+          productName: koFaker.product.name(),
+          storeName: koFaker.store.name(),
+          pickupAt: koFaker.groupBuy.pickupDate(),
+          paidAmount: 18000,
+          quantity: 1,
+          isClosed: false,
+          participatedAt: new Date().toISOString(),
+        },
+      ]
+    : [];
+  return {
+    ...base,
+    success: true,
+    data: {
+      content,
+      totalElements: content.length,
+      totalPages: content.length > 0 ? 1 : 0,
+    },
+    error: null,
+  };
+}
+
+export function createMyPageQrMock() {
+  const base = getGetApiV1ParticipationsParticipationIdQrResponseMock();
+  return {
+    ...base,
+    success: true,
+    data: {
+      ...base.data,
+      qrCode: faker.string.uuid(),
+      nickname: koFaker.user.nickname(),
+      productName: koFaker.product.name(),
+      quantity: 1,
+      isUsed: false,
+      storeName: koFaker.store.name(),
+      pickupDate: koFaker.groupBuy.pickupDate(),
+      pickupTimeStart: koFaker.groupBuy.pickupTime(),
+      pickupTimeEnd: koFaker.groupBuy.pickupTime(),
+    },
+    error: null,
+  };
+}
+
+export function createGroupBuyRequestDetailMock(requestId: number) {
+  const fixture =
+    REQUEST_FIXTURES[requestId] ?? REQUEST_FIXTURES[((requestId - 1) % 4) + 1];
+  return {
+    success: true,
+    data: fixture,
+    error: null,
   };
 }
 

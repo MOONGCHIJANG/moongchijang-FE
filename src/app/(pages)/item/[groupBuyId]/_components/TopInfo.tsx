@@ -19,9 +19,9 @@ const TopInfo = ({ data }: Props) => {
   return (
     <div className="flex flex-col gap-g3 p-4">
       <div className="flex flex-col gap-g5">
-        {data.imageUrls[0] ? (
+        {data.thumbnailUrl ? (
           <Image
-            src={data.imageUrls[0]}
+            src={data.thumbnailUrl}
             alt="상품 이미지"
             width={400}
             height={260}

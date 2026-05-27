@@ -34,7 +34,7 @@ import {
 } from '@/api/generated/api.schemas';
 import { useGetApiV1PickupsMeNearestQr } from '@/api/hooks/pickup/pickup';
 import { useAuthStore } from '@/store/authStore';
-import { formatPickupDateTime } from '@/lib/date';
+import { formatPickupDateTime, formatTime } from '@/lib/date';
 import { useFeedList } from '../_hooks/useFeedList';
 import { useRecentSearches } from '../_hooks/useRecentSearches';
 
@@ -101,10 +101,11 @@ export function FeedClient() {
   const { data: nearestQrResponse } = useGetApiV1PickupsMeNearestQr({
     query: { enabled: isLoggedIn },
   });
-  const qrItem =
-    nearestQrResponse?.status === 200
-      ? (nearestQrResponse.data?.data?.item ?? null)
-      : null;
+  const nearestQrData =
+    nearestQrResponse?.status === 200 ? nearestQrResponse.data?.data : null;
+  const qrItem = nearestQrData?.item ?? null;
+  const hasCandidate = nearestQrData?.hasCandidate ?? false;
+  const hasMultipleToday = nearestQrData?.hasMultipleToday ?? false;
   const isPickupDay = qrItem?.availabilityStatus === 'AVAILABLE';
   const dDayText = qrItem
     ? qrItem.dDay === 0
@@ -259,9 +260,11 @@ export function FeedClient() {
         <FeedTopBar
           location={locationDisplayText}
           onLocationClick={() => setIsLocationSheetOpen(true)}
+          onNotificationClick={() => router.push('/notifications')}
           onQrClick={() => setIsQrModalOpen(true)}
           showQr={isLoggedIn}
         />
+
         <div className="cursor-pointer" onClick={() => setIsSearchOpen(true)}>
           <SearchBar
             value={searchInput}
@@ -383,20 +386,27 @@ export function FeedClient() {
           isOpen={isQrModalOpen}
           onClose={() => setIsQrModalOpen(false)}
           isPickupDay={isPickupDay}
-          storeName={qrItem?.storeName ?? ''}
+          hasCandidate={hasCandidate}
+          hasMultipleToday={hasMultipleToday}
+          productName={qrItem?.productName ?? ''}
+          reservationNumber={qrItem?.reservationNumber ?? ''}
           pickupAddress={qrItem?.pickupLocation ?? ''}
           pickupTimeStart={
             qrItem
               ? formatPickupDateTime(qrItem.pickupDate, qrItem.pickupTimeStart)
               : ''
           }
-          pickupTimeEnd={qrItem?.pickupTimeEnd ?? ''}
+          pickupTimeEnd={qrItem ? formatTime(qrItem.pickupTimeEnd) : ''}
           qrCode={qrItem?.qrCode ?? ''}
           dDayText={dDayText}
           shakeEnabled={isEnabled}
           onShakeToggle={() => toggleShake()}
           onDetailClick={() => {
             if (qrItem) router.push(`/mypage/pickup/${qrItem.participationId}`);
+          }}
+          onMultiplePickupClick={() => {
+            setIsQrModalOpen(false);
+            router.push('/mypage');
           }}
         />
       )}

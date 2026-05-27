@@ -1,5 +1,9 @@
-import { redirect } from 'next/navigation';
+import OnboardingClient from './_components/OnboardingClient';
 
 export default function RootPage() {
-  redirect('/feed');
+  return (
+    <>
+      <OnboardingClient />
+    </>
+  );
 }

@@ -31,6 +31,8 @@ import {
   MOCK_HAS_PICKUP_WAITING,
   createGroupBuyRequestListMock,
   createGroupBuyRequestDetailMock,
+  createOwnerGroupBuysMock,
+  createOwnerGroupBuysSummaryMock,
 } from './mock-helpers';
 import { formatDeadline } from '@/lib/date';
 
@@ -548,6 +550,17 @@ const overrideHandlers = [
       { success: true, data: null, error: null },
       { status: 200 },
     );
+  }),
+
+  // ── 사장님 홈 ─────────────────────────────────────────────────────────
+  http.get('*/api/v1/owner/group-buys', async () => {
+    await delay(500);
+    return HttpResponse.json(createOwnerGroupBuysMock(), { status: 200 });
+  }),
+
+  http.get('*/api/v1/owner/group-buys/summary', async () => {
+    await delay(500);
+    return HttpResponse.json(createOwnerGroupBuysSummaryMock(), { status: 200 });
   }),
 ];
 

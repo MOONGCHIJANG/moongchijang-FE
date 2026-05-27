@@ -28,6 +28,10 @@ import {
 } from '../src/api/generated/group-buy-request/group-buy-request.msw';
 import { getGetApiV1UsersMeResponseMock } from '../src/api/generated/auth/auth.msw';
 import {
+  getGetApiV1OwnerGroupBuysResponseMock,
+  getGetApiV1OwnerGroupBuysSummaryResponseMock,
+} from '../src/api/generated/owner/owner.msw';
+import {
   getGetApiV1UsersMeTabsCountsResponseMock,
   getGetApiV1UsersMeParticipationsResponseMock,
   getGetApiV1UsersMeParticipationsPickupWaitingResponseMock,
@@ -528,6 +532,45 @@ export function createGroupBuyRequestDetailMock(requestId: number) {
   return {
     success: true,
     data: fixture,
+    error: null,
+  };
+}
+
+export function createOwnerGroupBuysMock() {
+  const base = getGetApiV1OwnerGroupBuysResponseMock();
+  return {
+    ...base,
+    success: true,
+    data: Array.from({ length: 3 }, (_, i) => {
+      const targetQuantity = koFaker.groupBuy.quantity();
+      const achievementRate = koFaker.groupBuy.achievementRate();
+      return {
+        groupBuyId: i + 1,
+        productName: koFaker.product.name(),
+        achievementRate,
+        currentQuantity: Math.floor(targetQuantity * (achievementRate / 100)),
+        targetQuantity,
+        price: koFaker.product.price(),
+        deadline: koFaker.groupBuy.deadline(),
+        status: 'IN_PROGRESS' as const,
+      };
+    }),
+    error: null,
+  };
+}
+
+export function createOwnerGroupBuysSummaryMock() {
+  const base = getGetApiV1OwnerGroupBuysSummaryResponseMock();
+  return {
+    ...base,
+    success: true,
+    data: {
+      ongoingCount: 2,
+      achievedCount: 1,
+      todayPickupUserCount: 12,
+      settlementExpectedAmount: 1280000,
+      isEmpty: false,
+    },
     error: null,
   };
 }

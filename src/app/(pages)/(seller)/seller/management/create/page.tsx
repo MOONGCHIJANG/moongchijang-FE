@@ -1,8 +1,11 @@
+import Header from '@/components/Header';
+import { CreateGroupBuyClient } from './_components/CreateGroupBuyClient';
+
 export default function SellerManagementCreatePage() {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-2 px-5 pt-20 text-center">
-      <p className="heading-sm-bold text-text-basic">공구 개설</p>
-      <p className="body-sm-regular text-text-secondary">준비 중이에요</p>
+    <div className="flex min-h-full flex-col bg-white">
+      <Header text="공구 개설" showBackButton />
+      <CreateGroupBuyClient />
     </div>
   );
 }

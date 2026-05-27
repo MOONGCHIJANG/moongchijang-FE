@@ -6,6 +6,8 @@ import type {
 } from '@/api/generated/api.schemas';
 import { ApiResponseOwnerGroupBuyListDataItemStatus as Status } from '@/api/generated/api.schemas';
 import { Badge } from '@/components/Badge';
+import { formatPickupDate } from '@/lib/date';
+import { GroupBuyProgressBar } from './GroupBuyProgressBar';
 
 const STATUS_LABEL: Record<ApiResponseOwnerGroupBuyListDataItemStatus, string> =
   {
@@ -22,21 +24,12 @@ function calcDDay(deadline: string): number {
   return Math.ceil((end.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 }
 
-function formatDeadlineDate(deadline: string): string {
-  const date = new Date(deadline);
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
-  return `${month}/${day}(${dayNames[date.getDay()]})`;
-}
-
 type Props = { item: ApiResponseOwnerGroupBuyListDataItem };
 
 export function GroupBuyItem({ item }: Props) {
   const dDay = calcDDay(item.deadline);
   const dDayLabel =
     dDay > 0 ? `공구마감D-${dDay}` : dDay === 0 ? '공구마감D-day' : '마감';
-  const clampedRate = Math.min(Math.max(item.achievementRate, 0), 100);
 
   return (
     <Link
@@ -69,21 +62,11 @@ export function GroupBuyItem({ item }: Props) {
       {/* 가격 · 픽업일 */}
       <p className="body-md-regular text-text-tertiary">
         {item.price.toLocaleString('ko-KR')}원 · 픽업{' '}
-        {formatDeadlineDate(item.deadline)}
+        {formatPickupDate(item.deadline)}
       </p>
 
-      {/* 프로그레스바 + 달성률 */}
-      <div className="flex items-center gap-2">
-        <div className="h-2 flex-1 overflow-hidden rounded-full bg-bg-gray-100">
-          <div
-            className="h-full rounded-full bg-brand-primary transition-all"
-            style={{ width: `${clampedRate}%` }}
-          />
-        </div>
-        <span className="w-9 shrink-0 text-right caption-sm-semibold font-medium text-text-brand">
-          {item.achievementRate}%
-        </span>
-      </div>
+      {/* 프로그레스바 */}
+      <GroupBuyProgressBar achievementRate={item.achievementRate} />
     </Link>
   );
 }

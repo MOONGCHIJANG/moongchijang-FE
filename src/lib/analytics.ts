@@ -38,9 +38,9 @@ export type EventParams = {
   groupbuy_request_confirm_close: { close_method: 'backdrop' | 'button' };
   groupbuy_request_submit_attempt: { store_id: string; quantity: number };
   groupbuy_request_submit_success: {
+    request_id: number;
     store_id: string;
     quantity: number;
-    lead_time_days?: number;
   };
   groupbuy_request_submit_fail: {
     error_code?: string;

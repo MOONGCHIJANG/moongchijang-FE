@@ -1,12 +1,11 @@
 'use client';
 
-import { usePathname, useSearchParams } from 'next/navigation';
-import { Suspense, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
+import { useEffect } from 'react';
 import { usePostHog } from 'posthog-js/react';
 
-function AnalyticsInner() {
+export function Analytics() {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const posthog = usePostHog();
 
   useEffect(() => {
@@ -19,15 +18,7 @@ function AnalyticsInner() {
         page_path: pathname,
       });
     }
-  }, [pathname, searchParams, posthog]);
+  }, [pathname, posthog]);
 
   return null;
-}
-
-export function Analytics() {
-  return (
-    <Suspense fallback={null}>
-      <AnalyticsInner />
-    </Suspense>
-  );
 }

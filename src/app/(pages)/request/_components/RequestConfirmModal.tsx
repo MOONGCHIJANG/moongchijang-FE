@@ -1,9 +1,11 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import { Icon } from '@iconify/react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/Button';
 import type { RequestFormData } from './RequestFormStep';
+import { logEvent } from '@/lib/analytics';
 
 interface RequestConfirmModalProps {
   isOpen: boolean;
@@ -23,6 +25,19 @@ export const RequestConfirmModal = ({
   onConfirm,
   data,
 }: RequestConfirmModalProps) => {
+  const prevOpenRef = useRef(false);
+
+  useEffect(() => {
+    if (isOpen && !prevOpenRef.current) {
+      logEvent('groupbuy_request_confirm_view', {
+        store_id: data.store.placeId,
+        quantity: data.quantity,
+        has_memo: !!data.additionalNote.trim(),
+      });
+    }
+    prevOpenRef.current = isOpen;
+  }, [isOpen, data]);
+
   return (
     <div
       className={cn(
@@ -30,7 +45,12 @@ export const RequestConfirmModal = ({
         isOpen ? 'opacity-100' : 'pointer-events-none opacity-0',
       )}
       onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
+        if (e.target === e.currentTarget) {
+          logEvent('groupbuy_request_confirm_close', {
+            close_method: 'backdrop',
+          });
+          onClose();
+        }
       }}
     >
       <div
@@ -41,7 +61,12 @@ export const RequestConfirmModal = ({
       >
         <button
           type="button"
-          onClick={onClose}
+          onClick={() => {
+            logEvent('groupbuy_request_confirm_close', {
+              close_method: 'button',
+            });
+            onClose();
+          }}
           className="absolute top-[10px] right-4"
           aria-label="닫기"
         >
@@ -106,7 +131,14 @@ export const RequestConfirmModal = ({
           size="lg"
           fullWidth
           className="w-full text-text-basic-inverse cursor-pointer"
-          onClick={onConfirm}
+          onClick={() => {
+            logEvent('group_request_submit');
+            logEvent('groupbuy_request_submit_attempt', {
+              store_id: data.store.placeId,
+              quantity: data.quantity,
+            });
+            onConfirm();
+          }}
         >
           요청 제출하기
         </Button>

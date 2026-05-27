@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Icon } from '@iconify/react';
@@ -7,6 +8,7 @@ import Header from '@/components/Header';
 import { Button } from '@/components/Button';
 import { RequestCard } from './RequestCard';
 import { useGetApiV1GroupBuyRequests } from '@/api/hooks/group-buy-request/group-buy-request';
+import { logEvent } from '@/lib/analytics';
 
 function RequestListSkeleton() {
   return (
@@ -29,6 +31,10 @@ function RequestListSkeleton() {
 
 export function RequestListClient() {
   const { data, isLoading, isError } = useGetApiV1GroupBuyRequests();
+
+  useEffect(() => {
+    logEvent('group_request_history_view');
+  }, []);
   const requests = data?.status === 200 ? (data.data?.data ?? []) : [];
 
   if (!isLoading && data !== undefined && data.status !== 200) {

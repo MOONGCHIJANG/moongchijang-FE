@@ -10,8 +10,16 @@ import { SubmitCompleteStep } from './SubmitCompleteStep';
 import { ToastBlack } from '@/components/ToastBlack';
 import { postApiV1GroupBuyRequests } from '@/api/generated/group-buy-request/group-buy-request';
 import type { RequestFormData } from './RequestFormStep';
+import { logEvent } from '@/lib/analytics';
 
 type Step = 'form' | 'search' | 'map' | 'complete';
+
+const STEP_META: Record<Step, { step: number; step_name: string }> = {
+  form: { step: 1, step_name: '폼 입력' },
+  search: { step: 2, step_name: '매장 검색' },
+  map: { step: 3, step_name: '지도 확인' },
+  complete: { step: 4, step_name: '완료' },
+};
 
 export const GroupBuyRequestClient = () => {
   const router = useRouter();
@@ -30,10 +38,21 @@ export const GroupBuyRequestClient = () => {
   };
 
   useEffect(() => {
+    const source =
+      (searchParams.get('source') as 'search_empty' | 'gnb' | 'mypage') ??
+      'gnb';
+    logEvent('group_request_start', { source });
+    logEvent('groupbuy_request_form_start', { entry_source: source });
+    logEvent('group_request_step', STEP_META.form);
     return () => {
       if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     };
   }, []);
+
+  const goToStep = (next: Step) => {
+    setStep(next);
+    logEvent('group_request_step', STEP_META[next]);
+  };
 
   const handleSubmit = async (data: RequestFormData) => {
     setIsLoading(true);
@@ -50,11 +69,28 @@ export const GroupBuyRequestClient = () => {
       });
 
       if (res.status === 201) {
-        setStep('complete');
+        logEvent('group_request_submit_success', {
+          store_name: data.store.storeName,
+          product_name: data.productName,
+        });
+        logEvent('groupbuy_request_submit_success', {
+          store_id: data.store.placeId,
+          quantity: data.quantity,
+        });
+        goToStep('complete');
       } else {
+        logEvent('group_request_submit_fail', { reason: 'server_error' });
+        logEvent('groupbuy_request_submit_fail', {
+          error_code: String(res.status),
+          error_message_group: 'server_error',
+        });
         showToast('요청 제출에 실패했어요. 다시 시도해 주세요.');
       }
     } catch {
+      logEvent('group_request_submit_fail', { reason: 'network_error' });
+      logEvent('groupbuy_request_submit_fail', {
+        error_message_group: 'network_error',
+      });
       showToast('요청 제출에 실패했어요. 다시 시도해 주세요.');
     } finally {
       setIsLoading(false);
@@ -67,9 +103,9 @@ export const GroupBuyRequestClient = () => {
         <StoreSearchStep
           onSelectStore={(store) => {
             setSelectedStore(store);
-            setStep('map');
+            goToStep('map');
           }}
-          onBack={() => setStep('form')}
+          onBack={() => goToStep('form')}
         />
       </div>
     );
@@ -80,8 +116,8 @@ export const GroupBuyRequestClient = () => {
       <div className="h-full">
         <MapConfirmStep
           store={selectedStore}
-          onBack={() => setStep('search')}
-          onConfirm={() => setStep('form')}
+          onBack={() => goToStep('search')}
+          onConfirm={() => goToStep('form')}
         />
       </div>
     );
@@ -99,7 +135,7 @@ export const GroupBuyRequestClient = () => {
     <div className="h-full">
       <RequestFormStep
         selectedStore={selectedStore}
-        onSearchStore={() => setStep('search')}
+        onSearchStore={() => goToStep('search')}
         onSubmit={handleSubmit}
         isLoading={isLoading}
         onBack={() => router.back()}

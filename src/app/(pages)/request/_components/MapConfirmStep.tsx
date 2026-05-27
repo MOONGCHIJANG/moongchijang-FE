@@ -5,6 +5,7 @@ import { Icon } from '@iconify/react';
 import { Button } from '@/components/Button';
 import NaverMap from '@/components/NaverMap';
 import { type Store } from './StoreSearchStep';
+import { logEvent } from '@/lib/analytics';
 
 interface MapConfirmStepProps {
   store?: Store | null;
@@ -79,7 +80,12 @@ export const MapConfirmStep = ({
           size="lg"
           fullWidth
           className="w-full text-text-basic-inverse cursor-pointer"
-          onClick={onConfirm}
+          onClick={() => {
+            logEvent('groupbuy_request_store_confirm', {
+              store_id: store?.placeId ?? '',
+            });
+            onConfirm();
+          }}
         >
           매장 선택하기
         </Button>

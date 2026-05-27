@@ -1,3 +1,5 @@
+import posthog from 'posthog-js';
+
 export type EventParams = {
   screen_view: {
     screen_name: string;
@@ -126,8 +128,6 @@ export const logEvent = <K extends keyof EventParams>(
   }
 
   if (typeof window !== 'undefined') {
-    import('posthog-js').then(({ default: posthog }) => {
-      posthog.capture(eventName, params);
-    });
+    posthog.capture(eventName, params);
   }
 };

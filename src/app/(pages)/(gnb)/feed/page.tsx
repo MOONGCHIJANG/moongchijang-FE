@@ -1,11 +1,15 @@
 import { Suspense } from 'react';
 import { FeedClient } from './_components/FeedClient';
 import { FeedSkeletonList } from './_components/FeedSkeleton';
+import Footer from '@/components/Footer';
 
 export default function FeedPage() {
   return (
-    <Suspense fallback={<FeedSkeletonList />}>
-      <FeedClient />
-    </Suspense>
+    <div className="flex flex-col">
+      <Suspense fallback={<FeedSkeletonList />}>
+        <FeedClient />
+      </Suspense>
+      <Footer />
+    </div>
   );
 }

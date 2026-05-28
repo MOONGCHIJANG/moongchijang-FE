@@ -9,7 +9,7 @@ export default function FeedPage() {
       <Suspense fallback={<FeedSkeletonList />}>
         <FeedClient />
       </Suspense>
-      <Footer />
+      <Footer hasBottomSticky={false} />
     </div>
   );
 }

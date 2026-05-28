@@ -5,7 +5,7 @@ export default function FavoritePage() {
   return (
     <div className="flex flex-col h-full">
       <FavoriteClient />
-      <Footer />
+      <Footer hasBottomSticky={false} />
     </div>
   );
 }

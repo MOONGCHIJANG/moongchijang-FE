@@ -1,6 +1,12 @@
 'use client';
 
-const Footer = () => {
+import { cn } from '@/lib/utils';
+
+interface FooterProps {
+  hasBottomSticky?: boolean;
+}
+
+const Footer = ({ hasBottomSticky = true }: FooterProps) => {
   const handleCSClick = () => {
     window.open('https://pf.kakao.com/_MdICX', '_blank');
   };
@@ -23,7 +29,12 @@ const Footer = () => {
   };
 
   return (
-    <footer className="px-g6 pt-g6 pb-32 flex flex-col gap-3 text-text-subtle caption-sm-medium">
+    <footer
+      className={cn(
+        'px-g6 pt-g6 flex flex-col gap-3 text-text-subtle caption-sm-medium',
+        hasBottomSticky ? 'pb-32' : 'pb-10',
+      )}
+    >
       <div className="flex gap-p6 items-center">
         <button onClick={handleCSClick}>고객센터</button>
         <div className="border-l border-text-subtle h-4" />

@@ -38,9 +38,11 @@ export const GroupBuyRequestClient = () => {
   };
 
   useEffect(() => {
+    const rawSource = searchParams.get('source');
     const source =
-      (searchParams.get('source') as 'search_empty' | 'gnb' | 'mypage') ??
-      'gnb';
+      rawSource === 'search_empty' || rawSource === 'mypage'
+        ? rawSource
+        : 'gnb';
     logEvent('screen_view', {
       screen_name: 'group_request_form',
       entry_source: source,

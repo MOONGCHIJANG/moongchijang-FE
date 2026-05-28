@@ -63,7 +63,7 @@ const StepRole = () => {
         </button>
         <button
           onClick={() => setSelected('seller')}
-          className={`px-3.75 flex rounded-[17.6px] h-26.75 border border-border-subtle items-center opacity-40 cursor-not-allowed ${
+          className={`px-3.75 flex rounded-[17.6px] h-26.75 border border-border-subtle items-center ${
             selected === 'seller'
               ? 'border-border-brand bg-surface-brand-lighter'
               : 'border-border-subtle'

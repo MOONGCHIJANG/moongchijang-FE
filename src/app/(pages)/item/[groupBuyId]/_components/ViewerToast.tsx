@@ -1,6 +1,5 @@
 'use client';
-
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Toast from './Toast';
 import { usePostApiV1GroupBuysGroupBuyIdViewersHeartbeat } from '@/api/hooks/group-buy/group-buy';
 
@@ -10,6 +9,8 @@ const ViewerToast = ({ groupBuyId }: { groupBuyId: number }) => {
   const [visible, setVisible] = useState(false);
   const [fadeOut, setFadeOut] = useState(false);
   const [viewerCount, setViewerCount] = useState(0);
+  const fadeTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const hideTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const { mutate: heartbeat } =
     usePostApiV1GroupBuysGroupBuyIdViewersHeartbeat();
@@ -27,13 +28,11 @@ const ViewerToast = ({ groupBuyId }: { groupBuyId: number }) => {
             setVisible(true);
             setFadeOut(false);
 
-            const fadeTimer = setTimeout(() => setFadeOut(true), 3_000);
-            const hideTimer = setTimeout(() => setVisible(false), 3_500);
+            if (fadeTimerRef.current) clearTimeout(fadeTimerRef.current);
+            if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
 
-            return () => {
-              clearTimeout(fadeTimer);
-              clearTimeout(hideTimer);
-            };
+            fadeTimerRef.current = setTimeout(() => setFadeOut(true), 3_000);
+            hideTimerRef.current = setTimeout(() => setVisible(false), 3_500);
           }
         },
       },
@@ -47,7 +46,11 @@ const ViewerToast = ({ groupBuyId }: { groupBuyId: number }) => {
     // 주기적 호출
     const interval = setInterval(sendHeartbeat, HEARTBEAT_INTERVAL);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      if (fadeTimerRef.current) clearTimeout(fadeTimerRef.current);
+      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+    };
   }, [groupBuyId]);
 
   if (!visible) return null;

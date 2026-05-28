@@ -44,10 +44,17 @@ const BottomJoin = ({ data }: Props) => {
       );
       const s = String(Math.floor((diff % 60_000) / 1_000)).padStart(2, '0');
 
+      if (diff <= 0) {
+        setTimeLeft('00:00:00');
+        return;
+      }
+
       if (days > 0) {
-        setTimeLeft(`${String(days).padStart(2, '0')}일 ${h}:${m}:${s}`);
+        setTimeLeft(
+          String(days).padStart(2, '0') + '일 ' + h + ':' + m + ':' + s,
+        );
       } else {
-        setTimeLeft(`${h}:${m}:${s}`);
+        setTimeLeft(h + ':' + m + ':' + s);
       }
     };
 

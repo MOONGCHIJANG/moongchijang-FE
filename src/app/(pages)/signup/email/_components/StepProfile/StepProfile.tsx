@@ -39,7 +39,7 @@ const StepProfile = ({ onNext }: StepProfileProps) => {
 
   return (
     <>
-      <div className="flex justify-between items-start pb-g8">
+      <div className="flex justify-between items-start pb-20">
         <p className="heading-lg-bold whitespace-pre-line">
           {`반가워요! 🥐\n닉네임을 알려주세요`}
         </p>

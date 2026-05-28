@@ -7,6 +7,11 @@ import { faker } from '@faker-js/faker';
 import { HttpResponse, http } from 'msw';
 import type { RequestHandlerOptions } from 'msw';
 
+import {
+  BuyerWithdrawalBlockingReason,
+  SellerWithdrawalBlockingReason,
+  WithdrawalScreenType,
+} from '../api.schemas';
 import type {
   ApiResponseAccessToken,
   ApiResponseAdditionalInfoUpdated,
@@ -22,8 +27,11 @@ import type {
   ApiResponsePhoneNumberUpdated,
   ApiResponsePhoneVerificationCodeSent,
   ApiResponsePhoneVerificationVerified,
+  ApiResponseSellerBusinessProfile,
+  ApiResponseSellerSettlementAccount,
   ApiResponseSellerSignupStatus,
   ApiResponseUserInfo,
+  ApiResponseWithdrawalContext,
   SuccessNoDataResponse,
 } from '../api.schemas';
 
@@ -70,6 +78,22 @@ export const getPostApiV1AuthKakaoResponseMock = (
           faker.helpers.arrayElement(['BUYER', 'SELLER', 'ADMIN'] as const),
           null,
         ]),
+        undefined,
+      ]),
+      hasBuyerRole: faker.helpers.arrayElement([
+        faker.datatype.boolean(),
+        undefined,
+      ]),
+      hasSellerRole: faker.helpers.arrayElement([
+        faker.datatype.boolean(),
+        undefined,
+      ]),
+      canSwitchToBuyer: faker.helpers.arrayElement([
+        faker.datatype.boolean(),
+        undefined,
+      ]),
+      canSwitchToSeller: faker.helpers.arrayElement([
+        faker.datatype.boolean(),
         undefined,
       ]),
       signupCompleted: faker.datatype.boolean(),
@@ -151,6 +175,22 @@ export const getGetApiV1UsersMeResponseMock = (
       ]),
       undefined,
     ]),
+    hasBuyerRole: faker.helpers.arrayElement([
+      faker.datatype.boolean(),
+      undefined,
+    ]),
+    hasSellerRole: faker.helpers.arrayElement([
+      faker.datatype.boolean(),
+      undefined,
+    ]),
+    canSwitchToBuyer: faker.helpers.arrayElement([
+      faker.datatype.boolean(),
+      undefined,
+    ]),
+    canSwitchToSeller: faker.helpers.arrayElement([
+      faker.datatype.boolean(),
+      undefined,
+    ]),
     signupCompleted: faker.datatype.boolean(),
     sellerSignupCompleted: faker.datatype.boolean(),
     deletedAt: faker.helpers.arrayElement([
@@ -167,11 +207,122 @@ export const getGetApiV1UsersMeResponseMock = (
   ...overrideResponse,
 });
 
-export const getDeleteApiV1UsersMeResponseMock = (
+export const getPatchApiV1UsersMeRoleResponseMock = (
+  overrideResponse: Partial<Extract<ApiResponseUserInfo, object>> = {},
+): ApiResponseUserInfo => ({
+  success: faker.datatype.boolean(),
+  data: {
+    id: faker.number.int(),
+    provider: faker.helpers.arrayElement(['KAKAO', 'EMAIL'] as const),
+    providerId: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        null,
+      ]),
+      undefined,
+    ]),
+    email: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([faker.internet.email(), null]),
+      undefined,
+    ]),
+    nickname: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        null,
+      ]),
+      undefined,
+    ]),
+    phoneNumber: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        null,
+      ]),
+      undefined,
+    ]),
+    role: faker.helpers.arrayElement(['BUYER', 'SELLER', 'ADMIN'] as const),
+    lastRole: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.helpers.arrayElement(['BUYER', 'SELLER', 'ADMIN'] as const),
+        null,
+      ]),
+      undefined,
+    ]),
+    hasBuyerRole: faker.helpers.arrayElement([
+      faker.datatype.boolean(),
+      undefined,
+    ]),
+    hasSellerRole: faker.helpers.arrayElement([
+      faker.datatype.boolean(),
+      undefined,
+    ]),
+    canSwitchToBuyer: faker.helpers.arrayElement([
+      faker.datatype.boolean(),
+      undefined,
+    ]),
+    canSwitchToSeller: faker.helpers.arrayElement([
+      faker.datatype.boolean(),
+      undefined,
+    ]),
+    signupCompleted: faker.datatype.boolean(),
+    sellerSignupCompleted: faker.datatype.boolean(),
+    deletedAt: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.date.past().toISOString().slice(0, 19) + 'Z',
+        null,
+      ]),
+      undefined,
+    ]),
+    createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z',
+    updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z',
+  },
+  error: {},
+  ...overrideResponse,
+});
+
+export const getDeleteApiV1UsersMeRoleResponseMock = (
   overrideResponse: Partial<Extract<SuccessNoDataResponse, object>> = {},
 ): SuccessNoDataResponse => ({
   success: faker.datatype.boolean(),
   data: {},
+  error: {},
+  ...overrideResponse,
+});
+
+export const getGetApiV1UsersMeWithdrawalContextResponseMock = (
+  overrideResponse: Partial<Extract<ApiResponseWithdrawalContext, object>> = {},
+): ApiResponseWithdrawalContext => ({
+  success: faker.datatype.boolean(),
+  data: {
+    currentRole: faker.helpers.arrayElement([
+      'BUYER',
+      'SELLER',
+      'ADMIN',
+    ] as const),
+    buyer: {
+      canProceed: faker.datatype.boolean(),
+      hasPendingPickup: faker.datatype.boolean(),
+      hasActiveParticipation: faker.datatype.boolean(),
+      blockingReason: faker.helpers.arrayElement(
+        Object.values(BuyerWithdrawalBlockingReason),
+      ),
+    },
+    seller: {
+      canProceed: faker.datatype.boolean(),
+      hasOpenGroupBuy: faker.datatype.boolean(),
+      hasPendingCustomerPickup: faker.datatype.boolean(),
+      blockingReason: faker.helpers.arrayElement(
+        Object.values(SellerWithdrawalBlockingReason),
+      ),
+    },
+    recommendedScreen: faker.helpers.arrayElement(
+      Object.values(WithdrawalScreenType),
+    ),
+    forceRedirect: faker.datatype.boolean(),
+    forceRedirectTarget: faker.helpers.arrayElement([
+      faker.helpers.arrayElement(Object.values(WithdrawalScreenType)),
+      null,
+    ]),
+  },
   error: {},
   ...overrideResponse,
 });
@@ -278,6 +429,83 @@ export const getPatchApiV1UsersMeSellerSettlementInfoResponseMock = (
     id: faker.number.int(),
     sellerSignupCompleted: faker.datatype.boolean(),
   },
+  error: {},
+  ...overrideResponse,
+});
+
+export const getGetApiV1UsersMeSellerSettlementAccountResponseMock = (
+  overrideResponse: Partial<
+    Extract<ApiResponseSellerSettlementAccount, object>
+  > = {},
+): ApiResponseSellerSettlementAccount => ({
+  success: faker.datatype.boolean(),
+  data: {
+    bankCode: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    accountNumber: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    accountHolderName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  },
+  error: {},
+  ...overrideResponse,
+});
+
+export const getPatchApiV1UsersMeSellerSettlementAccountResponseMock = (
+  overrideResponse: Partial<
+    Extract<ApiResponseSellerSettlementAccount, object>
+  > = {},
+): ApiResponseSellerSettlementAccount => ({
+  success: faker.datatype.boolean(),
+  data: {
+    bankCode: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    accountNumber: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    accountHolderName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  },
+  error: {},
+  ...overrideResponse,
+});
+
+export const getGetApiV1UsersMeSellerBusinessProfileResponseMock = (
+  overrideResponse: Partial<
+    Extract<ApiResponseSellerBusinessProfile, object>
+  > = {},
+): ApiResponseSellerBusinessProfile => ({
+  success: faker.datatype.boolean(),
+  data: {
+    businessRegistrationNumber: faker.string.alpha({
+      length: { min: 10, max: 20 },
+    }),
+    storeName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    ownerName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    storeAddress: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    phoneNumber: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  },
+  error: {},
+  ...overrideResponse,
+});
+
+export const getPatchApiV1UsersMeSellerBusinessProfileResponseMock = (
+  overrideResponse: Partial<
+    Extract<ApiResponseSellerBusinessProfile, object>
+  > = {},
+): ApiResponseSellerBusinessProfile => ({
+  success: faker.datatype.boolean(),
+  data: {
+    businessRegistrationNumber: faker.string.alpha({
+      length: { min: 10, max: 20 },
+    }),
+    storeName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    ownerName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    storeAddress: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    phoneNumber: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  },
+  error: {},
+  ...overrideResponse,
+});
+
+export const getDeleteApiV1UsersMeSellerResponseMock = (
+  overrideResponse: Partial<Extract<SuccessNoDataResponse, object>> = {},
+): SuccessNoDataResponse => ({
+  success: faker.datatype.boolean(),
+  data: {},
   error: {},
   ...overrideResponse,
 });
@@ -390,6 +618,22 @@ export const getPostApiV1AuthEmailSignupResponseMock = (
         ]),
         undefined,
       ]),
+      hasBuyerRole: faker.helpers.arrayElement([
+        faker.datatype.boolean(),
+        undefined,
+      ]),
+      hasSellerRole: faker.helpers.arrayElement([
+        faker.datatype.boolean(),
+        undefined,
+      ]),
+      canSwitchToBuyer: faker.helpers.arrayElement([
+        faker.datatype.boolean(),
+        undefined,
+      ]),
+      canSwitchToSeller: faker.helpers.arrayElement([
+        faker.datatype.boolean(),
+        undefined,
+      ]),
       signupCompleted: faker.datatype.boolean(),
       sellerSignupCompleted: faker.datatype.boolean(),
       deletedAt: faker.helpers.arrayElement([
@@ -450,6 +694,22 @@ export const getPostApiV1AuthEmailLoginResponseMock = (
           faker.helpers.arrayElement(['BUYER', 'SELLER', 'ADMIN'] as const),
           null,
         ]),
+        undefined,
+      ]),
+      hasBuyerRole: faker.helpers.arrayElement([
+        faker.datatype.boolean(),
+        undefined,
+      ]),
+      hasSellerRole: faker.helpers.arrayElement([
+        faker.datatype.boolean(),
+        undefined,
+      ]),
+      canSwitchToBuyer: faker.helpers.arrayElement([
+        faker.datatype.boolean(),
+        undefined,
+      ]),
+      canSwitchToSeller: faker.helpers.arrayElement([
+        faker.datatype.boolean(),
         undefined,
       ]),
       signupCompleted: faker.datatype.boolean(),
@@ -656,7 +916,31 @@ export const getGetApiV1UsersMeMockHandler = (
   );
 };
 
-export const getDeleteApiV1UsersMeMockHandler = (
+export const getPatchApiV1UsersMeRoleMockHandler = (
+  overrideResponse?:
+    | ApiResponseUserInfo
+    | ((
+        info: Parameters<Parameters<typeof http.patch>[1]>[0],
+      ) => Promise<ApiResponseUserInfo> | ApiResponseUserInfo),
+  options?: RequestHandlerOptions,
+) => {
+  return http.patch(
+    '*/api/v1/users/me/role',
+    async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getPatchApiV1UsersMeRoleResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
+
+export const getDeleteApiV1UsersMeRoleMockHandler = (
   overrideResponse?:
     | SuccessNoDataResponse
     | ((
@@ -665,14 +949,40 @@ export const getDeleteApiV1UsersMeMockHandler = (
   options?: RequestHandlerOptions,
 ) => {
   return http.delete(
-    '*/api/v1/users/me',
+    '*/api/v1/users/me/role',
     async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
       return HttpResponse.json(
         overrideResponse !== undefined
           ? typeof overrideResponse === 'function'
             ? await overrideResponse(info)
             : overrideResponse
-          : getDeleteApiV1UsersMeResponseMock(),
+          : getDeleteApiV1UsersMeRoleResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
+
+export const getGetApiV1UsersMeWithdrawalContextMockHandler = (
+  overrideResponse?:
+    | ApiResponseWithdrawalContext
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) =>
+        | Promise<ApiResponseWithdrawalContext>
+        | ApiResponseWithdrawalContext),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    '*/api/v1/users/me/withdrawal-context',
+    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getGetApiV1UsersMeWithdrawalContextResponseMock(),
         { status: 200 },
       );
     },
@@ -803,6 +1113,134 @@ export const getPatchApiV1UsersMeSellerSettlementInfoMockHandler = (
             ? await overrideResponse(info)
             : overrideResponse
           : getPatchApiV1UsersMeSellerSettlementInfoResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
+
+export const getGetApiV1UsersMeSellerSettlementAccountMockHandler = (
+  overrideResponse?:
+    | ApiResponseSellerSettlementAccount
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) =>
+        | Promise<ApiResponseSellerSettlementAccount>
+        | ApiResponseSellerSettlementAccount),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    '*/api/v1/users/me/seller/settlement-account',
+    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getGetApiV1UsersMeSellerSettlementAccountResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
+
+export const getPatchApiV1UsersMeSellerSettlementAccountMockHandler = (
+  overrideResponse?:
+    | ApiResponseSellerSettlementAccount
+    | ((
+        info: Parameters<Parameters<typeof http.patch>[1]>[0],
+      ) =>
+        | Promise<ApiResponseSellerSettlementAccount>
+        | ApiResponseSellerSettlementAccount),
+  options?: RequestHandlerOptions,
+) => {
+  return http.patch(
+    '*/api/v1/users/me/seller/settlement-account',
+    async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getPatchApiV1UsersMeSellerSettlementAccountResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
+
+export const getGetApiV1UsersMeSellerBusinessProfileMockHandler = (
+  overrideResponse?:
+    | ApiResponseSellerBusinessProfile
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) =>
+        | Promise<ApiResponseSellerBusinessProfile>
+        | ApiResponseSellerBusinessProfile),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    '*/api/v1/users/me/seller/business-profile',
+    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getGetApiV1UsersMeSellerBusinessProfileResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
+
+export const getPatchApiV1UsersMeSellerBusinessProfileMockHandler = (
+  overrideResponse?:
+    | ApiResponseSellerBusinessProfile
+    | ((
+        info: Parameters<Parameters<typeof http.patch>[1]>[0],
+      ) =>
+        | Promise<ApiResponseSellerBusinessProfile>
+        | ApiResponseSellerBusinessProfile),
+  options?: RequestHandlerOptions,
+) => {
+  return http.patch(
+    '*/api/v1/users/me/seller/business-profile',
+    async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getPatchApiV1UsersMeSellerBusinessProfileResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
+
+export const getDeleteApiV1UsersMeSellerMockHandler = (
+  overrideResponse?:
+    | SuccessNoDataResponse
+    | ((
+        info: Parameters<Parameters<typeof http.delete>[1]>[0],
+      ) => Promise<SuccessNoDataResponse> | SuccessNoDataResponse),
+  options?: RequestHandlerOptions,
+) => {
+  return http.delete(
+    '*/api/v1/users/me/seller',
+    async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getDeleteApiV1UsersMeSellerResponseMock(),
         { status: 200 },
       );
     },
@@ -1166,12 +1604,19 @@ export const getAuthMock = () => [
   getPostApiV1AuthRefreshMockHandler(),
   getPostApiV1AuthLogoutMockHandler(),
   getGetApiV1UsersMeMockHandler(),
-  getDeleteApiV1UsersMeMockHandler(),
+  getPatchApiV1UsersMeRoleMockHandler(),
+  getDeleteApiV1UsersMeRoleMockHandler(),
+  getGetApiV1UsersMeWithdrawalContextMockHandler(),
   getGetApiV1UsersNicknameAvailabilityMockHandler(),
   getPatchApiV1UsersMeAdditionalInfoMockHandler(),
   getPostApiV1UsersMeSellerBusinessRegistrationLookupMockHandler(),
   getPatchApiV1UsersMeSellerBusinessInfoMockHandler(),
   getPatchApiV1UsersMeSellerSettlementInfoMockHandler(),
+  getGetApiV1UsersMeSellerSettlementAccountMockHandler(),
+  getPatchApiV1UsersMeSellerSettlementAccountMockHandler(),
+  getGetApiV1UsersMeSellerBusinessProfileMockHandler(),
+  getPatchApiV1UsersMeSellerBusinessProfileMockHandler(),
+  getDeleteApiV1UsersMeSellerMockHandler(),
   getGetApiV1AuthEmailAvailabilityMockHandler(),
   getPostApiV1AuthEmailVerificationCodesMockHandler(),
   getPostApiV1AuthEmailVerificationCodesVerifyMockHandler(),

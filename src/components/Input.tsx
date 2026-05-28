@@ -21,6 +21,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     onClick: () => void;
     disabled?: boolean;
   };
+  noHelperSpace?: boolean;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
@@ -37,6 +38,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       helperAction,
       onChange,
       value,
+      noHelperSpace,
       ...rest
     },
     ref,
@@ -116,7 +118,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               type="button"
               onClick={rightButton.onClick}
               disabled={rightButton.disabled}
-              className="shrink-0 px-g3 h-10 rounded-large caption-sm-bold text-text-basic-inverse bg-button-primary-fill disabled:bg-button-tertiary-fill-pressed"
+              className="shrink-0 px-g3 h-10 rounded-large caption-sm-bold text-text-basic-inverse bg-button-primary-fill disabled:bg-button-tertiary-fill-pressed min-w-14.5"
             >
               {rightButton.label}
             </button>
@@ -140,7 +142,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               </button>
             )}
           </div>
-        ) : (
+        ) : noHelperSpace ? null : (
           <div className="h-4.5" />
         )}
       </div>

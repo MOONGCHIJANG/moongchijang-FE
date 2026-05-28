@@ -15,6 +15,11 @@ import type {
   ApiResponseOwnerGroupBuyRequestDetail,
   ApiResponseOwnerGroupBuyRequestList,
   ApiResponseOwnerGroupBuySummary,
+  ApiResponseOwnerRefundRequestDetail,
+  ApiResponseOwnerRefundRequestList,
+  ApiResponseOwnerRefundReviewSubmit,
+  ApiResponseOwnerSettlementMonthChipList,
+  ApiResponseOwnerSettlementMonthlySummary,
   ApiResponsePickupScheduleList,
   ApiResponseReservationPage,
   SuccessNoDataResponse,
@@ -215,6 +220,117 @@ export const getPostApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponseMock = (
   error: {},
   ...overrideResponse,
 });
+
+export const getGetApiV1OwnerSettlementsMonthlySummaryResponseMock = (
+  overrideResponse: Partial<
+    Extract<ApiResponseOwnerSettlementMonthlySummary, object>
+  > = {},
+): ApiResponseOwnerSettlementMonthlySummary => ({
+  success: faker.datatype.boolean(),
+  data: {
+    year: faker.number.int(),
+    month: faker.number.int(),
+    settlementExpectedAmount: faker.number.int(),
+    grossRevenueAmount: faker.number.int(),
+    refundFeeAmount: faker.number.int(),
+  },
+  error: {},
+  ...overrideResponse,
+});
+
+export const getGetApiV1OwnerSettlementsMonthChipsResponseMock = (
+  overrideResponse: Partial<
+    Extract<ApiResponseOwnerSettlementMonthChipList, object>
+  > = {},
+): ApiResponseOwnerSettlementMonthChipList => ({
+  success: faker.datatype.boolean(),
+  data: {
+    chips: Array.from(
+      { length: faker.number.int({ min: 1, max: 10 }) },
+      (_, i) => i + 1,
+    ).map(() => ({
+      year: faker.number.int(),
+      month: faker.number.int(),
+      label: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    })),
+  },
+  error: {},
+  ...overrideResponse,
+});
+
+export const getGetApiV1OwnerSettlementsRefundRequestsResponseMock = (
+  overrideResponse: Partial<
+    Extract<ApiResponseOwnerRefundRequestList, object>
+  > = {},
+): ApiResponseOwnerRefundRequestList => ({
+  success: faker.datatype.boolean(),
+  data: {
+    pendingCount: faker.number.int(),
+    completedCount: faker.number.int(),
+    hasPendingItems: faker.datatype.boolean(),
+    items: Array.from(
+      { length: faker.number.int({ min: 1, max: 10 }) },
+      (_, i) => i + 1,
+    ).map(() => ({
+      participationId: faker.number.int(),
+      groupBuyId: faker.number.int(),
+      productName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      paymentAmount: faker.number.int(),
+      requesterName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      requesterCode: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      refundReasonLabel: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      requestedDate: faker.date.past().toISOString().slice(0, 10),
+      status: faker.helpers.arrayElement(['PENDING', 'COMPLETED'] as const),
+      exceeded24Hours: faker.datatype.boolean(),
+    })),
+  },
+  error: {},
+  ...overrideResponse,
+});
+
+export const getGetApiV1OwnerSettlementsRefundRequestsParticipationIdResponseMock =
+  (
+    overrideResponse: Partial<
+      Extract<ApiResponseOwnerRefundRequestDetail, object>
+    > = {},
+  ): ApiResponseOwnerRefundRequestDetail => ({
+    success: faker.datatype.boolean(),
+    data: {
+      participationId: faker.number.int(),
+      groupBuyId: faker.number.int(),
+      productName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      requesterName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      requestedDate: faker.date.past().toISOString().slice(0, 10),
+      paymentAmount: faker.number.int(),
+      penaltyAmount: faker.number.int(),
+      refundExpectedAmount: faker.number.int(),
+      refundReasonDetail: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          null,
+        ]),
+        undefined,
+      ]),
+      status: faker.helpers.arrayElement(['PENDING', 'COMPLETED'] as const),
+    },
+    error: {},
+    ...overrideResponse,
+  });
+
+export const getPostApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsResponseMock =
+  (
+    overrideResponse: Partial<
+      Extract<ApiResponseOwnerRefundReviewSubmit, object>
+    > = {},
+  ): ApiResponseOwnerRefundReviewSubmit => ({
+    success: faker.datatype.boolean(),
+    data: {
+      participationId: faker.number.int(),
+      processed: faker.datatype.boolean(),
+    },
+    error: {},
+    ...overrideResponse,
+  });
 
 export const getGetApiV1OwnerGroupBuyRequestsResponseMock = (
   overrideResponse: Partial<
@@ -605,6 +721,138 @@ export const getPostApiV1OwnerGroupBuysGroupBuyIdCloseRequestsMockHandler = (
   );
 };
 
+export const getGetApiV1OwnerSettlementsMonthlySummaryMockHandler = (
+  overrideResponse?:
+    | ApiResponseOwnerSettlementMonthlySummary
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) =>
+        | Promise<ApiResponseOwnerSettlementMonthlySummary>
+        | ApiResponseOwnerSettlementMonthlySummary),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    '*/api/v1/owner/settlements/monthly-summary',
+    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getGetApiV1OwnerSettlementsMonthlySummaryResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
+
+export const getGetApiV1OwnerSettlementsMonthChipsMockHandler = (
+  overrideResponse?:
+    | ApiResponseOwnerSettlementMonthChipList
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) =>
+        | Promise<ApiResponseOwnerSettlementMonthChipList>
+        | ApiResponseOwnerSettlementMonthChipList),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    '*/api/v1/owner/settlements/month-chips',
+    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getGetApiV1OwnerSettlementsMonthChipsResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
+
+export const getGetApiV1OwnerSettlementsRefundRequestsMockHandler = (
+  overrideResponse?:
+    | ApiResponseOwnerRefundRequestList
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) =>
+        | Promise<ApiResponseOwnerRefundRequestList>
+        | ApiResponseOwnerRefundRequestList),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    '*/api/v1/owner/settlements/refund-requests',
+    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getGetApiV1OwnerSettlementsRefundRequestsResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
+
+export const getGetApiV1OwnerSettlementsRefundRequestsParticipationIdMockHandler =
+  (
+    overrideResponse?:
+      | ApiResponseOwnerRefundRequestDetail
+      | ((
+          info: Parameters<Parameters<typeof http.get>[1]>[0],
+        ) =>
+          | Promise<ApiResponseOwnerRefundRequestDetail>
+          | ApiResponseOwnerRefundRequestDetail),
+    options?: RequestHandlerOptions,
+  ) => {
+    return http.get(
+      '*/api/v1/owner/settlements/refund-requests/:participationId',
+      async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+        return HttpResponse.json(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === 'function'
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getGetApiV1OwnerSettlementsRefundRequestsParticipationIdResponseMock(),
+          { status: 200 },
+        );
+      },
+      options,
+    );
+  };
+
+export const getPostApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsMockHandler =
+  (
+    overrideResponse?:
+      | ApiResponseOwnerRefundReviewSubmit
+      | ((
+          info: Parameters<Parameters<typeof http.post>[1]>[0],
+        ) =>
+          | Promise<ApiResponseOwnerRefundReviewSubmit>
+          | ApiResponseOwnerRefundReviewSubmit),
+    options?: RequestHandlerOptions,
+  ) => {
+    return http.post(
+      '*/api/v1/owner/settlements/refund-requests/:participationId/review-submissions',
+      async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+        return HttpResponse.json(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === 'function'
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getPostApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsResponseMock(),
+          { status: 200 },
+        );
+      },
+      options,
+    );
+  };
+
 export const getGetApiV1OwnerGroupBuyRequestsMockHandler = (
   overrideResponse?:
     | ApiResponseOwnerGroupBuyRequestList
@@ -740,6 +988,11 @@ export const getOwnerMock = () => [
   getGetApiV1OwnerGroupBuysGroupBuyIdManageAchievedMockHandler(),
   getPostApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsMockHandler(),
   getPostApiV1OwnerGroupBuysGroupBuyIdCloseRequestsMockHandler(),
+  getGetApiV1OwnerSettlementsMonthlySummaryMockHandler(),
+  getGetApiV1OwnerSettlementsMonthChipsMockHandler(),
+  getGetApiV1OwnerSettlementsRefundRequestsMockHandler(),
+  getGetApiV1OwnerSettlementsRefundRequestsParticipationIdMockHandler(),
+  getPostApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsMockHandler(),
   getGetApiV1OwnerGroupBuyRequestsMockHandler(),
   getPostApiV1OwnerGroupBuyRequestsMockHandler(),
   getGetApiV1OwnerGroupBuyRequestsRequestIdMockHandler(),

@@ -11,6 +11,8 @@ import type {
   ApiResponseAdminDashboardSummary,
   ApiResponseAdminGroupBuyDetail,
   ApiResponseAdminGroupBuyList,
+  ApiResponseAdminGroupBuyRequestAction,
+  ApiResponseAdminOrderPage,
   ApiResponseAdminRefundPage,
   ApiResponseAdminRequestDetail,
   ApiResponseAdminRequestPage,
@@ -28,10 +30,71 @@ export const getGetApiV1AdminSummaryResponseMock = (
 ): ApiResponseAdminDashboardSummary => ({
   success: faker.datatype.boolean(),
   data: {
-    pendingRequestCount: faker.number.int(),
-    activeGroupBuyCount: faker.number.int(),
-    achievementRate: faker.number.float({ fractionDigits: 2 }),
-    pendingRefundCount: faker.number.int(),
+    pendingRefundAmount: faker.number.int(),
+    pendingRefundAmountChangeRate: faker.number.float({ fractionDigits: 2 }),
+    pendingApprovalCount: faker.number.int(),
+    averageReviewMinutes: faker.number.int(),
+    pendingApprovalChangeRate: faker.number.float({ fractionDigits: 2 }),
+    unconfirmedOrderCount: faker.number.int(),
+    unconfirmedOrderOver48hCount: faker.number.int(),
+    todayCompletedRefundCount: faker.number.int(),
+    todayCompletedApprovalCount: faker.number.int(),
+    hasOrderOver48h: faker.datatype.boolean(),
+  },
+  error: {},
+  ...overrideResponse,
+});
+
+export const getGetApiV1AdminOrdersResponseMock = (
+  overrideResponse: Partial<Extract<ApiResponseAdminOrderPage, object>> = {},
+): ApiResponseAdminOrderPage => ({
+  success: faker.datatype.boolean(),
+  data: {
+    content: Array.from(
+      { length: faker.number.int({ min: 1, max: 10 }) },
+      (_, i) => i + 1,
+    ).map(() => ({
+      orderId: faker.number.int(),
+      groupBuyId: faker.number.int(),
+      productName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      storeName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      achievedAt: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.date.past().toISOString().slice(0, 19) + 'Z',
+          null,
+        ]),
+        undefined,
+      ]),
+      finalQuantity: faker.number.int(),
+      pendingRefundCount: faker.number.int(),
+      pickupDate: faker.date.past().toISOString().slice(0, 10),
+      elapsedHours: faker.number.int(),
+      progressRate: faker.number.int(),
+      orderStatus: faker.helpers.arrayElement([
+        'PENDING',
+        'CONFIRMED',
+        'CANCELLED',
+      ] as const),
+      ownerContactedAt: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.date.past().toISOString().slice(0, 19) + 'Z',
+          null,
+        ]),
+        undefined,
+      ]),
+      orderConfirmedAt: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.date.past().toISOString().slice(0, 19) + 'Z',
+          null,
+        ]),
+        undefined,
+      ]),
+      actionable: faker.datatype.boolean(),
+    })),
+    totalElements: faker.number.int(),
+    totalPages: faker.number.int(),
+    number: faker.number.int(),
+    size: faker.number.int(),
   },
   error: {},
   ...overrideResponse,
@@ -65,6 +128,19 @@ export const getGetApiV1AdminGroupBuyRequestsResponseMock = (
         ]),
         undefined,
       ]),
+      originalPrice: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.number.int(), null]),
+        undefined,
+      ]),
+      price: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.number.int(), null]),
+        undefined,
+      ]),
+      reviewElapsedMinutes: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.number.int(), null]),
+        undefined,
+      ]),
+      actionable: faker.datatype.boolean(),
       createdAt: faker.helpers.arrayElement([
         faker.helpers.arrayElement([
           faker.date.past().toISOString().slice(0, 19) + 'Z',
@@ -306,6 +382,42 @@ export const getPatchApiV1AdminGroupBuyRequestsRequestIdStatusResponseMock = (
       changedAt: faker.date.past().toISOString().slice(0, 19) + 'Z',
     })),
     createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z',
+  },
+  error: {},
+  ...overrideResponse,
+});
+
+export const getPostApiV1AdminGroupBuyRequestsRequestIdApproveResponseMock = (
+  overrideResponse: Partial<
+    Extract<ApiResponseAdminGroupBuyRequestAction, object>
+  > = {},
+): ApiResponseAdminGroupBuyRequestAction => ({
+  success: faker.datatype.boolean(),
+  data: {
+    requestId: faker.number.int(),
+    status: faker.helpers.arrayElement(['OPENED', 'REJECTED'] as const),
+    groupBuyId: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([faker.number.int(), null]),
+      undefined,
+    ]),
+  },
+  error: {},
+  ...overrideResponse,
+});
+
+export const getPostApiV1AdminGroupBuyRequestsRequestIdRejectResponseMock = (
+  overrideResponse: Partial<
+    Extract<ApiResponseAdminGroupBuyRequestAction, object>
+  > = {},
+): ApiResponseAdminGroupBuyRequestAction => ({
+  success: faker.datatype.boolean(),
+  data: {
+    requestId: faker.number.int(),
+    status: faker.helpers.arrayElement(['OPENED', 'REJECTED'] as const),
+    groupBuyId: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([faker.number.int(), null]),
+      undefined,
+    ]),
   },
   error: {},
   ...overrideResponse,
@@ -554,6 +666,30 @@ export const getGetApiV1AdminSummaryMockHandler = (
   );
 };
 
+export const getGetApiV1AdminOrdersMockHandler = (
+  overrideResponse?:
+    | ApiResponseAdminOrderPage
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) => Promise<ApiResponseAdminOrderPage> | ApiResponseAdminOrderPage),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    '*/api/v1/admin/orders',
+    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getGetApiV1AdminOrdersResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
+
 export const getGetApiV1AdminGroupBuyRequestsMockHandler = (
   overrideResponse?:
     | ApiResponseAdminRequestPage
@@ -623,6 +759,58 @@ export const getPatchApiV1AdminGroupBuyRequestsRequestIdStatusMockHandler = (
             ? await overrideResponse(info)
             : overrideResponse
           : getPatchApiV1AdminGroupBuyRequestsRequestIdStatusResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
+
+export const getPostApiV1AdminGroupBuyRequestsRequestIdApproveMockHandler = (
+  overrideResponse?:
+    | ApiResponseAdminGroupBuyRequestAction
+    | ((
+        info: Parameters<Parameters<typeof http.post>[1]>[0],
+      ) =>
+        | Promise<ApiResponseAdminGroupBuyRequestAction>
+        | ApiResponseAdminGroupBuyRequestAction),
+  options?: RequestHandlerOptions,
+) => {
+  return http.post(
+    '*/api/v1/admin/group-buy-requests/:requestId/approve',
+    async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getPostApiV1AdminGroupBuyRequestsRequestIdApproveResponseMock(),
+        { status: 201 },
+      );
+    },
+    options,
+  );
+};
+
+export const getPostApiV1AdminGroupBuyRequestsRequestIdRejectMockHandler = (
+  overrideResponse?:
+    | ApiResponseAdminGroupBuyRequestAction
+    | ((
+        info: Parameters<Parameters<typeof http.post>[1]>[0],
+      ) =>
+        | Promise<ApiResponseAdminGroupBuyRequestAction>
+        | ApiResponseAdminGroupBuyRequestAction),
+  options?: RequestHandlerOptions,
+) => {
+  return http.post(
+    '*/api/v1/admin/group-buy-requests/:requestId/reject',
+    async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getPostApiV1AdminGroupBuyRequestsRequestIdRejectResponseMock(),
         { status: 200 },
       );
     },
@@ -899,9 +1087,12 @@ export const getPostApiV1AdminSettlementsSettlementIdReleaseMockHandler = (
 };
 export const getAdminMock = () => [
   getGetApiV1AdminSummaryMockHandler(),
+  getGetApiV1AdminOrdersMockHandler(),
   getGetApiV1AdminGroupBuyRequestsMockHandler(),
   getGetApiV1AdminGroupBuyRequestsRequestIdMockHandler(),
   getPatchApiV1AdminGroupBuyRequestsRequestIdStatusMockHandler(),
+  getPostApiV1AdminGroupBuyRequestsRequestIdApproveMockHandler(),
+  getPostApiV1AdminGroupBuyRequestsRequestIdRejectMockHandler(),
   getGetApiV1AdminGroupBuysMockHandler(),
   getPostApiV1AdminGroupBuysMockHandler(),
   getGetApiV1AdminGroupBuysGroupBuyIdMockHandler(),

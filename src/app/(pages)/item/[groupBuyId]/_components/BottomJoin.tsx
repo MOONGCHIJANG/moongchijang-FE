@@ -10,6 +10,7 @@ import {
 import { ApiResponseGroupBuyDetailResponseData } from '@/api/generated/api.schemas';
 import { useRouter } from 'next/navigation';
 import { logEvent } from '@/lib/analytics';
+import { ToastBlack } from '@/components/ToastBlack';
 
 interface Props {
   data: ApiResponseGroupBuyDetailResponseData;
@@ -20,6 +21,8 @@ const BottomJoin = ({ data }: Props) => {
   const router = useRouter();
   const [liked, setLiked] = useState(data.isWishlisted);
   const [timeLeft, setTimeLeft] = useState('');
+
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const isExpired = timeLeft === '00:00:00';
 
@@ -42,12 +45,17 @@ const BottomJoin = ({ data }: Props) => {
       );
       const s = String(Math.floor((diff % 60_000) / 1_000)).padStart(2, '0');
 
+      if (diff <= 0) {
+        setTimeLeft('00:00:00');
+        return;
+      }
+
       if (days > 0) {
         setTimeLeft(
-          `${String(days).padStart(2, '0')}일 ${h}시간 ${m}분 ${s}초`,
+          String(days).padStart(2, '0') + '일 ' + h + ':' + m + ':' + s,
         );
       } else {
-        setTimeLeft(`${h}:${m}:${s}`);
+        setTimeLeft(h + ':' + m + ':' + s);
       }
     };
 
@@ -76,6 +84,8 @@ const BottomJoin = ({ data }: Props) => {
       router.refresh();
     } catch {
       setLiked(!next);
+      setToastMessage('로그인 후에 이용해주세요.');
+      setTimeout(() => setToastMessage(null), 3_500);
     }
   };
 
@@ -111,6 +121,15 @@ const BottomJoin = ({ data }: Props) => {
           {isExpired ? '마감되었어요' : '공구 참여하기'}
         </Button>
       </div>
+      {toastMessage && (
+        <div className="fixed bottom-30 left-4 right-4 z-50 flex justify-center">
+          <ToastBlack
+            message={toastMessage}
+            isVisible
+            icon="cuida:alert-outline"
+          />
+        </div>
+      )}
     </div>
   );
 };

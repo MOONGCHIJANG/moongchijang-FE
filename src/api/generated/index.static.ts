@@ -5,6 +5,7 @@
 
 import {
   getGetApiV1AdminSummaryResponseMock,
+  getGetApiV1AdminOrdersResponseMock,
   getGetApiV1AdminGroupBuyRequestsResponseMock,
   getGetApiV1AdminGroupBuyRequestsRequestIdResponseMock,
   getGetApiV1AdminGroupBuysResponseMock,
@@ -14,7 +15,10 @@ import {
 } from './admin/admin.msw';
 import {
   getGetApiV1UsersMeResponseMock,
+  getGetApiV1UsersMeWithdrawalContextResponseMock,
   getGetApiV1UsersNicknameAvailabilityResponseMock,
+  getGetApiV1UsersMeSellerSettlementAccountResponseMock,
+  getGetApiV1UsersMeSellerBusinessProfileResponseMock,
   getGetApiV1AuthEmailAvailabilityResponseMock,
   getGetApiV1UsersMeRegionsResponseMock,
 } from './auth/auth.msw';
@@ -53,6 +57,10 @@ import {
   getGetApiV1OwnerGroupBuysManageResponseMock,
   getGetApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponseMock,
   getGetApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponseMock,
+  getGetApiV1OwnerSettlementsMonthlySummaryResponseMock,
+  getGetApiV1OwnerSettlementsMonthChipsResponseMock,
+  getGetApiV1OwnerSettlementsRefundRequestsResponseMock,
+  getGetApiV1OwnerSettlementsRefundRequestsParticipationIdResponseMock,
   getGetApiV1OwnerGroupBuyRequestsResponseMock,
   getGetApiV1OwnerGroupBuyRequestsRequestIdResponseMock,
   getGetApiV1OwnerReservationsResponseMock,
@@ -74,6 +82,10 @@ export const generatedStaticMockEntries: StaticMockEntry[] = [
   {
     urlPattern: '/api/v1/admin/summary',
     getResponseData: getGetApiV1AdminSummaryResponseMock,
+  },
+  {
+    urlPattern: '/api/v1/admin/orders',
+    getResponseData: getGetApiV1AdminOrdersResponseMock,
   },
   {
     urlPattern: '/api/v1/admin/group-buy-requests',
@@ -104,8 +116,20 @@ export const generatedStaticMockEntries: StaticMockEntry[] = [
     getResponseData: getGetApiV1UsersMeResponseMock,
   },
   {
+    urlPattern: '/api/v1/users/me/withdrawal-context',
+    getResponseData: getGetApiV1UsersMeWithdrawalContextResponseMock,
+  },
+  {
     urlPattern: '/api/v1/users/nickname/availability',
     getResponseData: getGetApiV1UsersNicknameAvailabilityResponseMock,
+  },
+  {
+    urlPattern: '/api/v1/users/me/seller/settlement-account',
+    getResponseData: getGetApiV1UsersMeSellerSettlementAccountResponseMock,
+  },
+  {
+    urlPattern: '/api/v1/users/me/seller/business-profile',
+    getResponseData: getGetApiV1UsersMeSellerBusinessProfileResponseMock,
   },
   {
     urlPattern: '/api/v1/auth/email/availability',
@@ -220,6 +244,23 @@ export const generatedStaticMockEntries: StaticMockEntry[] = [
     urlPattern: '/api/v1/owner/group-buys/:groupBuyId/manage/achieved',
     getResponseData:
       getGetApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponseMock,
+  },
+  {
+    urlPattern: '/api/v1/owner/settlements/monthly-summary',
+    getResponseData: getGetApiV1OwnerSettlementsMonthlySummaryResponseMock,
+  },
+  {
+    urlPattern: '/api/v1/owner/settlements/month-chips',
+    getResponseData: getGetApiV1OwnerSettlementsMonthChipsResponseMock,
+  },
+  {
+    urlPattern: '/api/v1/owner/settlements/refund-requests',
+    getResponseData: getGetApiV1OwnerSettlementsRefundRequestsResponseMock,
+  },
+  {
+    urlPattern: '/api/v1/owner/settlements/refund-requests/:participationId',
+    getResponseData:
+      getGetApiV1OwnerSettlementsRefundRequestsParticipationIdResponseMock,
   },
   {
     urlPattern: '/api/v1/owner/group-buy-requests',

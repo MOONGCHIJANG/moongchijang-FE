@@ -5,18 +5,101 @@
 import * as zod from 'zod';
 
 /**
- * 헤더에 항상 노출되는 대기중 요청 / 진행 중 공구 / 달성률 / 대기 환불 요약을 반환한다.
+ * 운영 관리 요약 영역에 노출되는 환불 금액, 개설승인 대기, 발주 미확정, 오늘 처리 완료 요약을 반환한다.
  * @summary 운영자 대시보드 요약 정보
  */
 export const GetApiV1AdminSummaryResponse = zod.object({
   success: zod.boolean(),
   data: zod.object({
-    pendingRequestCount: zod.number().describe('대기중 요청 건수 (처리 필요)'),
-    activeGroupBuyCount: zod.number().describe('진행 중 공구 개수'),
-    achievementRate: zod
+    pendingRefundAmount: zod
       .number()
-      .describe('최근 30일 공구 달성률 (%). 달성완료 \/ 마감된 전체 공구 기준'),
-    pendingRefundCount: zod.number().describe('대기 환불 건수 (처리 필요)'),
+      .describe(
+        '검토 대기 환불 총 금액. 현재는 REFUND_PENDING 참여의 결제 주문 총액 기준',
+      ),
+    pendingRefundAmountChangeRate: zod
+      .number()
+      .describe('전일 대비 검토 대기 환불 금액 증감률(%)'),
+    pendingApprovalCount: zod.number().describe('개설승인 대기 건수'),
+    averageReviewMinutes: zod
+      .number()
+      .describe('개설승인 대기 요청의 평균 검토 시간(분)'),
+    pendingApprovalChangeRate: zod
+      .number()
+      .describe('전일 대비 개설승인 대기 요청 생성 건수 증감률(%)'),
+    unconfirmedOrderCount: zod
+      .number()
+      .describe('달성된 공구 중 발주 확정 대기 건수'),
+    unconfirmedOrderOver48hCount: zod
+      .number()
+      .describe('달성 후 48시간을 초과한 발주 확정 대기 건수'),
+    todayCompletedRefundCount: zod
+      .number()
+      .describe('오늘 환불 처리 완료 건수'),
+    todayCompletedApprovalCount: zod
+      .number()
+      .describe('오늘 개설 승인\/반려 처리 완료 건수'),
+    hasOrderOver48h: zod
+      .boolean()
+      .describe('48시간 초과 발주 미확정 경고 노출 여부'),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * 달성된 공구의 발주 확정 대기, 48시간 초과, 확정 완료, 전체 목록을 조회한다.
+ * @summary 발주 관리 목록 조회 (운영자)
+ */
+export const getApiV1AdminOrdersQueryStatusDefault = `ALL`;
+export const getApiV1AdminOrdersQueryPageDefault = 0;
+export const getApiV1AdminOrdersQuerySizeDefault = 20;
+export const getApiV1AdminOrdersQuerySizeMax = 100;
+
+export const GetApiV1AdminOrdersQueryParams = zod.object({
+  status: zod
+    .enum(['OVERDUE_48H', 'PENDING', 'CONFIRMED', 'ALL'])
+    .default(getApiV1AdminOrdersQueryStatusDefault)
+    .describe(
+      'OVERDUE_48H=48시간 초과, PENDING=확정 대기, CONFIRMED=확정 완료, ALL=전체',
+    ),
+  page: zod.number().default(getApiV1AdminOrdersQueryPageDefault),
+  size: zod
+    .number()
+    .max(getApiV1AdminOrdersQuerySizeMax)
+    .default(getApiV1AdminOrdersQuerySizeDefault),
+});
+
+export const GetApiV1AdminOrdersResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    content: zod.array(
+      zod.object({
+        orderId: zod
+          .number()
+          .describe('발주 관리 식별자. 현재는 groupBuyId와 동일'),
+        groupBuyId: zod.number(),
+        productName: zod.string(),
+        storeName: zod.string(),
+        achievedAt: zod.iso
+          .datetime({ offset: true })
+          .nullish()
+          .describe('공구 달성 일시'),
+        finalQuantity: zod.number().describe('최종 참여 수량'),
+        pendingRefundCount: zod.number().describe('해당 공구의 환불 대기 건수'),
+        pickupDate: zod.iso.date(),
+        elapsedHours: zod.number().describe('달성 후 경과 시간'),
+        progressRate: zod.number().describe('목표 수량 대비 달성률(%)'),
+        orderStatus: zod.enum(['PENDING', 'CONFIRMED', 'CANCELLED']),
+        ownerContactedAt: zod.iso.datetime({ offset: true }).nullish(),
+        orderConfirmedAt: zod.iso.datetime({ offset: true }).nullish(),
+        actionable: zod
+          .boolean()
+          .describe('발주 확정\/연락 등 운영 작업 가능 여부'),
+      }),
+    ),
+    totalElements: zod.number(),
+    totalPages: zod.number(),
+    number: zod.number(),
+    size: zod.number(),
   }),
   error: zod.unknown().nullable(),
 });
@@ -33,6 +116,12 @@ export const GetApiV1AdminGroupBuyRequestsQueryParams = zod.object({
   status: zod
     .enum(['ALL', 'IN_REVIEW', 'IN_CONTACT', 'OPENED', 'REJECTED'])
     .default(getApiV1AdminGroupBuyRequestsQueryStatusDefault),
+  keyword: zod
+    .string()
+    .optional()
+    .describe(
+      '요청 ID, 상품명, 가게명, 요청자 닉네임\/이메일\/전화번호 검색어',
+    ),
   page: zod.number().default(getApiV1AdminGroupBuyRequestsQueryPageDefault),
   size: zod
     .number()
@@ -53,6 +142,21 @@ export const GetApiV1AdminGroupBuyRequestsResponse = zod.object({
         status: zod.enum(['IN_REVIEW', 'IN_CONTACT', 'OPENED', 'REJECTED']),
         requesterId: zod.number(),
         requesterName: zod.string().nullish(),
+        originalPrice: zod
+          .number()
+          .nullish()
+          .describe('승인 후 생성된 공구 정가. 승인 전 요청은 null'),
+        price: zod
+          .number()
+          .nullish()
+          .describe('승인 후 생성된 공구가. 승인 전 요청은 null'),
+        reviewElapsedMinutes: zod
+          .number()
+          .nullish()
+          .describe('요청 생성 후 경과한 검토 시간(분)'),
+        actionable: zod
+          .boolean()
+          .describe('운영자가 승인\/반려 등 후속 작업을 할 수 있는 상태 여부'),
         createdAt: zod.iso.datetime({ offset: true }).nullable(),
       }),
     ),
@@ -170,6 +274,116 @@ export const PatchApiV1AdminGroupBuyRequestsRequestIdStatusResponse =
     }),
     error: zod.unknown().nullable(),
   });
+
+/**
+ * @summary 소비자 공구 개설 요청 승인 및 공구 생성
+ */
+export const PostApiV1AdminGroupBuyRequestsRequestIdApproveParams = zod.object({
+  requestId: zod.number(),
+});
+
+export const postApiV1AdminGroupBuyRequestsRequestIdApproveBodyStoreNameMax = 100;
+
+export const postApiV1AdminGroupBuyRequestsRequestIdApproveBodyStoreAddressMax = 200;
+
+export const postApiV1AdminGroupBuyRequestsRequestIdApproveBodyStorePhoneNumberMax = 20;
+
+export const postApiV1AdminGroupBuyRequestsRequestIdApproveBodyProductNameMax = 100;
+
+export const postApiV1AdminGroupBuyRequestsRequestIdApproveBodyProductDescriptionMax = 1000;
+
+export const postApiV1AdminGroupBuyRequestsRequestIdApproveBodyImageUrlsMax = 5;
+
+export const postApiV1AdminGroupBuyRequestsRequestIdApproveBodyPickupLocationMax = 200;
+
+export const postApiV1AdminGroupBuyRequestsRequestIdApproveBodyPickupContactMax = 20;
+
+export const PostApiV1AdminGroupBuyRequestsRequestIdApproveBody = zod.object({
+  storeId: zod
+    .number()
+    .nullish()
+    .describe(
+      '기존 등록 매장을 사용할 때 입력. 없으면 매장명\/주소\/지역 정보로 신규 매장을 생성',
+    ),
+  storeName: zod
+    .string()
+    .max(postApiV1AdminGroupBuyRequestsRequestIdApproveBodyStoreNameMax)
+    .nullish(),
+  storeAddress: zod
+    .string()
+    .max(postApiV1AdminGroupBuyRequestsRequestIdApproveBodyStoreAddressMax)
+    .nullish(),
+  storePhoneNumber: zod
+    .string()
+    .max(postApiV1AdminGroupBuyRequestsRequestIdApproveBodyStorePhoneNumberMax)
+    .nullish(),
+  region: zod.string().nullish().describe('신규 매장 생성 시 필수'),
+  district: zod.string().nullish().describe('신규 매장 생성 시 필수'),
+  latitude: zod.number().nullish(),
+  longitude: zod.number().nullish(),
+  productName: zod
+    .string()
+    .max(postApiV1AdminGroupBuyRequestsRequestIdApproveBodyProductNameMax)
+    .describe('공구 제목'),
+  productDescription: zod
+    .string()
+    .max(
+      postApiV1AdminGroupBuyRequestsRequestIdApproveBodyProductDescriptionMax,
+    )
+    .describe('공구 내용'),
+  originalPrice: zod.number().min(1).nullish().describe('정가'),
+  price: zod.number().min(1).describe('공구가'),
+  targetQuantity: zod.number().min(1).describe('목표 수량'),
+  maxQuantity: zod
+    .number()
+    .min(1)
+    .nullish()
+    .describe('최대 수량. 생략 시 목표 수량과 동일하게 저장'),
+  perUserLimit: zod.number().min(1).nullish().describe('1인 구매 제한'),
+  imageUrls: zod
+    .array(zod.string())
+    .min(1)
+    .max(postApiV1AdminGroupBuyRequestsRequestIdApproveBodyImageUrlsMax),
+  recruitmentStartAt: zod.iso.datetime({ offset: true }),
+  deadline: zod.iso.datetime({ offset: true }).describe('모집 마감일시'),
+  pickupDate: zod.iso.date(),
+  pickupTimeStart: zod.iso.time({}),
+  pickupTimeEnd: zod.iso.time({}),
+  pickupLocation: zod
+    .string()
+    .max(postApiV1AdminGroupBuyRequestsRequestIdApproveBodyPickupLocationMax),
+  pickupContact: zod
+    .string()
+    .max(postApiV1AdminGroupBuyRequestsRequestIdApproveBodyPickupContactMax)
+    .nullish(),
+});
+
+/**
+ * @summary 소비자 공구 개설 요청 반려
+ */
+export const PostApiV1AdminGroupBuyRequestsRequestIdRejectParams = zod.object({
+  requestId: zod.number(),
+});
+
+export const postApiV1AdminGroupBuyRequestsRequestIdRejectBodyRejectionReasonMax = 200;
+
+export const PostApiV1AdminGroupBuyRequestsRequestIdRejectBody = zod.object({
+  rejectionReason: zod
+    .string()
+    .max(postApiV1AdminGroupBuyRequestsRequestIdRejectBodyRejectionReasonMax),
+});
+
+export const PostApiV1AdminGroupBuyRequestsRequestIdRejectResponse = zod.object(
+  {
+    success: zod.boolean(),
+    data: zod.object({
+      requestId: zod.number(),
+      status: zod.enum(['OPENED', 'REJECTED']),
+      groupBuyId: zod.number().nullish(),
+    }),
+    error: zod.unknown().nullable(),
+  },
+);
 
 /**
  * @summary 진행 중인 공구 현황 목록 (운영자)

@@ -45,7 +45,9 @@ const MyPageClient = ({ tab }: { tab: TabKey }) => {
 
   const { data: qrData } = useGetApiV1ParticipationsParticipationIdQr(
     qrParticipationId ?? 0,
-    { query: { enabled: isQrOpen && qrParticipationId !== null } },
+    {
+      query: { enabled: isLoggedIn && isQrOpen && qrParticipationId !== null },
+    },
   );
 
   const handleQrClose = useCallback(() => setIsQrOpen(false), []);
@@ -63,7 +65,9 @@ const MyPageClient = ({ tab }: { tab: TabKey }) => {
 
   const qrItem = qrData?.status === 200 ? qrData.data?.data : null;
 
-  const { data: tabCountsData } = useGetApiV1UsersMeTabsCounts();
+  const { data: tabCountsData } = useGetApiV1UsersMeTabsCounts({
+    query: { enabled: isLoggedIn },
+  });
   const tabCounts =
     tabCountsData?.status === 200 ? tabCountsData.data?.data : null;
 
@@ -136,7 +140,11 @@ const MyPageClient = ({ tab }: { tab: TabKey }) => {
             </button>
           ))}
         </div>
-        <ParticipationTab tabType={tab} onQrClick={handleQrClick} />
+        <ParticipationTab
+          tabType={tab}
+          onQrClick={handleQrClick}
+          isLoggedIn={isLoggedIn}
+        />
       </div>
 
       <QrModal

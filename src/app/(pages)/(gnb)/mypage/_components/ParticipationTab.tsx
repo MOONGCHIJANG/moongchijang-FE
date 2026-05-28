@@ -17,6 +17,7 @@ type TabType = 'active' | 'waiting' | 'completed' | 'refunded';
 interface ParticipationTabProps {
   tabType: TabType;
   onQrClick: (id: number, meta: { storeName: string; dDay: number }) => void;
+  isLoggedIn: boolean;
 }
 
 const EMPTY_MESSAGES: Record<TabType, string> = {
@@ -29,6 +30,7 @@ const EMPTY_MESSAGES: Record<TabType, string> = {
 export function ParticipationTab({
   tabType,
   onQrClick,
+  isLoggedIn,
 }: ParticipationTabProps) {
   const router = useRouter();
 
@@ -43,11 +45,11 @@ export function ParticipationTab({
 
   const { data: participationData } = useGetApiV1UsersMeParticipations(
     { status: statusByTab[tabType] },
-    { query: { enabled: !isRefunded } },
+    { query: { enabled: isLoggedIn && !isRefunded } },
   );
 
   const { data: refundData } = useGetApiV1UsersMeRefunds({
-    query: { enabled: isRefunded },
+    query: { enabled: isLoggedIn && isRefunded },
   });
 
   const handlePickupClick = useCallback(

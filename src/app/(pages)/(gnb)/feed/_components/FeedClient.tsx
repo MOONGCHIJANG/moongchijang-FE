@@ -38,6 +38,7 @@ import { formatPickupDateTime, formatTime } from '@/lib/date';
 import { useFeedList } from '../_hooks/useFeedList';
 import { useRecentSearches } from '../_hooks/useRecentSearches';
 import { logEvent } from '@/lib/analytics';
+import Footer from '@/components/Footer';
 
 const ALL_REGIONS = REGIONS_DATA.flatMap((city) => city.regions);
 const VALID_FILTERS: FilterId[] = ['all', 'due', 'target'];
@@ -304,7 +305,7 @@ export function FeedClient() {
         />
       </header>
 
-      <div className="flex flex-col gap-4 px-5 pb-5">
+      <div className="flex flex-col gap-4 px-5">
         {isDisplayLoading ? (
           <FeedSkeletonList />
         ) : !isSearchMode && !hasSearchResult ? (
@@ -408,6 +409,8 @@ export function FeedClient() {
         <div ref={sentinelRef} className="h-1" />
         {isFetchingNextPage && <FeedSkeletonList />}
       </div>
+
+      <Footer hasBottomSticky={false} />
 
       <LocationBottomSheet
         isOpen={isLocationSheetOpen}

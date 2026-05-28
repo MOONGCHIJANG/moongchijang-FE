@@ -227,6 +227,141 @@ export const PostApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse =
   });
 
 /**
+ * @summary 사장님 월별 정산 예정 조회
+ */
+export const getApiV1OwnerSettlementsMonthlySummaryQueryMonthMax = 12;
+
+export const GetApiV1OwnerSettlementsMonthlySummaryQueryParams = zod.object({
+  year: zod.number(),
+  month: zod
+    .number()
+    .min(1)
+    .max(getApiV1OwnerSettlementsMonthlySummaryQueryMonthMax),
+});
+
+export const GetApiV1OwnerSettlementsMonthlySummaryResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    year: zod.number(),
+    month: zod.number(),
+    settlementExpectedAmount: zod.number(),
+    grossRevenueAmount: zod.number(),
+    refundFeeAmount: zod.number(),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * @summary 사장님 정산 월 칩 조회
+ */
+export const GetApiV1OwnerSettlementsMonthChipsResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    chips: zod.array(
+      zod.object({
+        year: zod.number(),
+        month: zod.number(),
+        label: zod.string(),
+      }),
+    ),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * @summary 사장님 환불 요청 목록 조회
+ */
+export const getApiV1OwnerSettlementsRefundRequestsQueryTabDefault = `ALL`;
+
+export const GetApiV1OwnerSettlementsRefundRequestsQueryParams = zod.object({
+  tab: zod
+    .enum(['ALL', 'PENDING', 'COMPLETED'])
+    .default(getApiV1OwnerSettlementsRefundRequestsQueryTabDefault),
+});
+
+export const GetApiV1OwnerSettlementsRefundRequestsResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    pendingCount: zod.number(),
+    completedCount: zod.number(),
+    hasPendingItems: zod.boolean(),
+    items: zod.array(
+      zod.object({
+        participationId: zod.number(),
+        groupBuyId: zod.number(),
+        productName: zod.string(),
+        paymentAmount: zod.number(),
+        requesterName: zod.string(),
+        requesterCode: zod.string(),
+        refundReasonLabel: zod.string(),
+        requestedDate: zod.iso.date(),
+        status: zod.enum(['PENDING', 'COMPLETED']),
+        exceeded24Hours: zod.boolean(),
+      }),
+    ),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * @summary 사장님 환불 요청 상세 조회
+ */
+export const GetApiV1OwnerSettlementsRefundRequestsParticipationIdParams =
+  zod.object({
+    participationId: zod.number(),
+  });
+
+export const GetApiV1OwnerSettlementsRefundRequestsParticipationIdResponse =
+  zod.object({
+    success: zod.boolean(),
+    data: zod.object({
+      participationId: zod.number(),
+      groupBuyId: zod.number(),
+      productName: zod.string(),
+      requesterName: zod.string(),
+      requestedDate: zod.iso.date(),
+      paymentAmount: zod.number(),
+      penaltyAmount: zod.number(),
+      refundExpectedAmount: zod.number(),
+      refundReasonDetail: zod.string().nullish(),
+      status: zod.enum(['PENDING', 'COMPLETED']),
+    }),
+    error: zod.unknown().nullable(),
+  });
+
+/**
+ * @summary 사장님 환불 요청 검토 제출
+ */
+export const PostApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsParams =
+  zod.object({
+    participationId: zod.number(),
+  });
+
+export const postApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsBodyDisputeReasonMax = 500;
+
+export const PostApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsBody =
+  zod.object({
+    action: zod.enum(['APPROVE', 'DISPUTE']),
+    disputeReason: zod
+      .string()
+      .max(
+        postApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsBodyDisputeReasonMax,
+      )
+      .nullish()
+      .describe('action이 DISPUTE일 때 입력'),
+  });
+
+export const PostApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsResponse =
+  zod.object({
+    success: zod.boolean(),
+    data: zod.object({
+      participationId: zod.number(),
+      processed: zod.boolean(),
+    }),
+    error: zod.unknown().nullable(),
+  });
+
+/**
  * 사장님이 본인 매장 기준으로 제출한 공구 개설 요청 목록을 조회한다.
  * @summary 사장님 공구 개설 요청 목록 조회
  */

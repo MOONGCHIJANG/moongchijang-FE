@@ -19,8 +19,11 @@ import type {
   ApiResponsePhoneNumberUpdated,
   ApiResponsePhoneVerificationCodeSent,
   ApiResponsePhoneVerificationVerified,
+  ApiResponseSellerBusinessProfile,
+  ApiResponseSellerSettlementAccount,
   ApiResponseSellerSignupStatus,
   ApiResponseUserInfo,
+  ApiResponseWithdrawalContext,
   BadRequestResponse,
   BusinessRegistrationLookupRequest,
   ConflictResponse,
@@ -32,7 +35,10 @@ import type {
   GetApiV1AuthEmailAvailabilityParams,
   GetApiV1UsersNicknameAvailabilityParams,
   KakaoLoginRequest,
+  MyPageRoleSwitchRequest,
   NicknameUpdateRequest,
+  NotFoundResponse,
+  OwnerWithdrawRequest,
   PasswordChangeRequest,
   PhoneNumberUpdateRequest,
   PhoneVerificationCodeSendRequest,
@@ -189,58 +195,174 @@ export const getApiV1UsersMe = async (
 };
 
 /**
- * 회원 탈퇴를 처리한다.
-- 수령 예정 공구(달성 완료 + 픽업 미완료)가 있으면 탈퇴할 수 없다.
-- 참여 중 공구(PAID_WAITING_GOAL)는 자동 취소된다.
-- 찜 목록은 모두 삭제된다.
-- 동일 계정은 탈퇴 후 30일 이후 재가입 가능하다.
-
- * @summary 회원 탈퇴
+ * 소비자/사장님 모드를 전환한다.
+ * @summary 마이페이지 역할 전환
  */
-export type deleteApiV1UsersMeResponse200 = {
-  data: SuccessNoDataResponse;
+export type patchApiV1UsersMeRoleResponse200 = {
+  data: ApiResponseUserInfo;
   status: 200;
 };
 
-export type deleteApiV1UsersMeResponse401 = {
+export type patchApiV1UsersMeRoleResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type patchApiV1UsersMeRoleResponse401 = {
   data: UnauthorizedResponse;
   status: 401;
 };
 
-export type deleteApiV1UsersMeResponse409 = {
-  data: ConflictResponse;
-  status: 409;
+export type patchApiV1UsersMeRoleResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
 };
 
-export type deleteApiV1UsersMeResponseSuccess =
-  deleteApiV1UsersMeResponse200 & {
+export type patchApiV1UsersMeRoleResponseSuccess =
+  patchApiV1UsersMeRoleResponse200 & {
     headers: Headers;
   };
-export type deleteApiV1UsersMeResponseError = (
-  | deleteApiV1UsersMeResponse401
-  | deleteApiV1UsersMeResponse409
+export type patchApiV1UsersMeRoleResponseError = (
+  | patchApiV1UsersMeRoleResponse400
+  | patchApiV1UsersMeRoleResponse401
+  | patchApiV1UsersMeRoleResponse403
 ) & {
   headers: Headers;
 };
 
-export type deleteApiV1UsersMeResponse =
-  | deleteApiV1UsersMeResponseSuccess
-  | deleteApiV1UsersMeResponseError;
+export type patchApiV1UsersMeRoleResponse =
+  | patchApiV1UsersMeRoleResponseSuccess
+  | patchApiV1UsersMeRoleResponseError;
 
-export const getDeleteApiV1UsersMeUrl = () => {
-  return `/api/v1/users/me`;
+export const getPatchApiV1UsersMeRoleUrl = () => {
+  return `/api/v1/users/me/role`;
 };
 
-export const deleteApiV1UsersMe = async (
+export const patchApiV1UsersMeRole = async (
+  myPageRoleSwitchRequest: MyPageRoleSwitchRequest,
+  options?: RequestInit,
+): Promise<patchApiV1UsersMeRoleResponse> => {
+  return customFetch<patchApiV1UsersMeRoleResponse>(
+    getPatchApiV1UsersMeRoleUrl(),
+    {
+      ...options,
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(myPageRoleSwitchRequest),
+    },
+  );
+};
+
+/**
+ * 회원 탈퇴를 처리한다.
+- 탈퇴 진입 컨텍스트 조회 결과와 무관하게 실행 시점 최종 검증을 다시 수행한다.
+- 수령 예정 공구(달성 완료 + 픽업 미완료)가 있으면 탈퇴할 수 없다.
+- 참여 중 공구(PAID_WAITING_GOAL)는 자동 취소된다.
+- 찜 목록은 모두 삭제된다.
+- 동일 계정은 탈퇴 후 30일 이후 재가입 가능하다.
+- 최종 검증 실패 시 409 에러를 반환한다. (예: WITHDRAWAL_BLOCKED_PENDING_PICKUP)
+
+ * @summary 회원 탈퇴
+ */
+export type deleteApiV1UsersMeRoleResponse200 = {
+  data: SuccessNoDataResponse;
+  status: 200;
+};
+
+export type deleteApiV1UsersMeRoleResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type deleteApiV1UsersMeRoleResponse409 = {
+  data: ConflictResponse;
+  status: 409;
+};
+
+export type deleteApiV1UsersMeRoleResponseSuccess =
+  deleteApiV1UsersMeRoleResponse200 & {
+    headers: Headers;
+  };
+export type deleteApiV1UsersMeRoleResponseError = (
+  | deleteApiV1UsersMeRoleResponse401
+  | deleteApiV1UsersMeRoleResponse409
+) & {
+  headers: Headers;
+};
+
+export type deleteApiV1UsersMeRoleResponse =
+  | deleteApiV1UsersMeRoleResponseSuccess
+  | deleteApiV1UsersMeRoleResponseError;
+
+export const getDeleteApiV1UsersMeRoleUrl = () => {
+  return `/api/v1/users/me/role`;
+};
+
+export const deleteApiV1UsersMeRole = async (
   withdrawRequest?: WithdrawRequest,
   options?: RequestInit,
-): Promise<deleteApiV1UsersMeResponse> => {
-  return customFetch<deleteApiV1UsersMeResponse>(getDeleteApiV1UsersMeUrl(), {
-    ...options,
-    method: 'DELETE',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(withdrawRequest),
-  });
+): Promise<deleteApiV1UsersMeRoleResponse> => {
+  return customFetch<deleteApiV1UsersMeRoleResponse>(
+    getDeleteApiV1UsersMeRoleUrl(),
+    {
+      ...options,
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(withdrawRequest),
+    },
+  );
+};
+
+/**
+ * 소비자/사장님 탈퇴 가능 상태와 권장 탈퇴 화면 정보를 조회한다.
+이 응답은 진입/라우팅 가이드 용도이며, 실제 탈퇴 실행 시점에는 최종 검증이 다시 수행된다.
+
+ * @summary 탈퇴 진입 컨텍스트 조회
+ */
+export type getApiV1UsersMeWithdrawalContextResponse200 = {
+  data: ApiResponseWithdrawalContext;
+  status: 200;
+};
+
+export type getApiV1UsersMeWithdrawalContextResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type getApiV1UsersMeWithdrawalContextResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type getApiV1UsersMeWithdrawalContextResponseSuccess =
+  getApiV1UsersMeWithdrawalContextResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1UsersMeWithdrawalContextResponseError = (
+  | getApiV1UsersMeWithdrawalContextResponse401
+  | getApiV1UsersMeWithdrawalContextResponse404
+) & {
+  headers: Headers;
+};
+
+export type getApiV1UsersMeWithdrawalContextResponse =
+  | getApiV1UsersMeWithdrawalContextResponseSuccess
+  | getApiV1UsersMeWithdrawalContextResponseError;
+
+export const getGetApiV1UsersMeWithdrawalContextUrl = () => {
+  return `/api/v1/users/me/withdrawal-context`;
+};
+
+export const getApiV1UsersMeWithdrawalContext = async (
+  options?: RequestInit,
+): Promise<getApiV1UsersMeWithdrawalContextResponse> => {
+  return customFetch<getApiV1UsersMeWithdrawalContextResponse>(
+    getGetApiV1UsersMeWithdrawalContextUrl(),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
 };
 
 /**
@@ -528,6 +650,314 @@ export const patchApiV1UsersMeSellerSettlementInfo = async (
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', ...options?.headers },
       body: JSON.stringify(sellerSettlementInfoUpsertRequest),
+    },
+  );
+};
+
+/**
+ * 사장님의 현재 입금 계좌 정보를 조회한다.
+ * @summary 사장님 입금 계좌 조회
+ */
+export type getApiV1UsersMeSellerSettlementAccountResponse200 = {
+  data: ApiResponseSellerSettlementAccount;
+  status: 200;
+};
+
+export type getApiV1UsersMeSellerSettlementAccountResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type getApiV1UsersMeSellerSettlementAccountResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type getApiV1UsersMeSellerSettlementAccountResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type getApiV1UsersMeSellerSettlementAccountResponseSuccess =
+  getApiV1UsersMeSellerSettlementAccountResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1UsersMeSellerSettlementAccountResponseError = (
+  | getApiV1UsersMeSellerSettlementAccountResponse401
+  | getApiV1UsersMeSellerSettlementAccountResponse403
+  | getApiV1UsersMeSellerSettlementAccountResponse404
+) & {
+  headers: Headers;
+};
+
+export type getApiV1UsersMeSellerSettlementAccountResponse =
+  | getApiV1UsersMeSellerSettlementAccountResponseSuccess
+  | getApiV1UsersMeSellerSettlementAccountResponseError;
+
+export const getGetApiV1UsersMeSellerSettlementAccountUrl = () => {
+  return `/api/v1/users/me/seller/settlement-account`;
+};
+
+export const getApiV1UsersMeSellerSettlementAccount = async (
+  options?: RequestInit,
+): Promise<getApiV1UsersMeSellerSettlementAccountResponse> => {
+  return customFetch<getApiV1UsersMeSellerSettlementAccountResponse>(
+    getGetApiV1UsersMeSellerSettlementAccountUrl(),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
+
+/**
+ * 사장님의 입금 계좌 정보를 변경한다.
+ * @summary 사장님 입금 계좌 변경
+ */
+export type patchApiV1UsersMeSellerSettlementAccountResponse200 = {
+  data: ApiResponseSellerSettlementAccount;
+  status: 200;
+};
+
+export type patchApiV1UsersMeSellerSettlementAccountResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type patchApiV1UsersMeSellerSettlementAccountResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type patchApiV1UsersMeSellerSettlementAccountResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type patchApiV1UsersMeSellerSettlementAccountResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type patchApiV1UsersMeSellerSettlementAccountResponseSuccess =
+  patchApiV1UsersMeSellerSettlementAccountResponse200 & {
+    headers: Headers;
+  };
+export type patchApiV1UsersMeSellerSettlementAccountResponseError = (
+  | patchApiV1UsersMeSellerSettlementAccountResponse400
+  | patchApiV1UsersMeSellerSettlementAccountResponse401
+  | patchApiV1UsersMeSellerSettlementAccountResponse403
+  | patchApiV1UsersMeSellerSettlementAccountResponse404
+) & {
+  headers: Headers;
+};
+
+export type patchApiV1UsersMeSellerSettlementAccountResponse =
+  | patchApiV1UsersMeSellerSettlementAccountResponseSuccess
+  | patchApiV1UsersMeSellerSettlementAccountResponseError;
+
+export const getPatchApiV1UsersMeSellerSettlementAccountUrl = () => {
+  return `/api/v1/users/me/seller/settlement-account`;
+};
+
+export const patchApiV1UsersMeSellerSettlementAccount = async (
+  sellerSettlementInfoUpsertRequest: SellerSettlementInfoUpsertRequest,
+  options?: RequestInit,
+): Promise<patchApiV1UsersMeSellerSettlementAccountResponse> => {
+  return customFetch<patchApiV1UsersMeSellerSettlementAccountResponse>(
+    getPatchApiV1UsersMeSellerSettlementAccountUrl(),
+    {
+      ...options,
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(sellerSettlementInfoUpsertRequest),
+    },
+  );
+};
+
+/**
+ * 사장님의 현재 사업자 정보를 조회한다.
+ * @summary 사장님 사업자 정보 조회
+ */
+export type getApiV1UsersMeSellerBusinessProfileResponse200 = {
+  data: ApiResponseSellerBusinessProfile;
+  status: 200;
+};
+
+export type getApiV1UsersMeSellerBusinessProfileResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type getApiV1UsersMeSellerBusinessProfileResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type getApiV1UsersMeSellerBusinessProfileResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type getApiV1UsersMeSellerBusinessProfileResponseSuccess =
+  getApiV1UsersMeSellerBusinessProfileResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1UsersMeSellerBusinessProfileResponseError = (
+  | getApiV1UsersMeSellerBusinessProfileResponse401
+  | getApiV1UsersMeSellerBusinessProfileResponse403
+  | getApiV1UsersMeSellerBusinessProfileResponse404
+) & {
+  headers: Headers;
+};
+
+export type getApiV1UsersMeSellerBusinessProfileResponse =
+  | getApiV1UsersMeSellerBusinessProfileResponseSuccess
+  | getApiV1UsersMeSellerBusinessProfileResponseError;
+
+export const getGetApiV1UsersMeSellerBusinessProfileUrl = () => {
+  return `/api/v1/users/me/seller/business-profile`;
+};
+
+export const getApiV1UsersMeSellerBusinessProfile = async (
+  options?: RequestInit,
+): Promise<getApiV1UsersMeSellerBusinessProfileResponse> => {
+  return customFetch<getApiV1UsersMeSellerBusinessProfileResponse>(
+    getGetApiV1UsersMeSellerBusinessProfileUrl(),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
+
+/**
+ * 사장님의 사업자 정보를 변경한다.
+ * @summary 사장님 사업자 정보 변경
+ */
+export type patchApiV1UsersMeSellerBusinessProfileResponse200 = {
+  data: ApiResponseSellerBusinessProfile;
+  status: 200;
+};
+
+export type patchApiV1UsersMeSellerBusinessProfileResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type patchApiV1UsersMeSellerBusinessProfileResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type patchApiV1UsersMeSellerBusinessProfileResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type patchApiV1UsersMeSellerBusinessProfileResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type patchApiV1UsersMeSellerBusinessProfileResponseSuccess =
+  patchApiV1UsersMeSellerBusinessProfileResponse200 & {
+    headers: Headers;
+  };
+export type patchApiV1UsersMeSellerBusinessProfileResponseError = (
+  | patchApiV1UsersMeSellerBusinessProfileResponse400
+  | patchApiV1UsersMeSellerBusinessProfileResponse401
+  | patchApiV1UsersMeSellerBusinessProfileResponse403
+  | patchApiV1UsersMeSellerBusinessProfileResponse404
+) & {
+  headers: Headers;
+};
+
+export type patchApiV1UsersMeSellerBusinessProfileResponse =
+  | patchApiV1UsersMeSellerBusinessProfileResponseSuccess
+  | patchApiV1UsersMeSellerBusinessProfileResponseError;
+
+export const getPatchApiV1UsersMeSellerBusinessProfileUrl = () => {
+  return `/api/v1/users/me/seller/business-profile`;
+};
+
+export const patchApiV1UsersMeSellerBusinessProfile = async (
+  sellerBusinessInfoUpsertRequest: SellerBusinessInfoUpsertRequest,
+  options?: RequestInit,
+): Promise<patchApiV1UsersMeSellerBusinessProfileResponse> => {
+  return customFetch<patchApiV1UsersMeSellerBusinessProfileResponse>(
+    getPatchApiV1UsersMeSellerBusinessProfileUrl(),
+    {
+      ...options,
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(sellerBusinessInfoUpsertRequest),
+    },
+  );
+};
+
+/**
+ * 사장님 회원 탈퇴를 처리한다.
+- 탈퇴 진입 컨텍스트 조회 결과와 무관하게 실행 시점 최종 검증을 다시 수행한다.
+- 개설된 공구(IN_PROGRESS)가 있으면 탈퇴할 수 없다.
+- 달성 완료/완료 공구(ACHIEVED, COMPLETED)에 픽업 미완료 참여가 있으면 탈퇴할 수 없다.
+- 소비자 수령 예정 공구가 있으면 탈퇴할 수 없다.
+- 동일 계정은 탈퇴 후 30일 이후 재가입 가능하다.
+- 최종 검증 실패 시 409 에러를 반환한다. (예: OWNER_WITHDRAWAL_BLOCKED_OPEN_GROUPBUY, OWNER_WITHDRAWAL_BLOCKED_PENDING_CUSTOMER_PICKUP, WITHDRAWAL_BLOCKED_PENDING_PICKUP)
+
+ * @summary 사장님 회원 탈퇴
+ */
+export type deleteApiV1UsersMeSellerResponse200 = {
+  data: SuccessNoDataResponse;
+  status: 200;
+};
+
+export type deleteApiV1UsersMeSellerResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type deleteApiV1UsersMeSellerResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type deleteApiV1UsersMeSellerResponse409 = {
+  data: ConflictResponse;
+  status: 409;
+};
+
+export type deleteApiV1UsersMeSellerResponseSuccess =
+  deleteApiV1UsersMeSellerResponse200 & {
+    headers: Headers;
+  };
+export type deleteApiV1UsersMeSellerResponseError = (
+  | deleteApiV1UsersMeSellerResponse401
+  | deleteApiV1UsersMeSellerResponse403
+  | deleteApiV1UsersMeSellerResponse409
+) & {
+  headers: Headers;
+};
+
+export type deleteApiV1UsersMeSellerResponse =
+  | deleteApiV1UsersMeSellerResponseSuccess
+  | deleteApiV1UsersMeSellerResponseError;
+
+export const getDeleteApiV1UsersMeSellerUrl = () => {
+  return `/api/v1/users/me/seller`;
+};
+
+export const deleteApiV1UsersMeSeller = async (
+  ownerWithdrawRequest: OwnerWithdrawRequest,
+  options?: RequestInit,
+): Promise<deleteApiV1UsersMeSellerResponse> => {
+  return customFetch<deleteApiV1UsersMeSellerResponse>(
+    getDeleteApiV1UsersMeSellerUrl(),
+    {
+      ...options,
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(ownerWithdrawRequest),
     },
   );
 };

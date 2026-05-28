@@ -89,7 +89,7 @@ export default function SettingsPage() {
         </div>
       ) : (
         <Link
-          href="/login"
+          href="/signup/seller"
           className="bg-surface-brand-lighter px-p6 py-p5 flex items-center justify-between"
         >
           <span className="heading-sm-semibold text-text-brand">

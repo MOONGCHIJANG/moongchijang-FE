@@ -24,7 +24,7 @@ const StepEmail = ({ onNext }: StepEmailProps) => {
 
   return (
     <>
-      <div className="flex justify-between items-start pb-g8">
+      <div className="flex justify-between items-start pb-20">
         <Image
           src="/images/mcj-logo-1.png"
           alt="Logo"

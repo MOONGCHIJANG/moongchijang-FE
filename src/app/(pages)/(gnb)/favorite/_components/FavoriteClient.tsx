@@ -8,6 +8,7 @@ import Header from '@/components/Header';
 import Toast from '@/app/(pages)/item/[groupBuyId]/_components/Toast';
 import { Chip } from '@/components/Chip';
 import { EmptyState } from '@/app/(pages)/(gnb)/feed/_components/EmptyState';
+import Footer from '@/components/Footer';
 import { WishlistCard } from './WishlistCard';
 import { useWishlistList } from '../_hooks/useWishlistList';
 import { useDeleteApiV1GroupBuysGroupBuyIdWishlist } from '@/api/hooks/wishlist/wishlist';
@@ -95,108 +96,111 @@ export function FavoriteClient() {
     <div className="flex flex-col h-full">
       <Header text="찜" showBackButton={false} />
 
-      <div className="flex-1 overflow-y-auto bg-white">
-        {/* 필터 탭 */}
-        <div className="flex gap-2 px-4 pt-4 pb-2">
-          {FILTER_TABS.map(({ label, value }) => (
-            <Chip
-              key={value}
-              label={
-                filter === value && totalElements > 0
-                  ? `${label}(${totalElements})`
-                  : label
-              }
-              active={filter === value}
-              onClick={() => setFilter(value)}
-            />
-          ))}
-        </div>
-
-        {/* 마감 제외 · 정렬 */}
-        <div className="flex items-center justify-between px-4 pb-3">
-          {filter === GetApiV1WishlistsFilter.ALL ? (
-            <button
-              type="button"
-              onClick={() => setExcludeClosed((prev) => !prev)}
-              className="flex items-center gap-2"
-            >
-              <Icon
-                icon={
-                  excludeClosed
-                    ? 'material-symbols:radio-button-checked'
-                    : 'material-symbols:radio-button-unchecked'
+      <div className="flex-1 overflow-y-auto flex flex-col">
+        <div className="flex-1">
+          {/* 필터 탭 */}
+          <div className="flex gap-2 px-4 pt-4 pb-2">
+            {FILTER_TABS.map(({ label, value }) => (
+              <Chip
+                key={value}
+                label={
+                  filter === value && totalElements > 0
+                    ? `${label}(${totalElements})`
+                    : label
                 }
-                className={
-                  excludeClosed
-                    ? 'w-4 h-4 text-button-natural'
-                    : 'w-4 h-4 text-icon-tertiary'
-                }
+                active={filter === value}
+                onClick={() => setFilter(value)}
               />
-              <span className="caption-sm-regular text-text-basic font-pretendard">
-                마감 제외
-              </span>
-            </button>
-          ) : (
-            <div />
-          )}
-          <button
-            type="button"
-            onClick={() =>
-              setSort((prev) =>
-                prev === GetApiV1WishlistsSort.LATEST
-                  ? GetApiV1WishlistsSort.DEADLINE
-                  : GetApiV1WishlistsSort.LATEST,
-              )
-            }
-            className="flex items-center gap-1 caption-sm-regular text-text-basic font-pretendard"
-          >
-            <span>
-              {sort === GetApiV1WishlistsSort.DEADLINE
-                ? '마감임박순'
-                : '최신순'}
-            </span>
-            <Icon
-              icon="pepicons-pencil:down-up"
-              className="w-4 h-4 text-icon-basic"
-            />
-          </button>
-        </div>
-
-        {/* 목록 */}
-        {isLoading ? (
-          <div className="bg-bg-white overflow-hidden">
-            {Array.from({ length: 4 }, (_, i) => (
-              <WishlistSkeleton key={i} />
             ))}
           </div>
-        ) : items.length === 0 ? (
-          <EmptyState
-            title={'찜한 공구가 없어요'}
-            description={'마음에 드는 공구를 찜해보세요!'}
-          />
-        ) : (
-          <div className="bg-bg-white overflow-hidden pb-5">
-            {items.map((item) => (
-              <Link key={item.groupBuyId} href={`/item/${item.groupBuyId}`}>
-                <WishlistCard
-                  {...item}
-                  isRemoving={
-                    isPending && removingVars?.groupBuyId === item.groupBuyId
+
+          {/* 마감 제외 · 정렬 */}
+          <div className="flex items-center justify-between px-4 pb-3">
+            {filter === GetApiV1WishlistsFilter.ALL ? (
+              <button
+                type="button"
+                onClick={() => setExcludeClosed((prev) => !prev)}
+                className="flex items-center gap-2"
+              >
+                <Icon
+                  icon={
+                    excludeClosed
+                      ? 'material-symbols:radio-button-checked'
+                      : 'material-symbols:radio-button-unchecked'
                   }
-                  onRemove={() =>
-                    removeWishlist({ groupBuyId: item.groupBuyId })
+                  className={
+                    excludeClosed
+                      ? 'w-4 h-4 text-button-natural'
+                      : 'w-4 h-4 text-icon-tertiary'
                   }
                 />
-              </Link>
-            ))}
+                <span className="caption-sm-regular text-text-basic font-pretendard">
+                  마감 제외
+                </span>
+              </button>
+            ) : (
+              <div />
+            )}
+            <button
+              type="button"
+              onClick={() =>
+                setSort((prev) =>
+                  prev === GetApiV1WishlistsSort.LATEST
+                    ? GetApiV1WishlistsSort.DEADLINE
+                    : GetApiV1WishlistsSort.LATEST,
+                )
+              }
+              className="flex items-center gap-1 caption-sm-regular text-text-basic font-pretendard"
+            >
+              <span>
+                {sort === GetApiV1WishlistsSort.DEADLINE
+                  ? '마감임박순'
+                  : '최신순'}
+              </span>
+              <Icon
+                icon="pepicons-pencil:down-up"
+                className="w-4 h-4 text-icon-basic"
+              />
+            </button>
           </div>
-        )}
-        <div ref={sentinelRef} className="h-1" />
-        {isFetchingNextPage && (
-          <div className="bg-bg-white">
-            <WishlistSkeleton />
-          </div>
-        )}
+
+          {/* 목록 */}
+          {isLoading ? (
+            <div className="bg-bg-white overflow-hidden">
+              {Array.from({ length: 4 }, (_, i) => (
+                <WishlistSkeleton key={i} />
+              ))}
+            </div>
+          ) : items.length === 0 ? (
+            <EmptyState
+              title={'찜한 공구가 없어요'}
+              description={'마음에 드는 공구를 찜해보세요!'}
+            />
+          ) : (
+            <div className="bg-bg-white overflow-hidden pb-5">
+              {items.map((item) => (
+                <Link key={item.groupBuyId} href={`/item/${item.groupBuyId}`}>
+                  <WishlistCard
+                    {...item}
+                    isRemoving={
+                      isPending && removingVars?.groupBuyId === item.groupBuyId
+                    }
+                    onRemove={() =>
+                      removeWishlist({ groupBuyId: item.groupBuyId })
+                    }
+                  />
+                </Link>
+              ))}
+            </div>
+          )}
+          <div ref={sentinelRef} className="h-1" />
+          {isFetchingNextPage && (
+            <div className="bg-bg-white">
+              <WishlistSkeleton />
+            </div>
+          )}
+        </div>
+        <Footer hasBottomSticky={false} />
       </div>
 
       {urgentCount > 0 && (

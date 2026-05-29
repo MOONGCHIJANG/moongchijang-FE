@@ -2,9 +2,35 @@
 @import 'tailwindcss';
 
 @layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
   html,
   body {
     color: #111114;
+    overscroll-behavior: none;
+  }
+
+  body {
+    -webkit-touch-callout: none;
+  }
+
+  button,
+  a,
+  [role='button'],
+  label {
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  img {
+    -webkit-user-drag: none;
   }
 }
 

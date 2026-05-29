@@ -7,7 +7,7 @@ interface EmptyStateProps {
 
 export const EmptyState = ({ title, description }: EmptyStateProps) => {
   return (
-    <div className="flex flex-col items-center gap-3 pt-10 pb-6">
+    <div className="flex flex-col items-center gap-3 pt-30 pb-30">
       <Image src="/icons/request_empty.svg" alt="" width={115} height={82} />
       <div className="flex flex-col items-center gap-1.5">
         <p className="heading-md-bold text-text-basic text-center font-pretendard whitespace-pre-line">

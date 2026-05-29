@@ -13,7 +13,7 @@ type StepRoleProps = {
 
 const StepRole = ({ onComplete }: StepRoleProps) => {
   const router = useRouter();
-  const [selected, setSelected] = useState<'guest' | 'seller'>();
+  const [selected, setSelected] = useState<'guest' | 'seller' | null>(null);
 
   const handleComplete = () => {
     onComplete?.();

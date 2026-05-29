@@ -78,3 +78,21 @@
 .no-scroll::-webkit-scrollbar {
   display: none !important;
 }
+
+.gnb-content {
+  padding-bottom: 58px;
+}
+
+@media (display-mode: standalone) {
+  .gnb-nav {
+    height: 66px;
+  }
+
+  .gnb-content {
+    padding-bottom: 66px;
+  }
+
+  .pwa-pb {
+    padding-bottom: 8px;
+  }
+}

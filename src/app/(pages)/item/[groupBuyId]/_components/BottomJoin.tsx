@@ -114,7 +114,7 @@ const BottomJoin = ({ data }: Props) => {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-10 mx-auto w-full max-w-110 px-7 py-p6 flex flex-col gap-g3 rounded-t-3xlarge shadow-[0px_-2px_20px_0px_rgba(0,0,0,0.10)] bg-white">
+    <div className="pwa-pb fixed bottom-0 left-0 right-0 z-10 mx-auto w-full max-w-110 px-7 py-p6 flex flex-col gap-g3 rounded-t-3xlarge shadow-[0px_-2px_20px_0px_rgba(0,0,0,0.10)] bg-white">
       {!isExpired && (
         <p className="text-center text-brand-primary body-md-bold">
           {timeLeft} 뒤에는 줄 서서 구매해야 해요

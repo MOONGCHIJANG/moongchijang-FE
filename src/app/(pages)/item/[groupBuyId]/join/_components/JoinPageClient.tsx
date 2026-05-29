@@ -32,8 +32,11 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
   // TODO: 마감됨 페이지 접근 시 처리
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const [isTermsSheetOpen, setIsTermsSheetOpen] = useState(false);
-  const resetTerms = useTermsSheetStore((s) => s.reset);
+  const {
+    isOpen: isTermsSheetOpen,
+    open: openTermsSheet,
+    close: closeTermsSheet,
+  } = useTermsSheetStore();
   const payMethod = 'CARD' as const;
   const isPayable = !isLoading;
 
@@ -187,14 +190,17 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
       />
       <AgreeTermsSheet
         isOpen={isTermsSheetOpen}
-        onClose={() => { setIsTermsSheetOpen(false); resetTerms(); }}
-        onConfirm={() => { setIsTermsSheetOpen(false); resetTerms(); handlePayment(); }}
+        onClose={closeTermsSheet}
+        onConfirm={() => {
+          closeTermsSheet();
+          handlePayment();
+        }}
         groupBuyId={groupBuyId}
       />
       <PaymentButton
         price={totalAmount}
         disabled={!isPayable}
-        onClick={() => setIsTermsSheetOpen(true)}
+        onClick={openTermsSheet}
       />
     </div>
   );

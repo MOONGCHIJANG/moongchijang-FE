@@ -50,7 +50,7 @@ const AgreeTermsSheet = ({ isOpen, onClose, onConfirm, groupBuyId }: Props) => {
   const router = useRouter();
   const { checked, toggle } = useTermsSheetStore();
 
-  const allChecked = Object.values(checked).every(Boolean);
+  const allChecked = TERM_ITEMS.every(({ key }) => checked[key]);
 
   return (
     <BottomSheet isOpen={isOpen} onClose={onClose}>

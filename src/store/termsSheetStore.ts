@@ -18,14 +18,19 @@ const INITIAL_CHECKED: CheckedState = {
 };
 
 interface TermsSheetState {
+  isOpen: boolean;
   checked: CheckedState;
+  open: () => void;
+  close: () => void;
   toggle: (key: TermKey) => void;
   checkTerm: (key: TermKey) => void;
-  reset: () => void;
 }
 
 export const useTermsSheetStore = create<TermsSheetState>()((set) => ({
+  isOpen: false,
   checked: INITIAL_CHECKED,
+  open: () => set({ isOpen: true }),
+  close: () => set({ isOpen: false, checked: INITIAL_CHECKED }),
   toggle: (key) =>
     set((state) => ({
       checked: { ...state.checked, [key]: !state.checked[key] },
@@ -34,5 +39,4 @@ export const useTermsSheetStore = create<TermsSheetState>()((set) => ({
     set((state) => ({
       checked: { ...state.checked, [key]: true },
     })),
-  reset: () => set({ checked: INITIAL_CHECKED }),
 }));

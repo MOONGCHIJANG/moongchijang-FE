@@ -10,6 +10,12 @@ import { logEvent } from '@/lib/analytics';
 interface StoreSearchStepProps {
   onSelectStore: (store: Store) => void;
   onBack: () => void;
+  query: string;
+  onQueryChange: (query: string) => void;
+  results: ApiResponseStoreSearchListDataStoresItem[];
+  onResultsChange: (
+    results: ApiResponseStoreSearchListDataStoresItem[],
+  ) => void;
 }
 
 export interface Store {
@@ -24,19 +30,23 @@ export interface Store {
 export const StoreSearchStep = ({
   onSelectStore,
   onBack,
+  query,
+  onQueryChange,
+  results,
+  onResultsChange,
 }: StoreSearchStepProps) => {
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState<
-    ApiResponseStoreSearchListDataStoresItem[]
-  >([]);
   const [isLoading, setIsLoading] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastFetchedQuery = useRef(results.length > 0 ? query : '');
 
   useEffect(() => {
     if (!query.trim()) {
-      setResults([]);
+      lastFetchedQuery.current = '';
+      onResultsChange([]);
       return;
     }
+
+    if (query.trim() === lastFetchedQuery.current) return;
 
     if (debounceRef.current) clearTimeout(debounceRef.current);
 
@@ -51,7 +61,8 @@ export const StoreSearchStep = ({
         );
         if (res.status === 200) {
           const stores = res.data.data?.stores ?? [];
-          setResults(stores);
+          lastFetchedQuery.current = query.trim();
+          onResultsChange(stores);
           logEvent('groupbuy_request_search', {
             query_length: query.trim().length,
             result_count: stores.length,
@@ -131,7 +142,7 @@ export const StoreSearchStep = ({
           <input
             type="text"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => onQueryChange(e.target.value)}
             placeholder="매장 이름 또는 주소 검색"
             className="w-full bg-transparent body-md-regular text-icon-basic placeholder:text-icon-disabled outline-none"
             autoFocus
@@ -140,7 +151,7 @@ export const StoreSearchStep = ({
           {query && (
             <button
               type="button"
-              onClick={() => setQuery('')}
+              onClick={() => onQueryChange('')}
               className={cn(
                 'flex items-center justify-center w-4.5 h-4.5 text-icon-tertiary shrink-0',
               )}

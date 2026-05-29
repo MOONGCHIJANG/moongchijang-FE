@@ -30,9 +30,9 @@ export const GNB = ({ className = '' }: GNBProps) => {
 
   return (
     <div
-      className={`fixed bottom-0 left-1/2 z-50 -translate-x-1/2 w-full min-w-[360px] max-w-[440px] rounded-t-2xl bg-white shadow-[0_-6px_8px_rgba(0,0,0,0.05)] ${className}`}
+      className={`gnb-pwa fixed bottom-0 left-1/2 z-50 -translate-x-1/2 w-full min-w-[360px] max-w-[440px] rounded-t-2xl bg-white shadow-[0_-6px_8px_rgba(0,0,0,0.05)] ${className}`}
     >
-      <nav className="gnb-nav flex h-[58px] items-center justify-around px-4">
+      <nav className="flex h-[58px] items-center justify-around px-4">
         {TABS.map((tab) => {
           const isActive =
             pathname === tab.href ||

@@ -84,19 +84,20 @@
 }
 
 html.pwa .login-bottom {
-  bottom: calc(1.75rem + env(safe-area-inset-bottom, 0px));
+  bottom: 4rem;
 }
 
-html.pwa .gnb-nav {
-  height: 66px;
+html.pwa .gnb-pwa {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 html.pwa .gnb-content {
-  padding-bottom: 66px;
+  padding-bottom: calc(58px + env(safe-area-inset-bottom, 0px));
 }
 
 html.pwa .pwa-pb::after {
   content: '';
   display: block;
-  height: env(safe-area-inset-bottom, 8px);
+  height: env(safe-area-inset-bottom, 0px);
+  background-color: inherit;
 }

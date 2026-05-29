@@ -2,6 +2,8 @@
 
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { redirectStorage } from '@/lib/redirect';
+import { useAuthStore } from '@/store/authStore';
 
 export default function KakaoCallbackPage() {
   const router = useRouter();
@@ -48,7 +50,9 @@ export default function KakaoCallbackPage() {
           return;
         }
 
-        router.replace('/feed');
+        useAuthStore.getState().setIsLoggedIn(true);
+        const redirect = redirectStorage.consume();
+        router.replace(redirect ?? '/feed');
       } catch {
         router.replace('/login');
       }

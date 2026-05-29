@@ -83,8 +83,14 @@
   padding-bottom: 58px;
 }
 
+@media (display-mode: standalone) {
+  .login-bottom {
+    bottom: 4rem !important;
+  }
+}
+
 html.pwa .login-bottom {
-  bottom: 4rem;
+  bottom: 4rem !important;
 }
 
 html.pwa .gnb-pwa {

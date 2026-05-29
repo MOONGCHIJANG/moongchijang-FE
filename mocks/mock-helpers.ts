@@ -31,6 +31,7 @@ import {
   getGetApiV1OwnerGroupBuysResponseMock,
   getGetApiV1OwnerGroupBuysSummaryResponseMock,
   getGetApiV1OwnerGroupBuysManageResponseMock,
+  getGetApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponseMock,
 } from '../src/api/generated/owner/owner.msw';
 import {
   getGetApiV1UsersMeTabsCountsResponseMock,
@@ -537,68 +538,89 @@ export function createGroupBuyRequestDetailMock(requestId: number) {
   };
 }
 
-export function createOwnerGroupBuysManageMock() {
+// 전체 관리 목록 픽스처 — 필터별로 잘라 쓴다
+const MANAGE_ALL_ITEMS = [
+  {
+    groupBuyId: 1,
+    productName: '버터 크루아상 3개입',
+    price: 18_000,
+    pickupDate: '2026-06-10',
+    deadlineDday: 3,
+    achievementRate: 72,
+    currentQuantity: 7,
+    targetQuantity: 10,
+    status: 'IN_PROGRESS' as const,
+  },
+  {
+    groupBuyId: 2,
+    productName: '소금빵 5개입',
+    price: 14_500,
+    pickupDate: '2026-06-15',
+    deadlineDday: 0,
+    achievementRate: 45,
+    currentQuantity: 4,
+    targetQuantity: 9,
+    status: 'IN_PROGRESS' as const,
+  },
+  {
+    groupBuyId: 3,
+    productName: '말차 라떼 케이크',
+    price: 32_000,
+    pickupDate: '2026-06-05',
+    deadlineDday: 2,
+    achievementRate: 100,
+    currentQuantity: 12,
+    targetQuantity: 12,
+    status: 'ACHIEVED' as const,
+  },
+  {
+    groupBuyId: 4,
+    productName: '르뱅 초코칩쿠키 세트',
+    price: 22_000,
+    pickupDate: '2026-06-20',
+    deadlineDday: null,
+    achievementRate: null,
+    currentQuantity: null,
+    targetQuantity: null,
+    status: 'PENDING_APPROVAL' as const,
+  },
+  {
+    groupBuyId: 5,
+    productName: '두쫀 쌀쿠키 박스',
+    price: 16_000,
+    pickupDate: '2026-05-10',
+    deadlineDday: null,
+    achievementRate: null,
+    currentQuantity: null,
+    targetQuantity: null,
+    status: 'ENDED' as const,
+  },
+];
+
+export function createOwnerGroupBuysManageMock(filter = 'ALL') {
   const base = getGetApiV1OwnerGroupBuysManageResponseMock();
+  const data =
+    filter === 'ALL'
+      ? MANAGE_ALL_ITEMS
+      : MANAGE_ALL_ITEMS.filter((i) => i.status === filter);
+  return { ...base, success: true, data, error: null };
+}
+
+export function createOwnerGroupBuyCloseMock() {
+  return { success: true, data: {}, error: null };
+}
+
+export function createOwnerGroupBuyExtensionMock() {
+  return { success: true, data: {}, error: null };
+}
+
+export function createOwnerGroupBuyRequestCreatedMock() {
   return {
-    ...base,
     success: true,
-    data: [
-      {
-        groupBuyId: 1,
-        productName: koFaker.product.name(),
-        price: koFaker.product.price(),
-        pickupDate: koFaker.groupBuy.pickupDate(),
-        deadlineDday: 3,
-        achievementRate: 72,
-        currentQuantity: 7,
-        targetQuantity: 10,
-        status: 'IN_PROGRESS' as const,
-      },
-      {
-        groupBuyId: 2,
-        productName: koFaker.product.name(),
-        price: koFaker.product.price(),
-        pickupDate: koFaker.groupBuy.pickupDate(),
-        deadlineDday: 7,
-        achievementRate: 72,
-        currentQuantity: 7,
-        targetQuantity: 10,
-        status: 'IN_PROGRESS' as const,
-      },
-      {
-        groupBuyId: 3,
-        productName: koFaker.product.name(),
-        price: koFaker.product.price(),
-        pickupDate: koFaker.groupBuy.pickupDate(),
-        deadlineDday: 2,
-        achievementRate: 100,
-        currentQuantity: 10,
-        targetQuantity: 10,
-        status: 'ACHIEVED' as const,
-      },
-      {
-        groupBuyId: 4,
-        productName: koFaker.product.name(),
-        price: koFaker.product.price(),
-        pickupDate: koFaker.groupBuy.pickupDate(),
-        deadlineDday: null,
-        achievementRate: null,
-        currentQuantity: null,
-        targetQuantity: null,
-        status: 'PENDING_APPROVAL' as const,
-      },
-      {
-        groupBuyId: 5,
-        productName: koFaker.product.name(),
-        price: koFaker.product.price(),
-        pickupDate: koFaker.groupBuy.pickupDate(),
-        deadlineDday: null,
-        achievementRate: null,
-        currentQuantity: null,
-        targetQuantity: null,
-        status: 'ENDED' as const,
-      },
-    ],
+    data: {
+      requestId: faker.number.int({ min: 100, max: 999 }),
+      status: 'PENDING' as const,
+    },
     error: null,
   };
 }
@@ -626,8 +648,25 @@ export function createOwnerGroupBuysMock() {
   };
 }
 
+// ── 분기 확인용: true(빈 상태) / false(데이터 있음, 기본값) ──────────
+export const MOCK_SELLER_HOME_EMPTY = false;
+
 export function createOwnerGroupBuysSummaryMock() {
   const base = getGetApiV1OwnerGroupBuysSummaryResponseMock();
+  if (MOCK_SELLER_HOME_EMPTY) {
+    return {
+      ...base,
+      success: true,
+      data: {
+        ongoingCount: 0,
+        achievedCount: 0,
+        todayPickupUserCount: 0,
+        settlementExpectedAmount: 0,
+        isEmpty: true,
+      },
+      error: null,
+    };
+  }
   return {
     ...base,
     success: true,
@@ -635,8 +674,95 @@ export function createOwnerGroupBuysSummaryMock() {
       ongoingCount: 2,
       achievedCount: 1,
       todayPickupUserCount: 12,
-      settlementExpectedAmount: 1280000,
+      settlementExpectedAmount: 1_280_000,
       isEmpty: false,
+    },
+    error: null,
+  };
+}
+
+const KOREAN_NAMES = [
+  '김민지',
+  '이지현',
+  '박서연',
+  '최수민',
+  '정다은',
+  '이준서',
+  '김태양',
+  '박지훈',
+  '한소희',
+  '윤서준',
+];
+const PAYMENT_METHODS = ['카드', '카카오페이', '네이버페이', '토스페이'];
+
+function koreanPhone(): string {
+  return `010-${faker.string.numeric(4)}-${faker.string.numeric(4)}`;
+}
+
+export function createOwnerGroupBuyManageDetailMock(
+  status: 'IN_PROGRESS' | 'ACHIEVED' = 'IN_PROGRESS',
+) {
+  const base =
+    getGetApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponseMock();
+  const productName = koFaker.product.name();
+  const pickupTime = koFaker.groupBuy.pickupTime();
+
+  const participants = [
+    {
+      name: faker.helpers.arrayElement(KOREAN_NAMES),
+      phoneNumber: koreanPhone(),
+      productName,
+      quantity: 2,
+      paymentMethod: faker.helpers.arrayElement(PAYMENT_METHODS),
+      paymentStatus: 'PAYMENT_COMPLETED',
+      pickupTime,
+    },
+    {
+      name: faker.helpers.arrayElement(KOREAN_NAMES),
+      phoneNumber: koreanPhone(),
+      productName,
+      quantity: 1,
+      paymentMethod: faker.helpers.arrayElement(PAYMENT_METHODS),
+      paymentStatus: 'PAYMENT_COMPLETED',
+      pickupTime,
+    },
+    {
+      name: faker.helpers.arrayElement(KOREAN_NAMES),
+      phoneNumber: koreanPhone(),
+      productName,
+      quantity: 3,
+      paymentMethod: faker.helpers.arrayElement(PAYMENT_METHODS),
+      paymentStatus: 'REFUND_REQUESTED',
+      pickupTime,
+    },
+    {
+      name: faker.helpers.arrayElement(KOREAN_NAMES),
+      phoneNumber: koreanPhone(),
+      productName,
+      quantity: 1,
+      paymentMethod: faker.helpers.arrayElement(PAYMENT_METHODS),
+      paymentStatus: 'PAYMENT_COMPLETED',
+      pickupTime,
+    },
+  ];
+
+  const completedCount = participants.filter(
+    (p) => p.paymentStatus === 'PAYMENT_COMPLETED',
+  ).length;
+  const waitingCount = participants.length - completedCount;
+
+  return {
+    ...base,
+    success: true,
+    data: {
+      groupBuyId: 1,
+      status,
+      participantSummary: {
+        totalCount: participants.length,
+        completedCount,
+        waitingCount,
+      },
+      participants,
     },
     error: null,
   };

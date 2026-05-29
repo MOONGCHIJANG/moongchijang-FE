@@ -34,6 +34,11 @@ import {
   createOwnerGroupBuysMock,
   createOwnerGroupBuysSummaryMock,
   createOwnerGroupBuysManageMock,
+  createOwnerGroupBuyManageDetailMock,
+  createOwnerGroupBuyCloseMock,
+  createOwnerGroupBuyExtensionMock,
+  createOwnerGroupBuyRequestCreatedMock,
+  MOCK_SELLER_HOME_EMPTY,
 } from './mock-helpers';
 import { formatDeadline } from '@/lib/date';
 
@@ -554,20 +559,85 @@ const overrideHandlers = [
   }),
 
   // ── 사장님 홈 ─────────────────────────────────────────────────────────
+  // ── 사장님 홈 ─────────────────────────────────────────────────────────
+  // 분기 확인: mock-helpers.ts 의 MOCK_SELLER_HOME_EMPTY 를 true/false 로 토글
+  http.get('*/api/v1/owner/group-buys/summary', async () => {
+    await delay(500);
+    return HttpResponse.json(createOwnerGroupBuysSummaryMock(), {
+      status: 200,
+    });
+  }),
+
   http.get('*/api/v1/owner/group-buys', async () => {
     await delay(500);
+    // 빈 상태일 때는 빈 배열 반환
+    if (MOCK_SELLER_HOME_EMPTY) {
+      return HttpResponse.json(
+        { success: true, data: [], error: null },
+        { status: 200 },
+      );
+    }
     return HttpResponse.json(createOwnerGroupBuysMock(), { status: 200 });
   }),
 
-  http.get('*/api/v1/owner/group-buys/summary', async () => {
+  // ── 공구 관리 목록 (탭 필터 반영) ──────────────────────────────────────
+  http.get('*/api/v1/owner/group-buys/manage', async ({ request }) => {
     await delay(500);
-    return HttpResponse.json(createOwnerGroupBuysSummaryMock(), { status: 200 });
+    const url = new URL(request.url);
+    const filter = url.searchParams.get('filter') ?? 'ALL';
+    return HttpResponse.json(createOwnerGroupBuysManageMock(filter), {
+      status: 200,
+    });
   }),
 
-  http.get('*/api/v1/owner/group-buys/manage', async () => {
-    await delay(500);
-    return HttpResponse.json(createOwnerGroupBuysManageMock(), { status: 200 });
+  // ── 공구 마감 / 기간 연장 요청 ────────────────────────────────────────
+  http.post(
+    '*/api/v1/owner/group-buys/:groupBuyId/close-requests',
+    async () => {
+      await delay(500);
+      return HttpResponse.json(createOwnerGroupBuyCloseMock(), { status: 200 });
+    },
+  ),
+
+  http.post(
+    '*/api/v1/owner/group-buys/:groupBuyId/extension-requests',
+    async () => {
+      await delay(500);
+      return HttpResponse.json(createOwnerGroupBuyExtensionMock(), {
+        status: 200,
+      });
+    },
+  ),
+
+  // ── 공구 개설 요청 제출 ────────────────────────────────────────────────
+  http.post('*/api/v1/owner/group-buy-requests', async () => {
+    await delay(800);
+    return HttpResponse.json(createOwnerGroupBuyRequestCreatedMock(), {
+      status: 201,
+    });
   }),
+
+  http.get(
+    '*/api/v1/owner/group-buys/:groupBuyId/manage/in-progress',
+    async () => {
+      await delay(500);
+      return HttpResponse.json(
+        createOwnerGroupBuyManageDetailMock('IN_PROGRESS'),
+        { status: 200 },
+      );
+    },
+  ),
+
+  http.get(
+    '*/api/v1/owner/group-buys/:groupBuyId/manage/achieved',
+    async () => {
+      await delay(500);
+      return HttpResponse.json(
+        createOwnerGroupBuyManageDetailMock('ACHIEVED'),
+        { status: 200 },
+      );
+    },
+  ),
 ];
 
 export const handlers = [...overrideHandlers, ...generatedHandlers];

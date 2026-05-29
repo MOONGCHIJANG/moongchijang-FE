@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
 import { Icon } from '@iconify/react';
 import { cn } from '@/lib/utils';
-import { getApiV1StoresSearch } from '@/api/generated/group-buy-request/group-buy-request';
 import { type ApiResponseStoreSearchListDataStoresItem } from '@/api/generated/api.schemas';
 import { logEvent } from '@/lib/analytics';
+import { useStoreSearch } from '../_hooks/useStoreSearch';
 
 interface StoreSearchStepProps {
   onSelectStore: (store: Store) => void;
@@ -13,7 +12,7 @@ interface StoreSearchStepProps {
 }
 
 export interface Store {
-  placeId: string;
+  placeId: string | null;
   storeName: string;
   roadAddress: string;
   lotAddress?: string | null;
@@ -25,70 +24,32 @@ export const StoreSearchStep = ({
   onSelectStore,
   onBack,
 }: StoreSearchStepProps) => {
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState<
-    ApiResponseStoreSearchListDataStoresItem[]
-  >([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { query, results, isLoading, handleQueryChange, clearQueryFromUrl } =
+    useStoreSearch();
 
-  useEffect(() => {
-    if (!query.trim()) {
-      setResults([]);
-      return;
-    }
+  const handleBack = () => {
+    clearQueryFromUrl();
+    onBack();
+  };
 
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-
-    const controller = new AbortController();
-
-    debounceRef.current = setTimeout(async () => {
-      setIsLoading(true);
-      try {
-        const res = await getApiV1StoresSearch(
-          { keyword: query.trim() },
-          { signal: controller.signal },
-        );
-        if (res.status === 200) {
-          const stores = res.data.data?.stores ?? [];
-          setResults(stores);
-          logEvent('groupbuy_request_search', {
-            query_length: query.trim().length,
-            result_count: stores.length,
-          });
-        }
-      } catch (err) {
-        if (err instanceof Error && err.name !== 'AbortError') {
-          console.error(err);
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    }, 300);
-
-    return () => {
-      controller.abort();
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    };
-  }, [query]);
-
-  const handleSelect = (item: ApiResponseStoreSearchListDataStoresItem) => {
+  const handleSelect = (
+    item: ApiResponseStoreSearchListDataStoresItem,
+    position: number,
+  ) => {
     if (
-      !item.placeId ||
       !item.storeName ||
       !item.roadAddress ||
       item.latitude == null ||
       item.longitude == null
     )
       return;
-    const position = results.findIndex((r) => r.placeId === item.placeId);
     logEvent('groupbuy_request_store_select', {
-      store_id: item.placeId,
+      store_id: item.placeId ?? '',
       result_position: position,
       has_address: !!item.roadAddress,
     });
     onSelectStore({
-      placeId: item.placeId,
+      placeId: item.placeId ?? null,
       storeName: item.storeName,
       roadAddress: item.roadAddress,
       lotAddress: item.lotAddress,
@@ -105,7 +66,7 @@ export const StoreSearchStep = ({
       <header className="flex items-center h-[57px] px-4 border-b border-border-subtle shrink-0 gap-[2px]">
         <button
           type="button"
-          onClick={onBack}
+          onClick={handleBack}
           className="flex items-center justify-center w-8 h-8"
           aria-label="뒤로가기"
         >
@@ -129,7 +90,7 @@ export const StoreSearchStep = ({
           <input
             type="text"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => handleQueryChange(e.target.value)}
             placeholder="매장 이름 또는 주소 검색"
             className="w-full bg-transparent body-md-regular text-icon-basic placeholder:text-icon-disabled outline-none"
             autoFocus
@@ -138,7 +99,7 @@ export const StoreSearchStep = ({
           {query && (
             <button
               type="button"
-              onClick={() => setQuery('')}
+              onClick={() => handleQueryChange('')}
               className={cn(
                 'flex items-center justify-center w-4.5 h-4.5 text-icon-tertiary shrink-0',
               )}
@@ -168,11 +129,11 @@ export const StoreSearchStep = ({
 
         {!isLoading && results.length > 0 && (
           <ul className="flex flex-col divide-y divide-border-subtle">
-            {results.map((item) => (
-              <li key={item.placeId}>
+            {results.map((item, index) => (
+              <li key={`${item.placeId}-${index}`}>
                 <button
                   type="button"
-                  onClick={() => handleSelect(item)}
+                  onClick={() => handleSelect(item, index)}
                   className={cn(
                     'w-full flex flex-col gap-0.5 px-5 py-3 text-left',
                     'active:bg-surface-default',

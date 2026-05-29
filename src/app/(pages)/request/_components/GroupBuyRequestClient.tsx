@@ -37,12 +37,17 @@ export const GroupBuyRequestClient = () => {
     toastTimerRef.current = setTimeout(() => setToastMessage(null), 3000);
   };
 
+  const entrySource = useRef(
+    (() => {
+      const raw = searchParams.get('source');
+      const source: 'search_empty' | 'mypage' | 'gnb' =
+        raw === 'search_empty' || raw === 'mypage' ? raw : 'gnb';
+      return source;
+    })(),
+  );
+
   useEffect(() => {
-    const rawSource = searchParams.get('source');
-    const source =
-      rawSource === 'search_empty' || rawSource === 'mypage'
-        ? rawSource
-        : 'gnb';
+    const source = entrySource.current;
     logEvent('screen_view', {
       screen_name: 'group_request_form',
       entry_source: source,
@@ -82,7 +87,7 @@ export const GroupBuyRequestClient = () => {
         });
         logEvent('groupbuy_request_submit_success', {
           request_id: requestId!,
-          store_id: data.store.placeId,
+          store_id: data.store.placeId ?? '',
           quantity: data.quantity,
         });
         goToStep('complete');

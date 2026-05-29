@@ -51,6 +51,7 @@ export const SearchOverlay = ({
 
   return (
     <div className="fixed inset-y-0 left-1/2 -translate-x-1/2 w-full max-w-[440px] z-50 bg-bg-white-muted flex flex-col">
+      <div style={{ height: 'env(safe-area-inset-top, 0px)' }} />
       <div className="flex items-center gap-3 px-4 pt-4 pb-3">
         <button onClick={onClose} className="flex-shrink-0 p-1">
           <Icon icon="mingcute:left-line" className="h-6 w-6 text-icon-basic" />

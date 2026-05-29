@@ -63,11 +63,15 @@ export const QrModal = ({
 
   useEffect(() => {
     if (!isOpen) return;
+    document.body.style.overflow = 'hidden';
     logEvent('qr_view', {
       pickup_status: isPickupDay ? 'pickup_day' : 'before_pickup',
     });
     const timer = setTimeout(() => setAnimate(true), 50);
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      document.body.style.overflow = '';
+    };
   }, [isOpen]);
 
   if (!isOpen) return null;

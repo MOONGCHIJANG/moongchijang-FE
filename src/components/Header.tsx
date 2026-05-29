@@ -19,7 +19,16 @@ const Header = ({ text, showBackButton = true, onBack }: HeaderProps) => {
         {showBackButton && (
           <button
             type="button"
-            onClick={onBack || (() => router.back())}
+            onClick={
+              onBack ||
+              (() => {
+                if (window.history.length > 1) {
+                  router.back();
+                } else {
+                  router.push('/feed');
+                }
+              })
+            }
             className="flex items-center justify-center w-8 h-8"
             aria-label="뒤로가기"
           >

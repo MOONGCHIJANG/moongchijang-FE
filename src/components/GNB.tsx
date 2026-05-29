@@ -32,7 +32,7 @@ export const GNB = ({ className = '' }: GNBProps) => {
     <nav
       className={`flex flex-col w-full min-w-[360px] max-w-[440px] rounded-t-2xl bg-white shadow-[0_-6px_8px_rgba(0,0,0,0.05)] ${className}`}
     >
-      <div className="flex h-[62px] items-center justify-around px-4">
+      <div className="flex h-[58px] items-center justify-around px-4">
         {TABS.map((tab) => {
           const isActive =
             pathname === tab.href ||

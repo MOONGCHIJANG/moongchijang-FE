@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Header from '@/components/Header';
@@ -10,6 +11,7 @@ import {
 } from '@/api/generated/api.schemas';
 import { useGetApiV1GroupBuyRequestsRequestId } from '@/api/hooks/group-buy-request/group-buy-request';
 import { formatDate, formatPickupDate } from '@/lib/date';
+import { logEvent } from '@/lib/analytics';
 
 type StepState = 'completed' | 'current' | 'pending';
 
@@ -102,6 +104,17 @@ export function RequestStatusClient({ requestId }: RequestStatusClientProps) {
     useGetApiV1GroupBuyRequestsRequestId(requestId);
   const request = data?.status === 200 ? data.data?.data : null;
   const is403 = data?.status === 403;
+
+  useEffect(() => {
+    if (request) {
+      const status =
+        request.status === GroupBuyRequestDetailStatus.OPENED ||
+        request.status === GroupBuyRequestDetailStatus.REJECTED
+          ? '공구결과안내'
+          : '매장협의중';
+      logEvent('group_request_status_view', { status });
+    }
+  }, [request]);
 
   if (isLoading) {
     return (

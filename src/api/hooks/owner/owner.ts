@@ -26,6 +26,11 @@ import type {
   ApiResponseOwnerGroupBuyRequestDetail,
   ApiResponseOwnerGroupBuyRequestList,
   ApiResponseOwnerGroupBuySummary,
+  ApiResponseOwnerRefundRequestDetail,
+  ApiResponseOwnerRefundRequestList,
+  ApiResponseOwnerRefundReviewSubmit,
+  ApiResponseOwnerSettlementMonthChipList,
+  ApiResponseOwnerSettlementMonthlySummary,
   ApiResponsePickupScheduleList,
   ApiResponseReservationPage,
   BadRequestResponse,
@@ -34,10 +39,13 @@ import type {
   GetApiV1OwnerGroupBuyRequestsParams,
   GetApiV1OwnerGroupBuysManageParams,
   GetApiV1OwnerReservationsParams,
+  GetApiV1OwnerSettlementsMonthlySummaryParams,
+  GetApiV1OwnerSettlementsRefundRequestsParams,
   NotFoundResponse,
   OwnerGroupBuyCloseRequest,
   OwnerGroupBuyExtensionRequest,
   OwnerGroupBuyRequestCreate,
+  OwnerRefundReviewSubmitRequest,
   SuccessNoDataResponse,
   UnauthorizedResponse,
 } from '../api.schemas';
@@ -1676,6 +1684,1149 @@ export const usePostApiV1OwnerGroupBuysGroupBuyIdCloseRequests = <
     queryClient,
   );
 };
+/**
+ * @summary 사장님 월별 정산 예정 조회
+ */
+export type getApiV1OwnerSettlementsMonthlySummaryResponse200 = {
+  data: ApiResponseOwnerSettlementMonthlySummary;
+  status: 200;
+};
+
+export type getApiV1OwnerSettlementsMonthlySummaryResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type getApiV1OwnerSettlementsMonthlySummaryResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type getApiV1OwnerSettlementsMonthlySummaryResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type getApiV1OwnerSettlementsMonthlySummaryResponseSuccess =
+  getApiV1OwnerSettlementsMonthlySummaryResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1OwnerSettlementsMonthlySummaryResponseError = (
+  | getApiV1OwnerSettlementsMonthlySummaryResponse400
+  | getApiV1OwnerSettlementsMonthlySummaryResponse401
+  | getApiV1OwnerSettlementsMonthlySummaryResponse403
+) & {
+  headers: Headers;
+};
+
+export type getApiV1OwnerSettlementsMonthlySummaryResponse =
+  | getApiV1OwnerSettlementsMonthlySummaryResponseSuccess
+  | getApiV1OwnerSettlementsMonthlySummaryResponseError;
+
+export const getGetApiV1OwnerSettlementsMonthlySummaryUrl = (
+  params: GetApiV1OwnerSettlementsMonthlySummaryParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/owner/settlements/monthly-summary?${stringifiedParams}`
+    : `/api/v1/owner/settlements/monthly-summary`;
+};
+
+export const getApiV1OwnerSettlementsMonthlySummary = async (
+  params: GetApiV1OwnerSettlementsMonthlySummaryParams,
+  options?: RequestInit,
+): Promise<getApiV1OwnerSettlementsMonthlySummaryResponse> => {
+  return customFetch<getApiV1OwnerSettlementsMonthlySummaryResponse>(
+    getGetApiV1OwnerSettlementsMonthlySummaryUrl(params),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
+
+export const getGetApiV1OwnerSettlementsMonthlySummaryQueryKey = (
+  params?: GetApiV1OwnerSettlementsMonthlySummaryParams,
+) => {
+  return [
+    `/api/v1/owner/settlements/monthly-summary`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetApiV1OwnerSettlementsMonthlySummaryQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiV1OwnerSettlementsMonthlySummary>>,
+  TError = BadRequestResponse | UnauthorizedResponse | ForbiddenResponse,
+>(
+  params: GetApiV1OwnerSettlementsMonthlySummaryParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerSettlementsMonthlySummary>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetApiV1OwnerSettlementsMonthlySummaryQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiV1OwnerSettlementsMonthlySummary>>
+  > = ({ signal }) =>
+    getApiV1OwnerSettlementsMonthlySummary(params, {
+      signal,
+      ...requestOptions,
+    });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiV1OwnerSettlementsMonthlySummary>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiV1OwnerSettlementsMonthlySummaryQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiV1OwnerSettlementsMonthlySummary>>
+>;
+export type GetApiV1OwnerSettlementsMonthlySummaryQueryError =
+  | BadRequestResponse
+  | UnauthorizedResponse
+  | ForbiddenResponse;
+
+export function useGetApiV1OwnerSettlementsMonthlySummary<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerSettlementsMonthlySummary>>,
+  TError = BadRequestResponse | UnauthorizedResponse | ForbiddenResponse,
+>(
+  params: GetApiV1OwnerSettlementsMonthlySummaryParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerSettlementsMonthlySummary>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1OwnerSettlementsMonthlySummary>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1OwnerSettlementsMonthlySummary>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1OwnerSettlementsMonthlySummary<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerSettlementsMonthlySummary>>,
+  TError = BadRequestResponse | UnauthorizedResponse | ForbiddenResponse,
+>(
+  params: GetApiV1OwnerSettlementsMonthlySummaryParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerSettlementsMonthlySummary>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1OwnerSettlementsMonthlySummary>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1OwnerSettlementsMonthlySummary>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1OwnerSettlementsMonthlySummary<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerSettlementsMonthlySummary>>,
+  TError = BadRequestResponse | UnauthorizedResponse | ForbiddenResponse,
+>(
+  params: GetApiV1OwnerSettlementsMonthlySummaryParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerSettlementsMonthlySummary>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary 사장님 월별 정산 예정 조회
+ */
+
+export function useGetApiV1OwnerSettlementsMonthlySummary<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerSettlementsMonthlySummary>>,
+  TError = BadRequestResponse | UnauthorizedResponse | ForbiddenResponse,
+>(
+  params: GetApiV1OwnerSettlementsMonthlySummaryParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerSettlementsMonthlySummary>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiV1OwnerSettlementsMonthlySummaryQueryOptions(
+    params,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary 사장님 정산 월 칩 조회
+ */
+export type getApiV1OwnerSettlementsMonthChipsResponse200 = {
+  data: ApiResponseOwnerSettlementMonthChipList;
+  status: 200;
+};
+
+export type getApiV1OwnerSettlementsMonthChipsResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type getApiV1OwnerSettlementsMonthChipsResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type getApiV1OwnerSettlementsMonthChipsResponseSuccess =
+  getApiV1OwnerSettlementsMonthChipsResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1OwnerSettlementsMonthChipsResponseError = (
+  | getApiV1OwnerSettlementsMonthChipsResponse401
+  | getApiV1OwnerSettlementsMonthChipsResponse403
+) & {
+  headers: Headers;
+};
+
+export type getApiV1OwnerSettlementsMonthChipsResponse =
+  | getApiV1OwnerSettlementsMonthChipsResponseSuccess
+  | getApiV1OwnerSettlementsMonthChipsResponseError;
+
+export const getGetApiV1OwnerSettlementsMonthChipsUrl = () => {
+  return `/api/v1/owner/settlements/month-chips`;
+};
+
+export const getApiV1OwnerSettlementsMonthChips = async (
+  options?: RequestInit,
+): Promise<getApiV1OwnerSettlementsMonthChipsResponse> => {
+  return customFetch<getApiV1OwnerSettlementsMonthChipsResponse>(
+    getGetApiV1OwnerSettlementsMonthChipsUrl(),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
+
+export const getGetApiV1OwnerSettlementsMonthChipsQueryKey = () => {
+  return [`/api/v1/owner/settlements/month-chips`] as const;
+};
+
+export const getGetApiV1OwnerSettlementsMonthChipsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiV1OwnerSettlementsMonthChips>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getApiV1OwnerSettlementsMonthChips>>,
+      TError,
+      TData
+    >
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetApiV1OwnerSettlementsMonthChipsQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiV1OwnerSettlementsMonthChips>>
+  > = ({ signal }) =>
+    getApiV1OwnerSettlementsMonthChips({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiV1OwnerSettlementsMonthChips>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiV1OwnerSettlementsMonthChipsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiV1OwnerSettlementsMonthChips>>
+>;
+export type GetApiV1OwnerSettlementsMonthChipsQueryError =
+  | UnauthorizedResponse
+  | ForbiddenResponse;
+
+export function useGetApiV1OwnerSettlementsMonthChips<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerSettlementsMonthChips>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerSettlementsMonthChips>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1OwnerSettlementsMonthChips>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1OwnerSettlementsMonthChips>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1OwnerSettlementsMonthChips<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerSettlementsMonthChips>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerSettlementsMonthChips>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1OwnerSettlementsMonthChips>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1OwnerSettlementsMonthChips>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1OwnerSettlementsMonthChips<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerSettlementsMonthChips>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerSettlementsMonthChips>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary 사장님 정산 월 칩 조회
+ */
+
+export function useGetApiV1OwnerSettlementsMonthChips<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerSettlementsMonthChips>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerSettlementsMonthChips>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions =
+    getGetApiV1OwnerSettlementsMonthChipsQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary 사장님 환불 요청 목록 조회
+ */
+export type getApiV1OwnerSettlementsRefundRequestsResponse200 = {
+  data: ApiResponseOwnerRefundRequestList;
+  status: 200;
+};
+
+export type getApiV1OwnerSettlementsRefundRequestsResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type getApiV1OwnerSettlementsRefundRequestsResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type getApiV1OwnerSettlementsRefundRequestsResponseSuccess =
+  getApiV1OwnerSettlementsRefundRequestsResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1OwnerSettlementsRefundRequestsResponseError = (
+  | getApiV1OwnerSettlementsRefundRequestsResponse401
+  | getApiV1OwnerSettlementsRefundRequestsResponse403
+) & {
+  headers: Headers;
+};
+
+export type getApiV1OwnerSettlementsRefundRequestsResponse =
+  | getApiV1OwnerSettlementsRefundRequestsResponseSuccess
+  | getApiV1OwnerSettlementsRefundRequestsResponseError;
+
+export const getGetApiV1OwnerSettlementsRefundRequestsUrl = (
+  params?: GetApiV1OwnerSettlementsRefundRequestsParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/owner/settlements/refund-requests?${stringifiedParams}`
+    : `/api/v1/owner/settlements/refund-requests`;
+};
+
+export const getApiV1OwnerSettlementsRefundRequests = async (
+  params?: GetApiV1OwnerSettlementsRefundRequestsParams,
+  options?: RequestInit,
+): Promise<getApiV1OwnerSettlementsRefundRequestsResponse> => {
+  return customFetch<getApiV1OwnerSettlementsRefundRequestsResponse>(
+    getGetApiV1OwnerSettlementsRefundRequestsUrl(params),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
+
+export const getGetApiV1OwnerSettlementsRefundRequestsQueryKey = (
+  params?: GetApiV1OwnerSettlementsRefundRequestsParams,
+) => {
+  return [
+    `/api/v1/owner/settlements/refund-requests`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetApiV1OwnerSettlementsRefundRequestsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiV1OwnerSettlementsRefundRequests>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  params?: GetApiV1OwnerSettlementsRefundRequestsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerSettlementsRefundRequests>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetApiV1OwnerSettlementsRefundRequestsQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiV1OwnerSettlementsRefundRequests>>
+  > = ({ signal }) =>
+    getApiV1OwnerSettlementsRefundRequests(params, {
+      signal,
+      ...requestOptions,
+    });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiV1OwnerSettlementsRefundRequests>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiV1OwnerSettlementsRefundRequestsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiV1OwnerSettlementsRefundRequests>>
+>;
+export type GetApiV1OwnerSettlementsRefundRequestsQueryError =
+  | UnauthorizedResponse
+  | ForbiddenResponse;
+
+export function useGetApiV1OwnerSettlementsRefundRequests<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerSettlementsRefundRequests>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  params: undefined | GetApiV1OwnerSettlementsRefundRequestsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerSettlementsRefundRequests>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1OwnerSettlementsRefundRequests>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1OwnerSettlementsRefundRequests>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1OwnerSettlementsRefundRequests<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerSettlementsRefundRequests>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  params?: GetApiV1OwnerSettlementsRefundRequestsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerSettlementsRefundRequests>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1OwnerSettlementsRefundRequests>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1OwnerSettlementsRefundRequests>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1OwnerSettlementsRefundRequests<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerSettlementsRefundRequests>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  params?: GetApiV1OwnerSettlementsRefundRequestsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerSettlementsRefundRequests>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary 사장님 환불 요청 목록 조회
+ */
+
+export function useGetApiV1OwnerSettlementsRefundRequests<
+  TData = Awaited<ReturnType<typeof getApiV1OwnerSettlementsRefundRequests>>,
+  TError = UnauthorizedResponse | ForbiddenResponse,
+>(
+  params?: GetApiV1OwnerSettlementsRefundRequestsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1OwnerSettlementsRefundRequests>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiV1OwnerSettlementsRefundRequestsQueryOptions(
+    params,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary 사장님 환불 요청 상세 조회
+ */
+export type getApiV1OwnerSettlementsRefundRequestsParticipationIdResponse200 = {
+  data: ApiResponseOwnerRefundRequestDetail;
+  status: 200;
+};
+
+export type getApiV1OwnerSettlementsRefundRequestsParticipationIdResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type getApiV1OwnerSettlementsRefundRequestsParticipationIdResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type getApiV1OwnerSettlementsRefundRequestsParticipationIdResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type getApiV1OwnerSettlementsRefundRequestsParticipationIdResponseSuccess =
+  getApiV1OwnerSettlementsRefundRequestsParticipationIdResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1OwnerSettlementsRefundRequestsParticipationIdResponseError =
+  (
+    | getApiV1OwnerSettlementsRefundRequestsParticipationIdResponse401
+    | getApiV1OwnerSettlementsRefundRequestsParticipationIdResponse403
+    | getApiV1OwnerSettlementsRefundRequestsParticipationIdResponse404
+  ) & {
+    headers: Headers;
+  };
+
+export type getApiV1OwnerSettlementsRefundRequestsParticipationIdResponse =
+  | getApiV1OwnerSettlementsRefundRequestsParticipationIdResponseSuccess
+  | getApiV1OwnerSettlementsRefundRequestsParticipationIdResponseError;
+
+export const getGetApiV1OwnerSettlementsRefundRequestsParticipationIdUrl = (
+  participationId: number,
+) => {
+  return `/api/v1/owner/settlements/refund-requests/${participationId}`;
+};
+
+export const getApiV1OwnerSettlementsRefundRequestsParticipationId = async (
+  participationId: number,
+  options?: RequestInit,
+): Promise<getApiV1OwnerSettlementsRefundRequestsParticipationIdResponse> => {
+  return customFetch<getApiV1OwnerSettlementsRefundRequestsParticipationIdResponse>(
+    getGetApiV1OwnerSettlementsRefundRequestsParticipationIdUrl(
+      participationId,
+    ),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
+
+export const getGetApiV1OwnerSettlementsRefundRequestsParticipationIdQueryKey =
+  (participationId: number) => {
+    return [
+      `/api/v1/owner/settlements/refund-requests/${participationId}`,
+    ] as const;
+  };
+
+export const getGetApiV1OwnerSettlementsRefundRequestsParticipationIdQueryOptions =
+  <
+    TData = Awaited<
+      ReturnType<typeof getApiV1OwnerSettlementsRefundRequestsParticipationId>
+    >,
+    TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+  >(
+    participationId: number,
+    options?: {
+      query?: Partial<
+        UseQueryOptions<
+          Awaited<
+            ReturnType<
+              typeof getApiV1OwnerSettlementsRefundRequestsParticipationId
+            >
+          >,
+          TError,
+          TData
+        >
+      >;
+      request?: SecondParameter<typeof customFetch>;
+    },
+  ) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
+
+    const queryKey =
+      queryOptions?.queryKey ??
+      getGetApiV1OwnerSettlementsRefundRequestsParticipationIdQueryKey(
+        participationId,
+      );
+
+    const queryFn: QueryFunction<
+      Awaited<
+        ReturnType<typeof getApiV1OwnerSettlementsRefundRequestsParticipationId>
+      >
+    > = ({ signal }) =>
+      getApiV1OwnerSettlementsRefundRequestsParticipationId(participationId, {
+        signal,
+        ...requestOptions,
+      });
+
+    return {
+      queryKey,
+      queryFn,
+      enabled: !!participationId,
+      ...queryOptions,
+    } as UseQueryOptions<
+      Awaited<
+        ReturnType<typeof getApiV1OwnerSettlementsRefundRequestsParticipationId>
+      >,
+      TError,
+      TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+  };
+
+export type GetApiV1OwnerSettlementsRefundRequestsParticipationIdQueryResult =
+  NonNullable<
+    Awaited<
+      ReturnType<typeof getApiV1OwnerSettlementsRefundRequestsParticipationId>
+    >
+  >;
+export type GetApiV1OwnerSettlementsRefundRequestsParticipationIdQueryError =
+  | UnauthorizedResponse
+  | ForbiddenResponse
+  | NotFoundResponse;
+
+export function useGetApiV1OwnerSettlementsRefundRequestsParticipationId<
+  TData = Awaited<
+    ReturnType<typeof getApiV1OwnerSettlementsRefundRequestsParticipationId>
+  >,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  participationId: number,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<
+          ReturnType<
+            typeof getApiV1OwnerSettlementsRefundRequestsParticipationId
+          >
+        >,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<
+            ReturnType<
+              typeof getApiV1OwnerSettlementsRefundRequestsParticipationId
+            >
+          >,
+          TError,
+          Awaited<
+            ReturnType<
+              typeof getApiV1OwnerSettlementsRefundRequestsParticipationId
+            >
+          >
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1OwnerSettlementsRefundRequestsParticipationId<
+  TData = Awaited<
+    ReturnType<typeof getApiV1OwnerSettlementsRefundRequestsParticipationId>
+  >,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  participationId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<
+          ReturnType<
+            typeof getApiV1OwnerSettlementsRefundRequestsParticipationId
+          >
+        >,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<
+            ReturnType<
+              typeof getApiV1OwnerSettlementsRefundRequestsParticipationId
+            >
+          >,
+          TError,
+          Awaited<
+            ReturnType<
+              typeof getApiV1OwnerSettlementsRefundRequestsParticipationId
+            >
+          >
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1OwnerSettlementsRefundRequestsParticipationId<
+  TData = Awaited<
+    ReturnType<typeof getApiV1OwnerSettlementsRefundRequestsParticipationId>
+  >,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  participationId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<
+          ReturnType<
+            typeof getApiV1OwnerSettlementsRefundRequestsParticipationId
+          >
+        >,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary 사장님 환불 요청 상세 조회
+ */
+
+export function useGetApiV1OwnerSettlementsRefundRequestsParticipationId<
+  TData = Awaited<
+    ReturnType<typeof getApiV1OwnerSettlementsRefundRequestsParticipationId>
+  >,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  participationId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<
+          ReturnType<
+            typeof getApiV1OwnerSettlementsRefundRequestsParticipationId
+          >
+        >,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions =
+    getGetApiV1OwnerSettlementsRefundRequestsParticipationIdQueryOptions(
+      participationId,
+      options,
+    );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary 사장님 환불 요청 검토 제출
+ */
+export type postApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsResponse200 =
+  {
+    data: ApiResponseOwnerRefundReviewSubmit;
+    status: 200;
+  };
+
+export type postApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsResponse400 =
+  {
+    data: BadRequestResponse;
+    status: 400;
+  };
+
+export type postApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsResponse401 =
+  {
+    data: UnauthorizedResponse;
+    status: 401;
+  };
+
+export type postApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsResponse403 =
+  {
+    data: ForbiddenResponse;
+    status: 403;
+  };
+
+export type postApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsResponse404 =
+  {
+    data: NotFoundResponse;
+    status: 404;
+  };
+
+export type postApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsResponse409 =
+  {
+    data: ConflictResponse;
+    status: 409;
+  };
+
+export type postApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsResponseSuccess =
+  postApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsResponse200 & {
+    headers: Headers;
+  };
+export type postApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsResponseError =
+  (
+    | postApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsResponse400
+    | postApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsResponse401
+    | postApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsResponse403
+    | postApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsResponse404
+    | postApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsResponse409
+  ) & {
+    headers: Headers;
+  };
+
+export type postApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsResponse =
+
+    | postApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsResponseSuccess
+    | postApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsResponseError;
+
+export const getPostApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsUrl =
+  (participationId: number) => {
+    return `/api/v1/owner/settlements/refund-requests/${participationId}/review-submissions`;
+  };
+
+export const postApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissions =
+  async (
+    participationId: number,
+    ownerRefundReviewSubmitRequest: OwnerRefundReviewSubmitRequest,
+    options?: RequestInit,
+  ): Promise<postApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsResponse> => {
+    return customFetch<postApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsResponse>(
+      getPostApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsUrl(
+        participationId,
+      ),
+      {
+        ...options,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...options?.headers },
+        body: JSON.stringify(ownerRefundReviewSubmitRequest),
+      },
+    );
+  };
+
+export const getPostApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsMutationOptions =
+  <
+    TError =
+      | BadRequestResponse
+      | UnauthorizedResponse
+      | ForbiddenResponse
+      | NotFoundResponse
+      | ConflictResponse,
+    TContext = unknown,
+  >(options?: {
+    mutation?: UseMutationOptions<
+      Awaited<
+        ReturnType<
+          typeof postApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissions
+        >
+      >,
+      TError,
+      { participationId: number; data: OwnerRefundReviewSubmitRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  }): UseMutationOptions<
+    Awaited<
+      ReturnType<
+        typeof postApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissions
+      >
+    >,
+    TError,
+    { participationId: number; data: OwnerRefundReviewSubmitRequest },
+    TContext
+  > => {
+    const mutationKey = [
+      'postApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissions',
+    ];
+    const { mutation: mutationOptions, request: requestOptions } = options
+      ? options.mutation &&
+        'mutationKey' in options.mutation &&
+        options.mutation.mutationKey
+        ? options
+        : { ...options, mutation: { ...options.mutation, mutationKey } }
+      : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+      Awaited<
+        ReturnType<
+          typeof postApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissions
+        >
+      >,
+      { participationId: number; data: OwnerRefundReviewSubmitRequest }
+    > = (props) => {
+      const { participationId, data } = props ?? {};
+
+      return postApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissions(
+        participationId,
+        data,
+        requestOptions,
+      );
+    };
+
+    return { mutationFn, ...mutationOptions };
+  };
+
+export type PostApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsMutationResult =
+  NonNullable<
+    Awaited<
+      ReturnType<
+        typeof postApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissions
+      >
+    >
+  >;
+export type PostApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsMutationBody =
+  OwnerRefundReviewSubmitRequest;
+export type PostApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsMutationError =
+
+    | BadRequestResponse
+    | UnauthorizedResponse
+    | ForbiddenResponse
+    | NotFoundResponse
+    | ConflictResponse;
+
+/**
+ * @summary 사장님 환불 요청 검토 제출
+ */
+export const usePostApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissions =
+  <
+    TError =
+      | BadRequestResponse
+      | UnauthorizedResponse
+      | ForbiddenResponse
+      | NotFoundResponse
+      | ConflictResponse,
+    TContext = unknown,
+  >(
+    options?: {
+      mutation?: UseMutationOptions<
+        Awaited<
+          ReturnType<
+            typeof postApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissions
+          >
+        >,
+        TError,
+        { participationId: number; data: OwnerRefundReviewSubmitRequest },
+        TContext
+      >;
+      request?: SecondParameter<typeof customFetch>;
+    },
+    queryClient?: QueryClient,
+  ): UseMutationResult<
+    Awaited<
+      ReturnType<
+        typeof postApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissions
+      >
+    >,
+    TError,
+    { participationId: number; data: OwnerRefundReviewSubmitRequest },
+    TContext
+  > => {
+    return useMutation(
+      getPostApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsMutationOptions(
+        options,
+      ),
+      queryClient,
+    );
+  };
 /**
  * 사장님이 본인 매장 기준으로 제출한 공구 개설 요청 목록을 조회한다.
  * @summary 사장님 공구 개설 요청 목록 조회

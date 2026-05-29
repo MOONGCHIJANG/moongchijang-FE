@@ -78,7 +78,7 @@ const page = async ({ params }: Props) => {
 
   return (
     <div>
-      <ViewerToast />
+      <ViewerToast groupBuyId={Number(groupBuyId)} />
       <TopInfo data={data} />
       <ItemDetail data={data} />
       <BottomJoin data={data} />

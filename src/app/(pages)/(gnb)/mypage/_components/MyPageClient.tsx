@@ -1,7 +1,8 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { logEvent } from '@/lib/analytics';
 import { useAuthStore } from '@/store/authStore';
 import { useGetApiV1ParticipationsParticipationIdQr } from '@/api/hooks/pickup/pickup';
 import { formatPickupDateTime, formatTime } from '@/lib/date';
@@ -22,7 +23,6 @@ const TAB_LABELS: Record<TabKey, string> = {
   completed: '픽업 완료',
   refunded: '환불/취소',
 };
-
 
 function formatDDay(dDay: number): string {
   if (dDay === 0) return 'D-day';
@@ -45,7 +45,9 @@ const MyPageClient = ({ tab }: { tab: TabKey }) => {
 
   const { data: qrData } = useGetApiV1ParticipationsParticipationIdQr(
     qrParticipationId ?? 0,
-    { query: { enabled: isQrOpen && qrParticipationId !== null } },
+    {
+      query: { enabled: isLoggedIn && isQrOpen && qrParticipationId !== null },
+    },
   );
 
   const handleQrClose = useCallback(() => setIsQrOpen(false), []);
@@ -63,8 +65,11 @@ const MyPageClient = ({ tab }: { tab: TabKey }) => {
 
   const qrItem = qrData?.status === 200 ? qrData.data?.data : null;
 
-  const { data: tabCountsData } = useGetApiV1UsersMeTabsCounts();
-  const tabCounts = tabCountsData?.status === 200 ? tabCountsData.data?.data : null;
+  const { data: tabCountsData } = useGetApiV1UsersMeTabsCounts({
+    query: { enabled: isLoggedIn },
+  });
+  const tabCounts =
+    tabCountsData?.status === 200 ? tabCountsData.data?.data : null;
 
   const countByTab: Record<TabKey, number> = {
     active: tabCounts?.inProgressCount ?? 0,
@@ -79,6 +84,15 @@ const MyPageClient = ({ tab }: { tab: TabKey }) => {
     },
     [router],
   );
+
+  useEffect(() => {
+    if (!isInitialized) return;
+    if (isLoggedIn) {
+      logEvent('mypage_view');
+    } else {
+      logEvent('unauthorized_access', { target_screen: 'mypage' });
+    }
+  }, [isInitialized, isLoggedIn]);
 
   if (!isInitialized) return null;
 
@@ -126,7 +140,11 @@ const MyPageClient = ({ tab }: { tab: TabKey }) => {
             </button>
           ))}
         </div>
-        <ParticipationTab tabType={tab} onQrClick={handleQrClick} />
+        <ParticipationTab
+          tabType={tab}
+          onQrClick={handleQrClick}
+          isLoggedIn={isLoggedIn}
+        />
       </div>
 
       <QrModal
@@ -149,7 +167,8 @@ const MyPageClient = ({ tab }: { tab: TabKey }) => {
         shakeEnabled={isEnabled}
         onShakeToggle={toggleShake}
         onDetailClick={() => {
-          if (qrParticipationId) router.push(`/mypage/pickup/${qrParticipationId}`);
+          if (qrParticipationId)
+            router.push(`/mypage/pickup/${qrParticipationId}`);
         }}
       />
     </div>

@@ -7,6 +7,7 @@ import { Button } from '@/components/Button';
 import { type Store } from './StoreSearchStep';
 import { DatePickerBottomSheet } from './DatePickerBottomSheet';
 import { RequestConfirmModal } from './RequestConfirmModal';
+import { logEvent } from '@/lib/analytics';
 
 export interface RequestFormData {
   store: Store;
@@ -131,6 +132,13 @@ export const RequestFormStep = ({
             type="text"
             value={productName}
             onChange={(e) => setProductName(e.target.value)}
+            onBlur={() => {
+              if (productName.trim()) {
+                logEvent('groupbuy_request_field_complete', {
+                  field_name: 'product_name',
+                });
+              }
+            }}
             placeholder="원하는 상품명을 정확히 입력해주세요"
             maxLength={20}
             className="w-full px-3 py-4 bg-surface-default rounded-2xlarge body-md-regular text-text-subtle placeholder:text-icon-disabled outline-none"
@@ -160,6 +168,14 @@ export const RequestFormStep = ({
             min="1"
             value={quantity}
             onChange={(e) => setQuantity(e.target.value)}
+            onBlur={() => {
+              if (Number(quantity) > 0) {
+                logEvent('groupbuy_request_field_complete', {
+                  field_name: 'quantity',
+                  value_type: 'number',
+                });
+              }
+            }}
             placeholder="1인 픽업 수량을 입력해주세요"
             className="w-full px-3 py-4 bg-surface-default rounded-2xlarge body-md-regular text-text-subtle placeholder:text-icon-disabled outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           />
@@ -234,7 +250,20 @@ export const RequestFormStep = ({
           fullWidth
           className="w-full text-text-basic-inverse cursor-pointer"
           disabled={!isSubmittable || isLoading}
-          onClick={() => setIsConfirmModalOpen(true)}
+          onClick={() => {
+            const filledCount = [
+              !!store,
+              !!productName.trim(),
+              quantityNum > 0,
+              !!pickupDate,
+            ].filter(Boolean).length;
+            logEvent('groupbuy_request_submit_click', {
+              filled_field_count: filledCount,
+              has_memo: !!additionalNote.trim(),
+              quantity: quantityNum,
+            });
+            setIsConfirmModalOpen(true);
+          }}
         >
           {isLoading ? '제출 중...' : '요청 제출하기'}
         </Button>
@@ -244,7 +273,15 @@ export const RequestFormStep = ({
         isOpen={isDatePickerOpen}
         onClose={() => setIsDatePickerOpen(false)}
         selectedDate={pickupDate}
-        onSelect={setPickupDate}
+        onSelect={(date) => {
+          setPickupDate(date);
+          if (date) {
+            logEvent('groupbuy_request_field_complete', {
+              field_name: 'pickup_date',
+              value_type: 'date',
+            });
+          }
+        }}
       />
 
       {store && (

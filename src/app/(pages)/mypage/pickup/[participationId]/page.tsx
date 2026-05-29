@@ -11,7 +11,11 @@ import {
   useGetApiV1ParticipationsParticipationIdQr,
 } from '@/api/hooks/pickup/pickup';
 import { useShake } from '@/hooks/useShake';
-import { formatPickupDate, formatPickupDateTime as formatPickupDateTimeLib, formatTime } from '@/lib/date';
+import {
+  formatPickupDate,
+  formatPickupDateTime as formatPickupDateTimeLib,
+  formatTime,
+} from '@/lib/date';
 
 const NaverMap = dynamic(() => import('@/components/NaverMap'), { ssr: false });
 

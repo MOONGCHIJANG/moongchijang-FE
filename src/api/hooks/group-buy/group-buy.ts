@@ -31,7 +31,6 @@ import type {
   BadRequestResponse,
   GetApiV1GroupBuysParams,
   GetApiV1GroupBuysProgressParams,
-  GroupBuyViewerHeartbeatRequest,
   NotFoundResponse,
   PostApiV1SearchBody,
   SuccessNoDataResponse,
@@ -663,17 +662,14 @@ export function useGetApiV1GroupBuysGroupBuyIdProgress<
 /**
  * 공구 상세 화면 진입 시 및 체류 중 일정 주기(예: 20~30초)로 호출한다.
 서버는 세션 TTL을 연장하고 최신 활성 조회자 수를 반환한다.
+비로그인 사용자는 viewerSessionId 쿠키가 없으면 서버에서 자동 발급한다.
+로그인 사용자는 userId 기준으로 집계한다.
 
  * @summary 활성 조회자 heartbeat 조회/갱신
  */
 export type postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse200 = {
   data: ApiResponseGroupBuyViewerCount;
   status: 200;
-};
-
-export type postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse400 = {
-  data: BadRequestResponse;
-  status: 400;
 };
 
 export type postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse404 = {
@@ -685,12 +681,10 @@ export type postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponseSuccess =
   postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse200 & {
     headers: Headers;
   };
-export type postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponseError = (
-  | postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse400
-  | postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse404
-) & {
-  headers: Headers;
-};
+export type postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponseError =
+  postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse404 & {
+    headers: Headers;
+  };
 
 export type postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse =
   | postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponseSuccess
@@ -704,7 +698,6 @@ export const getPostApiV1GroupBuysGroupBuyIdViewersHeartbeatUrl = (
 
 export const postApiV1GroupBuysGroupBuyIdViewersHeartbeat = async (
   groupBuyId: number,
-  groupBuyViewerHeartbeatRequest: GroupBuyViewerHeartbeatRequest,
   options?: RequestInit,
 ): Promise<postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse> => {
   return customFetch<postApiV1GroupBuysGroupBuyIdViewersHeartbeatResponse>(
@@ -712,27 +705,25 @@ export const postApiV1GroupBuysGroupBuyIdViewersHeartbeat = async (
     {
       ...options,
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...options?.headers },
-      body: JSON.stringify(groupBuyViewerHeartbeatRequest),
     },
   );
 };
 
 export const getPostApiV1GroupBuysGroupBuyIdViewersHeartbeatMutationOptions = <
-  TError = BadRequestResponse | NotFoundResponse,
+  TError = NotFoundResponse,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiV1GroupBuysGroupBuyIdViewersHeartbeat>>,
     TError,
-    { groupBuyId: number; data: GroupBuyViewerHeartbeatRequest },
+    { groupBuyId: number },
     TContext
   >;
   request?: SecondParameter<typeof customFetch>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postApiV1GroupBuysGroupBuyIdViewersHeartbeat>>,
   TError,
-  { groupBuyId: number; data: GroupBuyViewerHeartbeatRequest },
+  { groupBuyId: number },
   TContext
 > => {
   const mutationKey = ['postApiV1GroupBuysGroupBuyIdViewersHeartbeat'];
@@ -746,13 +737,12 @@ export const getPostApiV1GroupBuysGroupBuyIdViewersHeartbeatMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postApiV1GroupBuysGroupBuyIdViewersHeartbeat>>,
-    { groupBuyId: number; data: GroupBuyViewerHeartbeatRequest }
+    { groupBuyId: number }
   > = (props) => {
-    const { groupBuyId, data } = props ?? {};
+    const { groupBuyId } = props ?? {};
 
     return postApiV1GroupBuysGroupBuyIdViewersHeartbeat(
       groupBuyId,
-      data,
       requestOptions,
     );
   };
@@ -764,24 +754,22 @@ export type PostApiV1GroupBuysGroupBuyIdViewersHeartbeatMutationResult =
   NonNullable<
     Awaited<ReturnType<typeof postApiV1GroupBuysGroupBuyIdViewersHeartbeat>>
   >;
-export type PostApiV1GroupBuysGroupBuyIdViewersHeartbeatMutationBody =
-  GroupBuyViewerHeartbeatRequest;
+
 export type PostApiV1GroupBuysGroupBuyIdViewersHeartbeatMutationError =
-  | BadRequestResponse
-  | NotFoundResponse;
+  NotFoundResponse;
 
 /**
  * @summary 활성 조회자 heartbeat 조회/갱신
  */
 export const usePostApiV1GroupBuysGroupBuyIdViewersHeartbeat = <
-  TError = BadRequestResponse | NotFoundResponse,
+  TError = NotFoundResponse,
   TContext = unknown,
 >(
   options?: {
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof postApiV1GroupBuysGroupBuyIdViewersHeartbeat>>,
       TError,
-      { groupBuyId: number; data: GroupBuyViewerHeartbeatRequest },
+      { groupBuyId: number },
       TContext
     >;
     request?: SecondParameter<typeof customFetch>;
@@ -790,7 +778,7 @@ export const usePostApiV1GroupBuysGroupBuyIdViewersHeartbeat = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiV1GroupBuysGroupBuyIdViewersHeartbeat>>,
   TError,
-  { groupBuyId: number; data: GroupBuyViewerHeartbeatRequest },
+  { groupBuyId: number },
   TContext
 > => {
   return useMutation(

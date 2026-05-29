@@ -37,6 +37,8 @@ import { useAuthStore } from '@/store/authStore';
 import { formatPickupDateTime, formatTime } from '@/lib/date';
 import { useFeedList } from '../_hooks/useFeedList';
 import { useRecentSearches } from '../_hooks/useRecentSearches';
+import { logEvent } from '@/lib/analytics';
+import Footer from '@/components/Footer';
 
 const ALL_REGIONS = REGIONS_DATA.flatMap((city) => city.regions);
 const VALID_FILTERS: FilterId[] = ['all', 'due', 'target'];
@@ -213,13 +215,30 @@ export function FeedClient() {
     setIsSearchOpen(false);
   };
 
+  const FILTER_NAMES: Record<FilterId, string> = {
+    all: '전체',
+    due: '마감임박',
+    target: '달성임박',
+  };
+
   const handleFilterChange = (filter: FilterId) => {
+    logEvent('search_chip_select', { chip_name: FILTER_NAMES[filter] });
     setActiveFilter(filter);
     updateUrl({ filter: filter === 'all' ? null : filter });
   };
 
   const handleApplyLocation = (newRegions: Region[]) => {
     const resolved = newRegions.length > 0 ? newRegions : [DEFAULT_REGION];
+    const regionBefore = selectedRegions.map((r) => r.name).join(',');
+    const regionAfter = resolved.map((r) => r.name).join(',');
+    logEvent('region_change', {
+      region_before: regionBefore,
+      region_after: regionAfter,
+    });
+    logEvent('search_filter_apply', {
+      filter_type: 'region',
+      filter_value: regionAfter,
+    });
     setSelectedRegions(resolved);
     setIsLocationSheetOpen(false);
     const districtValues = resolved.map((r) => r.districtType);
@@ -233,6 +252,12 @@ export function FeedClient() {
   };
 
   const handleOpenRequestSheet = useCallback(() => {
+    if (searchKeyword) {
+      logEvent('group_request_cta_click', {
+        search_term: searchKeyword,
+        source: 'search_empty',
+      });
+    }
     const params = new URLSearchParams();
     if (searchAnalysis?.detectedProduct)
       params.set('bakery', searchAnalysis.detectedProduct);
@@ -240,7 +265,7 @@ export function FeedClient() {
       params.set('neighborhood', searchAnalysis.detectedRegion);
     const qs = params.toString();
     router.push(`/feed/request${qs ? `?${qs}` : ''}`);
-  }, [router, searchAnalysis]);
+  }, [router, searchAnalysis, searchKeyword]);
 
   const handleShake = useCallback(() => {
     if (!isLoggedIn) return;
@@ -280,7 +305,7 @@ export function FeedClient() {
         />
       </header>
 
-      <div className="flex flex-col gap-4 px-5 pb-5">
+      <div className="flex flex-col gap-4 px-5">
         {isDisplayLoading ? (
           <FeedSkeletonList />
         ) : !isSearchMode && !hasSearchResult ? (
@@ -298,8 +323,19 @@ export function FeedClient() {
               <span className="heading-sm-bold text-text-basic font-pretendard">
                 지금 인기 있는 공구 상품
               </span>
-              {feeds.map((feed) => (
-                <Link key={feed.id} href={`/item/${feed.id}`}>
+              {feeds.map((feed, index) => (
+                <Link
+                  key={feed.id}
+                  href={`/item/${feed.id}`}
+                  onClick={() =>
+                    logEvent('feed_item_click', {
+                      item_id: feed.id,
+                      item_name: feed.productName,
+                      store_name: feed.storeName,
+                      position: index,
+                    })
+                  }
+                >
                   <FeedCard {...feed} />
                 </Link>
               ))}
@@ -317,8 +353,19 @@ export function FeedClient() {
           </div>
         ) : (
           <>
-            {displayItems.map((feed) => (
-              <Link key={feed.id} href={`/item/${feed.id}`}>
+            {displayItems.map((feed, index) => (
+              <Link
+                key={feed.id}
+                href={`/item/${feed.id}`}
+                onClick={() =>
+                  logEvent('feed_item_click', {
+                    item_id: feed.id,
+                    item_name: feed.productName,
+                    store_name: feed.storeName,
+                    position: index,
+                  })
+                }
+              >
                 <FeedCard {...feed} />
               </Link>
             ))}
@@ -362,6 +409,8 @@ export function FeedClient() {
         <div ref={sentinelRef} className="h-1" />
         {isFetchingNextPage && <FeedSkeletonList />}
       </div>
+
+      <Footer hasBottomSticky={false} />
 
       <LocationBottomSheet
         isOpen={isLocationSheetOpen}

@@ -35,8 +35,11 @@ import type {
   ApiResponsePhoneNumberUpdated,
   ApiResponsePhoneVerificationCodeSent,
   ApiResponsePhoneVerificationVerified,
+  ApiResponseSellerBusinessProfile,
+  ApiResponseSellerSettlementAccount,
   ApiResponseSellerSignupStatus,
   ApiResponseUserInfo,
+  ApiResponseWithdrawalContext,
   BadRequestResponse,
   BusinessRegistrationLookupRequest,
   ConflictResponse,
@@ -48,7 +51,10 @@ import type {
   GetApiV1AuthEmailAvailabilityParams,
   GetApiV1UsersNicknameAvailabilityParams,
   KakaoLoginRequest,
+  MyPageRoleSwitchRequest,
   NicknameUpdateRequest,
+  NotFoundResponse,
+  OwnerWithdrawRequest,
   PasswordChangeRequest,
   PhoneNumberUpdateRequest,
   PhoneVerificationCodeSendRequest,
@@ -551,78 +557,82 @@ export function useGetApiV1UsersMe<
 }
 
 /**
- * 회원 탈퇴를 처리한다.
-- 수령 예정 공구(달성 완료 + 픽업 미완료)가 있으면 탈퇴할 수 없다.
-- 참여 중 공구(PAID_WAITING_GOAL)는 자동 취소된다.
-- 찜 목록은 모두 삭제된다.
-- 동일 계정은 탈퇴 후 30일 이후 재가입 가능하다.
-
- * @summary 회원 탈퇴
+ * 소비자/사장님 모드를 전환한다.
+ * @summary 마이페이지 역할 전환
  */
-export type deleteApiV1UsersMeResponse200 = {
-  data: SuccessNoDataResponse;
+export type patchApiV1UsersMeRoleResponse200 = {
+  data: ApiResponseUserInfo;
   status: 200;
 };
 
-export type deleteApiV1UsersMeResponse401 = {
+export type patchApiV1UsersMeRoleResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type patchApiV1UsersMeRoleResponse401 = {
   data: UnauthorizedResponse;
   status: 401;
 };
 
-export type deleteApiV1UsersMeResponse409 = {
-  data: ConflictResponse;
-  status: 409;
+export type patchApiV1UsersMeRoleResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
 };
 
-export type deleteApiV1UsersMeResponseSuccess =
-  deleteApiV1UsersMeResponse200 & {
+export type patchApiV1UsersMeRoleResponseSuccess =
+  patchApiV1UsersMeRoleResponse200 & {
     headers: Headers;
   };
-export type deleteApiV1UsersMeResponseError = (
-  | deleteApiV1UsersMeResponse401
-  | deleteApiV1UsersMeResponse409
+export type patchApiV1UsersMeRoleResponseError = (
+  | patchApiV1UsersMeRoleResponse400
+  | patchApiV1UsersMeRoleResponse401
+  | patchApiV1UsersMeRoleResponse403
 ) & {
   headers: Headers;
 };
 
-export type deleteApiV1UsersMeResponse =
-  | deleteApiV1UsersMeResponseSuccess
-  | deleteApiV1UsersMeResponseError;
+export type patchApiV1UsersMeRoleResponse =
+  | patchApiV1UsersMeRoleResponseSuccess
+  | patchApiV1UsersMeRoleResponseError;
 
-export const getDeleteApiV1UsersMeUrl = () => {
-  return `/api/v1/users/me`;
+export const getPatchApiV1UsersMeRoleUrl = () => {
+  return `/api/v1/users/me/role`;
 };
 
-export const deleteApiV1UsersMe = async (
-  withdrawRequest?: WithdrawRequest,
+export const patchApiV1UsersMeRole = async (
+  myPageRoleSwitchRequest: MyPageRoleSwitchRequest,
   options?: RequestInit,
-): Promise<deleteApiV1UsersMeResponse> => {
-  return customFetch<deleteApiV1UsersMeResponse>(getDeleteApiV1UsersMeUrl(), {
-    ...options,
-    method: 'DELETE',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(withdrawRequest),
-  });
+): Promise<patchApiV1UsersMeRoleResponse> => {
+  return customFetch<patchApiV1UsersMeRoleResponse>(
+    getPatchApiV1UsersMeRoleUrl(),
+    {
+      ...options,
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(myPageRoleSwitchRequest),
+    },
+  );
 };
 
-export const getDeleteApiV1UsersMeMutationOptions = <
-  TError = UnauthorizedResponse | ConflictResponse,
+export const getPatchApiV1UsersMeRoleMutationOptions = <
+  TError = BadRequestResponse | UnauthorizedResponse | ForbiddenResponse,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof deleteApiV1UsersMe>>,
+    Awaited<ReturnType<typeof patchApiV1UsersMeRole>>,
     TError,
-    { data?: WithdrawRequest },
+    { data: MyPageRoleSwitchRequest },
     TContext
   >;
   request?: SecondParameter<typeof customFetch>;
 }): UseMutationOptions<
-  Awaited<ReturnType<typeof deleteApiV1UsersMe>>,
+  Awaited<ReturnType<typeof patchApiV1UsersMeRole>>,
   TError,
-  { data?: WithdrawRequest },
+  { data: MyPageRoleSwitchRequest },
   TContext
 > => {
-  const mutationKey = ['deleteApiV1UsersMe'];
+  const mutationKey = ['patchApiV1UsersMeRole'];
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation &&
       'mutationKey' in options.mutation &&
@@ -632,35 +642,170 @@ export const getDeleteApiV1UsersMeMutationOptions = <
     : { mutation: { mutationKey }, request: undefined };
 
   const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof deleteApiV1UsersMe>>,
-    { data?: WithdrawRequest }
+    Awaited<ReturnType<typeof patchApiV1UsersMeRole>>,
+    { data: MyPageRoleSwitchRequest }
   > = (props) => {
     const { data } = props ?? {};
 
-    return deleteApiV1UsersMe(data, requestOptions);
+    return patchApiV1UsersMeRole(data, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
 };
 
-export type DeleteApiV1UsersMeMutationResult = NonNullable<
-  Awaited<ReturnType<typeof deleteApiV1UsersMe>>
+export type PatchApiV1UsersMeRoleMutationResult = NonNullable<
+  Awaited<ReturnType<typeof patchApiV1UsersMeRole>>
 >;
-export type DeleteApiV1UsersMeMutationBody = WithdrawRequest | undefined;
-export type DeleteApiV1UsersMeMutationError =
+export type PatchApiV1UsersMeRoleMutationBody = MyPageRoleSwitchRequest;
+export type PatchApiV1UsersMeRoleMutationError =
+  | BadRequestResponse
+  | UnauthorizedResponse
+  | ForbiddenResponse;
+
+/**
+ * @summary 마이페이지 역할 전환
+ */
+export const usePatchApiV1UsersMeRole = <
+  TError = BadRequestResponse | UnauthorizedResponse | ForbiddenResponse,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof patchApiV1UsersMeRole>>,
+      TError,
+      { data: MyPageRoleSwitchRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof patchApiV1UsersMeRole>>,
+  TError,
+  { data: MyPageRoleSwitchRequest },
+  TContext
+> => {
+  return useMutation(
+    getPatchApiV1UsersMeRoleMutationOptions(options),
+    queryClient,
+  );
+};
+/**
+ * 회원 탈퇴를 처리한다.
+- 탈퇴 진입 컨텍스트 조회 결과와 무관하게 실행 시점 최종 검증을 다시 수행한다.
+- 수령 예정 공구(달성 완료 + 픽업 미완료)가 있으면 탈퇴할 수 없다.
+- 참여 중 공구(PAID_WAITING_GOAL)는 자동 취소된다.
+- 찜 목록은 모두 삭제된다.
+- 동일 계정은 탈퇴 후 30일 이후 재가입 가능하다.
+- 최종 검증 실패 시 409 에러를 반환한다. (예: WITHDRAWAL_BLOCKED_PENDING_PICKUP)
+
+ * @summary 회원 탈퇴
+ */
+export type deleteApiV1UsersMeRoleResponse200 = {
+  data: SuccessNoDataResponse;
+  status: 200;
+};
+
+export type deleteApiV1UsersMeRoleResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type deleteApiV1UsersMeRoleResponse409 = {
+  data: ConflictResponse;
+  status: 409;
+};
+
+export type deleteApiV1UsersMeRoleResponseSuccess =
+  deleteApiV1UsersMeRoleResponse200 & {
+    headers: Headers;
+  };
+export type deleteApiV1UsersMeRoleResponseError = (
+  | deleteApiV1UsersMeRoleResponse401
+  | deleteApiV1UsersMeRoleResponse409
+) & {
+  headers: Headers;
+};
+
+export type deleteApiV1UsersMeRoleResponse =
+  | deleteApiV1UsersMeRoleResponseSuccess
+  | deleteApiV1UsersMeRoleResponseError;
+
+export const getDeleteApiV1UsersMeRoleUrl = () => {
+  return `/api/v1/users/me/role`;
+};
+
+export const deleteApiV1UsersMeRole = async (
+  withdrawRequest?: WithdrawRequest,
+  options?: RequestInit,
+): Promise<deleteApiV1UsersMeRoleResponse> => {
+  return customFetch<deleteApiV1UsersMeRoleResponse>(
+    getDeleteApiV1UsersMeRoleUrl(),
+    {
+      ...options,
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(withdrawRequest),
+    },
+  );
+};
+
+export const getDeleteApiV1UsersMeRoleMutationOptions = <
+  TError = UnauthorizedResponse | ConflictResponse,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteApiV1UsersMeRole>>,
+    TError,
+    { data?: WithdrawRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteApiV1UsersMeRole>>,
+  TError,
+  { data?: WithdrawRequest },
+  TContext
+> => {
+  const mutationKey = ['deleteApiV1UsersMeRole'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteApiV1UsersMeRole>>,
+    { data?: WithdrawRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return deleteApiV1UsersMeRole(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteApiV1UsersMeRoleMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteApiV1UsersMeRole>>
+>;
+export type DeleteApiV1UsersMeRoleMutationBody = WithdrawRequest | undefined;
+export type DeleteApiV1UsersMeRoleMutationError =
   | UnauthorizedResponse
   | ConflictResponse;
 
 /**
  * @summary 회원 탈퇴
  */
-export const useDeleteApiV1UsersMe = <
+export const useDeleteApiV1UsersMeRole = <
   TError = UnauthorizedResponse | ConflictResponse,
   TContext = unknown,
 >(
   options?: {
     mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof deleteApiV1UsersMe>>,
+      Awaited<ReturnType<typeof deleteApiV1UsersMeRole>>,
       TError,
       { data?: WithdrawRequest },
       TContext
@@ -669,16 +814,211 @@ export const useDeleteApiV1UsersMe = <
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
-  Awaited<ReturnType<typeof deleteApiV1UsersMe>>,
+  Awaited<ReturnType<typeof deleteApiV1UsersMeRole>>,
   TError,
   { data?: WithdrawRequest },
   TContext
 > => {
   return useMutation(
-    getDeleteApiV1UsersMeMutationOptions(options),
+    getDeleteApiV1UsersMeRoleMutationOptions(options),
     queryClient,
   );
 };
+/**
+ * 소비자/사장님 탈퇴 가능 상태와 권장 탈퇴 화면 정보를 조회한다.
+이 응답은 진입/라우팅 가이드 용도이며, 실제 탈퇴 실행 시점에는 최종 검증이 다시 수행된다.
+
+ * @summary 탈퇴 진입 컨텍스트 조회
+ */
+export type getApiV1UsersMeWithdrawalContextResponse200 = {
+  data: ApiResponseWithdrawalContext;
+  status: 200;
+};
+
+export type getApiV1UsersMeWithdrawalContextResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type getApiV1UsersMeWithdrawalContextResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type getApiV1UsersMeWithdrawalContextResponseSuccess =
+  getApiV1UsersMeWithdrawalContextResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1UsersMeWithdrawalContextResponseError = (
+  | getApiV1UsersMeWithdrawalContextResponse401
+  | getApiV1UsersMeWithdrawalContextResponse404
+) & {
+  headers: Headers;
+};
+
+export type getApiV1UsersMeWithdrawalContextResponse =
+  | getApiV1UsersMeWithdrawalContextResponseSuccess
+  | getApiV1UsersMeWithdrawalContextResponseError;
+
+export const getGetApiV1UsersMeWithdrawalContextUrl = () => {
+  return `/api/v1/users/me/withdrawal-context`;
+};
+
+export const getApiV1UsersMeWithdrawalContext = async (
+  options?: RequestInit,
+): Promise<getApiV1UsersMeWithdrawalContextResponse> => {
+  return customFetch<getApiV1UsersMeWithdrawalContextResponse>(
+    getGetApiV1UsersMeWithdrawalContextUrl(),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
+
+export const getGetApiV1UsersMeWithdrawalContextQueryKey = () => {
+  return [`/api/v1/users/me/withdrawal-context`] as const;
+};
+
+export const getGetApiV1UsersMeWithdrawalContextQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiV1UsersMeWithdrawalContext>>,
+  TError = UnauthorizedResponse | NotFoundResponse,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getApiV1UsersMeWithdrawalContext>>,
+      TError,
+      TData
+    >
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetApiV1UsersMeWithdrawalContextQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiV1UsersMeWithdrawalContext>>
+  > = ({ signal }) =>
+    getApiV1UsersMeWithdrawalContext({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiV1UsersMeWithdrawalContext>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiV1UsersMeWithdrawalContextQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiV1UsersMeWithdrawalContext>>
+>;
+export type GetApiV1UsersMeWithdrawalContextQueryError =
+  | UnauthorizedResponse
+  | NotFoundResponse;
+
+export function useGetApiV1UsersMeWithdrawalContext<
+  TData = Awaited<ReturnType<typeof getApiV1UsersMeWithdrawalContext>>,
+  TError = UnauthorizedResponse | NotFoundResponse,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1UsersMeWithdrawalContext>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1UsersMeWithdrawalContext>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1UsersMeWithdrawalContext>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1UsersMeWithdrawalContext<
+  TData = Awaited<ReturnType<typeof getApiV1UsersMeWithdrawalContext>>,
+  TError = UnauthorizedResponse | NotFoundResponse,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1UsersMeWithdrawalContext>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1UsersMeWithdrawalContext>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1UsersMeWithdrawalContext>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1UsersMeWithdrawalContext<
+  TData = Awaited<ReturnType<typeof getApiV1UsersMeWithdrawalContext>>,
+  TError = UnauthorizedResponse | NotFoundResponse,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1UsersMeWithdrawalContext>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary 탈퇴 진입 컨텍스트 조회
+ */
+
+export function useGetApiV1UsersMeWithdrawalContext<
+  TData = Awaited<ReturnType<typeof getApiV1UsersMeWithdrawalContext>>,
+  TError = UnauthorizedResponse | NotFoundResponse,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1UsersMeWithdrawalContext>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiV1UsersMeWithdrawalContextQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
 /**
  * 추가정보 입력(0.5) 단계에서 닉네임 사용 가능 여부를 확인한다.
  * @summary 닉네임 중복 확인
@@ -1438,6 +1778,851 @@ export const usePatchApiV1UsersMeSellerSettlementInfo = <
 > => {
   return useMutation(
     getPatchApiV1UsersMeSellerSettlementInfoMutationOptions(options),
+    queryClient,
+  );
+};
+/**
+ * 사장님의 현재 입금 계좌 정보를 조회한다.
+ * @summary 사장님 입금 계좌 조회
+ */
+export type getApiV1UsersMeSellerSettlementAccountResponse200 = {
+  data: ApiResponseSellerSettlementAccount;
+  status: 200;
+};
+
+export type getApiV1UsersMeSellerSettlementAccountResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type getApiV1UsersMeSellerSettlementAccountResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type getApiV1UsersMeSellerSettlementAccountResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type getApiV1UsersMeSellerSettlementAccountResponseSuccess =
+  getApiV1UsersMeSellerSettlementAccountResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1UsersMeSellerSettlementAccountResponseError = (
+  | getApiV1UsersMeSellerSettlementAccountResponse401
+  | getApiV1UsersMeSellerSettlementAccountResponse403
+  | getApiV1UsersMeSellerSettlementAccountResponse404
+) & {
+  headers: Headers;
+};
+
+export type getApiV1UsersMeSellerSettlementAccountResponse =
+  | getApiV1UsersMeSellerSettlementAccountResponseSuccess
+  | getApiV1UsersMeSellerSettlementAccountResponseError;
+
+export const getGetApiV1UsersMeSellerSettlementAccountUrl = () => {
+  return `/api/v1/users/me/seller/settlement-account`;
+};
+
+export const getApiV1UsersMeSellerSettlementAccount = async (
+  options?: RequestInit,
+): Promise<getApiV1UsersMeSellerSettlementAccountResponse> => {
+  return customFetch<getApiV1UsersMeSellerSettlementAccountResponse>(
+    getGetApiV1UsersMeSellerSettlementAccountUrl(),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
+
+export const getGetApiV1UsersMeSellerSettlementAccountQueryKey = () => {
+  return [`/api/v1/users/me/seller/settlement-account`] as const;
+};
+
+export const getGetApiV1UsersMeSellerSettlementAccountQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiV1UsersMeSellerSettlementAccount>>,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getApiV1UsersMeSellerSettlementAccount>>,
+      TError,
+      TData
+    >
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetApiV1UsersMeSellerSettlementAccountQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiV1UsersMeSellerSettlementAccount>>
+  > = ({ signal }) =>
+    getApiV1UsersMeSellerSettlementAccount({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiV1UsersMeSellerSettlementAccount>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiV1UsersMeSellerSettlementAccountQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiV1UsersMeSellerSettlementAccount>>
+>;
+export type GetApiV1UsersMeSellerSettlementAccountQueryError =
+  | UnauthorizedResponse
+  | ForbiddenResponse
+  | NotFoundResponse;
+
+export function useGetApiV1UsersMeSellerSettlementAccount<
+  TData = Awaited<ReturnType<typeof getApiV1UsersMeSellerSettlementAccount>>,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1UsersMeSellerSettlementAccount>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1UsersMeSellerSettlementAccount>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1UsersMeSellerSettlementAccount>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1UsersMeSellerSettlementAccount<
+  TData = Awaited<ReturnType<typeof getApiV1UsersMeSellerSettlementAccount>>,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1UsersMeSellerSettlementAccount>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1UsersMeSellerSettlementAccount>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1UsersMeSellerSettlementAccount>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1UsersMeSellerSettlementAccount<
+  TData = Awaited<ReturnType<typeof getApiV1UsersMeSellerSettlementAccount>>,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1UsersMeSellerSettlementAccount>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary 사장님 입금 계좌 조회
+ */
+
+export function useGetApiV1UsersMeSellerSettlementAccount<
+  TData = Awaited<ReturnType<typeof getApiV1UsersMeSellerSettlementAccount>>,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1UsersMeSellerSettlementAccount>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions =
+    getGetApiV1UsersMeSellerSettlementAccountQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * 사장님의 입금 계좌 정보를 변경한다.
+ * @summary 사장님 입금 계좌 변경
+ */
+export type patchApiV1UsersMeSellerSettlementAccountResponse200 = {
+  data: ApiResponseSellerSettlementAccount;
+  status: 200;
+};
+
+export type patchApiV1UsersMeSellerSettlementAccountResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type patchApiV1UsersMeSellerSettlementAccountResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type patchApiV1UsersMeSellerSettlementAccountResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type patchApiV1UsersMeSellerSettlementAccountResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type patchApiV1UsersMeSellerSettlementAccountResponseSuccess =
+  patchApiV1UsersMeSellerSettlementAccountResponse200 & {
+    headers: Headers;
+  };
+export type patchApiV1UsersMeSellerSettlementAccountResponseError = (
+  | patchApiV1UsersMeSellerSettlementAccountResponse400
+  | patchApiV1UsersMeSellerSettlementAccountResponse401
+  | patchApiV1UsersMeSellerSettlementAccountResponse403
+  | patchApiV1UsersMeSellerSettlementAccountResponse404
+) & {
+  headers: Headers;
+};
+
+export type patchApiV1UsersMeSellerSettlementAccountResponse =
+  | patchApiV1UsersMeSellerSettlementAccountResponseSuccess
+  | patchApiV1UsersMeSellerSettlementAccountResponseError;
+
+export const getPatchApiV1UsersMeSellerSettlementAccountUrl = () => {
+  return `/api/v1/users/me/seller/settlement-account`;
+};
+
+export const patchApiV1UsersMeSellerSettlementAccount = async (
+  sellerSettlementInfoUpsertRequest: SellerSettlementInfoUpsertRequest,
+  options?: RequestInit,
+): Promise<patchApiV1UsersMeSellerSettlementAccountResponse> => {
+  return customFetch<patchApiV1UsersMeSellerSettlementAccountResponse>(
+    getPatchApiV1UsersMeSellerSettlementAccountUrl(),
+    {
+      ...options,
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(sellerSettlementInfoUpsertRequest),
+    },
+  );
+};
+
+export const getPatchApiV1UsersMeSellerSettlementAccountMutationOptions = <
+  TError =
+    | BadRequestResponse
+    | UnauthorizedResponse
+    | ForbiddenResponse
+    | NotFoundResponse,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof patchApiV1UsersMeSellerSettlementAccount>>,
+    TError,
+    { data: SellerSettlementInfoUpsertRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof patchApiV1UsersMeSellerSettlementAccount>>,
+  TError,
+  { data: SellerSettlementInfoUpsertRequest },
+  TContext
+> => {
+  const mutationKey = ['patchApiV1UsersMeSellerSettlementAccount'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof patchApiV1UsersMeSellerSettlementAccount>>,
+    { data: SellerSettlementInfoUpsertRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return patchApiV1UsersMeSellerSettlementAccount(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PatchApiV1UsersMeSellerSettlementAccountMutationResult =
+  NonNullable<
+    Awaited<ReturnType<typeof patchApiV1UsersMeSellerSettlementAccount>>
+  >;
+export type PatchApiV1UsersMeSellerSettlementAccountMutationBody =
+  SellerSettlementInfoUpsertRequest;
+export type PatchApiV1UsersMeSellerSettlementAccountMutationError =
+  | BadRequestResponse
+  | UnauthorizedResponse
+  | ForbiddenResponse
+  | NotFoundResponse;
+
+/**
+ * @summary 사장님 입금 계좌 변경
+ */
+export const usePatchApiV1UsersMeSellerSettlementAccount = <
+  TError =
+    | BadRequestResponse
+    | UnauthorizedResponse
+    | ForbiddenResponse
+    | NotFoundResponse,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof patchApiV1UsersMeSellerSettlementAccount>>,
+      TError,
+      { data: SellerSettlementInfoUpsertRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof patchApiV1UsersMeSellerSettlementAccount>>,
+  TError,
+  { data: SellerSettlementInfoUpsertRequest },
+  TContext
+> => {
+  return useMutation(
+    getPatchApiV1UsersMeSellerSettlementAccountMutationOptions(options),
+    queryClient,
+  );
+};
+/**
+ * 사장님의 현재 사업자 정보를 조회한다.
+ * @summary 사장님 사업자 정보 조회
+ */
+export type getApiV1UsersMeSellerBusinessProfileResponse200 = {
+  data: ApiResponseSellerBusinessProfile;
+  status: 200;
+};
+
+export type getApiV1UsersMeSellerBusinessProfileResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type getApiV1UsersMeSellerBusinessProfileResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type getApiV1UsersMeSellerBusinessProfileResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type getApiV1UsersMeSellerBusinessProfileResponseSuccess =
+  getApiV1UsersMeSellerBusinessProfileResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1UsersMeSellerBusinessProfileResponseError = (
+  | getApiV1UsersMeSellerBusinessProfileResponse401
+  | getApiV1UsersMeSellerBusinessProfileResponse403
+  | getApiV1UsersMeSellerBusinessProfileResponse404
+) & {
+  headers: Headers;
+};
+
+export type getApiV1UsersMeSellerBusinessProfileResponse =
+  | getApiV1UsersMeSellerBusinessProfileResponseSuccess
+  | getApiV1UsersMeSellerBusinessProfileResponseError;
+
+export const getGetApiV1UsersMeSellerBusinessProfileUrl = () => {
+  return `/api/v1/users/me/seller/business-profile`;
+};
+
+export const getApiV1UsersMeSellerBusinessProfile = async (
+  options?: RequestInit,
+): Promise<getApiV1UsersMeSellerBusinessProfileResponse> => {
+  return customFetch<getApiV1UsersMeSellerBusinessProfileResponse>(
+    getGetApiV1UsersMeSellerBusinessProfileUrl(),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
+
+export const getGetApiV1UsersMeSellerBusinessProfileQueryKey = () => {
+  return [`/api/v1/users/me/seller/business-profile`] as const;
+};
+
+export const getGetApiV1UsersMeSellerBusinessProfileQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiV1UsersMeSellerBusinessProfile>>,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getApiV1UsersMeSellerBusinessProfile>>,
+      TError,
+      TData
+    >
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetApiV1UsersMeSellerBusinessProfileQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiV1UsersMeSellerBusinessProfile>>
+  > = ({ signal }) =>
+    getApiV1UsersMeSellerBusinessProfile({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiV1UsersMeSellerBusinessProfile>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiV1UsersMeSellerBusinessProfileQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiV1UsersMeSellerBusinessProfile>>
+>;
+export type GetApiV1UsersMeSellerBusinessProfileQueryError =
+  | UnauthorizedResponse
+  | ForbiddenResponse
+  | NotFoundResponse;
+
+export function useGetApiV1UsersMeSellerBusinessProfile<
+  TData = Awaited<ReturnType<typeof getApiV1UsersMeSellerBusinessProfile>>,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1UsersMeSellerBusinessProfile>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1UsersMeSellerBusinessProfile>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1UsersMeSellerBusinessProfile>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1UsersMeSellerBusinessProfile<
+  TData = Awaited<ReturnType<typeof getApiV1UsersMeSellerBusinessProfile>>,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1UsersMeSellerBusinessProfile>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1UsersMeSellerBusinessProfile>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1UsersMeSellerBusinessProfile>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1UsersMeSellerBusinessProfile<
+  TData = Awaited<ReturnType<typeof getApiV1UsersMeSellerBusinessProfile>>,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1UsersMeSellerBusinessProfile>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary 사장님 사업자 정보 조회
+ */
+
+export function useGetApiV1UsersMeSellerBusinessProfile<
+  TData = Awaited<ReturnType<typeof getApiV1UsersMeSellerBusinessProfile>>,
+  TError = UnauthorizedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1UsersMeSellerBusinessProfile>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions =
+    getGetApiV1UsersMeSellerBusinessProfileQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * 사장님의 사업자 정보를 변경한다.
+ * @summary 사장님 사업자 정보 변경
+ */
+export type patchApiV1UsersMeSellerBusinessProfileResponse200 = {
+  data: ApiResponseSellerBusinessProfile;
+  status: 200;
+};
+
+export type patchApiV1UsersMeSellerBusinessProfileResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type patchApiV1UsersMeSellerBusinessProfileResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type patchApiV1UsersMeSellerBusinessProfileResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type patchApiV1UsersMeSellerBusinessProfileResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type patchApiV1UsersMeSellerBusinessProfileResponseSuccess =
+  patchApiV1UsersMeSellerBusinessProfileResponse200 & {
+    headers: Headers;
+  };
+export type patchApiV1UsersMeSellerBusinessProfileResponseError = (
+  | patchApiV1UsersMeSellerBusinessProfileResponse400
+  | patchApiV1UsersMeSellerBusinessProfileResponse401
+  | patchApiV1UsersMeSellerBusinessProfileResponse403
+  | patchApiV1UsersMeSellerBusinessProfileResponse404
+) & {
+  headers: Headers;
+};
+
+export type patchApiV1UsersMeSellerBusinessProfileResponse =
+  | patchApiV1UsersMeSellerBusinessProfileResponseSuccess
+  | patchApiV1UsersMeSellerBusinessProfileResponseError;
+
+export const getPatchApiV1UsersMeSellerBusinessProfileUrl = () => {
+  return `/api/v1/users/me/seller/business-profile`;
+};
+
+export const patchApiV1UsersMeSellerBusinessProfile = async (
+  sellerBusinessInfoUpsertRequest: SellerBusinessInfoUpsertRequest,
+  options?: RequestInit,
+): Promise<patchApiV1UsersMeSellerBusinessProfileResponse> => {
+  return customFetch<patchApiV1UsersMeSellerBusinessProfileResponse>(
+    getPatchApiV1UsersMeSellerBusinessProfileUrl(),
+    {
+      ...options,
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(sellerBusinessInfoUpsertRequest),
+    },
+  );
+};
+
+export const getPatchApiV1UsersMeSellerBusinessProfileMutationOptions = <
+  TError =
+    | BadRequestResponse
+    | UnauthorizedResponse
+    | ForbiddenResponse
+    | NotFoundResponse,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof patchApiV1UsersMeSellerBusinessProfile>>,
+    TError,
+    { data: SellerBusinessInfoUpsertRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof patchApiV1UsersMeSellerBusinessProfile>>,
+  TError,
+  { data: SellerBusinessInfoUpsertRequest },
+  TContext
+> => {
+  const mutationKey = ['patchApiV1UsersMeSellerBusinessProfile'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof patchApiV1UsersMeSellerBusinessProfile>>,
+    { data: SellerBusinessInfoUpsertRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return patchApiV1UsersMeSellerBusinessProfile(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PatchApiV1UsersMeSellerBusinessProfileMutationResult = NonNullable<
+  Awaited<ReturnType<typeof patchApiV1UsersMeSellerBusinessProfile>>
+>;
+export type PatchApiV1UsersMeSellerBusinessProfileMutationBody =
+  SellerBusinessInfoUpsertRequest;
+export type PatchApiV1UsersMeSellerBusinessProfileMutationError =
+  | BadRequestResponse
+  | UnauthorizedResponse
+  | ForbiddenResponse
+  | NotFoundResponse;
+
+/**
+ * @summary 사장님 사업자 정보 변경
+ */
+export const usePatchApiV1UsersMeSellerBusinessProfile = <
+  TError =
+    | BadRequestResponse
+    | UnauthorizedResponse
+    | ForbiddenResponse
+    | NotFoundResponse,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof patchApiV1UsersMeSellerBusinessProfile>>,
+      TError,
+      { data: SellerBusinessInfoUpsertRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof patchApiV1UsersMeSellerBusinessProfile>>,
+  TError,
+  { data: SellerBusinessInfoUpsertRequest },
+  TContext
+> => {
+  return useMutation(
+    getPatchApiV1UsersMeSellerBusinessProfileMutationOptions(options),
+    queryClient,
+  );
+};
+/**
+ * 사장님 회원 탈퇴를 처리한다.
+- 탈퇴 진입 컨텍스트 조회 결과와 무관하게 실행 시점 최종 검증을 다시 수행한다.
+- 개설된 공구(IN_PROGRESS)가 있으면 탈퇴할 수 없다.
+- 달성 완료/완료 공구(ACHIEVED, COMPLETED)에 픽업 미완료 참여가 있으면 탈퇴할 수 없다.
+- 소비자 수령 예정 공구가 있으면 탈퇴할 수 없다.
+- 동일 계정은 탈퇴 후 30일 이후 재가입 가능하다.
+- 최종 검증 실패 시 409 에러를 반환한다. (예: OWNER_WITHDRAWAL_BLOCKED_OPEN_GROUPBUY, OWNER_WITHDRAWAL_BLOCKED_PENDING_CUSTOMER_PICKUP, WITHDRAWAL_BLOCKED_PENDING_PICKUP)
+
+ * @summary 사장님 회원 탈퇴
+ */
+export type deleteApiV1UsersMeSellerResponse200 = {
+  data: SuccessNoDataResponse;
+  status: 200;
+};
+
+export type deleteApiV1UsersMeSellerResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type deleteApiV1UsersMeSellerResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type deleteApiV1UsersMeSellerResponse409 = {
+  data: ConflictResponse;
+  status: 409;
+};
+
+export type deleteApiV1UsersMeSellerResponseSuccess =
+  deleteApiV1UsersMeSellerResponse200 & {
+    headers: Headers;
+  };
+export type deleteApiV1UsersMeSellerResponseError = (
+  | deleteApiV1UsersMeSellerResponse401
+  | deleteApiV1UsersMeSellerResponse403
+  | deleteApiV1UsersMeSellerResponse409
+) & {
+  headers: Headers;
+};
+
+export type deleteApiV1UsersMeSellerResponse =
+  | deleteApiV1UsersMeSellerResponseSuccess
+  | deleteApiV1UsersMeSellerResponseError;
+
+export const getDeleteApiV1UsersMeSellerUrl = () => {
+  return `/api/v1/users/me/seller`;
+};
+
+export const deleteApiV1UsersMeSeller = async (
+  ownerWithdrawRequest: OwnerWithdrawRequest,
+  options?: RequestInit,
+): Promise<deleteApiV1UsersMeSellerResponse> => {
+  return customFetch<deleteApiV1UsersMeSellerResponse>(
+    getDeleteApiV1UsersMeSellerUrl(),
+    {
+      ...options,
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(ownerWithdrawRequest),
+    },
+  );
+};
+
+export const getDeleteApiV1UsersMeSellerMutationOptions = <
+  TError = UnauthorizedResponse | ForbiddenResponse | ConflictResponse,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteApiV1UsersMeSeller>>,
+    TError,
+    { data: OwnerWithdrawRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteApiV1UsersMeSeller>>,
+  TError,
+  { data: OwnerWithdrawRequest },
+  TContext
+> => {
+  const mutationKey = ['deleteApiV1UsersMeSeller'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      'mutationKey' in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteApiV1UsersMeSeller>>,
+    { data: OwnerWithdrawRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return deleteApiV1UsersMeSeller(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteApiV1UsersMeSellerMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteApiV1UsersMeSeller>>
+>;
+export type DeleteApiV1UsersMeSellerMutationBody = OwnerWithdrawRequest;
+export type DeleteApiV1UsersMeSellerMutationError =
+  | UnauthorizedResponse
+  | ForbiddenResponse
+  | ConflictResponse;
+
+/**
+ * @summary 사장님 회원 탈퇴
+ */
+export const useDeleteApiV1UsersMeSeller = <
+  TError = UnauthorizedResponse | ForbiddenResponse | ConflictResponse,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deleteApiV1UsersMeSeller>>,
+      TError,
+      { data: OwnerWithdrawRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof deleteApiV1UsersMeSeller>>,
+  TError,
+  { data: OwnerWithdrawRequest },
+  TContext
+> => {
+  return useMutation(
+    getDeleteApiV1UsersMeSellerMutationOptions(options),
     queryClient,
   );
 };

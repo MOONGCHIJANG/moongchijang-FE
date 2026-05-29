@@ -5,6 +5,7 @@ import { useTermsSheetStore } from '@/store/termsSheetStore';
 
 import ItemSummary from './ItemSummary';
 import JoinForm from './JoinForm';
+import AgreeTerms from './AgreeTerms';
 import AgreeTermsSheet from './AgreeTermsSheet';
 import PaymentButton from './PaymentButton';
 import type { ApiResponseGroupBuyDetailResponseData } from '@/api/generated/api.schemas';
@@ -188,6 +189,7 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
         totalAmount={totalAmount}
         productImage={groupBuy.imageUrls[0] || ''}
       />
+      <AgreeTerms />
       <AgreeTermsSheet
         isOpen={isTermsSheetOpen}
         onClose={closeTermsSheet}

@@ -5,7 +5,6 @@ import { useTermsSheetStore } from '@/store/termsSheetStore';
 
 import ItemSummary from './ItemSummary';
 import JoinForm from './JoinForm';
-import AgreeTerms from './AgreeTerms';
 import AgreeTermsSheet from './AgreeTermsSheet';
 import PaymentButton from './PaymentButton';
 import type { ApiResponseGroupBuyDetailResponseData } from '@/api/generated/api.schemas';
@@ -174,7 +173,7 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
   const totalAmount = productAmount + feeAmount;
 
   return (
-    <div className="relative bg-bg-white-muted p-4 pb-24">
+    <div className="relative bg-bg-white-muted p-4 pb-24 min-h-dvh">
       {isLoading && (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center" />
       )}
@@ -189,7 +188,6 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
         totalAmount={totalAmount}
         productImage={groupBuy.imageUrls[0] || ''}
       />
-      <AgreeTerms />
       <AgreeTermsSheet
         isOpen={isTermsSheetOpen}
         onClose={closeTermsSheet}

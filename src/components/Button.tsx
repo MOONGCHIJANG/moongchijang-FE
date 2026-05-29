@@ -16,7 +16,8 @@ const variants = {
     'border border-border-default bg-button-white text-text-tertiary active:bg-surface-default',
   ghost: 'bg-transparent text-text-disabled hover:text-gray-600',
   tertiary: 'bg-surface-default text-text-tertiary active:brightness-95',
-  black: 'bg-button-natural text-text-basic-inverse active:brightness-90',
+  black:
+    'bg-button-natural text-text-basic-inverse active:brightness-90 disabled:bg-surface-muted disabled:text-text-disabled',
 };
 
 const sizes = {

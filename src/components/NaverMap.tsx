@@ -131,7 +131,11 @@ export default function NaverMap({
 
   return (
     <div style={{ width, height }} className="relative">
-      <div ref={mapRef} className="w-full h-full" />
+      <div
+        ref={mapRef}
+        className="w-full h-full"
+        style={{ touchAction: 'auto' }}
+      />
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="w-8 h-8 border-4 border-border-brand border-t-transparent rounded-full animate-spin" />

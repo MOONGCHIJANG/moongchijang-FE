@@ -60,7 +60,7 @@ export function ManageGroupBuyItem({ item }: Props) {
 
   return (
     <Link
-      href={`/seller/management/${item.groupBuyId}`}
+      href={`/seller/management/${item.groupBuyId}?name=${encodeURIComponent(item.productName)}&price=${item.price}`}
       className="flex flex-col gap-2.5 rounded-2xl bg-white px-4 py-4 shadow-sm"
     >
       {/* 배지 행 */}

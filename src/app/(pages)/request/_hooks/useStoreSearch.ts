@@ -26,39 +26,40 @@ export const useStoreSearch = (): UseStoreSearchReturn => {
   const [isLoading, setIsLoading] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastFetchedQuery = useRef('');
+  // ref로 최신 searchParams를 유지해 콜백 deps에서 searchParams 제거
+  const searchParamsRef = useRef(searchParams);
+  useEffect(() => {
+    searchParamsRef.current = searchParams;
+  }, [searchParams]);
 
-  const updateUrlQuery = useCallback(
-    (value: string) => {
-      const params = new URLSearchParams(searchParams.toString());
-      if (value) {
-        params.set('q', value);
+  const replaceUrlParam = useCallback(
+    (key: string, value: string | null) => {
+      const params = new URLSearchParams(searchParamsRef.current.toString());
+      if (value !== null) {
+        params.set(key, value);
       } else {
-        params.delete('q');
+        params.delete(key);
       }
       const search = params.toString();
       router.replace(search ? `${pathname}?${search}` : pathname, {
         scroll: false,
       });
     },
-    [router, pathname, searchParams],
+    [router, pathname],
   );
 
   const handleQueryChange = useCallback(
     (value: string) => {
       setQuery(value);
-      updateUrlQuery(value);
+      replaceUrlParam('q', value || null);
     },
-    [updateUrlQuery],
+    [replaceUrlParam],
   );
 
-  const clearQueryFromUrl = useCallback(() => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.delete('q');
-    const search = params.toString();
-    router.replace(search ? `${pathname}?${search}` : pathname, {
-      scroll: false,
-    });
-  }, [router, pathname, searchParams]);
+  const clearQueryFromUrl = useCallback(
+    () => replaceUrlParam('q', null),
+    [replaceUrlParam],
+  );
 
   useEffect(() => {
     if (!query.trim()) {

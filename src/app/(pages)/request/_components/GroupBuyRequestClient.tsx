@@ -28,7 +28,6 @@ export const GroupBuyRequestClient = () => {
   const initialBakery = searchParams.get('bakery') ?? '';
   const [step, setStep] = useState<Step>('form');
   const [selectedStore, setSelectedStore] = useState<Store | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<
     ApiResponseStoreSearchListDataStoresItem[]
   >([]);
@@ -47,12 +46,17 @@ export const GroupBuyRequestClient = () => {
     toastTimerRef.current = setTimeout(() => setToastMessage(null), 3000);
   };
 
+  const entrySource = useRef(
+    (() => {
+      const raw = searchParams.get('source');
+      const source: 'search_empty' | 'mypage' | 'gnb' =
+        raw === 'search_empty' || raw === 'mypage' ? raw : 'gnb';
+      return source;
+    })(),
+  );
+
   useEffect(() => {
-    const rawSource = searchParams.get('source');
-    const source =
-      rawSource === 'search_empty' || rawSource === 'mypage'
-        ? rawSource
-        : 'gnb';
+    const source = entrySource.current;
     logEvent('screen_view', {
       screen_name: 'group_request_form',
       entry_source: source,
@@ -119,15 +123,16 @@ export const GroupBuyRequestClient = () => {
     return (
       <div className="h-full">
         <StoreSearchStep
-          query={searchQuery}
-          onQueryChange={setSearchQuery}
           results={searchResults}
           onResultsChange={handleSearchResultsChange}
           onSelectStore={(store) => {
             setSelectedStore(store);
             goToStep('map');
           }}
-          onBack={() => goToStep('form')}
+          onBack={() => {
+            setSearchResults([]);
+            goToStep('form');
+          }}
         />
       </div>
     );

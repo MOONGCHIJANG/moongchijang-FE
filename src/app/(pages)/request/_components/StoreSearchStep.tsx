@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { Icon } from '@iconify/react';
 import { cn } from '@/lib/utils';
 import { getApiV1StoresSearch } from '@/api/generated/group-buy-request/group-buy-request';
@@ -10,8 +11,6 @@ import { logEvent } from '@/lib/analytics';
 interface StoreSearchStepProps {
   onSelectStore: (store: Store) => void;
   onBack: () => void;
-  query: string;
-  onQueryChange: (query: string) => void;
   results: ApiResponseStoreSearchListDataStoresItem[];
   onResultsChange: (
     results: ApiResponseStoreSearchListDataStoresItem[],
@@ -30,14 +29,49 @@ export interface Store {
 export const StoreSearchStep = ({
   onSelectStore,
   onBack,
-  query,
-  onQueryChange,
   results,
   onResultsChange,
 }: StoreSearchStepProps) => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const [query, setQuery] = useState(searchParams.get('q') ?? '');
   const [isLoading, setIsLoading] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // URL에 이미 검색어가 있고 결과도 복원됐다면 재요청 불필요
   const lastFetchedQuery = useRef(results.length > 0 ? query : '');
+
+  const updateUrlQuery = useCallback(
+    (value: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (value) {
+        params.set('q', value);
+      } else {
+        params.delete('q');
+      }
+      const search = params.toString();
+      router.replace(search ? `${pathname}?${search}` : pathname, {
+        scroll: false,
+      });
+    },
+    [router, pathname, searchParams],
+  );
+
+  const handleQueryChange = (value: string) => {
+    setQuery(value);
+    updateUrlQuery(value);
+  };
+
+  const handleBack = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('q');
+    const search = params.toString();
+    router.replace(search ? `${pathname}?${search}` : pathname, {
+      scroll: false,
+    });
+    onBack();
+  };
 
   useEffect(() => {
     if (!query.trim()) {
@@ -118,7 +152,7 @@ export const StoreSearchStep = ({
       <header className="flex items-center h-[57px] px-4 border-b border-border-subtle shrink-0 gap-[2px]">
         <button
           type="button"
-          onClick={onBack}
+          onClick={handleBack}
           className="flex items-center justify-center w-8 h-8"
           aria-label="뒤로가기"
         >
@@ -142,7 +176,7 @@ export const StoreSearchStep = ({
           <input
             type="text"
             value={query}
-            onChange={(e) => onQueryChange(e.target.value)}
+            onChange={(e) => handleQueryChange(e.target.value)}
             placeholder="매장 이름 또는 주소 검색"
             className="w-full bg-transparent body-md-regular text-icon-basic placeholder:text-icon-disabled outline-none"
             autoFocus
@@ -151,7 +185,7 @@ export const StoreSearchStep = ({
           {query && (
             <button
               type="button"
-              onClick={() => onQueryChange('')}
+              onClick={() => handleQueryChange('')}
               className={cn(
                 'flex items-center justify-center w-4.5 h-4.5 text-icon-tertiary shrink-0',
               )}

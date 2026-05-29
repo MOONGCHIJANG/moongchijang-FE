@@ -9,6 +9,7 @@ import { Button } from '@/components/Button';
 import { RequestCard } from './RequestCard';
 import { useGetApiV1GroupBuyRequests } from '@/api/hooks/group-buy-request/group-buy-request';
 import { logEvent } from '@/lib/analytics';
+import { useAuthStore } from '@/store/authStore';
 
 function RequestListSkeleton() {
   return (
@@ -30,13 +31,46 @@ function RequestListSkeleton() {
 }
 
 export function RequestListClient() {
-  const { data, isLoading, isError } = useGetApiV1GroupBuyRequests();
+  const { isLoggedIn, isInitialized } = useAuthStore();
+
+  const { data, isLoading, isError } = useGetApiV1GroupBuyRequests({
+    query: { enabled: isLoggedIn }, // 로그인 시에만 호출
+  });
 
   useEffect(() => {
     logEvent('screen_view', { screen_name: 'group_request_history' });
     logEvent('group_request_history_view');
   }, []);
   const requests = data?.status === 200 ? (data.data?.data ?? []) : [];
+
+  if (!isInitialized) return null;
+
+  // 비로그인 안내
+  if (!isLoggedIn) {
+    return (
+      <div className="flex flex-col h-full">
+        <Header text="공구 요청하기" showBackButton={false} />
+        <div className="flex flex-col items-center justify-center h-full pb-[74px]">
+          <div className="flex flex-col items-center gap-g4">
+            <Image
+              src="/icons/moongchinyang.svg"
+              alt=""
+              width={51}
+              height={65}
+              className="mb-g4 w-20 h-25"
+            />
+            <span className="heading-md-semibold text-text-basic">
+              공구를 개설하려면&#160;
+              <Link href="/login" className="text-brand-primary">
+                로그인
+              </Link>
+              이 필요해요🥐
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!isLoading && data !== undefined && data.status !== 200) {
     throw new Error(`서버 오류: ${data.status}`);

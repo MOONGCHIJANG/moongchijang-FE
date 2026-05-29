@@ -1,20 +1,14 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { Icon } from '@iconify/react';
 import { cn } from '@/lib/utils';
-import { getApiV1StoresSearch } from '@/api/generated/group-buy-request/group-buy-request';
 import { type ApiResponseStoreSearchListDataStoresItem } from '@/api/generated/api.schemas';
 import { logEvent } from '@/lib/analytics';
+import { useStoreSearch } from '../_hooks/useStoreSearch';
 
 interface StoreSearchStepProps {
   onSelectStore: (store: Store) => void;
   onBack: () => void;
-  results: ApiResponseStoreSearchListDataStoresItem[];
-  onResultsChange: (
-    results: ApiResponseStoreSearchListDataStoresItem[],
-  ) => void;
 }
 
 export interface Store {
@@ -29,95 +23,19 @@ export interface Store {
 export const StoreSearchStep = ({
   onSelectStore,
   onBack,
-  results,
-  onResultsChange,
 }: StoreSearchStepProps) => {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
-  const [query, setQuery] = useState(searchParams.get('q') ?? '');
-  const [isLoading, setIsLoading] = useState(false);
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  // URL에 이미 검색어가 있고 결과도 복원됐다면 재요청 불필요
-  const lastFetchedQuery = useRef(results.length > 0 ? query : '');
-
-  const updateUrlQuery = useCallback(
-    (value: string) => {
-      const params = new URLSearchParams(searchParams.toString());
-      if (value) {
-        params.set('q', value);
-      } else {
-        params.delete('q');
-      }
-      const search = params.toString();
-      router.replace(search ? `${pathname}?${search}` : pathname, {
-        scroll: false,
-      });
-    },
-    [router, pathname, searchParams],
-  );
-
-  const handleQueryChange = (value: string) => {
-    setQuery(value);
-    updateUrlQuery(value);
-  };
+  const { query, results, isLoading, handleQueryChange, clearQueryFromUrl } =
+    useStoreSearch();
 
   const handleBack = () => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.delete('q');
-    const search = params.toString();
-    router.replace(search ? `${pathname}?${search}` : pathname, {
-      scroll: false,
-    });
+    clearQueryFromUrl();
     onBack();
   };
 
-  useEffect(() => {
-    if (!query.trim()) {
-      lastFetchedQuery.current = '';
-      onResultsChange([]);
-      return;
-    }
-
-    if (query.trim() === lastFetchedQuery.current) return;
-
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-
-    const controller = new AbortController();
-
-    debounceRef.current = setTimeout(async () => {
-      setIsLoading(true);
-      try {
-        const res = await getApiV1StoresSearch(
-          { keyword: query.trim() },
-          { signal: controller.signal },
-        );
-        if (res.status === 200) {
-          const stores = res.data.data?.stores ?? [];
-          lastFetchedQuery.current = query.trim();
-          onResultsChange(stores);
-          logEvent('groupbuy_request_search', {
-            query_length: query.trim().length,
-            result_count: stores.length,
-          });
-        }
-      } catch (err) {
-        if (err instanceof Error && err.name !== 'AbortError') {
-          console.error(err);
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    }, 300);
-
-    return () => {
-      controller.abort();
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    };
-  }, [query, onResultsChange]);
-
-  const handleSelect = (item: ApiResponseStoreSearchListDataStoresItem) => {
+  const handleSelect = (
+    item: ApiResponseStoreSearchListDataStoresItem,
+    position: number,
+  ) => {
     if (
       !item.storeName ||
       !item.roadAddress ||
@@ -125,10 +43,6 @@ export const StoreSearchStep = ({
       item.longitude == null
     )
       return;
-    const position = results.findIndex(
-      (r) =>
-        r.storeName === item.storeName && r.roadAddress === item.roadAddress,
-    );
     logEvent('groupbuy_request_store_select', {
       store_id: item.placeId ?? '',
       result_position: position,
@@ -219,7 +133,7 @@ export const StoreSearchStep = ({
               <li key={`${item.placeId}-${index}`}>
                 <button
                   type="button"
-                  onClick={() => handleSelect(item)}
+                  onClick={() => handleSelect(item, index)}
                   className={cn(
                     'w-full flex flex-col gap-0.5 px-5 py-3 text-left',
                     'active:bg-surface-default',

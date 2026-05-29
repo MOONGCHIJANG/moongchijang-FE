@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { type Store } from './StoreSearchStep';
-import { type ApiResponseStoreSearchListDataStoresItem } from '@/api/generated/api.schemas';
 import { RequestFormStep } from './RequestFormStep';
 import { StoreSearchStep } from './StoreSearchStep';
 import { MapConfirmStep } from './MapConfirmStep';
@@ -28,14 +27,6 @@ export const GroupBuyRequestClient = () => {
   const initialBakery = searchParams.get('bakery') ?? '';
   const [step, setStep] = useState<Step>('form');
   const [selectedStore, setSelectedStore] = useState<Store | null>(null);
-  const [searchResults, setSearchResults] = useState<
-    ApiResponseStoreSearchListDataStoresItem[]
-  >([]);
-  const handleSearchResultsChange = useCallback(
-    (results: ApiResponseStoreSearchListDataStoresItem[]) =>
-      setSearchResults(results),
-    [],
-  );
   const [isLoading, setIsLoading] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -123,16 +114,11 @@ export const GroupBuyRequestClient = () => {
     return (
       <div className="h-full">
         <StoreSearchStep
-          results={searchResults}
-          onResultsChange={handleSearchResultsChange}
           onSelectStore={(store) => {
             setSelectedStore(store);
             goToStep('map');
           }}
-          onBack={() => {
-            setSearchResults([]);
-            goToStep('form');
-          }}
+          onBack={() => goToStep('form')}
         />
       </div>
     );

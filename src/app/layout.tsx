@@ -104,6 +104,7 @@ export default function RootLayout({
     <html
       lang="ko"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased bg-bg-white-muted`}
+      suppressHydrationWarning
     >
       <script dangerouslySetInnerHTML={{ __html: `try{if(window.matchMedia('(display-mode:standalone)').matches||navigator.standalone){document.documentElement.classList.add('pwa');}}catch(e){}` }} />
       <body className="min-h-full flex flex-col mx-auto max-w-110">

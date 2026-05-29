@@ -18,7 +18,7 @@ export default async function MyPage({
 
   return (
     <>
-      <Header text="마이페이지" />
+      <Header text="마이페이지" showBackButton={false} />
       <MyPageClient tab={activeTab} />
     </>
   );

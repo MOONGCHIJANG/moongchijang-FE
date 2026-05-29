@@ -8,9 +8,7 @@ export default function GnbLayout({ children }: { children: React.ReactNode }) {
     >
       <main
         className="min-h-dvh overscroll-none"
-        style={{
-          paddingBottom: 'calc(58px + env(safe-area-inset-bottom, 0px))',
-        }}
+        style={{ paddingBottom: '58px' }}
       >
         {children}
       </main>

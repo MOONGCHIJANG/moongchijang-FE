@@ -89,6 +89,14 @@ export const useShake = (onShake: () => void) => {
   useEffect(() => {
     if (!isEnabled || !permissionGranted) return;
 
+    const preventUndoDialog = (e: Event) => {
+      const ie = e as InputEvent;
+      if (ie.inputType === 'historyUndo' || ie.inputType === 'historyRedo') {
+        e.preventDefault();
+      }
+    };
+    document.addEventListener('beforeinput', preventUndoDialog, true);
+
     let lastX = 0,
       lastY = 0,
       lastZ = 0;
@@ -124,7 +132,10 @@ export const useShake = (onShake: () => void) => {
     };
 
     window.addEventListener('devicemotion', handleDeviceMotion);
-    return () => window.removeEventListener('devicemotion', handleDeviceMotion);
+    return () => {
+      window.removeEventListener('devicemotion', handleDeviceMotion);
+      document.removeEventListener('beforeinput', preventUndoDialog, true);
+    };
   }, [isEnabled, permissionGranted]);
 
   return { isSupported, isEnabled, toggleShake };

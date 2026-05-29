@@ -83,16 +83,16 @@
   padding-bottom: 58px;
 }
 
-@media (display-mode: standalone) {
-  .gnb-nav {
-    height: 66px;
-  }
+html.pwa .gnb-nav {
+  height: 66px;
+}
 
-  .gnb-content {
-    padding-bottom: 66px;
-  }
+html.pwa .gnb-content {
+  padding-bottom: 66px;
+}
 
-  .pwa-pb {
-    padding-bottom: 8px;
-  }
+html.pwa .pwa-pb::after {
+  content: '';
+  display: block;
+  height: env(safe-area-inset-bottom, 8px);
 }

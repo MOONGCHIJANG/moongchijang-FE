@@ -92,7 +92,7 @@ export const GroupBuyRequestClient = () => {
         });
         logEvent('groupbuy_request_submit_success', {
           request_id: requestId!,
-          store_id: data.store.placeId,
+          store_id: data.store.placeId ?? '',
           quantity: data.quantity,
         });
         goToStep('complete');

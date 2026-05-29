@@ -19,7 +19,7 @@ interface StoreSearchStepProps {
 }
 
 export interface Store {
-  placeId: string;
+  placeId: string | null;
   storeName: string;
   roadAddress: string;
   lotAddress?: string | null;
@@ -101,7 +101,7 @@ export const StoreSearchStep = ({
       has_address: !!item.roadAddress,
     });
     onSelectStore({
-      placeId: item.placeId ?? '',
+      placeId: item.placeId ?? null,
       storeName: item.storeName,
       roadAddress: item.roadAddress,
       lotAddress: item.lotAddress,

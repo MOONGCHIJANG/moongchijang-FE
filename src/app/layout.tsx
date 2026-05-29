@@ -103,7 +103,7 @@ export default function RootLayout({
   return (
     <html
       lang="ko"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased bg-bg-white-muted`}
     >
       <body className="min-h-full flex flex-col mx-auto max-w-110">
         {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID &&

@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { QueryProvider } from '@/providers/QueryProvider';
@@ -18,6 +18,15 @@ const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
   subsets: ['latin'],
 });
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
+  themeColor: '#ffffff',
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -75,6 +84,14 @@ export const metadata: Metadata = {
         alt: '뭉치장 - 동네 공구 플랫폼',
       },
     ],
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: '뭉치장',
+  },
+  formatDetection: {
+    telephone: false,
   },
 };
 

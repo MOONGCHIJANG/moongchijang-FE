@@ -5,10 +5,14 @@ export default function manifest(): MetadataRoute.Manifest {
     name: '뭉치장',
     short_name: '뭉치장',
     description: '동네 공구 플랫폼 뭉치장에서 주변 공구를 찾아보세요.',
-    start_url: '/',
+    start_url: '/feed',
+    scope: '/',
     display: 'standalone',
     background_color: '#ffffff',
     theme_color: '#ffffff',
+    orientation: 'portrait',
+    lang: 'ko-KR',
+    categories: ['shopping'],
     icons: [
       {
         src: '/favicon/android-icon-192x192.png',
@@ -19,6 +23,13 @@ export default function manifest(): MetadataRoute.Manifest {
         src: '/favicon/android-icon-512x512.png',
         sizes: '512x512',
         type: 'image/png',
+        purpose: 'any',
+      },
+      {
+        src: '/favicon/android-icon-512x512.png',
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'maskable',
       },
     ],
   };

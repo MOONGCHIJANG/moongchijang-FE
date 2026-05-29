@@ -28,15 +28,17 @@ const PUBLIC_URLS = [
 
 // 비로그인 허용이지만 일부 하위 경로는 인증 필요한 경우
 const isPublicUrl = (url: string) => {
+  const pathname = url.split('?')[0];
+
   // group-buys 하위 중 인증 필요한 경로 먼저 체크
-  if (url.includes('/checkout')) return false;
-  if (url.includes('/payment-orders')) return false;
-  if (url.includes('/wishlist')) return false;
+  if (pathname.includes('/checkout')) return false;
+  if (pathname.includes('/payment-orders')) return false;
+  if (pathname.includes('/wishlist')) return false;
 
   // 그 외 group-buys는 모두 public
-  if (url.includes('/group-buys')) return true;
+  if (pathname.includes('/group-buys')) return true;
 
-  return PUBLIC_URLS.some((publicUrl) => url.includes(publicUrl));
+  return PUBLIC_URLS.some((publicUrl) => pathname.includes(publicUrl));
 };
 
 const tryRefreshToken = async (): Promise<string | null> => {

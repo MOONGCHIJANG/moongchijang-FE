@@ -86,6 +86,7 @@ const MyPageClient = ({ tab }: { tab: TabKey }) => {
   );
 
   useEffect(() => {
+    if (!isInitialized) return;
     if (isLoggedIn) {
       logEvent('mypage_view');
     } else {

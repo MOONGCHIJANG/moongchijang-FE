@@ -37,10 +37,7 @@ export const useStepProfile = (onNext: () => void) => {
     resolver: zodResolver(stepProfileSchema),
     mode: 'onBlur',
     defaultValues: {
-      nickname:
-        typeof window !== 'undefined'
-          ? (sessionStorage.getItem('kakaoNickname') ?? '')
-          : '',
+      nickname: '',
       phoneNumber: '',
       verificationCode: '',
     },
@@ -97,6 +94,13 @@ export const useStepProfile = (onNext: () => void) => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
   }, []);
+
+  useEffect(() => {
+    const kakaoNickname = sessionStorage.getItem('kakaoNickname');
+    if (kakaoNickname) {
+      form.setValue('nickname', kakaoNickname);
+    }
+  }, [form]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect

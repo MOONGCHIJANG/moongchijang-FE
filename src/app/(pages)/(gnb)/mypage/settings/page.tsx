@@ -69,7 +69,7 @@ export default function SettingsPage() {
 
   async function handleLogout() {
     await storeLogout();
-    router.push('/login');
+    router.push('/feed');
   }
 
   return (

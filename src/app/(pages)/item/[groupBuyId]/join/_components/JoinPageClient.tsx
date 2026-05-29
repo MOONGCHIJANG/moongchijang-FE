@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import * as PortOne from '@portone/browser-sdk/v2';
 import ItemSummary from './ItemSummary';
 import JoinForm from './JoinForm';
@@ -16,6 +16,7 @@ import {
   PaymentOrderCreatedResponse,
   PaymentConfirmedResponse,
 } from '@/api/schemas/participation';
+import { logEvent } from '@/lib/analytics';
 
 type Props = {
   groupBuyId: string;
@@ -31,6 +32,15 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
   const [isLoading, setIsLoading] = useState(false);
   const payMethod = 'CARD' as const;
   const isPayable = !isLoading;
+
+  useEffect(() => {
+    logEvent('begin_checkout', {
+      item_id: parseInt(groupBuyId),
+      item_name: groupBuy.productName,
+      price: groupBuy.price,
+      currency: 'KRW',
+    });
+  }, []);
 
   const handlePayment = async () => {
     if (isLoading) return;
@@ -126,6 +136,14 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
       participationId = completeParsed.data.data.participationId;
 
       // [5] 완료 페이지 이동
+      logEvent('purchase', {
+        transaction_id: participationId.toString(),
+        value: totalAmount,
+        currency: 'KRW',
+        item_id: parseInt(groupBuyId),
+        item_name: groupBuy.productName,
+        quantity,
+      });
       sessionStorage.setItem('paymentSuccess', participationId.toString());
       await new Promise((resolve) => setTimeout(resolve, 50));
       window.location.replace(

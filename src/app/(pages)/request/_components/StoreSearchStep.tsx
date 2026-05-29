@@ -5,6 +5,7 @@ import { Icon } from '@iconify/react';
 import { cn } from '@/lib/utils';
 import { getApiV1StoresSearch } from '@/api/generated/group-buy-request/group-buy-request';
 import { type ApiResponseStoreSearchListDataStoresItem } from '@/api/generated/api.schemas';
+import { logEvent } from '@/lib/analytics';
 
 interface StoreSearchStepProps {
   onSelectStore: (store: Store) => void;
@@ -49,7 +50,12 @@ export const StoreSearchStep = ({
           { signal: controller.signal },
         );
         if (res.status === 200) {
-          setResults(res.data.data?.stores ?? []);
+          const stores = res.data.data?.stores ?? [];
+          setResults(stores);
+          logEvent('groupbuy_request_search', {
+            query_length: query.trim().length,
+            result_count: stores.length,
+          });
         }
       } catch (err) {
         if (err instanceof Error && err.name !== 'AbortError') {
@@ -75,6 +81,12 @@ export const StoreSearchStep = ({
       item.longitude == null
     )
       return;
+    const position = results.findIndex((r) => r.placeId === item.placeId);
+    logEvent('groupbuy_request_store_select', {
+      store_id: item.placeId,
+      result_position: position,
+      has_address: !!item.roadAddress,
+    });
     onSelectStore({
       placeId: item.placeId,
       storeName: item.storeName,
@@ -121,6 +133,7 @@ export const StoreSearchStep = ({
             placeholder="매장 이름 또는 주소 검색"
             className="w-full bg-transparent body-md-regular text-icon-basic placeholder:text-icon-disabled outline-none"
             autoFocus
+            onFocus={() => logEvent('groupbuy_request_search_start', {})}
           />
           {query && (
             <button

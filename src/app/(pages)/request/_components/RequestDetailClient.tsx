@@ -1,9 +1,11 @@
 'use client';
 
+import { useEffect } from 'react';
 import Header from '@/components/Header';
 import { GroupBuyRequestDetailStatus } from '@/api/generated/api.schemas';
 import { useGetApiV1GroupBuyRequestsRequestId } from '@/api/hooks/group-buy-request/group-buy-request';
 import { formatDate } from '@/lib/date';
+import { logEvent } from '@/lib/analytics';
 
 function getStatusConfig(status: GroupBuyRequestDetailStatus): {
   badge: string;
@@ -43,6 +45,15 @@ export function RequestDetailClient({ requestId }: RequestDetailClientProps) {
     useGetApiV1GroupBuyRequestsRequestId(requestId);
   const request = data?.status === 200 ? data.data?.data : null;
   const is403 = data?.status === 403;
+
+  useEffect(() => {
+    if (request) {
+      logEvent('groupbuy_request_detail_view', {
+        request_id: requestId,
+        request_status: request.status,
+      });
+    }
+  }, [request, requestId]);
 
   if (isLoading) {
     return (

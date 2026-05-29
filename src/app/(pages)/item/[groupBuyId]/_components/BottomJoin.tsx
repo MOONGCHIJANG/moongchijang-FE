@@ -9,6 +9,7 @@ import {
 } from '@/api/generated/wishlist/wishlist';
 import { ApiResponseGroupBuyDetailResponseData } from '@/api/generated/api.schemas';
 import { useRouter } from 'next/navigation';
+import { logEvent } from '@/lib/analytics';
 import { ToastBlack } from '@/components/ToastBlack';
 
 interface Props {
@@ -66,6 +67,13 @@ const BottomJoin = ({ data }: Props) => {
   const handleWishlist = async () => {
     const next = !liked;
     setLiked(next);
+    if (next) {
+      logEvent('add_to_wishlist', {
+        item_id: data.id,
+        item_name: data.productName,
+        store_name: data.storeName,
+      });
+    }
     try {
       if (next) {
         await postApiV1GroupBuysGroupBuyIdWishlist(data.id);
@@ -83,6 +91,10 @@ const BottomJoin = ({ data }: Props) => {
 
   const handleJoin = () => {
     if (isExpired) return;
+    logEvent('group_buy_join_click', {
+      item_id: data.id,
+      item_name: data.productName,
+    });
     router.push(`/item/${data.id}/join`);
   };
 

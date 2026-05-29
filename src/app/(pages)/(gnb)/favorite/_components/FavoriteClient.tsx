@@ -16,6 +16,7 @@ import {
   GetApiV1WishlistsFilter,
   GetApiV1WishlistsSort,
 } from '@/api/generated/api.schemas';
+import { logEvent } from '@/lib/analytics';
 
 type WishlistFilter =
   (typeof GetApiV1WishlistsFilter)[keyof typeof GetApiV1WishlistsFilter];
@@ -63,6 +64,14 @@ export function FavoriteClient() {
   useLayoutEffect(() => {
     scrollStateRef.current = { hasNextPage, isFetchingNextPage };
   });
+
+  const hasFiredRef = useRef(false);
+  useEffect(() => {
+    if (!isLoading && !hasFiredRef.current) {
+      logEvent('wishlist_view', { item_count: totalElements });
+      hasFiredRef.current = true;
+    }
+  }, [isLoading, totalElements]);
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
@@ -179,7 +188,16 @@ export function FavoriteClient() {
           ) : (
             <div className="bg-bg-white overflow-hidden pb-5">
               {items.map((item) => (
-                <Link key={item.groupBuyId} href={`/item/${item.groupBuyId}`}>
+                <Link
+                  key={item.groupBuyId}
+                  href={`/item/${item.groupBuyId}`}
+                  onClick={() =>
+                    logEvent('wishlist_item_click', {
+                      item_id: item.groupBuyId,
+                      item_name: item.productName,
+                    })
+                  }
+                >
                   <WishlistCard
                     {...item}
                     isRemoving={

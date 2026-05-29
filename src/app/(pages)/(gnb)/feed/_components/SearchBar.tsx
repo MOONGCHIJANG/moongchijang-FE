@@ -13,7 +13,7 @@ interface SearchBarProps {
 }
 
 export const SearchBar = ({
-  placeholder = '매장명 또는 상품명 검색',
+  placeholder = '먹고 싶은 메뉴나 가게를 찾아보세요',
   value = '',
   onChange,
   onClear,

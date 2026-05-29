@@ -46,6 +46,66 @@ export const GetApiV1AdminSummaryResponse = zod.object({
 });
 
 /**
+ * 달성됐지만 발주 확정 전인 공구와 48시간 초과 여부를 조회한다.
+ * @summary 대시보드 발주 미확정 모니터링 (운영자)
+ */
+export const getApiV1AdminDashboardUnconfirmedOrdersQueryPageDefault = 0;
+export const getApiV1AdminDashboardUnconfirmedOrdersQuerySizeDefault = 20;
+export const getApiV1AdminDashboardUnconfirmedOrdersQuerySizeMax = 100;
+
+export const GetApiV1AdminDashboardUnconfirmedOrdersQueryParams = zod.object({
+  page: zod
+    .number()
+    .default(getApiV1AdminDashboardUnconfirmedOrdersQueryPageDefault),
+  size: zod
+    .number()
+    .max(getApiV1AdminDashboardUnconfirmedOrdersQuerySizeMax)
+    .default(getApiV1AdminDashboardUnconfirmedOrdersQuerySizeDefault),
+});
+
+export const GetApiV1AdminDashboardUnconfirmedOrdersResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    totalUnconfirmedCount: zod
+      .number()
+      .describe('달성된 공구 중 발주 확정 대기 건수'),
+    overdueCount: zod
+      .number()
+      .describe('달성 후 48시간을 초과한 발주 확정 대기 건수'),
+    hasOverdue: zod
+      .boolean()
+      .describe('48시간 초과 발주 미확정 경고 노출 여부'),
+    content: zod.array(
+      zod.object({
+        orderId: zod
+          .number()
+          .describe('발주 관리 식별자. 현재는 groupBuyId와 동일'),
+        groupBuyId: zod.number(),
+        productName: zod.string(),
+        storeName: zod.string(),
+        achievedAt: zod.iso
+          .datetime({ offset: true })
+          .nullish()
+          .describe('공구 달성 일시'),
+        finalQuantity: zod.number().describe('최종 참여 수량'),
+        pendingRefundCount: zod.number().describe('해당 공구의 환불 대기 건수'),
+        pickupDate: zod.iso.date(),
+        elapsedHours: zod.number().describe('달성 후 경과 시간'),
+        overdue: zod.boolean().describe('달성 후 48시간 초과 여부'),
+        progressRate: zod.number().describe('목표 수량 대비 달성률(%)'),
+        ownerContacted: zod.boolean().describe('사장님 연락 완료 여부'),
+        ownerContactedAt: zod.iso.datetime({ offset: true }).nullish(),
+      }),
+    ),
+    totalElements: zod.number(),
+    totalPages: zod.number(),
+    number: zod.number(),
+    size: zod.number(),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
  * 달성된 공구의 발주 확정 대기, 48시간 초과, 확정 완료, 전체 목록을 조회한다.
  * @summary 발주 관리 목록 조회 (운영자)
  */
@@ -100,6 +160,359 @@ export const GetApiV1AdminOrdersResponse = zod.object({
     totalPages: zod.number(),
     number: zod.number(),
     size: zod.number(),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * 발주 관리 목록에서 선택한 달성 공구의 상세 정보와 처리 상태를 조회한다.
+ * @summary 발주 관리 상세 조회 (운영자)
+ */
+export const GetApiV1AdminOrdersOrderIdParams = zod.object({
+  orderId: zod.number().describe('발주 관리 식별자. 현재는 groupBuyId와 동일'),
+});
+
+export const GetApiV1AdminOrdersOrderIdResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    orderId: zod
+      .number()
+      .describe('발주 관리 식별자. 현재는 groupBuyId와 동일'),
+    groupBuyId: zod.number(),
+    productName: zod.string(),
+    productDescription: zod.string(),
+    storeName: zod.string(),
+    storeAddress: zod.string(),
+    storePhoneNumber: zod.string().nullish(),
+    achievedAt: zod.iso
+      .datetime({ offset: true })
+      .nullish()
+      .describe('공구 달성 일시'),
+    finalQuantity: zod.number().describe('최종 참여 수량'),
+    targetQuantity: zod.number().describe('목표 수량'),
+    pendingRefundCount: zod.number().describe('해당 공구의 환불 대기 건수'),
+    pickupDate: zod.iso.date(),
+    pickupTimeStart: zod.iso.time({}),
+    pickupTimeEnd: zod.iso.time({}),
+    pickupLocation: zod.string(),
+    pickupContact: zod.string().nullish(),
+    elapsedHours: zod.number().describe('달성 후 경과 시간'),
+    progressRate: zod.number().describe('목표 수량 대비 달성률(%)'),
+    orderStatus: zod.enum(['PENDING', 'CONFIRMED', 'CANCELLED']),
+    ownerContactedAt: zod.iso.datetime({ offset: true }).nullish(),
+    orderConfirmedAt: zod.iso.datetime({ offset: true }).nullish(),
+    orderCancelledAt: zod.iso.datetime({ offset: true }).nullish(),
+    actionable: zod
+      .boolean()
+      .describe('발주 확정\/연락 등 운영 작업 가능 여부'),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * 확정 대기 발주 건에 사장님 연락 완료 시각을 기록한다.
+ * @summary 발주 사장님 연락 완료 기록 (운영자)
+ */
+export const PostApiV1AdminOrdersOrderIdOwnerContactParams = zod.object({
+  orderId: zod.number(),
+});
+
+export const PostApiV1AdminOrdersOrderIdOwnerContactResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    orderId: zod
+      .number()
+      .describe('발주 관리 식별자. 현재는 groupBuyId와 동일'),
+    groupBuyId: zod.number(),
+    productName: zod.string(),
+    productDescription: zod.string(),
+    storeName: zod.string(),
+    storeAddress: zod.string(),
+    storePhoneNumber: zod.string().nullish(),
+    achievedAt: zod.iso
+      .datetime({ offset: true })
+      .nullish()
+      .describe('공구 달성 일시'),
+    finalQuantity: zod.number().describe('최종 참여 수량'),
+    targetQuantity: zod.number().describe('목표 수량'),
+    pendingRefundCount: zod.number().describe('해당 공구의 환불 대기 건수'),
+    pickupDate: zod.iso.date(),
+    pickupTimeStart: zod.iso.time({}),
+    pickupTimeEnd: zod.iso.time({}),
+    pickupLocation: zod.string(),
+    pickupContact: zod.string().nullish(),
+    elapsedHours: zod.number().describe('달성 후 경과 시간'),
+    progressRate: zod.number().describe('목표 수량 대비 달성률(%)'),
+    orderStatus: zod.enum(['PENDING', 'CONFIRMED', 'CANCELLED']),
+    ownerContactedAt: zod.iso.datetime({ offset: true }).nullish(),
+    orderConfirmedAt: zod.iso.datetime({ offset: true }).nullish(),
+    orderCancelledAt: zod.iso.datetime({ offset: true }).nullish(),
+    actionable: zod
+      .boolean()
+      .describe('발주 확정\/연락 등 운영 작업 가능 여부'),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * 확정 대기 발주 건을 확정 완료 상태로 변경한다.
+ * @summary 발주 확정 처리 (운영자)
+ */
+export const PostApiV1AdminOrdersOrderIdConfirmParams = zod.object({
+  orderId: zod.number(),
+});
+
+export const PostApiV1AdminOrdersOrderIdConfirmResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    orderId: zod
+      .number()
+      .describe('발주 관리 식별자. 현재는 groupBuyId와 동일'),
+    groupBuyId: zod.number(),
+    productName: zod.string(),
+    productDescription: zod.string(),
+    storeName: zod.string(),
+    storeAddress: zod.string(),
+    storePhoneNumber: zod.string().nullish(),
+    achievedAt: zod.iso
+      .datetime({ offset: true })
+      .nullish()
+      .describe('공구 달성 일시'),
+    finalQuantity: zod.number().describe('최종 참여 수량'),
+    targetQuantity: zod.number().describe('목표 수량'),
+    pendingRefundCount: zod.number().describe('해당 공구의 환불 대기 건수'),
+    pickupDate: zod.iso.date(),
+    pickupTimeStart: zod.iso.time({}),
+    pickupTimeEnd: zod.iso.time({}),
+    pickupLocation: zod.string(),
+    pickupContact: zod.string().nullish(),
+    elapsedHours: zod.number().describe('달성 후 경과 시간'),
+    progressRate: zod.number().describe('목표 수량 대비 달성률(%)'),
+    orderStatus: zod.enum(['PENDING', 'CONFIRMED', 'CANCELLED']),
+    ownerContactedAt: zod.iso.datetime({ offset: true }).nullish(),
+    orderConfirmedAt: zod.iso.datetime({ offset: true }).nullish(),
+    orderCancelledAt: zod.iso.datetime({ offset: true }).nullish(),
+    actionable: zod
+      .boolean()
+      .describe('발주 확정\/연락 등 운영 작업 가능 여부'),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * 확정 대기 발주 건을 취소 상태로 변경한다.
+ * @summary 발주 취소 처리 (운영자)
+ */
+export const PostApiV1AdminOrdersOrderIdCancelParams = zod.object({
+  orderId: zod.number(),
+});
+
+export const PostApiV1AdminOrdersOrderIdCancelResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    orderId: zod
+      .number()
+      .describe('발주 관리 식별자. 현재는 groupBuyId와 동일'),
+    groupBuyId: zod.number(),
+    productName: zod.string(),
+    productDescription: zod.string(),
+    storeName: zod.string(),
+    storeAddress: zod.string(),
+    storePhoneNumber: zod.string().nullish(),
+    achievedAt: zod.iso
+      .datetime({ offset: true })
+      .nullish()
+      .describe('공구 달성 일시'),
+    finalQuantity: zod.number().describe('최종 참여 수량'),
+    targetQuantity: zod.number().describe('목표 수량'),
+    pendingRefundCount: zod.number().describe('해당 공구의 환불 대기 건수'),
+    pickupDate: zod.iso.date(),
+    pickupTimeStart: zod.iso.time({}),
+    pickupTimeEnd: zod.iso.time({}),
+    pickupLocation: zod.string(),
+    pickupContact: zod.string().nullish(),
+    elapsedHours: zod.number().describe('달성 후 경과 시간'),
+    progressRate: zod.number().describe('목표 수량 대비 달성률(%)'),
+    orderStatus: zod.enum(['PENDING', 'CONFIRMED', 'CANCELLED']),
+    ownerContactedAt: zod.iso.datetime({ offset: true }).nullish(),
+    orderConfirmedAt: zod.iso.datetime({ offset: true }).nullish(),
+    orderCancelledAt: zod.iso.datetime({ offset: true }).nullish(),
+    actionable: zod
+      .boolean()
+      .describe('발주 확정\/연락 등 운영 작업 가능 여부'),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * 접수, 처리중, 완료, 전체 CS 티켓을 상태와 키워드로 조회한다.
+ * @summary CS 티켓 목록 조회 (운영자)
+ */
+export const getApiV1AdminCsTicketsQueryStatusDefault = `ALL`;
+export const getApiV1AdminCsTicketsQueryPageDefault = 0;
+export const getApiV1AdminCsTicketsQuerySizeDefault = 20;
+export const getApiV1AdminCsTicketsQuerySizeMax = 100;
+
+export const GetApiV1AdminCsTicketsQueryParams = zod.object({
+  status: zod
+    .enum(['RECEIVED', 'IN_PROGRESS', 'COMPLETED', 'ALL'])
+    .default(getApiV1AdminCsTicketsQueryStatusDefault)
+    .describe('RECEIVED=접수, IN_PROGRESS=처리중, COMPLETED=완료, ALL=전체'),
+  keyword: zod
+    .string()
+    .optional()
+    .describe('티켓 ID, 제목, 소비자 닉네임\/이메일\/전화번호, 공구명 검색어'),
+  page: zod.number().default(getApiV1AdminCsTicketsQueryPageDefault),
+  size: zod
+    .number()
+    .max(getApiV1AdminCsTicketsQuerySizeMax)
+    .default(getApiV1AdminCsTicketsQuerySizeDefault),
+});
+
+export const GetApiV1AdminCsTicketsResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    content: zod.array(
+      zod.object({
+        ticketId: zod.number(),
+        type: zod
+          .enum(['REFUND', 'ORDER', 'PICKUP', 'ACCOUNT', 'ETC'])
+          .describe('티켓 유형'),
+        title: zod.string(),
+        consumerId: zod.number().nullish(),
+        consumerName: zod.string().nullish(),
+        groupBuyId: zod.number().nullish(),
+        groupBuyName: zod.string().nullish(),
+        priority: zod.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']),
+        assigneeName: zod.string().nullish(),
+        createdAt: zod.iso.datetime({ offset: true }).nullish(),
+        slaHours: zod.number().describe('티켓 생성 후 경과 시간'),
+        status: zod.enum(['RECEIVED', 'IN_PROGRESS', 'COMPLETED']),
+        actionable: zod.boolean().describe('운영 처리 가능 여부'),
+      }),
+    ),
+    totalElements: zod.number(),
+    totalPages: zod.number(),
+    number: zod.number(),
+    size: zod.number(),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * 선택한 CS 티켓의 문제 설명, 관련 사용자/공구/환불, 처리 정보를 조회한다.
+ * @summary CS 티켓 상세 조회 (운영자)
+ */
+export const GetApiV1AdminCsTicketsTicketIdParams = zod.object({
+  ticketId: zod.number(),
+});
+
+export const GetApiV1AdminCsTicketsTicketIdResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    ticketId: zod.number(),
+    type: zod.enum(['REFUND', 'ORDER', 'PICKUP', 'ACCOUNT', 'ETC']),
+    title: zod.string(),
+    description: zod.string(),
+    priority: zod.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']),
+    status: zod.enum(['RECEIVED', 'IN_PROGRESS', 'COMPLETED']),
+    createdAt: zod.iso.datetime({ offset: true }).nullish(),
+    updatedAt: zod.iso.datetime({ offset: true }).nullish(),
+    slaHours: zod.number().describe('티켓 생성 후 경과 시간'),
+    consumer: zod
+      .object({
+        userId: zod.number().nullish(),
+        nickname: zod.string().nullish(),
+        email: zod.string().nullish(),
+        phoneNumber: zod.string().nullish(),
+      })
+      .nullish(),
+    owner: zod
+      .object({
+        storeId: zod.number(),
+        storeName: zod.string(),
+        storePhoneNumber: zod.string().nullish(),
+      })
+      .nullish(),
+    groupBuy: zod
+      .object({
+        groupBuyId: zod.number(),
+        productName: zod.string(),
+        storeName: zod.string(),
+      })
+      .nullish(),
+    refundParticipationId: zod.number().nullish(),
+    assigneeName: zod.string().nullish(),
+    processingMemo: zod.string().nullish(),
+    resolvedAt: zod.iso.datetime({ offset: true }).nullish(),
+    actionable: zod.boolean().describe('운영 처리 가능 여부'),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * CS 티켓의 상태, 담당자, 처리 메모를 변경한다.
+ * @summary CS 티켓 처리 정보 변경 (운영자)
+ */
+export const PatchApiV1AdminCsTicketsTicketIdParams = zod.object({
+  ticketId: zod.number(),
+});
+
+export const patchApiV1AdminCsTicketsTicketIdBodyAssigneeNameMax = 50;
+
+export const patchApiV1AdminCsTicketsTicketIdBodyProcessingMemoMax = 1000;
+
+export const PatchApiV1AdminCsTicketsTicketIdBody = zod.object({
+  status: zod.enum(['RECEIVED', 'IN_PROGRESS', 'COMPLETED']).nullish(),
+  assigneeName: zod
+    .string()
+    .max(patchApiV1AdminCsTicketsTicketIdBodyAssigneeNameMax)
+    .nullish(),
+  processingMemo: zod
+    .string()
+    .max(patchApiV1AdminCsTicketsTicketIdBodyProcessingMemoMax)
+    .nullish(),
+});
+
+export const PatchApiV1AdminCsTicketsTicketIdResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    ticketId: zod.number(),
+    type: zod.enum(['REFUND', 'ORDER', 'PICKUP', 'ACCOUNT', 'ETC']),
+    title: zod.string(),
+    description: zod.string(),
+    priority: zod.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']),
+    status: zod.enum(['RECEIVED', 'IN_PROGRESS', 'COMPLETED']),
+    createdAt: zod.iso.datetime({ offset: true }).nullish(),
+    updatedAt: zod.iso.datetime({ offset: true }).nullish(),
+    slaHours: zod.number().describe('티켓 생성 후 경과 시간'),
+    consumer: zod
+      .object({
+        userId: zod.number().nullish(),
+        nickname: zod.string().nullish(),
+        email: zod.string().nullish(),
+        phoneNumber: zod.string().nullish(),
+      })
+      .nullish(),
+    owner: zod
+      .object({
+        storeId: zod.number(),
+        storeName: zod.string(),
+        storePhoneNumber: zod.string().nullish(),
+      })
+      .nullish(),
+    groupBuy: zod
+      .object({
+        groupBuyId: zod.number(),
+        productName: zod.string(),
+        storeName: zod.string(),
+      })
+      .nullish(),
+    refundParticipationId: zod.number().nullish(),
+    assigneeName: zod.string().nullish(),
+    processingMemo: zod.string().nullish(),
+    resolvedAt: zod.iso.datetime({ offset: true }).nullish(),
+    actionable: zod.boolean().describe('운영 처리 가능 여부'),
   }),
   error: zod.unknown().nullable(),
 });
@@ -386,152 +799,6 @@ export const PostApiV1AdminGroupBuyRequestsRequestIdRejectResponse = zod.object(
 );
 
 /**
- * @summary 진행 중인 공구 현황 목록 (운영자)
- */
-export const getApiV1AdminGroupBuysQueryStatusDefault = `ALL`;
-
-export const GetApiV1AdminGroupBuysQueryParams = zod.object({
-  status: zod
-    .enum(['ALL', 'IN_PROGRESS', 'ACHIEVED'])
-    .default(getApiV1AdminGroupBuysQueryStatusDefault),
-});
-
-export const GetApiV1AdminGroupBuysResponse = zod.object({
-  success: zod.boolean(),
-  data: zod.array(
-    zod.object({
-      groupBuyId: zod.number(),
-      storeName: zod.string(),
-      productName: zod.string(),
-      status: zod.enum(['IN_PROGRESS', 'ACHIEVED']),
-      deadline: zod.iso.date(),
-      achievementRate: zod.number(),
-      currentQuantity: zod.number(),
-      targetQuantity: zod.number(),
-      remainingQuantity: zod.number(),
-      isOrderConfirmed: zod.boolean(),
-      isOrderSheetSent: zod.boolean(),
-    }),
-  ),
-  error: zod.unknown().nullable(),
-});
-
-/**
- * @summary 공구 개설 (운영자)
- */
-export const postApiV1AdminGroupBuysBodyProductNameMax = 100;
-
-export const PostApiV1AdminGroupBuysBody = zod.object({
-  requestId: zod.number().nullish(),
-  storeId: zod.number(),
-  productName: zod.string().max(postApiV1AdminGroupBuysBodyProductNameMax),
-  productDescription: zod.string(),
-  price: zod.number().min(1),
-  targetQuantity: zod.number().min(1).describe('목표 수량'),
-  maxQuantity: zod.number().min(1).describe('최대 수량 (선착순 마감 기준)'),
-  notice: zod.string().nullish().describe('유의사항'),
-  deadline: zod.iso.datetime({ offset: true }),
-  pickupDate: zod.iso.date(),
-  pickupTimeStart: zod.iso.time({}),
-  pickupTimeEnd: zod.iso.time({}),
-  pickupLocation: zod.string(),
-  pickupAddress: zod
-    .string()
-    .nullish()
-    .describe('픽업 장소 주소 (매장 주소와 다를 경우 입력)'),
-});
-
-/**
- * @summary 공구 상세 조회 (운영자)
- */
-export const GetApiV1AdminGroupBuysGroupBuyIdParams = zod.object({
-  groupBuyId: zod.number(),
-});
-
-export const GetApiV1AdminGroupBuysGroupBuyIdResponse = zod.object({
-  success: zod.boolean(),
-  data: zod.object({
-    groupBuyId: zod.number(),
-    requestId: zod.number().nullable(),
-    storeId: zod.number(),
-    storeName: zod.string(),
-    productName: zod.string(),
-    productDescription: zod.string(),
-    price: zod.number(),
-    targetQuantity: zod.number(),
-    maxQuantity: zod.number().nullable(),
-    currentQuantity: zod.number(),
-    remainingQuantity: zod.number(),
-    achievementRate: zod.number(),
-    notice: zod.string().nullable(),
-    status: zod.enum(['IN_PROGRESS', 'ACHIEVED', 'FAILED']),
-    deadline: zod.iso.datetime({ offset: true }),
-    pickupDate: zod.iso.date(),
-    pickupTimeStart: zod.iso.time({}),
-    pickupTimeEnd: zod.iso.time({}),
-    pickupLocation: zod.string(),
-    isOrderConfirmed: zod.boolean(),
-    isOrderSheetSent: zod.boolean(),
-  }),
-  error: zod.unknown().nullable(),
-});
-
-/**
- * @summary 공구 정보 수정 (운영자)
- */
-export const PatchApiV1AdminGroupBuysGroupBuyIdParams = zod.object({
-  groupBuyId: zod.number(),
-});
-
-export const PatchApiV1AdminGroupBuysGroupBuyIdBody = zod.object({
-  productName: zod.string().optional(),
-  productDescription: zod.string().optional(),
-  price: zod.number().min(1).optional(),
-  targetQuantity: zod.number().min(1).optional(),
-  maxQuantity: zod.number().min(1).optional(),
-  deadline: zod.iso.datetime({ offset: true }).optional(),
-  pickupDate: zod.iso.date().optional(),
-  pickupTimeStart: zod.iso.time({}).optional(),
-  pickupTimeEnd: zod.iso.time({}).optional(),
-  pickupLocation: zod.string().optional(),
-});
-
-export const PatchApiV1AdminGroupBuysGroupBuyIdResponse = zod.object({
-  success: zod.boolean(),
-  data: zod.unknown().nullable(),
-  error: zod.unknown().nullable(),
-});
-
-/**
- * ACHIEVED 상태 공구에 대해 발주를 확정한다.
- * @summary 발주 확정 처리
- */
-export const PostApiV1AdminGroupBuysGroupBuyIdOrderConfirmParams = zod.object({
-  groupBuyId: zod.number(),
-});
-
-export const PostApiV1AdminGroupBuysGroupBuyIdOrderConfirmResponse = zod.object(
-  {
-    success: zod.boolean(),
-    data: zod.unknown().nullable(),
-    error: zod.unknown().nullable(),
-  },
-);
-
-/**
- * @summary 발주서 발송
- */
-export const PostApiV1AdminGroupBuysGroupBuyIdOrderSheetParams = zod.object({
-  groupBuyId: zod.number(),
-});
-
-export const PostApiV1AdminGroupBuysGroupBuyIdOrderSheetResponse = zod.object({
-  success: zod.boolean(),
-  data: zod.unknown().nullable(),
-  error: zod.unknown().nullable(),
-});
-
-/**
  * @summary 환불 처리 현황 목록 (운영자)
  */
 export const getApiV1AdminRefundsQueryStatusDefault = `ALL`;
@@ -600,17 +867,52 @@ export const PostApiV1AdminRefundsParticipationIdManualResponse = zod.object({
 });
 
 /**
- * @summary 정산 내역 목록 (운영자)
+ * 선택한 연월의 정산 완료 금액, 정산 예정 금액, 서비스 수수료, 총 거래액을 조회한다. 현재 서비스 수수료 정책은 0원이다.
+ * @summary 정산 현황 대시보드 조회 (운영자)
  */
-export const getApiV1AdminSettlementsQueryEscrowStatusDefault = `ALL`;
+export const getApiV1AdminSettlementsDashboardQueryMonthMax = 12;
+
+export const GetApiV1AdminSettlementsDashboardQueryParams = zod.object({
+  year: zod.number(),
+  month: zod
+    .number()
+    .min(1)
+    .max(getApiV1AdminSettlementsDashboardQueryMonthMax),
+});
+
+export const GetApiV1AdminSettlementsDashboardResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    year: zod.number(),
+    month: zod.number(),
+    completedSettlementAmount: zod.number().describe('정산 완료 금액 합계'),
+    scheduledSettlementAmount: zod.number().describe('정산 예정 금액 합계'),
+    platformFeeAmount: zod
+      .number()
+      .describe('서비스 수수료 합계. 현재 정책은 0원'),
+    totalTransactionAmount: zod.number().describe('총 거래액 합계'),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * 선택한 연월의 정산 예정, 정산 완료, 전체 목록을 조회한다. 현재 settlementId는 groupBuyId와 동일하다.
+ * @summary 정산 현황 목록 조회 (운영자)
+ */
+export const getApiV1AdminSettlementsQueryMonthMax = 12;
+
+export const getApiV1AdminSettlementsQueryStatusDefault = `ALL`;
 export const getApiV1AdminSettlementsQueryPageDefault = 0;
 export const getApiV1AdminSettlementsQuerySizeDefault = 20;
 export const getApiV1AdminSettlementsQuerySizeMax = 100;
 
 export const GetApiV1AdminSettlementsQueryParams = zod.object({
-  escrowStatus: zod
-    .enum(['ALL', 'HOLDING', 'RELEASED'])
-    .default(getApiV1AdminSettlementsQueryEscrowStatusDefault),
+  year: zod.number(),
+  month: zod.number().min(1).max(getApiV1AdminSettlementsQueryMonthMax),
+  status: zod
+    .enum(['SCHEDULED', 'COMPLETED', 'ALL'])
+    .default(getApiV1AdminSettlementsQueryStatusDefault)
+    .describe('SCHEDULED=정산 예정, COMPLETED=정산 완료, ALL=전체'),
   page: zod.number().default(getApiV1AdminSettlementsQueryPageDefault),
   size: zod
     .number()
@@ -623,44 +925,67 @@ export const GetApiV1AdminSettlementsResponse = zod.object({
   data: zod.object({
     content: zod.array(
       zod.object({
-        settlementId: zod.number(),
+        settlementId: zod
+          .number()
+          .describe('정산 식별자. 현재는 groupBuyId와 동일'),
+        groupBuyId: zod.number(),
         storeName: zod.string(),
         productName: zod.string(),
-        totalAmount: zod.number(),
-        escrowStatus: zod.enum(['HOLDING', 'RELEASED']),
-        scheduledPaymentDate: zod.iso.date().nullable(),
-        settlementMethod: zod.string().nullable(),
-        memo: zod.string().nullable(),
-        createdAt: zod.iso.datetime({ offset: true }),
+        pickupCompletedDate: zod.iso
+          .date()
+          .describe('픽업 완료 기준일. 현재는 공구 pickupDate 기준'),
+        participantCount: zod.number().describe('정산 대상 참여 인원'),
+        totalPaymentAmount: zod.number().describe('총 결제액'),
+        refundDeductionAmount: zod.number().describe('환불 차감액'),
+        platformFeeAmount: zod
+          .number()
+          .describe('서비스 수수료. 현재 정책은 0원'),
+        settlementAmount: zod.number().describe('총 결제액 - 환불 차감액'),
+        scheduledSettlementDate: zod.iso
+          .date()
+          .describe('정산 예정일. 현재 정책은 pickupCompletedDate + 3일'),
+        status: zod.enum(['SCHEDULED', 'COMPLETED']),
+        actionable: zod.boolean().describe('운영 작업 가능 여부'),
       }),
     ),
     totalElements: zod.number(),
     totalPages: zod.number(),
+    number: zod.number(),
+    size: zod.number(),
   }),
   error: zod.unknown().nullable(),
 });
 
 /**
- * @summary 정산 생성 및 처리
+ * 목록에서 선택한 정산 건의 상세 팝업용 정보를 조회한다. 현재 settlementId는 groupBuyId와 동일하다.
+ * @summary 정산 현황 상세 조회 (운영자)
  */
-export const postApiV1AdminSettlementsBodyMemoMax = 100;
-
-export const PostApiV1AdminSettlementsBody = zod.object({
-  groupBuyId: zod.number(),
-  scheduledPaymentDate: zod.iso.date(),
-  settlementMethod: zod.enum(['BANK_TRANSFER', 'ESCROW_AUTO']),
-  memo: zod.string().max(postApiV1AdminSettlementsBodyMemoMax).nullish(),
-});
-
-/**
- * @summary 에스크로 해제
- */
-export const PostApiV1AdminSettlementsSettlementIdReleaseParams = zod.object({
+export const GetApiV1AdminSettlementsSettlementIdParams = zod.object({
   settlementId: zod.number(),
 });
 
-export const PostApiV1AdminSettlementsSettlementIdReleaseResponse = zod.object({
+export const GetApiV1AdminSettlementsSettlementIdResponse = zod.object({
   success: zod.boolean(),
-  data: zod.unknown().nullable(),
+  data: zod.object({
+    settlementId: zod
+      .number()
+      .describe('정산 식별자. 현재는 groupBuyId와 동일'),
+    groupBuyId: zod.number(),
+    storeName: zod.string(),
+    productName: zod.string(),
+    pickupCompletedDate: zod.iso
+      .date()
+      .describe('픽업 완료 기준일. 현재는 공구 pickupDate 기준'),
+    participantCount: zod.number().describe('정산 대상 참여 인원'),
+    totalPaymentAmount: zod.number().describe('총 결제액'),
+    refundDeductionAmount: zod.number().describe('환불 차감액'),
+    platformFeeAmount: zod.number().describe('서비스 수수료. 현재 정책은 0원'),
+    settlementAmount: zod.number().describe('총 결제액 - 환불 차감액'),
+    scheduledSettlementDate: zod.iso
+      .date()
+      .describe('정산 예정일. 현재 정책은 pickupCompletedDate + 3일'),
+    status: zod.enum(['SCHEDULED', 'COMPLETED']),
+    actionable: zod.boolean().describe('운영 작업 가능 여부'),
+  }),
   error: zod.unknown().nullable(),
 });

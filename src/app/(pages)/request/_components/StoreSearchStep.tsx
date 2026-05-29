@@ -81,7 +81,7 @@ export const StoreSearchStep = ({
       controller.abort();
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [query]);
+  }, [query, onResultsChange]);
 
   const handleSelect = (item: ApiResponseStoreSearchListDataStoresItem) => {
     if (

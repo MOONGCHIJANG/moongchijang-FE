@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { type Store } from './StoreSearchStep';
 import { type ApiResponseStoreSearchListDataStoresItem } from '@/api/generated/api.schemas';
@@ -32,6 +32,11 @@ export const GroupBuyRequestClient = () => {
   const [searchResults, setSearchResults] = useState<
     ApiResponseStoreSearchListDataStoresItem[]
   >([]);
+  const handleSearchResultsChange = useCallback(
+    (results: ApiResponseStoreSearchListDataStoresItem[]) =>
+      setSearchResults(results),
+    [],
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -117,7 +122,7 @@ export const GroupBuyRequestClient = () => {
           query={searchQuery}
           onQueryChange={setSearchQuery}
           results={searchResults}
-          onResultsChange={setSearchResults}
+          onResultsChange={handleSearchResultsChange}
           onSelectStore={(store) => {
             setSelectedStore(store);
             goToStep('map');

@@ -13,7 +13,7 @@ const Header = ({ text, showBackButton = true, onBack }: HeaderProps) => {
   const router = useRouter();
 
   return (
-    <header className="flex items-center h-14.25 px-4 border-b border-border-subtle shrink-0 gap-0.5 bg-surface-white">
+    <header className="sticky top-0 z-10 flex items-center h-14 px-4 border-b border-border-subtle shrink-0 gap-0.5 bg-surface-white">
       {showBackButton && (
         <button
           type="button"

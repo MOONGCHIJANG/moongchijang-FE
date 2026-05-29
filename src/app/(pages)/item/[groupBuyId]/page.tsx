@@ -8,6 +8,7 @@ import type { ApiResponseGroupBuyDetailResponse } from '@/api/generated/api.sche
 import { notFound } from 'next/navigation';
 import ViewerToast from './_components/ViewerToast';
 import Footer from '@/components/Footer';
+import Header from '@/components/Header';
 import { cookies } from 'next/headers';
 
 interface Props {
@@ -78,6 +79,7 @@ const page = async ({ params }: Props) => {
 
   return (
     <div>
+      <Header />
       <ViewerToast groupBuyId={Number(groupBuyId)} />
       <TopInfo data={data} />
       <ItemDetail data={data} />

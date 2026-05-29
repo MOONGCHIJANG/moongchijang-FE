@@ -83,10 +83,6 @@
   padding-bottom: 58px;
 }
 
-html.pwa .login-bottom {
-  bottom: calc(1.75rem + env(safe-area-inset-bottom, 8px));
-}
-
 html.pwa .gnb-nav {
   height: 66px;
 }

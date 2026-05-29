@@ -36,6 +36,14 @@ export const useStepProfile = (onNext: () => void) => {
   const form = useForm<StepProfileFormValues>({
     resolver: zodResolver(stepProfileSchema),
     mode: 'onBlur',
+    defaultValues: {
+      nickname:
+        typeof window !== 'undefined'
+          ? (sessionStorage.getItem('kakaoNickname') ?? '')
+          : '',
+      phoneNumber: '',
+      verificationCode: '',
+    },
   });
 
   const {
@@ -215,7 +223,7 @@ export const useStepProfile = (onNext: () => void) => {
   };
 
   const onSubmit = () => {
-    if (phoneStatus !== 'verified') return;
+    if (phoneStatus !== 'verified' || nicknameStatus !== 'available') return;
 
     saveAdditionalInfo(
       {
@@ -227,6 +235,7 @@ export const useStepProfile = (onNext: () => void) => {
       {
         onSuccess: (result) => {
           if (result.status !== 200) return;
+          sessionStorage.removeItem('kakaoNickname');
           setIsLoggedIn(true);
           onNext();
         },

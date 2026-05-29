@@ -74,21 +74,23 @@ export const StoreSearchStep = ({
 
   const handleSelect = (item: ApiResponseStoreSearchListDataStoresItem) => {
     if (
-      !item.placeId ||
       !item.storeName ||
       !item.roadAddress ||
       item.latitude == null ||
       item.longitude == null
     )
       return;
-    const position = results.findIndex((r) => r.placeId === item.placeId);
+    const position = results.findIndex(
+      (r) =>
+        r.storeName === item.storeName && r.roadAddress === item.roadAddress,
+    );
     logEvent('groupbuy_request_store_select', {
-      store_id: item.placeId,
+      store_id: item.placeId ?? '',
       result_position: position,
       has_address: !!item.roadAddress,
     });
     onSelectStore({
-      placeId: item.placeId,
+      placeId: item.placeId ?? '',
       storeName: item.storeName,
       roadAddress: item.roadAddress,
       lotAddress: item.lotAddress,
@@ -168,8 +170,8 @@ export const StoreSearchStep = ({
 
         {!isLoading && results.length > 0 && (
           <ul className="flex flex-col divide-y divide-border-subtle">
-            {results.map((item) => (
-              <li key={item.placeId}>
+            {results.map((item, index) => (
+              <li key={`${item.placeId}-${index}`}>
                 <button
                   type="button"
                   onClick={() => handleSelect(item)}

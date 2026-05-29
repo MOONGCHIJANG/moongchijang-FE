@@ -74,11 +74,20 @@ const BottomJoin = ({ data }: Props) => {
         store_name: data.storeName,
       });
     }
+
     try {
-      if (next) {
-        await postApiV1GroupBuysGroupBuyIdWishlist(data.id);
-      } else {
-        await deleteApiV1GroupBuysGroupBuyIdWishlist(data.id);
+      const result = next
+        ? await postApiV1GroupBuysGroupBuyIdWishlist(data.id)
+        : await deleteApiV1GroupBuysGroupBuyIdWishlist(data.id);
+
+      if (
+        (result.status as number) === 401 ||
+        (result.status as number) === 403
+      ) {
+        setLiked(!next);
+        setToastMessage('로그인 후에 이용해주세요.');
+        setTimeout(() => setToastMessage(null), 3_500);
+        return;
       }
       queryClient.invalidateQueries({ queryKey: ['/api/v1/wishlists'] });
       router.refresh();

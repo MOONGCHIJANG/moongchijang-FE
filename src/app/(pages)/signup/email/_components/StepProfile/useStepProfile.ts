@@ -36,6 +36,11 @@ export const useStepProfile = (onNext: () => void) => {
   const form = useForm<StepProfileFormValues>({
     resolver: zodResolver(stepProfileSchema),
     mode: 'onBlur',
+    defaultValues: {
+      nickname: '',
+      phoneNumber: '',
+      verificationCode: '',
+    },
   });
 
   const {
@@ -89,6 +94,13 @@ export const useStepProfile = (onNext: () => void) => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
   }, []);
+
+  useEffect(() => {
+    const kakaoNickname = sessionStorage.getItem('kakaoNickname');
+    if (kakaoNickname) {
+      form.setValue('nickname', kakaoNickname);
+    }
+  }, [form]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -215,7 +227,7 @@ export const useStepProfile = (onNext: () => void) => {
   };
 
   const onSubmit = () => {
-    if (phoneStatus !== 'verified') return;
+    if (phoneStatus !== 'verified' || nicknameStatus !== 'available') return;
 
     saveAdditionalInfo(
       {
@@ -227,6 +239,7 @@ export const useStepProfile = (onNext: () => void) => {
       {
         onSuccess: (result) => {
           if (result.status !== 200) return;
+          sessionStorage.removeItem('kakaoNickname');
           setIsLoggedIn(true);
           onNext();
         },

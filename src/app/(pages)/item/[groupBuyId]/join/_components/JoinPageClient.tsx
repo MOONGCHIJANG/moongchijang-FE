@@ -1,9 +1,11 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import * as PortOne from '@portone/browser-sdk/v2';
+import { useTermsSheetStore } from '@/store/termsSheetStore';
+
 import ItemSummary from './ItemSummary';
 import JoinForm from './JoinForm';
-import AgreeTerms from './AgreeTerms';
+import AgreeTermsSheet from './AgreeTermsSheet';
 import PaymentButton from './PaymentButton';
 import type { ApiResponseGroupBuyDetailResponseData } from '@/api/generated/api.schemas';
 import {
@@ -30,6 +32,8 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
   // TODO: 마감됨 페이지 접근 시 처리
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [isTermsSheetOpen, setIsTermsSheetOpen] = useState(false);
+  const resetTerms = useTermsSheetStore((s) => s.reset);
   const payMethod = 'CARD' as const;
   const isPayable = !isLoading;
 
@@ -181,11 +185,16 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
         totalAmount={totalAmount}
         productImage={groupBuy.imageUrls[0] || ''}
       />
-      <AgreeTerms />
+      <AgreeTermsSheet
+        isOpen={isTermsSheetOpen}
+        onClose={() => { setIsTermsSheetOpen(false); resetTerms(); }}
+        onConfirm={() => { setIsTermsSheetOpen(false); resetTerms(); handlePayment(); }}
+        groupBuyId={groupBuyId}
+      />
       <PaymentButton
         price={totalAmount}
         disabled={!isPayable}
-        onClick={handlePayment}
+        onClick={() => setIsTermsSheetOpen(true)}
       />
     </div>
   );

@@ -30,7 +30,7 @@ export const RequestConfirmModal = ({
   useEffect(() => {
     if (isOpen && !prevOpenRef.current) {
       logEvent('groupbuy_request_confirm_view', {
-        store_id: data.store.placeId,
+        store_id: data.store.placeId ?? '',
         quantity: data.quantity,
         has_memo: !!data.additionalNote.trim(),
       });
@@ -134,7 +134,7 @@ export const RequestConfirmModal = ({
           onClick={() => {
             logEvent('group_request_submit');
             logEvent('groupbuy_request_submit_attempt', {
-              store_id: data.store.placeId,
+              store_id: data.store.placeId ?? '',
               quantity: data.quantity,
             });
             onConfirm();

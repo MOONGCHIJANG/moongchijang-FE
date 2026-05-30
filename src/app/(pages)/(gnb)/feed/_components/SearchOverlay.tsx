@@ -4,7 +4,7 @@ import { useRef, useEffect } from 'react';
 import { Icon } from '@iconify/react';
 import { SearchBar } from './SearchBar';
 
-const RECOMMENDED_SEARCHES = ['두쫀쿠', '버터떡', '모모양과', '밤티말빵'];
+const RECOMMENDED_SEARCHES = ['두쫀쿠', '버터떡', '두쫀떡', '밤티말빵'];
 
 interface SearchOverlayProps {
   isOpen: boolean;

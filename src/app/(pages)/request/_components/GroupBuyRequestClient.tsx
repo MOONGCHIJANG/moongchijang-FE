@@ -41,17 +41,27 @@ export const GroupBuyRequestClient = () => {
     const vv = window.visualViewport;
     if (!vv) return;
 
+    const isPWA =
+      window.matchMedia('(display-mode: standalone)').matches ||
+      (window.navigator as unknown as { standalone?: boolean }).standalone ===
+        true;
+    if (!isPWA) return;
+
     const handleResize = () => {
       const el = document.querySelector<HTMLElement>(
         '[data-scroll-reset="request"]',
       );
       if (!el) return;
+
       const keyboardVisible = vv.height < window.innerHeight - 100;
-      if (keyboardVisible) {
+
+      if (keyboardVisible || el.style.height) {
         el.style.height = `${vv.height}px`;
-      } else {
-        el.style.height = '';
-        el.scrollTo({ top: 0 });
+
+        if (!keyboardVisible && vv.height >= window.innerHeight - 50) {
+          el.scrollTop = 0;
+          el.style.height = '';
+        }
       }
     };
 

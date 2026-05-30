@@ -47,6 +47,44 @@ export const GroupBuyRequestClient = () => {
   );
 
   useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+
+    const isPWA =
+      window.matchMedia('(display-mode: standalone)').matches ||
+      (window.navigator as unknown as { standalone?: boolean }).standalone ===
+        true;
+    if (!isPWA) return;
+
+    const handleResize = () => {
+      const el = document.querySelector<HTMLElement>(
+        '[data-scroll-reset="request"]',
+      );
+      if (!el) return;
+
+      const keyboardVisible = vv.height < window.innerHeight - 100;
+
+      if (keyboardVisible || el.style.height) {
+        el.style.height = `${vv.height}px`;
+
+        if (!keyboardVisible && vv.height >= window.innerHeight - 50) {
+          el.scrollTop = 0;
+          el.style.height = '';
+        }
+      }
+    };
+
+    vv.addEventListener('resize', handleResize);
+    return () => {
+      vv.removeEventListener('resize', handleResize);
+      const el = document.querySelector<HTMLElement>(
+        '[data-scroll-reset="request"]',
+      );
+      if (el) el.style.height = '';
+    };
+  }, []);
+
+  useEffect(() => {
     const source = entrySource.current;
     logEvent('screen_view', {
       screen_name: 'group_request_form',

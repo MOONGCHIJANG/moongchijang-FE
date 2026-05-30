@@ -116,7 +116,7 @@ export function RequestListClient() {
         )}
       </div>
 
-      <div className="fixed bottom-20 left-1/2 z-40 -translate-x-1/2 w-[calc(100%-32px)] max-w-[408px]">
+      <div className="gnb-floating-btn fixed left-1/2 z-40 -translate-x-1/2 w-[calc(100%-32px)] max-w-[408px]">
         <Link href="/request/new">
           <Button size="lg" variant="primary" fullWidth>
             <Icon icon="lucide:plus" className="w-6 h-6" />

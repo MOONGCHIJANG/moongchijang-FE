@@ -45,7 +45,7 @@ export default function TermsDetailPage() {
         )}
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 mx-auto max-w-110 p-4">
+      <div className="pwa-pb fixed bottom-0 left-0 right-0 mx-auto max-w-110 p-4">
         <Button
           variant="black"
           size="lg"

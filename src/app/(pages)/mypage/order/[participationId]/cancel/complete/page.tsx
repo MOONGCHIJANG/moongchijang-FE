@@ -50,7 +50,7 @@ export default function CancelCompletePage() {
       </div>
 
       {/* 하단 고정 버튼 */}
-      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full min-w-[360px] max-w-[440px] px-g5 pb-g5 pt-g3">
+      <div className="pwa-pb fixed bottom-0 left-1/2 -translate-x-1/2 w-full min-w-[360px] max-w-[440px] px-g5 pb-g5 pt-g3">
         <Button
           variant="black"
           size="lg"

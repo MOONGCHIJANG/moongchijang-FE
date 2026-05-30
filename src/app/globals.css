@@ -78,3 +78,30 @@
 .no-scroll::-webkit-scrollbar {
   display: none !important;
 }
+
+.gnb-content {
+  padding-bottom: 58px;
+}
+
+html.pwa .gnb-pwa {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+html.pwa .gnb-content {
+  padding-bottom: calc(58px + env(safe-area-inset-bottom, 0px));
+}
+
+html.pwa .pwa-pb::after {
+  content: '';
+  display: block;
+  height: env(safe-area-inset-bottom, 0px);
+  background-color: inherit;
+}
+
+.gnb-floating-btn {
+  bottom: 5rem;
+}
+
+html.pwa .gnb-floating-btn {
+  bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
+}

@@ -63,19 +63,22 @@ export const StoreSearchStep = ({
 
   return (
     <div className="flex flex-col min-h-full bg-white">
-      <header className="flex items-center h-[57px] px-4 border-b border-border-subtle shrink-0 gap-[2px]">
-        <button
-          type="button"
-          onClick={handleBack}
-          className="flex items-center justify-center w-8 h-8"
-          aria-label="뒤로가기"
-        >
-          <Icon
-            icon="lucide:chevron-left"
-            className="w-6 h-6 text-icon-basic"
-          />
-        </button>
-        <span className="heading-sm-semibold text-text-basic">매장 검색</span>
+      <header className="flex flex-col border-b border-border-subtle shrink-0">
+        <div style={{ height: 'env(safe-area-inset-top, 0px)' }} />
+        <div className="flex items-center h-[57px] px-4 gap-[2px]">
+          <button
+            type="button"
+            onClick={handleBack}
+            className="flex items-center justify-center w-8 h-8"
+            aria-label="뒤로가기"
+          >
+            <Icon
+              icon="lucide:chevron-left"
+              className="w-6 h-6 text-icon-basic"
+            />
+          </button>
+          <span className="heading-sm-semibold text-text-basic">매장 검색</span>
+        </div>
       </header>
 
       <div className="px-4 pt-5">

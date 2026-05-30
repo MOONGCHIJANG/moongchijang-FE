@@ -40,18 +40,29 @@ export const GroupBuyRequestClient = () => {
   useEffect(() => {
     const vv = window.visualViewport;
     if (!vv) return;
-    let prevHeight = vv.height;
+
     const handleResize = () => {
-      if (vv.height > prevHeight + 100) {
-        const el = document.querySelector<HTMLElement>(
-          '[data-scroll-reset="request"]',
-        );
-        el?.scrollTo({ top: 0 });
+      const el = document.querySelector<HTMLElement>(
+        '[data-scroll-reset="request"]',
+      );
+      if (!el) return;
+      const keyboardVisible = vv.height < window.innerHeight - 100;
+      if (keyboardVisible) {
+        el.style.height = `${vv.height}px`;
+      } else {
+        el.style.height = '';
+        el.scrollTo({ top: 0 });
       }
-      prevHeight = vv.height;
     };
+
     vv.addEventListener('resize', handleResize);
-    return () => vv.removeEventListener('resize', handleResize);
+    return () => {
+      vv.removeEventListener('resize', handleResize);
+      const el = document.querySelector<HTMLElement>(
+        '[data-scroll-reset="request"]',
+      );
+      if (el) el.style.height = '';
+    };
   }, []);
 
   useEffect(() => {

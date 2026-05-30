@@ -38,6 +38,23 @@ export const GroupBuyRequestClient = () => {
   };
 
   useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    let prevHeight = vv.height;
+    const handleViewport = () => {
+      if (vv.height > prevHeight + 100) {
+        const el = document.querySelector<HTMLElement>(
+          '[data-scroll-reset="request"]',
+        );
+        el?.scrollTo({ top: 0 });
+      }
+      prevHeight = vv.height;
+    };
+    vv.addEventListener('resize', handleViewport);
+    return () => vv.removeEventListener('resize', handleViewport);
+  }, []);
+
+  useEffect(() => {
     const rawSource = searchParams.get('source');
     const source =
       rawSource === 'search_empty' || rawSource === 'mypage'

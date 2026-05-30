@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 const page = () => {
   return (
-    <main className="relative h-dvh bg-white flex flex-col overflow-hidden">
+    <main className="flex-1 bg-white flex flex-col overflow-hidden">
       <Header text="아이디/비밀번호 찾기" />
       <div className="flex-1 flex flex-col items-center justify-center">
         <Image

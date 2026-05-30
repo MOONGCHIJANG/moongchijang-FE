@@ -25,7 +25,7 @@ const page = () => {
         </p>
       </div>
 
-      <div className="login-bottom absolute bottom-7 left-0 right-0 px-4 flex flex-col gap-3.25 items-center">
+      <div className="login-bottom absolute left-0 right-0 px-4 flex flex-col gap-3.25 items-center">
         <ToastToolTip text="3초만에 빠른 회원가입" />
         <LoginButton />
       </div>

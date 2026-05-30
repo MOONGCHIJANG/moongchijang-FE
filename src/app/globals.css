@@ -83,16 +83,6 @@
   padding-bottom: 58px;
 }
 
-@media (display-mode: standalone) {
-  .login-bottom {
-    bottom: 4rem !important;
-  }
-}
-
-html.pwa .login-bottom {
-  bottom: 4rem !important;
-}
-
 html.pwa .gnb-pwa {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
@@ -106,4 +96,20 @@ html.pwa .pwa-pb::after {
   display: block;
   height: env(safe-area-inset-bottom, 0px);
   background-color: inherit;
+}
+
+.login-bottom {
+  bottom: 1.75rem;
+}
+
+html.pwa .login-bottom {
+  bottom: calc(1.75rem + env(safe-area-inset-bottom, 0px));
+}
+
+.gnb-floating-btn {
+  bottom: 5rem;
+}
+
+html.pwa .gnb-floating-btn {
+  bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
 }

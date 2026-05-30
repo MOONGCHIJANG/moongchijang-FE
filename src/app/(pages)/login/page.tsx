@@ -25,10 +25,7 @@ const page = () => {
         </p>
       </div>
 
-      <div
-        className="px-4 flex flex-col gap-3.25 items-center"
-        style={{ paddingBottom: 'calc(1.75rem + env(safe-area-inset-bottom, 0px))' }}
-      >
+      <div className="px-4 pb-7 flex flex-col gap-3.25 items-center">
         <ToastToolTip text="3초만에 빠른 회원가입" />
         <LoginButton />
       </div>

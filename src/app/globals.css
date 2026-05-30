@@ -98,14 +98,6 @@ html.pwa .pwa-pb::after {
   background-color: inherit;
 }
 
-.login-bottom {
-  bottom: 1.75rem;
-}
-
-html.pwa .login-bottom {
-  bottom: calc(1.75rem + env(safe-area-inset-bottom, 0px));
-}
-
 .gnb-floating-btn {
   bottom: 5rem;
 }

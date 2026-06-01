@@ -41,7 +41,7 @@ export default function NicknameChangePage() {
 
   const helperColor =
     checkState === 'available'
-      ? 'text-text-basic'
+      ? 'text-text-subtle-inverse'
       : checkState === 'unavailable'
         ? 'text-text-error'
         : 'text-text-subtle-inverse';

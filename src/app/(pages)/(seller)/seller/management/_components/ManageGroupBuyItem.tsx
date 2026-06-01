@@ -24,8 +24,8 @@ const STATUS_CONFIG: Record<
   },
   [Status.ACHIEVED]: {
     label: '달성',
-    badgeClassName: 'bg-success-25',
-    textClassName: 'text-text-success caption-xs-bold',
+    badgeClassName: 'bg-success-50',
+    textClassName: 'text-success-600 caption-xs-bold',
   },
   [Status.ENDED]: {
     label: '종료',
@@ -68,20 +68,20 @@ export function ManageGroupBuyItem({ item }: Props) {
         <div className="flex items-center gap-1.5">
           <Badge
             label={config.label}
-            className={config.badgeClassName}
+            className={`min-w-10 ${config.badgeClassName}`}
             textClassName={config.textClassName}
           />
           {item.status === Status.IN_PROGRESS && dDayLabel && (
             <Badge
               label={dDayLabel}
-              className="bg-surface-brand-lighter"
+              className="min-w-10 bg-surface-brand-lighter"
               textClassName="text-text-brand caption-xs-bold"
             />
           )}
           {item.status === Status.ACHIEVED && pickupDDayLabel && (
             <Badge
               label={pickupDDayLabel}
-              className="bg-success-50"
+              className="min-w-10 bg-success-50"
               textClassName="text-success-600 caption-xs-bold"
             />
           )}
@@ -113,7 +113,7 @@ export function ManageGroupBuyItem({ item }: Props) {
         <button
           type="button"
           onClick={(e) => e.preventDefault()}
-          className="w-full rounded-xl border border-border-gray-200 py-2.5 body-sm-medium text-text-secondary"
+          className="w-full rounded-xl border border-border-default py-2.5 heading-sm-bold text-text-tertiary"
         >
           QR 스캔 준비
         </button>

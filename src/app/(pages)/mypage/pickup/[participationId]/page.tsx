@@ -190,9 +190,7 @@ export default function PickupPage() {
                 픽업 위치
               </span>
 
-              <div
-                className={`border border-border-subtle rounded-medium overflow-hidden${isQrOpen ? ' invisible' : ''}`}
-              >
+              <div className="border border-border-subtle rounded-medium overflow-hidden isolate">
                 <NaverMap
                   height="226px"
                   center={{

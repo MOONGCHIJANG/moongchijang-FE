@@ -2374,7 +2374,7 @@ export interface OwnerGroupBuyRequestCreate {
    */
   perUserLimit?: number | null;
   /**
-   * 상품 이미지 URL 목록. 첫 번째 이미지를 대표 이미지로 사용한다.
+   * 상품 이미지 S3 key 목록. 첫 번째 key를 대표 이미지로 사용한다.
    * @minItems 1
    * @maxItems 5
    */
@@ -3148,6 +3148,7 @@ export interface AdminGroupBuyRequestApprove {
    */
   perUserLimit?: number | null;
   /**
+   * 상품 이미지 S3 key 목록
    * @minItems 1
    * @maxItems 5
    */
@@ -3319,7 +3320,7 @@ export interface ApiResponseAdminSettlementDetail {
 }
 
 /**
- * AI 키워드 분류 케이스
+ * FULLTEXT 인덱스 매칭 결과 기반 분류 케이스(상품 인덱스 + 매장/주소 인덱스 hit 조합)
  */
 export type ApiResponseSearchAnalysisDataSearchCase =
   (typeof ApiResponseSearchAnalysisDataSearchCase)[keyof typeof ApiResponseSearchAnalysisDataSearchCase];
@@ -3336,7 +3337,7 @@ export const ApiResponseSearchAnalysisDataSearchCase = {
 RESULTS=공구 결과 노출 /
 EMPTY_CAN_REQUEST=검색 결과 없음, 공구 개설 요청 진입점 /
 NEED_REGION/NEED_PRODUCT/NEED_BOTH=추가 키워드 입력 안내 /
-AMBIGUOUS_CONFIRMATION=AI 인식 결과 재확인 필요
+AMBIGUOUS_CONFIRMATION=분류 결과 재확인 필요
 
  */
 export type ApiResponseSearchAnalysisDataUiState =
@@ -3363,25 +3364,25 @@ export interface RecommendedStoreDto {
 }
 
 export type ApiResponseSearchAnalysisData = {
-  /** AI 키워드 분류 케이스 */
+  /** FULLTEXT 인덱스 매칭 결과 기반 분류 케이스(상품 인덱스 + 매장/주소 인덱스 hit 조합) */
   searchCase: ApiResponseSearchAnalysisDataSearchCase;
   /**
-   * AI가 감지한 동네 키워드
+   * 매장/주소 인덱스가 매치된 경우 검색어, 아니면 null
    * @nullable
    */
   detectedRegion?: string | null;
   /**
-   * AI가 감지한 상품/베이커리 키워드
+   * 상품 인덱스가 매치된 경우 검색어, 아니면 null
    * @nullable
    */
   detectedProduct?: string | null;
-  /** AI 분류 신뢰도(0.0~1.0) */
+  /** FULLTEXT 분류 신뢰도. BOTH=1.0 / 단일 인덱스 매치=0.5 / NONE=0.0 */
   confidence: number;
   /** 프론트 화면 분기 상태.
   RESULTS=공구 결과 노출 /
   EMPTY_CAN_REQUEST=검색 결과 없음, 공구 개설 요청 진입점 /
   NEED_REGION/NEED_PRODUCT/NEED_BOTH=추가 키워드 입력 안내 /
-  AMBIGUOUS_CONFIRMATION=AI 인식 결과 재확인 필요
+  AMBIGUOUS_CONFIRMATION=분류 결과 재확인 필요
    */
   uiState: ApiResponseSearchAnalysisDataUiState;
   /** 전체 공구 결과 개수 */
@@ -3678,6 +3679,73 @@ export interface ApiResponseStoreRecommendation {
   success?: boolean;
   data?: ApiResponseStoreRecommendationData;
   error?: unknown | null;
+}
+
+/**
+ * 이미지 업로드 카테고리
+ */
+export type ImageUploadCategory =
+  (typeof ImageUploadCategory)[keyof typeof ImageUploadCategory];
+
+export const ImageUploadCategory = {
+  THUMBNAIL: 'THUMBNAIL',
+  PRODUCT: 'PRODUCT',
+} as const;
+
+export interface ImagePresignedUploadItemRequest {
+  category: ImageUploadCategory;
+  /** 원본 파일명 */
+  fileName: string;
+  /** 파일 Content-Type */
+  contentType: string;
+}
+
+export interface ImagePresignedUploadRequest {
+  /**
+   * 공구 ID. 생성 전 단계면 null
+   * @nullable
+   */
+  groupBuyId?: number | null;
+  /** 발급 대상 파일 목록 */
+  files: ImagePresignedUploadItemRequest[];
+}
+
+export interface ImagePresignedUploadItemResponse {
+  category: ImageUploadCategory;
+  /** S3 Object Key */
+  key: string;
+  /** S3 업로드용 Presigned URL */
+  uploadUrl: string;
+  method: string;
+}
+
+export interface ImagePresignedUploadResponse {
+  /** 발급 결과 목록 */
+  items: ImagePresignedUploadItemResponse[];
+}
+
+export interface ApiResponseImagePresignedUpload {
+  success: boolean;
+  data: ImagePresignedUploadResponse;
+  error: unknown | null;
+}
+
+export interface ImageDeleteRequest {
+  /** 삭제할 S3 key 목록 */
+  keys: string[];
+}
+
+export interface ImageDeleteResponse {
+  /** 삭제 완료 key 목록 */
+  deletedKeys: string[];
+  /** 삭제 실패 key 목록 */
+  failedKeys: string[];
+}
+
+export interface ApiResponseImageDelete {
+  success: boolean;
+  data: ImageDeleteResponse;
+  error: unknown | null;
 }
 
 /**

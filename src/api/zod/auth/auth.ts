@@ -6,6 +6,8 @@ import * as zod from 'zod';
 
 /**
  * 카카오 인가 코드로 로그인하거나 최초 가입 처리한다.
+카카오 닉네임은 선저장 단계에서 2~10자/한글·영문·숫자 조건을 만족할 때만 저장되며, 조건 미충족 시 null로 저장된다.
+
  * @summary 카카오 로그인 / 회원가입
  */
 export const PostApiV1AuthKakaoBody = zod.object({
@@ -271,6 +273,8 @@ export const GetApiV1UsersMeWithdrawalContextResponse = zod.object({
 
 /**
  * 추가정보 입력(0.5) 단계에서 닉네임 사용 가능 여부를 확인한다.
+인증 사용자가 호출한 경우 본인 현재 닉네임은 중복으로 보지 않는다.
+
  * @summary 닉네임 중복 확인
  */
 export const getApiV1UsersNicknameAvailabilityQueryNicknameMin = 2;
@@ -300,6 +304,7 @@ export const GetApiV1UsersNicknameAvailabilityResponse = zod.object({
 
 /**
  * 신규 가입 공통(카카오/이메일) 추가 정보 입력을 저장한다.
+닉네임은 최종 저장 시점에 중복 검증되며, 본인 현재 닉네임과 동일한 값은 허용된다.
 성공 시 nickname, phoneNumber, signupCompleted가 반영된다.
 
  * @summary 추가 정보 입력 완료

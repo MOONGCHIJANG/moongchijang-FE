@@ -78,6 +78,10 @@ import {
   getPostApiV1GroupBuyOpenRequestsStoreRecommendationsMockHandler,
 } from './group-buy-request/group-buy-request.msw';
 import {
+  getPostApiV1ImagesPresignedUrlsMockHandler,
+  getDeleteApiV1ImagesMockHandler,
+} from './image-upload/image-upload.msw';
+import {
   getGetApiV1UsersMeParticipationsMockHandler,
   getGetApiV1UsersMeParticipationsInProgressMockHandler,
   getGetApiV1UsersMeParticipationsPickupWaitingMockHandler,
@@ -201,6 +205,8 @@ export const generatedHandlers = [
   getGetApiV1GroupBuyRequestsRequestIdMockHandler(),
   getPostApiV1GroupBuyOpenRequestsMockHandler(),
   getPostApiV1GroupBuyOpenRequestsStoreRecommendationsMockHandler(),
+  getPostApiV1ImagesPresignedUrlsMockHandler(),
+  getDeleteApiV1ImagesMockHandler(),
   getGetApiV1UsersMeParticipationsMockHandler(),
   getGetApiV1UsersMeParticipationsInProgressMockHandler(),
   getGetApiV1UsersMeParticipationsPickupWaitingMockHandler(),

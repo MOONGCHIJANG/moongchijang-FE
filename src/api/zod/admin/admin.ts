@@ -756,7 +756,8 @@ export const PostApiV1AdminGroupBuyRequestsRequestIdApproveBody = zod.object({
   imageUrls: zod
     .array(zod.string())
     .min(1)
-    .max(postApiV1AdminGroupBuyRequestsRequestIdApproveBodyImageUrlsMax),
+    .max(postApiV1AdminGroupBuyRequestsRequestIdApproveBodyImageUrlsMax)
+    .describe('상품 이미지 S3 key 목록'),
   recruitmentStartAt: zod.iso.datetime({ offset: true }),
   deadline: zod.iso.datetime({ offset: true }).describe('모집 마감일시'),
   pickupDate: zod.iso.date(),

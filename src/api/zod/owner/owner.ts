@@ -407,7 +407,7 @@ export const GetApiV1OwnerGroupBuyRequestsResponse = zod.object({
  * 사장님이 본인 매장에 대한 공구 개설 요청을 제출한다.
 - SELLER 권한만 요청할 수 있다.
 - storeId는 요청자에게 연결된 매장이어야 한다.
-- imageUrls의 첫 번째 이미지를 대표 이미지(thumbnailUrl)로 저장한다.
+- imageUrls의 첫 번째 key를 대표 이미지(thumbnailKey)로 저장한다.
 - 희망 공구 기간은 현재 시각 기준 최소 7일 이상이어야 한다.
 
  * @summary 사장님 공구 개설 요청 제출
@@ -447,7 +447,7 @@ export const PostApiV1OwnerGroupBuyRequestsBody = zod.object({
     .array(zod.string())
     .min(1)
     .max(postApiV1OwnerGroupBuyRequestsBodyImageUrlsMax)
-    .describe('상품 이미지 URL 목록. 첫 번째 이미지를 대표 이미지로 사용한다.'),
+    .describe('상품 이미지 S3 key 목록. 첫 번째 key를 대표 이미지로 사용한다.'),
   pickupDate: zod.iso.date().describe('픽업일. 공구 마감일 이후여야 한다.'),
   pickupTimeStart: zod.iso.time({}),
   pickupTimeEnd: zod.iso.time({}),

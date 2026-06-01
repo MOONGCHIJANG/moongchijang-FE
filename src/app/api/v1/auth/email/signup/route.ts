@@ -12,25 +12,7 @@ export async function POST(req: NextRequest) {
   });
 
   if (result.status === 200) {
-    const data = result.data as {
-      data?: {
-        accessToken: string;
-        expiresIn: number;
-        user?: { signupCompleted: boolean };
-      };
-    };
-
-    const accessToken = data?.data?.accessToken ?? '';
-    const expiresIn = data?.data?.expiresIn ?? 3600;
-
     const response = NextResponse.json(result.data, { status: 200 });
-    response.cookies.set('accessToken', accessToken, {
-      httpOnly: false,
-      maxAge: expiresIn,
-      path: '/',
-      sameSite: 'strict',
-      secure: process.env.NODE_ENV === 'production',
-    });
 
     const setCookie = result.headers?.get('set-cookie');
     if (setCookie) {

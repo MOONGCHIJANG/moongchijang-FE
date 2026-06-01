@@ -32,6 +32,10 @@ import {
   getGetApiV1OwnerGroupBuysSummaryResponseMock,
   getGetApiV1OwnerGroupBuysManageResponseMock,
   getGetApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponseMock,
+  getGetApiV1OwnerSettlementsMonthlySummaryResponseMock,
+  getGetApiV1OwnerSettlementsMonthChipsResponseMock,
+  getGetApiV1OwnerSettlementsRefundRequestsResponseMock,
+  getGetApiV1OwnerSettlementsRefundRequestsParticipationIdResponseMock,
 } from '../src/api/generated/owner/owner.msw';
 import {
   getGetApiV1UsersMeTabsCountsResponseMock,
@@ -766,6 +770,156 @@ export function createOwnerGroupBuyManageDetailMock(
     },
     error: null,
   };
+}
+
+// ── 정산 ─────────────────────────────────────────────────────────────────
+
+export function createOwnerSettlementMonthChipsMock() {
+  const base = getGetApiV1OwnerSettlementsMonthChipsResponseMock();
+  return {
+    ...base,
+    success: true,
+    data: {
+      chips: [
+        { year: 2026, month: 5, label: '2026년 5월' },
+        { year: 2026, month: 4, label: '2026년 4월' },
+        { year: 2026, month: 3, label: '2026년 3월' },
+      ],
+    },
+    error: null,
+  };
+}
+
+export function createOwnerSettlementMonthlySummaryMock(year: number, month: number) {
+  const base = getGetApiV1OwnerSettlementsMonthlySummaryResponseMock();
+  const summaries: Record<string, { gross: number; fee: number }> = {
+    '2026-5': { gross: 1_328_000, fee: 304_000 },
+    '2026-4': { gross: 980_000, fee: 120_000 },
+    '2026-3': { gross: 540_000, fee: 0 },
+  };
+  const key = `${year}-${month}`;
+  const { gross, fee } = summaries[key] ?? { gross: 0, fee: 0 };
+  return {
+    ...base,
+    success: true,
+    data: {
+      year,
+      month,
+      grossRevenueAmount: gross,
+      refundFeeAmount: fee,
+      settlementExpectedAmount: gross - fee,
+    },
+    error: null,
+  };
+}
+
+// ── 환불 요청 목록 픽스처 ─────────────────────────────────────────────────
+
+const REFUND_ITEMS = [
+  {
+    participationId: 101,
+    groupBuyId: 3,
+    productName: '초코 크루아상&소금빵 세트',
+    paymentAmount: 24_000,
+    requesterName: '김민지',
+    requesterCode: 'P001',
+    refundReasonLabel: '단순 변심',
+    requestedDate: '2026-05-02',
+    status: 'PENDING' as const,
+    exceeded24Hours: true,
+  },
+  {
+    participationId: 102,
+    groupBuyId: 3,
+    productName: '딸기 타르트',
+    paymentAmount: 18_000,
+    requesterName: '이준서',
+    requesterCode: 'P002',
+    refundReasonLabel: '상품 불만족',
+    requestedDate: '2026-05-02',
+    status: 'COMPLETED' as const,
+    exceeded24Hours: false,
+  },
+  {
+    participationId: 103,
+    groupBuyId: 1,
+    productName: '말차 라떼 케이크',
+    paymentAmount: 32_000,
+    requesterName: '박서연',
+    requesterCode: 'P003',
+    refundReasonLabel: '픽업 불가',
+    requestedDate: '2026-05-03',
+    status: 'COMPLETED' as const,
+    exceeded24Hours: false,
+  },
+];
+
+export function createOwnerRefundRequestsMock(tab = 'ALL') {
+  const base = getGetApiV1OwnerSettlementsRefundRequestsResponseMock();
+  const items =
+    tab === 'ALL'
+      ? REFUND_ITEMS
+      : REFUND_ITEMS.filter((i) => i.status === tab);
+  const pendingCount = REFUND_ITEMS.filter((i) => i.status === 'PENDING').length;
+  const completedCount = REFUND_ITEMS.filter((i) => i.status === 'COMPLETED').length;
+  return {
+    ...base,
+    success: true,
+    data: {
+      pendingCount,
+      completedCount,
+      hasPendingItems: pendingCount > 0,
+      items,
+    },
+    error: null,
+  };
+}
+
+const REFUND_DETAIL_FIXTURES: Record<number, object> = {
+  101: {
+    participationId: 101,
+    groupBuyId: 3,
+    productName: '초코 크루아상&소금빵 세트',
+    requesterName: '김민지',
+    requestedDate: '2026-05-02',
+    paymentAmount: 24_000,
+    penaltyAmount: 2_400,
+    refundExpectedAmount: 21_600,
+    refundReasonDetail: '일정 변경으로 픽업이 어려워졌어요. 변경 부탁드립니다.',
+    status: 'PENDING' as const,
+  },
+  102: {
+    participationId: 102,
+    groupBuyId: 3,
+    productName: '딸기 타르트',
+    requesterName: '이준서',
+    requestedDate: '2026-05-02',
+    paymentAmount: 18_000,
+    penaltyAmount: 0,
+    refundExpectedAmount: 18_000,
+    refundReasonDetail: null,
+    status: 'COMPLETED' as const,
+  },
+  103: {
+    participationId: 103,
+    groupBuyId: 1,
+    productName: '말차 라떼 케이크',
+    requesterName: '박서연',
+    requestedDate: '2026-05-03',
+    paymentAmount: 32_000,
+    penaltyAmount: 3_200,
+    refundExpectedAmount: 28_800,
+    refundReasonDetail: '개인 사정으로 픽업이 불가능해졌습니다.',
+    status: 'COMPLETED' as const,
+  },
+};
+
+export function createOwnerRefundDetailMock(participationId: number) {
+  const base = getGetApiV1OwnerSettlementsRefundRequestsParticipationIdResponseMock();
+  const fixture =
+    REFUND_DETAIL_FIXTURES[participationId] ??
+    REFUND_DETAIL_FIXTURES[101];
+  return { ...base, success: true, data: fixture, error: null };
 }
 
 export function createGroupBuysFeedMock() {

@@ -39,6 +39,10 @@ import {
   createOwnerGroupBuyExtensionMock,
   createOwnerGroupBuyRequestCreatedMock,
   MOCK_SELLER_HOME_EMPTY,
+  createOwnerSettlementMonthChipsMock,
+  createOwnerSettlementMonthlySummaryMock,
+  createOwnerRefundRequestsMock,
+  createOwnerRefundDetailMock,
 } from './mock-helpers';
 import { formatDeadline } from '@/lib/date';
 
@@ -634,6 +638,53 @@ const overrideHandlers = [
       await delay(500);
       return HttpResponse.json(
         createOwnerGroupBuyManageDetailMock('ACHIEVED'),
+        { status: 200 },
+      );
+    },
+  ),
+
+  // ── 정산 ─────────────────────────────────────────────────────────────
+  http.get('*/api/v1/owner/settlements/month-chips', async () => {
+    await delay(300);
+    return HttpResponse.json(createOwnerSettlementMonthChipsMock(), { status: 200 });
+  }),
+
+  http.get('*/api/v1/owner/settlements/monthly-summary', async ({ request }) => {
+    await delay(400);
+    const url = new URL(request.url);
+    const year = parseInt(url.searchParams.get('year') ?? '2026', 10);
+    const month = parseInt(url.searchParams.get('month') ?? '5', 10);
+    return HttpResponse.json(
+      createOwnerSettlementMonthlySummaryMock(year, month),
+      { status: 200 },
+    );
+  }),
+
+  http.get('*/api/v1/owner/settlements/refund-requests', async ({ request }) => {
+    await delay(400);
+    const url = new URL(request.url);
+    const tab = url.searchParams.get('tab') ?? 'ALL';
+    return HttpResponse.json(createOwnerRefundRequestsMock(tab), { status: 200 });
+  }),
+
+  http.get(
+    '*/api/v1/owner/settlements/refund-requests/:participationId',
+    async ({ params }) => {
+      await delay(300);
+      const participationId = Number(params.participationId);
+      return HttpResponse.json(
+        createOwnerRefundDetailMock(participationId),
+        { status: 200 },
+      );
+    },
+  ),
+
+  http.post(
+    '*/api/v1/owner/settlements/refund-requests/:participationId/review-submissions',
+    async () => {
+      await delay(500);
+      return HttpResponse.json(
+        { success: true, data: { participationId: 101, processed: true }, error: null },
         { status: 200 },
       );
     },

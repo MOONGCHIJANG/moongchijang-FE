@@ -109,7 +109,7 @@ export const QrModal = ({
   return (
     <div
       className={cn(
-        'fixed inset-0 z-50 flex flex-col items-center justify-center transition-opacity duration-300 ease-out',
+        'fixed inset-0 z-[9999] flex flex-col items-center justify-center transition-opacity duration-300 ease-out',
         animate ? 'opacity-100' : 'opacity-0',
       )}
     >

@@ -146,7 +146,7 @@ export default function PickupPage() {
       <Header text="픽업 안내" showBackButton />
 
       <div
-        className={`flex-1 min-h-0 ${isQrOpen ? 'overflow-hidden' : 'overflow-y-auto'}`}
+        className="flex-1 min-h-0 overflow-y-auto"
       >
         <div className="flex flex-col gap-g8 px-4 py-g8">
           {/* 상단 카드 + QR 버튼 */}
@@ -191,7 +191,7 @@ export default function PickupPage() {
               </span>
 
               <div
-                className={`border border-border-subtle rounded-medium overflow-hidden${isQrOpen ? ' invisible' : ''}`}
+                className="border border-border-subtle rounded-medium overflow-hidden isolate"
               >
                 <NaverMap
                   height="226px"

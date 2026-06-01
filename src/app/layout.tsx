@@ -107,11 +107,13 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased bg-bg-white-muted`}
       suppressHydrationWarning
     >
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `try{if(window.matchMedia('(display-mode:standalone)').matches||navigator.standalone){document.documentElement.classList.add('pwa');}}catch(e){}`,
-        }}
-      />
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{if(window.matchMedia('(display-mode:standalone)').matches||navigator.standalone){document.documentElement.classList.add('pwa');}}catch(e){}`,
+          }}
+        />
+      </head>
       <body className="min-h-dvh flex flex-col mx-auto max-w-110">
         {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID &&
           process.env.NODE_ENV !== 'development' && (

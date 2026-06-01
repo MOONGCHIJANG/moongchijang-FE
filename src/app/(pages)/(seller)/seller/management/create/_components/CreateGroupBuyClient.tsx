@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import { Icon } from '@iconify/react';
 import { cn } from '@/lib/utils';
@@ -8,8 +8,7 @@ import { Button } from '@/components/Button';
 import { formatDeadline } from '@/lib/date';
 import { DateRangePickerBottomSheet } from './DateRangePickerBottomSheet';
 import { usePostApiV1OwnerGroupBuyRequests } from '@/api/hooks/owner/owner';
-
-const MAX_IMAGES = 10;
+import { useImageUpload } from '../_hooks/useImageUpload';
 
 function isDeadlineValid(dateStr: string): boolean {
   if (!dateStr) return false;
@@ -21,8 +20,6 @@ function isDeadlineValid(dateStr: string): boolean {
   );
   return diffDays >= 7;
 }
-
-type ImageItem = { file: File; previewUrl: string };
 
 function FormField({
   label,
@@ -63,10 +60,17 @@ export function CreateGroupBuyClient() {
   const [price, setPrice] = useState('');
   const [targetQuantity, setTargetQuantity] = useState('');
   const [perUserLimit, setPerUserLimit] = useState('');
-  const [images, setImages] = useState<ImageItem[]>([]);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const {
+    images,
+    fileInputRef,
+    handleAdd,
+    handleRemove,
+    uploadedKeys,
+    isUploading,
+    canAdd,
+  } = useImageUpload();
 
   const { mutate: submitRequest, isPending } =
     usePostApiV1OwnerGroupBuyRequests();
@@ -82,25 +86,8 @@ export function CreateGroupBuyClient() {
     Number(price) > 0 &&
     targetQuantity !== '' &&
     Number(targetQuantity) > 0 &&
-    images.length > 0;
-
-  const handleImageAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files ?? []);
-    const remaining = MAX_IMAGES - images.length;
-    const toAdd = files.slice(0, remaining).map((file) => ({
-      file,
-      previewUrl: URL.createObjectURL(file),
-    }));
-    setImages((prev) => [...prev, ...toAdd]);
-    e.target.value = '';
-  };
-
-  const handleImageRemove = (index: number) => {
-    setImages((prev) => {
-      URL.revokeObjectURL(prev[index].previewUrl);
-      return prev.filter((_, i) => i !== index);
-    });
-  };
+    uploadedKeys.length > 0 &&
+    !isUploading;
 
   const handleSubmit = () => {
     if (!isSubmittable) return;
@@ -115,7 +102,7 @@ export function CreateGroupBuyClient() {
         targetQuantity: Number(targetQuantity),
         maxQuantity: Number(targetQuantity),
         perUserLimit: perUserLimit ? Number(perUserLimit) : null,
-        imageUrls: [], // TODO: 이미지 업로드 API 연동 후 URL 목록 전달
+        imageUrls: uploadedKeys,
         pickupDate: deadline,
         pickupTimeStart: '10:00',
         pickupTimeEnd: '18:00',
@@ -232,19 +219,40 @@ export function CreateGroupBuyClient() {
 
       {/* 대표 이미지 */}
       <FormField label="대표 이미지" required>
-        <div className="flex flex-wrap gap-2">
-          {images.map((img, i) => (
-            <div key={i} className="relative h-[72px] w-[72px] shrink-0">
+        <div className="flex gap-2 overflow-x-auto py-1 pr-1 [&::-webkit-scrollbar]:hidden">
+          {images.map((img) => (
+            <div key={img.id} className="relative h-[72px] w-[72px] shrink-0">
               <Image
                 src={img.previewUrl}
-                alt={`이미지 ${i + 1}`}
+                alt={img.file.name}
                 fill
-                className="rounded-xl object-cover"
+                className={cn(
+                  'rounded-xl object-cover',
+                  img.status === 'uploading' && 'opacity-50',
+                  img.status === 'error' && 'opacity-40',
+                )}
                 unoptimized
               />
+              {img.status === 'uploading' && (
+                <div className="absolute inset-0 flex items-center justify-center rounded-xl">
+                  <Icon
+                    icon="lucide:loader-circle"
+                    className="h-5 w-5 animate-spin text-white"
+                  />
+                </div>
+              )}
+              {img.status === 'error' && (
+                <div className="absolute inset-0 flex items-center justify-center rounded-xl">
+                  <Icon
+                    icon="lucide:circle-alert"
+                    className="h-5 w-5 text-white"
+                  />
+                </div>
+              )}
               <button
                 type="button"
-                onClick={() => handleImageRemove(i)}
+                onClick={() => handleRemove(img.id)}
+                aria-label="이미지 삭제"
                 className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-surface-inverse"
               >
                 <Icon
@@ -254,7 +262,7 @@ export function CreateGroupBuyClient() {
               </button>
             </div>
           ))}
-          {images.length < MAX_IMAGES && (
+          {canAdd && (
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
@@ -268,10 +276,10 @@ export function CreateGroupBuyClient() {
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/*"
+          accept="image/*,.heic,.heif"
           multiple
           className="hidden"
-          onChange={handleImageAdd}
+          onChange={handleAdd}
         />
       </FormField>
 

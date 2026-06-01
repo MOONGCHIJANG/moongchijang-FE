@@ -2,29 +2,38 @@
 
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import { Icon } from '@iconify/react';
 import { Button } from '@/components/Button';
+import { logEvent } from '@/lib/analytics';
 
 export const SubmitCompleteStep = () => {
   const router = useRouter();
 
+  useEffect(() => {
+    logEvent('screen_view', { screen_name: 'group_request_complete' });
+  }, []);
+
   return (
     <div className="flex flex-col min-h-full bg-white">
-      <header className="flex items-center h-[57px] px-4 border-b border-border-subtle shrink-0 gap-[2px]">
-        <button
-          type="button"
-          onClick={() => router.push('/')}
-          className="flex items-center justify-center w-8 h-8"
-          aria-label="뒤로가기"
-        >
-          <Icon
-            icon="lucide:chevron-left"
-            className="w-6 h-6 text-icon-basic"
-          />
-        </button>
-        <span className="heading-sm-semibold text-text-basic">
-          공구 요청하기
-        </span>
+      <header className="flex flex-col border-b border-border-subtle shrink-0">
+        <div style={{ height: 'env(safe-area-inset-top, 0px)' }} />
+        <div className="flex items-center h-[57px] px-4 gap-[2px]">
+          <button
+            type="button"
+            onClick={() => router.push('/')}
+            className="flex items-center justify-center w-8 h-8"
+            aria-label="뒤로가기"
+          >
+            <Icon
+              icon="lucide:chevron-left"
+              className="w-6 h-6 text-icon-basic"
+            />
+          </button>
+          <span className="heading-sm-semibold text-text-basic">
+            공구 요청하기
+          </span>
+        </div>
       </header>
 
       <div className="flex flex-1 flex-col items-center justify-center gap-10 px-8">

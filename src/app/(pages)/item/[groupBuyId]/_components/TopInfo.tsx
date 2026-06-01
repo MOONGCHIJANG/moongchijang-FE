@@ -2,10 +2,11 @@
 import Image from 'next/image';
 import ShareBtn from '@/components/ShareBtn';
 import { Icon } from '@iconify/react';
-import React from 'react';
+import React, { useEffect } from 'react';
 import BottomShare from './BottomShare';
 import { ApiResponseGroupBuyDetailResponseData } from '@/api/generated/api.schemas';
 import { formatDeadline, formatPickupDate, formatPickupTime } from '@/lib/date';
+import { logEvent } from '@/lib/analytics';
 
 interface Props {
   data: ApiResponseGroupBuyDetailResponseData;
@@ -13,6 +14,17 @@ interface Props {
 
 const TopInfo = ({ data }: Props) => {
   const [isShared, setIsShared] = React.useState(false);
+
+  useEffect(() => {
+    const itemStatus =
+      new Date(data.deadline) > new Date() ? 'open' : 'closed';
+    logEvent('view_item', {
+      item_id: data.id,
+      item_name: data.productName,
+      store_name: data.storeName,
+      item_status: itemStatus,
+    });
+  }, []);
 
   const pickupText = `픽업 ${formatPickupDate(data.pickupDate)}`;
 

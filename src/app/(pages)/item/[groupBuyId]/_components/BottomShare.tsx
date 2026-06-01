@@ -3,6 +3,7 @@ import React, { useState, useCallback } from 'react';
 import ShareButtonItem from './ShareButtonItem';
 import { BottomSheet } from '@/components/BottomSheet';
 import { ToastBlack } from '@/components/ToastBlack';
+import { logEvent } from '@/lib/analytics';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://moongchijang.com';
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og/og-1200x630.png`;
@@ -49,12 +50,14 @@ const BottomShare = ({
     : DEFAULT_OG_IMAGE;
 
   const handleX = () => {
+    logEvent('product_share', { item_id: groupBuyId, share_method: 'link' });
     onClose?.();
     const url = `https://twitter.com/intent/tweet?url=${encodeURIComponent(pageUrl)}&text=${encodeURIComponent(shareText)}`;
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   const handleInstagram = async () => {
+    logEvent('product_share', { item_id: groupBuyId, share_method: 'link' });
     try {
       await navigator.clipboard.writeText(pageUrl);
       showToast('링크가 복사됐어요. 인스타그램에 붙여넣기 해보세요!');
@@ -64,6 +67,7 @@ const BottomShare = ({
   };
 
   const handleKakao = async () => {
+    logEvent('product_share', { item_id: groupBuyId, share_method: 'kakao' });
     if (!window.Kakao?.isInitialized()) {
       try {
         await navigator.clipboard.writeText(pageUrl);
@@ -92,6 +96,7 @@ const BottomShare = ({
   };
 
   const handleEtc = async () => {
+    logEvent('product_share', { item_id: groupBuyId, share_method: 'link' });
     if (navigator.share) {
       try {
         await navigator.share({ title: shareText, url: pageUrl });

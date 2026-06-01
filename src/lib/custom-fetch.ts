@@ -22,13 +22,24 @@ const PUBLIC_URLS = [
   '/auth/email/availability',
   '/auth/email/verification-codes',
   '/auth/kakao',
-  '/group-buys',
   '/search',
   '/stores/search',
 ];
 
-const isPublicUrl = (url: string) =>
-  PUBLIC_URLS.some((publicUrl) => url.includes(publicUrl));
+// 비로그인 허용이지만 일부 하위 경로는 인증 필요한 경우
+const isPublicUrl = (url: string) => {
+  const pathname = url.split('?')[0];
+
+  // group-buys 하위 중 인증 필요한 경로 먼저 체크
+  if (pathname.includes('/checkout')) return false;
+  if (pathname.includes('/payment-orders')) return false;
+  if (pathname.includes('/wishlist')) return false;
+
+  // 그 외 group-buys는 모두 public
+  if (pathname.includes('/group-buys')) return true;
+
+  return PUBLIC_URLS.some((publicUrl) => pathname.includes(publicUrl));
+};
 
 const tryRefreshToken = async (): Promise<string | null> => {
   if (isRefreshing) {
@@ -54,9 +65,6 @@ const tryRefreshToken = async (): Promise<string | null> => {
       processQueue(null);
       tokenStorage.remove();
       useAuthStore.getState().setIsLoggedIn(false);
-      if (typeof window !== 'undefined') {
-        window.location.href = '/login';
-      }
       return null;
     }
   } finally {
@@ -87,7 +95,9 @@ export const customFetch = async <T>(
     // accessToken 없고 public URL 아니면 바로 refresh 시도
     if (!token && !isPublicUrl(url)) {
       const newToken = await tryRefreshToken();
-      if (!newToken) throw new Error('Unauthorized');
+      if (!newToken) {
+        throw new Error('Unauthorized');
+      }
       const retryResponse = await fetchWithToken(newToken);
       const data = await retryResponse.json();
       return {

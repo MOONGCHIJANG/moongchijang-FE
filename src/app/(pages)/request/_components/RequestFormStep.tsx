@@ -7,6 +7,7 @@ import { Button } from '@/components/Button';
 import { type Store } from './StoreSearchStep';
 import { DatePickerBottomSheet } from './DatePickerBottomSheet';
 import { RequestConfirmModal } from './RequestConfirmModal';
+import { logEvent } from '@/lib/analytics';
 
 export interface RequestFormData {
   store: Store;
@@ -67,22 +68,25 @@ export const RequestFormStep = ({
   return (
     <div className="flex flex-col min-h-full bg-white">
       {/* 헤더 */}
-      <header className="flex items-center h-[57px] px-4 border-b border-border-subtle shrink-0 gap-[2px]">
-        <button
-          type="button"
-          onClick={onBack}
-          className="flex items-center justify-center w-8 h-8"
-          aria-label="뒤로가기"
-        >
-          <Icon
-            icon="lucide:chevron-left"
-            className="w-6 h-6 text-icon-basic"
-          />
-        </button>
+      <header className="flex flex-col border-b border-border-subtle shrink-0">
+        <div style={{ height: 'env(safe-area-inset-top, 0px)' }} />
+        <div className="flex items-center h-[57px] px-4 gap-[2px]">
+          <button
+            type="button"
+            onClick={onBack}
+            className="flex items-center justify-center w-8 h-8"
+            aria-label="뒤로가기"
+          >
+            <Icon
+              icon="lucide:chevron-left"
+              className="w-6 h-6 text-icon-basic"
+            />
+          </button>
 
-        <span className="heading-sm-semibold text-text-basic">
-          공구 요청하기
-        </span>
+          <span className="heading-sm-semibold text-text-basic">
+            공구 요청하기
+          </span>
+        </div>
       </header>
 
       {/* 요청 폼 */}
@@ -131,6 +135,13 @@ export const RequestFormStep = ({
             type="text"
             value={productName}
             onChange={(e) => setProductName(e.target.value)}
+            onBlur={() => {
+              if (productName.trim()) {
+                logEvent('groupbuy_request_field_complete', {
+                  field_name: 'product_name',
+                });
+              }
+            }}
             placeholder="원하는 상품명을 정확히 입력해주세요"
             maxLength={20}
             className="w-full px-3 py-4 bg-surface-default rounded-2xlarge body-md-regular text-text-subtle placeholder:text-icon-disabled outline-none"
@@ -160,6 +171,14 @@ export const RequestFormStep = ({
             min="1"
             value={quantity}
             onChange={(e) => setQuantity(e.target.value)}
+            onBlur={() => {
+              if (Number(quantity) > 0) {
+                logEvent('groupbuy_request_field_complete', {
+                  field_name: 'quantity',
+                  value_type: 'number',
+                });
+              }
+            }}
             placeholder="1인 픽업 수량을 입력해주세요"
             className="w-full px-3 py-4 bg-surface-default rounded-2xlarge body-md-regular text-text-subtle placeholder:text-icon-disabled outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           />
@@ -234,7 +253,20 @@ export const RequestFormStep = ({
           fullWidth
           className="w-full text-text-basic-inverse cursor-pointer"
           disabled={!isSubmittable || isLoading}
-          onClick={() => setIsConfirmModalOpen(true)}
+          onClick={() => {
+            const filledCount = [
+              !!store,
+              !!productName.trim(),
+              quantityNum > 0,
+              !!pickupDate,
+            ].filter(Boolean).length;
+            logEvent('groupbuy_request_submit_click', {
+              filled_field_count: filledCount,
+              has_memo: !!additionalNote.trim(),
+              quantity: quantityNum,
+            });
+            setIsConfirmModalOpen(true);
+          }}
         >
           {isLoading ? '제출 중...' : '요청 제출하기'}
         </Button>
@@ -244,7 +276,15 @@ export const RequestFormStep = ({
         isOpen={isDatePickerOpen}
         onClose={() => setIsDatePickerOpen(false)}
         selectedDate={pickupDate}
-        onSelect={setPickupDate}
+        onSelect={(date) => {
+          setPickupDate(date);
+          if (date) {
+            logEvent('groupbuy_request_field_complete', {
+              field_name: 'pickup_date',
+              value_type: 'date',
+            });
+          }
+        }}
       />
 
       {store && (

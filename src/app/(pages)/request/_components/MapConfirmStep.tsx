@@ -5,6 +5,7 @@ import { Icon } from '@iconify/react';
 import { Button } from '@/components/Button';
 import NaverMap from '@/components/NaverMap';
 import { type Store } from './StoreSearchStep';
+import { logEvent } from '@/lib/analytics';
 
 interface MapConfirmStepProps {
   store?: Store | null;
@@ -33,19 +34,22 @@ export const MapConfirmStep = ({
 
   return (
     <div className="flex flex-col min-h-full bg-white">
-      <header className="flex items-center h-[57px] px-4 border-b border-border-subtle shrink-0 gap-[2px]">
-        <button
-          type="button"
-          onClick={onBack}
-          className="flex items-center justify-center w-8 h-8"
-          aria-label="뒤로가기"
-        >
-          <Icon
-            icon="lucide:chevron-left"
-            className="w-6 h-6 text-icon-basic"
-          />
-        </button>
-        <span className="heading-sm-semibold text-text-basic">주소 상세</span>
+      <header className="flex flex-col border-b border-border-subtle shrink-0">
+        <div style={{ height: 'env(safe-area-inset-top, 0px)' }} />
+        <div className="flex items-center h-[57px] px-4 gap-[2px]">
+          <button
+            type="button"
+            onClick={onBack}
+            className="flex items-center justify-center w-8 h-8"
+            aria-label="뒤로가기"
+          >
+            <Icon
+              icon="lucide:chevron-left"
+              className="w-6 h-6 text-icon-basic"
+            />
+          </button>
+          <span className="heading-sm-semibold text-text-basic">주소 상세</span>
+        </div>
       </header>
 
       {/* 지도 영역 */}
@@ -79,7 +83,12 @@ export const MapConfirmStep = ({
           size="lg"
           fullWidth
           className="w-full text-text-basic-inverse cursor-pointer"
-          onClick={onConfirm}
+          onClick={() => {
+            logEvent('groupbuy_request_store_confirm', {
+              store_id: store?.placeId ?? '',
+            });
+            onConfirm();
+          }}
         >
           매장 선택하기
         </Button>

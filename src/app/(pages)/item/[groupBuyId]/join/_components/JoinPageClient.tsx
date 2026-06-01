@@ -1,9 +1,11 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import * as PortOne from '@portone/browser-sdk/v2';
+import { useTermsSheetStore } from '@/store/termsSheetStore';
+
 import ItemSummary from './ItemSummary';
 import JoinForm from './JoinForm';
-import AgreeTerms from './AgreeTerms';
+import AgreeTermsSheet from './AgreeTermsSheet';
 import PaymentButton from './PaymentButton';
 import type { ApiResponseGroupBuyDetailResponseData } from '@/api/generated/api.schemas';
 import {
@@ -16,6 +18,7 @@ import {
   PaymentOrderCreatedResponse,
   PaymentConfirmedResponse,
 } from '@/api/schemas/participation';
+import { logEvent } from '@/lib/analytics';
 
 type Props = {
   groupBuyId: string;
@@ -29,8 +32,22 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
   // TODO: 마감됨 페이지 접근 시 처리
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const {
+    isOpen: isTermsSheetOpen,
+    open: openTermsSheet,
+    close: closeTermsSheet,
+  } = useTermsSheetStore();
   const payMethod = 'CARD' as const;
   const isPayable = !isLoading;
+
+  useEffect(() => {
+    logEvent('begin_checkout', {
+      item_id: parseInt(groupBuyId),
+      item_name: groupBuy.productName,
+      price: groupBuy.price,
+      currency: 'KRW',
+    });
+  }, []);
 
   const handlePayment = async () => {
     if (isLoading) return;
@@ -126,6 +143,14 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
       participationId = completeParsed.data.data.participationId;
 
       // [5] 완료 페이지 이동
+      logEvent('purchase', {
+        transaction_id: participationId.toString(),
+        value: totalAmount,
+        currency: 'KRW',
+        item_id: parseInt(groupBuyId),
+        item_name: groupBuy.productName,
+        quantity,
+      });
       sessionStorage.setItem('paymentSuccess', participationId.toString());
       await new Promise((resolve) => setTimeout(resolve, 50));
       window.location.replace(
@@ -148,7 +173,7 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
   const totalAmount = productAmount + feeAmount;
 
   return (
-    <div className="relative bg-bg-white-muted p-4 pb-24">
+    <div className="relative bg-bg-white-muted p-4 pb-24 min-h-dvh">
       {isLoading && (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center" />
       )}
@@ -163,11 +188,19 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
         totalAmount={totalAmount}
         productImage={groupBuy.imageUrls[0] || ''}
       />
-      <AgreeTerms />
+      <AgreeTermsSheet
+        isOpen={isTermsSheetOpen}
+        onClose={closeTermsSheet}
+        onConfirm={() => {
+          closeTermsSheet();
+          handlePayment();
+        }}
+        groupBuyId={groupBuyId}
+      />
       <PaymentButton
         price={totalAmount}
         disabled={!isPayable}
-        onClick={handlePayment}
+        onClick={openTermsSheet}
       />
     </div>
   );

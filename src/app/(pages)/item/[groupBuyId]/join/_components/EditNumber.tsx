@@ -53,7 +53,7 @@ const EditNumber = ({
       />
       {/* Bottom Sheet */}
       <div
-        className={`z-20 fixed bottom-0 left-0 right-0 mx-auto w-full max-w-110
+        className={`pwa-pb z-20 fixed bottom-0 left-0 right-0 mx-auto w-full max-w-110
           transition-transform duration-300 ease-in-out
           ${animate ? 'translate-y-0' : 'translate-y-full'}
           ${!animate ? 'pointer-events-none' : ''}`}

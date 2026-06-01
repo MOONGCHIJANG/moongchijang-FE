@@ -2,6 +2,8 @@
 
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { redirectStorage } from '@/lib/redirect';
+import { useAuthStore } from '@/store/authStore';
 
 export default function KakaoCallbackPage() {
   const router = useRouter();
@@ -44,11 +46,17 @@ export default function KakaoCallbackPage() {
         // 토큰은 Route Handler에서 쿠키에 저장 완료
         // signupCompleted 여부로 이동 분기만 처리
         if (!user.signupCompleted) {
+          // 카카오 닉네임 임시 저장
+          if (user.nickname) {
+            sessionStorage.setItem('kakaoNickname', user.nickname);
+          }
           router.replace('/signup/email?step=profile');
           return;
         }
 
-        router.replace('/feed');
+        useAuthStore.getState().setIsLoggedIn(true);
+        const redirect = redirectStorage.consume();
+        router.replace(redirect ?? '/feed');
       } catch {
         router.replace('/login');
       }

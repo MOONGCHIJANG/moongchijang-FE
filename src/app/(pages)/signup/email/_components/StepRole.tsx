@@ -5,12 +5,19 @@ import { Icon } from '@iconify/react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { logEvent } from '@/lib/analytics';
 
-const StepRole = () => {
+type StepRoleProps = {
+  onComplete?: () => void;
+};
+
+const StepRole = ({ onComplete }: StepRoleProps) => {
   const router = useRouter();
-  const [selected, setSelected] = useState<'guest' | 'seller'>();
+  const [selected, setSelected] = useState<'guest' | 'seller' | null>(null);
 
   const handleComplete = () => {
+    onComplete?.();
+    logEvent('sign_up', { method: 'email' });
     if (selected === 'guest') {
       router.push('/feed');
     } else if (selected === 'seller') {

@@ -37,6 +37,7 @@ import { useAuthStore } from '@/store/authStore';
 import { formatPickupDateTime, formatTime } from '@/lib/date';
 import { useFeedList } from '../_hooks/useFeedList';
 import { useRecentSearches } from '../_hooks/useRecentSearches';
+import { logEvent } from '@/lib/analytics';
 import Footer from '@/components/Footer';
 
 const ALL_REGIONS = REGIONS_DATA.flatMap((city) => city.regions);
@@ -136,7 +137,10 @@ export function FeedClient() {
   );
 
   const districts = useMemo(
-    () => selectedRegions.map((r) => r.districtType),
+    () =>
+      selectedRegions
+        .filter((r) => r.districtType !== 'NATIONWIDE')
+        .map((r) => r.districtType),
     [selectedRegions],
   );
 
@@ -214,13 +218,30 @@ export function FeedClient() {
     setIsSearchOpen(false);
   };
 
+  const FILTER_NAMES: Record<FilterId, string> = {
+    all: '전체',
+    due: '마감임박',
+    target: '달성임박',
+  };
+
   const handleFilterChange = (filter: FilterId) => {
+    logEvent('search_chip_select', { chip_name: FILTER_NAMES[filter] });
     setActiveFilter(filter);
     updateUrl({ filter: filter === 'all' ? null : filter });
   };
 
   const handleApplyLocation = (newRegions: Region[]) => {
     const resolved = newRegions.length > 0 ? newRegions : [DEFAULT_REGION];
+    const regionBefore = selectedRegions.map((r) => r.name).join(',');
+    const regionAfter = resolved.map((r) => r.name).join(',');
+    logEvent('region_change', {
+      region_before: regionBefore,
+      region_after: regionAfter,
+    });
+    logEvent('search_filter_apply', {
+      filter_type: 'region',
+      filter_value: regionAfter,
+    });
     setSelectedRegions(resolved);
     setIsLocationSheetOpen(false);
     const districtValues = resolved.map((r) => r.districtType);
@@ -234,6 +255,12 @@ export function FeedClient() {
   };
 
   const handleOpenRequestSheet = useCallback(() => {
+    if (searchKeyword) {
+      logEvent('group_request_cta_click', {
+        search_term: searchKeyword,
+        source: 'search_empty',
+      });
+    }
     const params = new URLSearchParams();
     if (searchAnalysis?.detectedProduct)
       params.set('bakery', searchAnalysis.detectedProduct);
@@ -241,7 +268,7 @@ export function FeedClient() {
       params.set('neighborhood', searchAnalysis.detectedRegion);
     const qs = params.toString();
     router.push(`/feed/request${qs ? `?${qs}` : ''}`);
-  }, [router, searchAnalysis]);
+  }, [router, searchAnalysis, searchKeyword]);
 
   const handleShake = useCallback(() => {
     if (!isLoggedIn) return;
@@ -257,7 +284,10 @@ export function FeedClient() {
 
   return (
     <>
-      <header className="sticky top-0 z-10 flex flex-col gap-3 bg-bg-white-muted px-5 pb-2 pt-4">
+      <header
+        className="sticky top-0 z-10 flex flex-col gap-3 bg-bg-white-muted px-5 pb-2 pt-4"
+        style={{ paddingTop: 'calc(16px + env(safe-area-inset-top, 0px))' }}
+      >
         <FeedTopBar
           location={locationDisplayText}
           onLocationClick={() => setIsLocationSheetOpen(true)}
@@ -299,64 +329,88 @@ export function FeedClient() {
               <span className="heading-sm-bold text-text-basic font-pretendard">
                 지금 인기 있는 공구 상품
               </span>
-              {feeds.map((feed) => (
-                <Link key={feed.id} href={`/item/${feed.id}`}>
+              {feeds.map((feed, index) => (
+                <Link
+                  key={feed.id}
+                  href={`/item/${feed.id}`}
+                  onClick={() =>
+                    logEvent('feed_item_click', {
+                      item_id: feed.id,
+                      item_name: feed.productName,
+                      store_name: feed.storeName,
+                      position: index,
+                    })
+                  }
+                >
                   <FeedCard {...feed} />
                 </Link>
               ))}
             </div>
           </>
-        ) : displayItems.length === 0 ? (
-          <div className="flex flex-col gap-4">
-            <EmptyState
-              title={'원하시는 공구가\n아직 없어요'}
-              description={
-                '다른 검색어를 입력하거나\n공구 개설을 요청해보세요.'
-              }
-            />
-            <GroupBuyRequestCard onRequest={handleOpenRequestSheet} />
-          </div>
         ) : (
           <>
-            {displayItems.map((feed) => (
-              <Link key={feed.id} href={`/item/${feed.id}`}>
+            {displayItems.length === 0 && (
+              <EmptyState
+                title={'원하시는 공구가\n아직 없어요'}
+                description={
+                  '다른 검색어를 입력하거나\n공구 개설을 요청해보세요.'
+                }
+              />
+            )}
+            {displayItems.map((feed, index) => (
+              <Link
+                key={feed.id}
+                href={`/item/${feed.id}`}
+                onClick={() =>
+                  logEvent('feed_item_click', {
+                    item_id: feed.id,
+                    item_name: feed.productName,
+                    store_name: feed.storeName,
+                    position: index,
+                  })
+                }
+              >
                 <FeedCard {...feed} />
               </Link>
             ))}
             {isSearchMode &&
+            (searchAnalysis?.uiState ===
+              ApiResponseSearchAnalysisDataUiState.RESULTS ||
               searchAnalysis?.uiState ===
-                ApiResponseSearchAnalysisDataUiState.RESULTS && (
-                <>
-                  {searchAnalysis.searchCase ===
-                    ApiResponseSearchAnalysisDataSearchCase.PRODUCT_ONLY && (
-                    <GroupBuyRequestCard
-                      icon="/icons/search.svg"
-                      title={`찾으시는 ${searchAnalysis.detectedProduct ?? searchKeyword} 공구가\n없나요?`}
-                      onRequest={handleOpenRequestSheet}
-                    />
-                  )}
-                  {searchAnalysis.searchCase ===
-                    ApiResponseSearchAnalysisDataSearchCase.NEIGHBORHOOD_ONLY && (
-                    <GroupBuyRequestCard
-                      icon="/icons/search.svg"
-                      title={`찾으시는 ${searchAnalysis.detectedRegion ?? searchKeyword} 공구가\n없나요?`}
-                      onRequest={handleOpenRequestSheet}
-                    />
-                  )}
-                  {searchAnalysis.searchCase ===
-                    ApiResponseSearchAnalysisDataSearchCase.BOTH_DETECTED && (
-                    <GroupBuyRequestCard
-                      icon="/icons/search.svg"
-                      title={`찾으시는 ${searchAnalysis.detectedProduct ?? searchKeyword} 공구가\n없나요?`}
-                      onRequest={handleOpenRequestSheet}
-                    />
-                  )}
-                  {searchAnalysis.searchCase ===
-                    ApiResponseSearchAnalysisDataSearchCase.NONE_DETECTED && (
-                    <GroupBuyRequestCard onRequest={handleOpenRequestSheet} />
-                  )}
-                </>
-              )}
+                ApiResponseSearchAnalysisDataUiState.EMPTY_CAN_REQUEST) ? (
+              <>
+                {searchAnalysis.searchCase ===
+                  ApiResponseSearchAnalysisDataSearchCase.PRODUCT_ONLY && (
+                  <GroupBuyRequestCard
+                    icon="/icons/search.svg"
+                    title={`찾으시는 ${searchAnalysis.detectedProduct ?? searchKeyword} 공구가\n없나요?`}
+                    onRequest={handleOpenRequestSheet}
+                  />
+                )}
+                {searchAnalysis.searchCase ===
+                  ApiResponseSearchAnalysisDataSearchCase.NEIGHBORHOOD_ONLY && (
+                  <GroupBuyRequestCard
+                    icon="/icons/search.svg"
+                    title={`찾으시는 ${searchAnalysis.detectedRegion ?? searchKeyword} 공구가\n없나요?`}
+                    onRequest={handleOpenRequestSheet}
+                  />
+                )}
+                {searchAnalysis.searchCase ===
+                  ApiResponseSearchAnalysisDataSearchCase.BOTH_DETECTED && (
+                  <GroupBuyRequestCard
+                    icon="/icons/search.svg"
+                    title={`찾으시는 ${searchAnalysis.detectedProduct ?? searchKeyword} 공구가\n없나요?`}
+                    onRequest={handleOpenRequestSheet}
+                  />
+                )}
+                {searchAnalysis.searchCase ===
+                  ApiResponseSearchAnalysisDataSearchCase.NONE_DETECTED && (
+                  <GroupBuyRequestCard onRequest={handleOpenRequestSheet} />
+                )}
+              </>
+            ) : !isSearchMode ? null : (
+              <GroupBuyRequestCard onRequest={handleOpenRequestSheet} />
+            )}
           </>
         )}
 

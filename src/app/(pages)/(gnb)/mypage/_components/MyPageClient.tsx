@@ -1,7 +1,8 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { logEvent } from '@/lib/analytics';
 import { useAuthStore } from '@/store/authStore';
 import { useGetApiV1ParticipationsParticipationIdQr } from '@/api/hooks/pickup/pickup';
 import { formatPickupDateTime, formatTime } from '@/lib/date';
@@ -83,6 +84,15 @@ const MyPageClient = ({ tab }: { tab: TabKey }) => {
     },
     [router],
   );
+
+  useEffect(() => {
+    if (!isInitialized) return;
+    if (isLoggedIn) {
+      logEvent('mypage_view');
+    } else {
+      logEvent('unauthorized_access', { target_screen: 'mypage' });
+    }
+  }, [isInitialized, isLoggedIn]);
 
   if (!isInitialized) return null;
 

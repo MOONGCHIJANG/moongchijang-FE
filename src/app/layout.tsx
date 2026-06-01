@@ -1,9 +1,13 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { QueryProvider } from '@/providers/QueryProvider';
 import IconsSetup from '@/components/IconsSetup';
 import AuthInitializer from '@/components/AuthInitializer';
+import IOSScrollReset from '@/components/IOSScrollReset';
+import Script from 'next/script';
+import { PostHogProvider } from './_components/PostHogProvider';
+import { Analytics } from './_components/Analytics';
 import KakaoInit from '@/components/KakaoInit';
 
 const geistSans = Geist({
@@ -15,6 +19,15 @@ const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
   subsets: ['latin'],
 });
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
+  themeColor: '#ffffff',
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -73,6 +86,14 @@ export const metadata: Metadata = {
       },
     ],
   },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: '뭉치장',
+  },
+  formatDetection: {
+    telephone: false,
+  },
 };
 
 export default function RootLayout({
@@ -83,15 +104,42 @@ export default function RootLayout({
   return (
     <html
       lang="ko"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased bg-bg-white-muted`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col mx-auto max-w-110">
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `try{if(window.matchMedia('(display-mode:standalone)').matches||navigator.standalone){document.documentElement.classList.add('pwa');}}catch(e){}`,
+        }}
+      />
+      <body className="min-h-dvh flex flex-col mx-auto max-w-110">
+        {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID &&
+          process.env.NODE_ENV !== 'development' && (
+            <>
+              <Script
+                src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}`}
+                strategy="afterInteractive"
+              />
+              <Script id="google-analytics" strategy="afterInteractive">
+                {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}');
+              `}
+              </Script>
+            </>
+          )}
+        <IOSScrollReset />
         <IconsSetup />
         <KakaoInit />
-        <QueryProvider>
-          <AuthInitializer />
-          {children}
-        </QueryProvider>
+        <PostHogProvider>
+          <Analytics />
+          <QueryProvider>
+            <AuthInitializer />
+            {children}
+          </QueryProvider>
+        </PostHogProvider>
       </body>
     </html>
   );

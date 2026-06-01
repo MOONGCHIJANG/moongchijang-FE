@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { logEvent } from '@/lib/analytics';
 import {
   GetApiV1NotificationsCategory,
   NotificationItemResponse,
@@ -45,6 +46,11 @@ const NoticeClient = ({ initialData }: NoticeClientProps) => {
   const [filter, setFilter] = useState<NotificationsCategory>(
     GetApiV1NotificationsCategory.ALL,
   );
+
+  useEffect(() => {
+    const unreadCount = initialData.items.filter((item) => !item.isRead).length;
+    logEvent('notification_view', { unread_count: unreadCount });
+  }, []);
 
   const {
     items,

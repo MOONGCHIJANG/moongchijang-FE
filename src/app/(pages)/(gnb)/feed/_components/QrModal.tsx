@@ -7,6 +7,7 @@ import { Icon } from '@iconify/react';
 import { cn } from '@/lib/utils';
 import { Toggle } from '@/components/Toggle';
 import { QrExpandTooltip } from './QrExpandTooltip';
+import { logEvent } from '@/lib/analytics';
 
 interface QrModalProps {
   isOpen: boolean;
@@ -62,8 +63,15 @@ export const QrModal = ({
 
   useEffect(() => {
     if (!isOpen) return;
+    document.body.style.overflow = 'hidden';
+    logEvent('qr_view', {
+      pickup_status: isPickupDay ? 'pickup_day' : 'before_pickup',
+    });
     const timer = setTimeout(() => setAnimate(true), 50);
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      document.body.style.overflow = '';
+    };
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -101,7 +109,7 @@ export const QrModal = ({
   return (
     <div
       className={cn(
-        'absolute inset-0 z-50 flex flex-col items-center justify-center transition-opacity duration-300 ease-out',
+        'fixed inset-0 z-50 flex flex-col items-center justify-center transition-opacity duration-300 ease-out',
         animate ? 'opacity-100' : 'opacity-0',
       )}
     >
@@ -217,7 +225,11 @@ export const QrModal = ({
                     'relative flex items-center justify-center',
                     isPickupDay ? 'cursor-pointer' : 'cursor-not-allowed',
                   )}
-                  onClick={() => isPickupDay && setIsExpanded(!isExpanded)}
+                  onClick={() => {
+                    if (!isPickupDay) return;
+                    if (!isExpanded) logEvent('qr_enlarge');
+                    setIsExpanded(!isExpanded);
+                  }}
                 >
                   <div
                     className={cn(

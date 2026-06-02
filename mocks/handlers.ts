@@ -300,7 +300,32 @@ const overrideHandlers = [
     await delay(500);
     const body = (await request.json()) as { email: string; password: string };
 
-    if (body.email !== 'test@test.com' || body.password !== 'Test1234!') {
+    const ACCOUNTS = {
+      'test@test.com': {
+        password: 'Test1234!',
+        id: 1,
+        nickname: '테스트유저',
+        role: 'BUYER',
+        accessToken: 'mock-access-token',
+      },
+      'admin@test.com': {
+        password: 'Admin1234!',
+        id: 2,
+        nickname: '운영자',
+        role: 'ADMIN',
+        accessToken: 'mock-admin-access-token',
+      },
+      'seller@test.com': {
+        password: 'Seller1234!',
+        id: 3,
+        nickname: '테스트사장님',
+        role: 'SELLER',
+        accessToken: 'mock-seller-access-token',
+      },
+    } as const;
+
+    const account = ACCOUNTS[body.email as keyof typeof ACCOUNTS];
+    if (!account || account.password !== body.password) {
       return HttpResponse.json(
         {
           success: false,
@@ -314,16 +339,16 @@ const overrideHandlers = [
       {
         success: true,
         data: {
-          accessToken: 'mock-access-token',
+          accessToken: account.accessToken,
           tokenType: 'Bearer',
           expiresIn: 3600,
           isNewUser: false,
           user: {
-            id: 1,
+            id: account.id,
             provider: 'EMAIL',
-            email: 'test@test.com',
-            nickname: '테스트유저',
-            role: 'BUYER',
+            email: body.email,
+            nickname: account.nickname,
+            role: account.role,
             signupCompleted: true,
             deletedAt: null,
             createdAt: new Date().toISOString(),
@@ -332,7 +357,13 @@ const overrideHandlers = [
         },
         error: null,
       },
-      { status: 200 },
+      {
+        status: 200,
+        headers: {
+          'set-cookie':
+            'refreshToken=mock-refresh-token; Path=/; SameSite=Strict; Max-Age=1209600',
+        },
+      },
     );
   }),
   // 피드용 가장 가까운 픽업 QR 조회
@@ -689,6 +720,101 @@ const overrideHandlers = [
       );
     },
   ),
+
+  // ── 알림 (사장님용 픽스처) ─────────────────────────────────────────────
+  http.get('*/api/v1/notifications', async () => {
+    await delay(300);
+    const hoursAgo = (h: number) =>
+      new Date(Date.now() - h * 3_600_000).toISOString();
+    return HttpResponse.json({
+      success: true,
+      data: {
+        items: [
+          {
+            id: 1,
+            type: 'PICKUP',
+            title: '오늘 픽업일이에요!',
+            body: '소금빵 45개 / 14:00~16:00',
+            isRead: false,
+            occurredAt: hoursAgo(3),
+            triggerType: 'PICKUP_SAME_DAY_MORNING',
+            deeplinkType: 'PICKUP_GUIDE',
+            deeplinkParams: { groupBuyId: '1' },
+            section: 'TODAY',
+            targetId: 1,
+          },
+          {
+            id: 2,
+            type: 'PICKUP',
+            title: '내일 픽업 안내드려요',
+            body: '크루아상 30개 / 14:00~16:00',
+            isRead: false,
+            occurredAt: hoursAgo(8),
+            triggerType: 'PICKUP_DAY_BEFORE_MORNING',
+            deeplinkType: 'GROUPBUY_DETAIL',
+            deeplinkParams: { groupBuyId: '2' },
+            section: 'TODAY',
+            targetId: 2,
+          },
+          {
+            id: 3,
+            type: 'REQUEST',
+            title: '공구가 확정 됐어요! 🎉',
+            body: '마카롱 25개 주문이 확정됐습니다\n픽업일: 2026-04-28 15:00~17:00',
+            isRead: true,
+            occurredAt: hoursAgo(12),
+            triggerType: 'REQUEST_TARGET_ACHIEVED_IMMEDIATE',
+            deeplinkType: 'GROUPBUY_DETAIL',
+            deeplinkParams: { groupBuyId: '3' },
+            section: 'YESTERDAY',
+            targetId: 3,
+          },
+          {
+            id: 4,
+            type: 'REQUEST',
+            title: '공구가 미달됐어요',
+            body: '유기농 통밀 베이글 6개 세트 픽업이 내일 14:00~17:00로 예정됐어요.',
+            isRead: true,
+            occurredAt: '2026-05-13T08:00:00Z',
+            triggerType: 'REQUEST_REJECTED_IMMEDIATE',
+            deeplinkType: 'GROUPBUY_DETAIL',
+            deeplinkParams: { groupBuyId: '4' },
+            section: 'OLDER',
+            targetId: 4,
+          },
+          {
+            id: 5,
+            type: 'REQUEST',
+            title: '공구 조기 마감 요청이 수락됐어요',
+            body: '유기농 통밀 베이글 6개 세트 픽업이 내일 14:00~17:00로 예정됐어요.',
+            isRead: true,
+            occurredAt: '2026-05-13T08:00:00Z',
+            triggerType: 'REQUEST_REJECTED_IMMEDIATE',
+            deeplinkType: 'GROUPBUY_DETAIL',
+            deeplinkParams: { groupBuyId: '4' },
+            section: 'OLDER',
+            targetId: 4,
+          },
+          {
+            id: 6,
+            type: 'REQUEST',
+            title: '공구 마감 3일 전이에요',
+            body: '곡선 밀 앙금 단팥빵 10개 마감까지 3일 남았어요.',
+            isRead: true,
+            occurredAt: '2026-04-07T10:00:00Z',
+            triggerType: 'REQUEST_DEADLINE_MINUS_3_DAYS',
+            deeplinkType: 'GROUPBUY_DETAIL',
+            deeplinkParams: { groupBuyId: '5' },
+            section: 'OLDER',
+            targetId: 5,
+          },
+        ],
+        nextCursor: null,
+        hasNext: false,
+      },
+      error: null,
+    });
+  }),
 ];
 
 export const handlers = [...overrideHandlers, ...generatedHandlers];

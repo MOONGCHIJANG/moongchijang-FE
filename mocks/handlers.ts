@@ -288,7 +288,25 @@ const overrideHandlers = [
     await delay(500);
     const body = (await request.json()) as { email: string; password: string };
 
-    if (body.email !== 'test@test.com' || body.password !== 'Test1234!') {
+    const ACCOUNTS = {
+      'test@test.com': {
+        password: 'Test1234!',
+        id: 1,
+        nickname: '테스트유저',
+        role: 'BUYER',
+        accessToken: 'mock-access-token',
+      },
+      'admin@test.com': {
+        password: 'Admin1234!',
+        id: 2,
+        nickname: '운영자',
+        role: 'ADMIN',
+        accessToken: 'mock-admin-access-token',
+      },
+    } as const;
+
+    const account = ACCOUNTS[body.email as keyof typeof ACCOUNTS];
+    if (!account || account.password !== body.password) {
       return HttpResponse.json(
         {
           success: false,
@@ -302,16 +320,16 @@ const overrideHandlers = [
       {
         success: true,
         data: {
-          accessToken: 'mock-access-token',
+          accessToken: account.accessToken,
           tokenType: 'Bearer',
           expiresIn: 3600,
           isNewUser: false,
           user: {
-            id: 1,
+            id: account.id,
             provider: 'EMAIL',
-            email: 'test@test.com',
-            nickname: '테스트유저',
-            role: 'BUYER',
+            email: body.email,
+            nickname: account.nickname,
+            role: account.role,
             signupCompleted: true,
             deletedAt: null,
             createdAt: new Date().toISOString(),

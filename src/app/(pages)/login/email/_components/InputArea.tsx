@@ -10,6 +10,7 @@ import { redirectStorage } from '@/lib/redirect';
 import { useAuthStore } from '@/store/authStore';
 import { ToastBlack } from '@/components/ToastBlack';
 import { logEvent } from '@/lib/analytics';
+import { tokenStorage } from '@/lib/token';
 
 const InputArea = () => {
   const [email, setEmail] = useState('');
@@ -41,7 +42,13 @@ const InputArea = () => {
         const data = await res.json();
         const redirectTo = data?.redirectTo as string | null;
 
-        // 회원가입 이어서 진행
+        // 메모리에 토큰 저장
+        const accessToken = data?.data?.accessToken;
+        const expiresIn = data?.data?.expiresIn;
+        if (accessToken && expiresIn) {
+          tokenStorage.set(accessToken, expiresIn);
+        }
+
         if (redirectTo) {
           router.push(redirectTo);
           return;

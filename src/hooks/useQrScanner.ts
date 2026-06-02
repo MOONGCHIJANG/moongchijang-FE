@@ -11,8 +11,13 @@ interface UseQrScannerOptions {
 export function useQrScanner({ onScan, onError }: UseQrScannerOptions) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const scannerRef = useRef<QrScannerType | null>(null);
+  const onScanRef = useRef(onScan);
+  const onErrorRef = useRef(onError);
   const [isScanning, setIsScanning] = useState(false);
   const [hasCamera, setHasCamera] = useState<boolean | null>(null);
+
+  onScanRef.current = onScan;
+  onErrorRef.current = onError;
 
   const stop = useCallback(() => {
     scannerRef.current?.stop();
@@ -22,29 +27,32 @@ export function useQrScanner({ onScan, onError }: UseQrScannerOptions) {
   }, []);
 
   const start = useCallback(async () => {
-    if (!videoRef.current) return;
+    // 이미 활성 스캐너가 있으면 중복 생성 방지
+    if (!videoRef.current || scannerRef.current) return;
     try {
       const QrScanner = (await import('qr-scanner')).default;
 
       const cameraAvailable = await QrScanner.hasCamera();
       setHasCamera(cameraAvailable);
       if (!cameraAvailable) {
-        onError?.(new Error('카메라를 찾을 수 없습니다.'));
+        onErrorRef.current?.(new Error('카메라를 찾을 수 없습니다.'));
         return;
       }
 
       scannerRef.current = new QrScanner(
         videoRef.current,
-        (result) => onScan(result.data),
+        (result) => onScanRef.current(result.data),
         { returnDetailedScanResult: true, highlightScanRegion: true },
       );
 
       await scannerRef.current.start();
       setIsScanning(true);
     } catch (e) {
-      onError?.(e instanceof Error ? e : new Error('QR 스캐너 오류'));
+      onErrorRef.current?.(
+        e instanceof Error ? e : new Error('QR 스캐너 오류'),
+      );
     }
-  }, [onScan, onError]);
+  }, []);
 
   useEffect(() => {
     return () => {

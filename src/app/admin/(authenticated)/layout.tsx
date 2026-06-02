@@ -13,7 +13,18 @@ export default function AdminAuthenticatedLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    return localStorage.getItem('adminSidebarOpen') !== 'false';
+  });
+
+  function toggleSidebar() {
+    setSidebarOpen((prev) => {
+      const next = !prev;
+      localStorage.setItem('adminSidebarOpen', String(next));
+      return next;
+    });
+  }
   const router = useRouter();
   const setIsLoggedIn = useAuthStore((s) => s.setIsLoggedIn);
   const { mutate: logout } = usePostApiV1AuthLogout();
@@ -35,7 +46,7 @@ export default function AdminAuthenticatedLayout({
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={() => setSidebarOpen((prev) => !prev)}
+            onClick={toggleSidebar}
             className="flex h-8 w-8 items-center justify-center rounded hover:bg-gray-100"
           >
             <Icon

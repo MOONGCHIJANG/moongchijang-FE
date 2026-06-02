@@ -338,7 +338,17 @@ const overrideHandlers = [
         },
         error: null,
       },
-      { status: 200 },
+      {
+        status: 200,
+        headers: {
+          'Set-Cookie': [
+            'refreshToken=mock-refresh-token; Path=/; SameSite=Strict; Max-Age=1209600',
+            account.role === 'ADMIN'
+              ? 'isAdmin=true; Path=/; SameSite=Strict; Max-Age=3600'
+              : 'isAdmin=; Path=/; SameSite=Strict; Max-Age=0',
+          ].join(', '),
+        },
+      },
     );
   }),
   // 피드용 가장 가까운 픽업 QR 조회
@@ -528,7 +538,15 @@ const overrideHandlers = [
   }),
   http.post('*/api/v1/auth/logout', async () => {
     await delay(300);
-    return HttpResponse.json({ success: true, data: {}, error: null });
+    return HttpResponse.json(
+      { success: true, data: {}, error: null },
+      {
+        headers: {
+          'Set-Cookie':
+            'refreshToken=; Path=/; SameSite=Strict; Max-Age=0',
+        },
+      },
+    );
   }),
   http.delete('*/api/v1/users/me', async () => {
     await delay(500);

@@ -58,7 +58,7 @@ const PaymentFailClient = ({ errorCode, groupBuyId }: Props) => {
       </div>
       <div className="flex flex-col gap-g3 w-full max-w-xs">
         <Link
-          href="/feed"
+          href={`/item/${groupBuyId}`}
           className="w-full py-p4 rounded-2xlarge border border-border-default text-text-secondary body-md-medium cursor-pointer"
         >
           홈으로

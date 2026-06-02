@@ -15,6 +15,22 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/feed', request.url));
   }
 
+  const isAdmin = request.cookies.get('isAdmin')?.value === 'true';
+
+  // 로그인 유저가 /admin/login 접근 시 /admin/dashboard로 redirect
+  if (pathname === '/admin/login' && token && isAdmin) {
+    return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+  }
+
+  // 어드민 토큰 없거나 어드민 권한 없으면 /admin/login으로 redirect
+  if (
+    pathname.startsWith('/admin') &&
+    pathname !== '/admin/login' &&
+    !(token && isAdmin)
+  ) {
+    return NextResponse.redirect(new URL('/admin/login', request.url));
+  }
+
   // 토큰 없이 /signup/email 접근 시 /login으로
   if (pathname === '/signup/email' && !token) {
     const step = request.nextUrl.searchParams.get('step');
@@ -49,5 +65,6 @@ export const config = {
     '/login',
     '/login/:path*',
     '/signup/email',
+    '/admin/:path*',
   ],
 };

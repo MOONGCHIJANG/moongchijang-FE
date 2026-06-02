@@ -36,6 +36,7 @@ export default function AdminLoginPage() {
             return;
           }
           tokenStorage.set(accessToken, expiresIn);
+          document.cookie = `isAdmin=true; path=/; SameSite=Strict; Max-Age=${expiresIn}`;
           setIsLoggedIn(true);
           router.push('/admin/dashboard');
         },

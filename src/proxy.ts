@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
  */
 
 export function proxy(request: NextRequest) {
-  const token = request.cookies.get('accessToken')?.value;
+  const token = request.cookies.get('refreshToken')?.value;
   const { pathname } = request.nextUrl;
 
   // 로그인 유저가 /login 접근 시 /feed로 redirect

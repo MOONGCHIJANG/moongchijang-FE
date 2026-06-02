@@ -114,7 +114,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-dvh flex flex-col mx-auto max-w-110">
+      <body className="min-h-dvh flex flex-col mx-auto max-w-110 bg-bg-white">
         {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID &&
           process.env.NODE_ENV !== 'development' && (
             <>

@@ -9,26 +9,31 @@ import posthog from 'posthog-js';
 const AuthInitializer = () => {
   const { setIsLoggedIn, setInitialized } = useAuthStore();
   useEffect(() => {
-    fetch('/api/auth/status')
+    fetch('/api/v1/auth/refresh', { method: 'POST' })
       .then((res) => res.json())
-      .then(({ isLoggedIn, expiresIn }) => {
-        setIsLoggedIn(isLoggedIn);
-        if (expiresIn) {
-          // 30초 여유 만료 시간 저장
-          tokenStorage.setExpiration(expiresIn);
-        }
-        if (isLoggedIn && process.env.NODE_ENV !== 'development') {
-          getApiV1UsersMe()
-            .then((res) => {
-              if (res.status === 200 && res.data?.data) {
-                const { id, email, nickname } = res.data.data;
-                posthog.identify(String(id), {
-                  email: email ?? undefined,
-                  nickname: nickname ?? undefined,
-                });
-              }
-            })
-            .catch(() => {});
+      .then((data) => {
+        const accessToken = data?.data?.accessToken;
+        const expiresIn = data?.data?.expiresIn;
+
+        if (accessToken && expiresIn) {
+          tokenStorage.set(accessToken, expiresIn);
+          setIsLoggedIn(true);
+
+          if (process.env.NODE_ENV !== 'development') {
+            getApiV1UsersMe()
+              .then((res) => {
+                if (res.status === 200 && res.data?.data) {
+                  const { id, email, nickname } = res.data.data;
+                  posthog.identify(String(id), {
+                    email: email ?? undefined,
+                    nickname: nickname ?? undefined,
+                  });
+                }
+              })
+              .catch(() => {});
+          }
+        } else {
+          setIsLoggedIn(false);
         }
       })
       .catch(() => setIsLoggedIn(false))

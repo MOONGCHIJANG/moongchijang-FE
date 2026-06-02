@@ -82,7 +82,7 @@ const ItemDetail = ({ data }: Props) => {
             </p>
           </div>
           <div className="flex flex-col gap-g5">
-            <div className="w-full h-56 rounded-medium overflow-hidden">
+            <div className="w-full h-56 rounded-medium overflow-hidden isolate">
               {data.pickupLatitude && data.pickupLongitude && (
                 <NaverMap
                   center={{

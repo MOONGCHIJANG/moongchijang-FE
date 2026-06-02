@@ -18,8 +18,6 @@ export async function POST(req: NextRequest) {
       };
     };
 
-    const accessToken = data?.data?.accessToken ?? '';
-    const expiresIn = data?.data?.expiresIn ?? 3600;
     const signupCompleted = data?.data?.user?.signupCompleted ?? true;
 
     const response = NextResponse.json(
@@ -29,14 +27,6 @@ export async function POST(req: NextRequest) {
       },
       { status: 200 },
     );
-
-    response.cookies.set('accessToken', accessToken, {
-      httpOnly: false, // TODO: customFetch 구조 변경 후 httpOnly: true로 전환 필요
-      maxAge: expiresIn,
-      path: '/',
-      sameSite: 'strict',
-      secure: process.env.NODE_ENV === 'production',
-    });
 
     const setCookie = result.headers?.get('set-cookie');
     if (setCookie) {

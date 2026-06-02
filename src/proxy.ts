@@ -22,12 +22,17 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/admin/dashboard', request.url));
   }
 
-  // 어드민 토큰 없거나 어드민 권한 없으면 /admin/login으로 redirect
+  // 어드민 권한 없이 /admin 접근 시 분기 처리
   if (
     pathname.startsWith('/admin') &&
     pathname !== '/admin/login' &&
     !(token && isAdmin)
   ) {
+    // 로그인은 됐지만 어드민 권한 없는 경우 → 일반 홈으로
+    if (token && !isAdmin) {
+      return NextResponse.redirect(new URL('/feed', request.url));
+    }
+    // 비로그인 → 어드민 로그인으로
     return NextResponse.redirect(new URL('/admin/login', request.url));
   }
 

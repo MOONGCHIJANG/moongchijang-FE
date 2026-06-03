@@ -12,6 +12,7 @@ import { MyPageRoleSwitchRequestRole } from '@/api/generated/api.schemas';
 import { useAuthStore } from '@/store/authStore';
 import Header from '@/components/Header';
 import Modal from '@/components/Modal';
+import { RoleSwitchBanner } from '@/components/RoleSwitchBanner';
 
 function SettingRow({
   label,
@@ -88,19 +89,12 @@ export default function SellerMyPage() {
     <div className="min-h-dvh bg-bg-white flex flex-col">
       <Header text="마이페이지" />
 
-      <button
-        type="button"
-        disabled={isSwitching}
+      <RoleSwitchBanner
+        label="소비자 화면으로 전환하기"
         onClick={handleSwitchToCustomer}
-        className="bg-surface-brand-lighter px-p6 py-p5 flex items-center justify-between w-full"
-      >
-        <span className="body-md-semibold text-text-brand">
-          소비자 화면으로 전환하기
-        </span>
-        <div className="w-[50px] h-[26px] rounded-full bg-button-primary-fill flex items-center justify-end px-[2px]">
-          <div className="w-[22px] h-[22px] rounded-full bg-white" />
-        </div>
-      </button>
+        isOn
+        disabled={isSwitching}
+      />
 
       <div className="bg-surface-white px-g5 py-[16px] border-b border-dashed border-divider-default">
         <p className="heading-md-bold text-text-basic">

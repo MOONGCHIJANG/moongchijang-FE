@@ -22,7 +22,7 @@ export const useAuthStore = create<AuthState>()((set) => ({
   setIsLoggedIn: (value) => set({ isLoggedIn: value }),
   setInitialized: () => set({ isInitialized: true }),
   logout: async () => {
-    await postApiV1AuthLogout().catch(() => {});
+    await fetch('/api/v1/auth/logout', { method: 'POST' }).catch(() => {});
     tokenStorage.remove();
     set({ isLoggedIn: false });
     if (process.env.NODE_ENV !== 'development') posthog.reset();

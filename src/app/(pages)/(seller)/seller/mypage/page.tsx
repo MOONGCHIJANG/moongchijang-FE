@@ -134,6 +134,7 @@ export default function SellerMyPage() {
         <p className="caption-sm-medium text-text-disabled pt-p6 pb-p3">기타</p>
         <SettingRow label="이용약관" href="/terms" />
         <SettingRow label="로그아웃" onClick={() => setShowLogoutModal(true)} />
+        <SettingRow label="탈퇴하기" href="/mypage/withdraw" />
       </div>
 
       <div className="border-t border-border-subtle" />

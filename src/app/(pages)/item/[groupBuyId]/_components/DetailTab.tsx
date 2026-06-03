@@ -7,7 +7,7 @@ type DetailTabProps = {
 
 const DetailTab = ({ activeTab, onTabClick }: DetailTabProps) => {
   return (
-    <div className="flex sticky top-0 z-5 bg-bg-white">
+    <div className="flex sticky top-14 z-5 bg-bg-white">
       <button
         className={`flex-1 text-center pt-p6 pb-p5 cursor-pointer transition-colors duration-150 font-medium text-base ${
           activeTab === 'description'

@@ -42,7 +42,7 @@ export function useQrScanner({ onScan, onError }: UseQrScannerOptions) {
       scannerRef.current = new QrScanner(
         videoRef.current,
         (result) => onScanRef.current(result.data),
-        { returnDetailedScanResult: true, highlightScanRegion: true },
+        { returnDetailedScanResult: true, highlightScanRegion: false },
       );
 
       await scannerRef.current.start();

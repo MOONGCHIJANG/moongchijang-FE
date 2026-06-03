@@ -1,7 +1,14 @@
 import { Icon } from '@iconify/react';
 import { OwnerGroupBuyParticipantItem } from '@/api/generated/api.schemas';
+import { Badge } from '@/components/Badge';
 
-type Cfg = { badge: string; label: string; badgeCn: string; statusCn: string };
+type Cfg = {
+  badge: string;
+  label: string;
+  bgCn: string;
+  textCn: string;
+  statusCn: string;
+};
 
 function resolveConfig(paymentStatus: string): Cfg {
   const s = paymentStatus;
@@ -15,7 +22,8 @@ function resolveConfig(paymentStatus: string): Cfg {
     return {
       badge: '완료',
       label: '결제완료',
-      badgeCn: 'bg-success-25 text-text-success',
+      bgCn: 'bg-success-50',
+      textCn: 'text-success-600',
       statusCn: 'text-text-success',
     };
   }
@@ -30,7 +38,8 @@ function resolveConfig(paymentStatus: string): Cfg {
     return {
       badge: '취소',
       label: '환불완료',
-      badgeCn: 'bg-surface-default text-text-subtle',
+      bgCn: 'bg-surface-default',
+      textCn: 'text-text-subtle',
       statusCn: 'text-text-error',
     };
   }
@@ -39,7 +48,8 @@ function resolveConfig(paymentStatus: string): Cfg {
     return {
       badge: '환불중',
       label: '환불요청',
-      badgeCn: 'bg-surface-default text-text-subtle',
+      bgCn: 'bg-surface-default',
+      textCn: 'text-text-subtle',
       statusCn: 'text-text-error',
     };
   }
@@ -47,7 +57,8 @@ function resolveConfig(paymentStatus: string): Cfg {
   return {
     badge: '대기',
     label: '대기중',
-    badgeCn: 'bg-surface-default text-text-tertiary',
+    bgCn: 'bg-surface-default',
+    textCn: 'text-text-tertiary',
     statusCn: 'text-text-tertiary',
   };
 }
@@ -85,11 +96,11 @@ export function ParticipantCard({ participant: p, index }: Props) {
             {code}
           </span>
         </p>
-        <span
-          className={`caption-xs-bold rounded-large px-2 py-0.5 ${cfg.badgeCn}`}
-        >
-          {cfg.badge}
-        </span>
+        <Badge
+          label={cfg.badge}
+          className={`h-auto min-w-10 rounded-md px-1.5 py-[5px] ${cfg.bgCn}`}
+          textClassName={`caption-xs-bold ${cfg.textCn}`}
+        />
       </div>
 
       {/* 전화번호 */}

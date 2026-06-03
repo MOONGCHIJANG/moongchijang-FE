@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/Button';
+import { Badge } from '@/components/Badge';
 import Modal from '@/components/Modal';
 import { DateRangePickerBottomSheet } from '../../create/_components/DateRangePickerBottomSheet';
 import {
@@ -147,9 +148,11 @@ function PendingApprovalDetailView({ requestId }: { requestId: number }) {
     <div className="min-h-full bg-bg-white-muted">
       {/* 상단 상태 안내 */}
       <div className="bg-white px-5 py-5">
-        <span className="caption-xs-bold mb-3 inline-flex w-fit rounded-large bg-secondary-50 px-2 py-0.5 text-secondary-600">
-          승인대기
-        </span>
+        <Badge
+          label="승인대기"
+          className="mb-3 h-auto rounded-md px-1.5 py-[5px] bg-secondary-50"
+          textClassName="caption-xs-bold text-secondary-600"
+        />
         <p className="heading-md-bold mt-3 text-text-basic">
           운영자가 공구 신청을 검토 중입니다
         </p>

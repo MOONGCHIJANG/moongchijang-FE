@@ -66,7 +66,7 @@ const AgreeTermsSheet = ({ isOpen, onClose, onConfirm, groupBuyId }: Props) => {
           {TERM_ITEMS.map(({ key, label, routeKey }) => (
             <div key={key} className="flex items-center justify-between gap-3">
               <button
-                className="flex items-start gap-2 flex-1 text-left"
+                className="flex items-center gap-2 flex-1 text-left"
                 onClick={() => toggle(key)}
               >
                 <CheckboxIcon checked={checked[key]} />

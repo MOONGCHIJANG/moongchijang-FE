@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import { Chip } from '@/components/Chip';
@@ -15,6 +15,11 @@ import {
   NotificationSection,
   NotificationTriggerType,
 } from '@/api/generated/api.schemas';
+import {
+  QrScannerModal,
+  type ScanToastItem,
+} from '../../_components/QrScannerModal';
+import { usePostApiV1PickupsQrCodeVerify } from '@/api/hooks/pickup/pickup';
 
 type SellerTabConfig = {
   label: string;
@@ -62,11 +67,58 @@ function groupBySection(items: NotificationItemResponse[]) {
 
 type Props = { initialData: NotificationListResponse };
 
+const TOAST_VISIBLE_MS = 2700;
+const TOAST_REMOVE_MS = 3000;
+
 export function SellerNoticeClient({ initialData }: Props) {
   const router = useRouter();
   const sentinelRef = useRef<HTMLDivElement>(null);
   const [tabIndex, setTabIndex] = useState(0);
   const activeTab = SELLER_TABS[tabIndex];
+  const [isQrOpen, setIsQrOpen] = useState(false);
+  const [toasts, setToasts] = useState<ScanToastItem[]>([]);
+
+  const { mutate: verifyQr } = usePostApiV1PickupsQrCodeVerify();
+
+  const addToast = useCallback(
+    (type: ScanToastItem['type'], title: string, subtitle: string) => {
+      const id = `${Date.now()}-${Math.random()}`;
+      setToasts((prev) => [...prev, { id, type, title, subtitle, visible: true }]);
+      setTimeout(() => {
+        setToasts((prev) =>
+          prev.map((t) => (t.id === id ? { ...t, visible: false } : t)),
+        );
+      }, TOAST_VISIBLE_MS);
+      setTimeout(() => {
+        setToasts((prev) => prev.filter((t) => t.id !== id));
+      }, TOAST_REMOVE_MS);
+    },
+    [],
+  );
+
+  const handleScan = (qrCode: string) => {
+    verifyQr(
+      { qrCode },
+      {
+        onSuccess: (res) => {
+          if (res.status === 200) {
+            const d = res.data.data;
+            addToast(
+              'success',
+              '픽업 완료',
+              `${d.userName ?? '익명'} · ${d.productName} · ${d.quantity}개`,
+            );
+          } else if (res.status === 409) {
+            addToast('error', '이미 처리된 픽업입니다.', '');
+          } else if (res.status === 403) {
+            addToast('error', '권한이 없는 QR 코드입니다.', '');
+          } else {
+            addToast('error', '유효하지 않은 QR 코드입니다.', '');
+          }
+        },
+      },
+    );
+  };
 
   const {
     items,
@@ -164,7 +216,11 @@ export function SellerNoticeClient({ initialData }: Props) {
                 </p>
                 <div>
                   {items.map((item) => (
-                    <SellerNoticeItem key={item.id} item={item} />
+                    <SellerNoticeItem
+                      key={item.id}
+                      item={item}
+                      onQrOpen={() => setIsQrOpen(true)}
+                    />
                   ))}
                 </div>
               </div>
@@ -175,6 +231,16 @@ export function SellerNoticeClient({ initialData }: Props) {
 
       <div ref={sentinelRef} className="h-1" />
       {isFetchingNextPage && <NoticeSkeleton count={3} />}
+
+      <QrScannerModal
+        isOpen={isQrOpen}
+        onClose={() => {
+          setIsQrOpen(false);
+          setToasts([]);
+        }}
+        onScan={handleScan}
+        toasts={toasts}
+      />
     </div>
   );
 }

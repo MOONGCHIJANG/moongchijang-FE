@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { Icon } from '@iconify/react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/Button';
@@ -52,6 +53,7 @@ const numberInputBase = cn(
 );
 
 export function CreateGroupBuyClient() {
+  const router = useRouter();
   const [productName, setProductName] = useState('');
   const [productDescription, setProductDescription] = useState('');
   const [deadlineStart, setDeadlineStart] = useState('');
@@ -91,25 +93,28 @@ export function CreateGroupBuyClient() {
 
   const handleSubmit = () => {
     if (!isSubmittable) return;
-    submitRequest({
-      data: {
-        storeId: 1, // TODO: storeId를 seller 프로필 API에서 가져와야 합니다
-        productName,
-        productDescription,
-        deadline: `${deadline}T23:59:59`,
-        originalPrice: originalPrice ? Number(originalPrice) : null,
-        price: Number(price),
-        targetQuantity: Number(targetQuantity),
-        maxQuantity: Number(targetQuantity),
-        perUserLimit: perUserLimit ? Number(perUserLimit) : null,
-        imageUrls: uploadedKeys,
-        pickupDate: deadline,
-        pickupTimeStart: '10:00',
-        pickupTimeEnd: '18:00',
-        pickupLocation: '',
-        pickupContact: null,
+    submitRequest(
+      {
+        data: {
+          storeId: 1, // TODO: storeId를 seller 프로필 API에서 가져와야 합니다
+          productName,
+          productDescription,
+          deadline: `${deadline}T23:59:59`,
+          originalPrice: originalPrice ? Number(originalPrice) : null,
+          price: Number(price),
+          targetQuantity: Number(targetQuantity),
+          maxQuantity: Number(targetQuantity),
+          perUserLimit: perUserLimit ? Number(perUserLimit) : null,
+          imageUrls: uploadedKeys,
+          pickupDate: deadline,
+          pickupTimeStart: '10:00',
+          pickupTimeEnd: '18:00',
+          pickupLocation: '',
+          pickupContact: null,
+        },
       },
-    });
+      { onSuccess: () => router.push('/seller/management') },
+    );
   };
 
   return (

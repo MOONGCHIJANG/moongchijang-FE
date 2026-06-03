@@ -11,7 +11,10 @@ import { formatNotificationTime, resolveIcon } from '@/lib/notice';
 import { usePatchApiV1NotificationsNotificationIdRead } from '@/api/hooks/notification/notification';
 import { Button } from '@/components/Button';
 
-type Cta = { label: string; href: string };
+type Cta = { label: string } & (
+  | { href: string; action?: never }
+  | { action: 'qr'; href?: never }
+);
 
 const ICON_ALT: Partial<Record<NotificationTriggerType, string>> = {
   [NotificationTriggerType.PICKUP_SAME_DAY_MORNING]: '오늘 픽업 알림',
@@ -32,7 +35,7 @@ function resolveCta(
 
   switch (triggerType) {
     case NotificationTriggerType.PICKUP_SAME_DAY_MORNING:
-      return { label: 'QR 스캔 열기', href: '/seller' };
+      return { label: 'QR 스캔 열기', action: 'qr' as const };
     case NotificationTriggerType.PICKUP_DAY_BEFORE_MORNING:
       return { label: '예약자 명단 보기', href: groupBuyPath };
     case NotificationTriggerType.REQUEST_TARGET_ACHIEVED_IMMEDIATE:
@@ -60,9 +63,9 @@ function BodyText({ text }: { text: string }) {
   );
 }
 
-type Props = { item: NotificationItemResponse };
+type Props = { item: NotificationItemResponse; onQrOpen?: () => void };
 
-export default function SellerNoticeItem({ item }: Props) {
+export default function SellerNoticeItem({ item, onQrOpen }: Props) {
   const {
     id,
     title,
@@ -93,7 +96,7 @@ export default function SellerNoticeItem({ item }: Props) {
 
   const handleClick = () => {
     if (!isRead) markAsRead({ notificationId: id });
-    if (cta) router.push(cta.href);
+    if (cta?.href) router.push(cta.href);
   };
 
   return (
@@ -133,7 +136,8 @@ export default function SellerNoticeItem({ item }: Props) {
             onClick={(e) => {
               e.stopPropagation();
               if (!isRead) markAsRead({ notificationId: id });
-              router.push(cta.href);
+              if (cta.action === 'qr') onQrOpen?.();
+              else if (cta.href) router.push(cta.href);
             }}
           >
             {cta.label}

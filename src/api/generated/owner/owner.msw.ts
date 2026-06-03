@@ -152,6 +152,8 @@ export const getGetApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponseMock = (
       'ENDED',
       'PENDING_APPROVAL',
     ] as const),
+    recruitmentStartDate: faker.date.past().toISOString().slice(0, 10),
+    recruitmentEndDate: faker.date.past().toISOString().slice(0, 10),
     participantSummary: {
       totalCount: faker.number.int(),
       completedCount: faker.number.int(),
@@ -189,6 +191,8 @@ export const getGetApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponseMock = (
       'ENDED',
       'PENDING_APPROVAL',
     ] as const),
+    recruitmentStartDate: faker.date.past().toISOString().slice(0, 10),
+    recruitmentEndDate: faker.date.past().toISOString().slice(0, 10),
     participantSummary: {
       totalCount: faker.number.int(),
       completedCount: faker.number.int(),

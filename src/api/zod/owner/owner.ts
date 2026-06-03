@@ -131,6 +131,8 @@ export const GetApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse =
         'ENDED',
         'PENDING_APPROVAL',
       ]),
+      recruitmentStartDate: zod.iso.date(),
+      recruitmentEndDate: zod.iso.date(),
       participantSummary: zod.object({
         totalCount: zod.number(),
         completedCount: zod.number(),
@@ -170,6 +172,8 @@ export const GetApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse =
         'ENDED',
         'PENDING_APPROVAL',
       ]),
+      recruitmentStartDate: zod.iso.date(),
+      recruitmentEndDate: zod.iso.date(),
       participantSummary: zod.object({
         totalCount: zod.number(),
         completedCount: zod.number(),

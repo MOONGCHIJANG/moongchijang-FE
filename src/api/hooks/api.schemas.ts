@@ -2210,6 +2210,8 @@ export interface OwnerGroupBuyParticipantItem {
 export interface OwnerGroupBuyManageDetail {
   groupBuyId: number;
   status: OwnerGroupBuyManageDetailStatus;
+  recruitmentStartDate: string;
+  recruitmentEndDate: string;
   participantSummary: OwnerGroupBuyManageParticipantSummary;
   participants: OwnerGroupBuyParticipantItem[];
 }

@@ -109,36 +109,36 @@ export default function SellerNoticeItem({ item }: Props) {
         height={20}
         className="mt-0.5 shrink-0"
       />
-      <div className="flex min-w-0 flex-1">
-        <div className="flex min-w-0 flex-1 flex-col items-start gap-g3">
+      <div className="flex min-w-0 flex-1 flex-col gap-g3">
+        <div className="flex items-start justify-between gap-2">
           <p
             className={`body-md-semibold ${isRead ? 'text-text-subtle-inverse' : 'text-text-basic'}`}
           >
             {title}
           </p>
-          <p
-            className={`body-sm-regular whitespace-pre-line text-left ${textColor}`}
-          >
-            <BodyText text={body} />
+          <p className="caption-sm-regular min-w-15 shrink-0 text-right text-text-subtle-inverse">
+            {timeLabel}
           </p>
-          {cta && (
-            <Button
-              variant="brand-soft"
-              size="cta"
-              fullWidth
-              onClick={(e) => {
-                e.stopPropagation();
-                if (!isRead) markAsRead({ notificationId: id });
-                router.push(cta.href);
-              }}
-            >
-              {cta.label}
-            </Button>
-          )}
         </div>
-        <p className="caption-sm-regular min-w-15 shrink-0 text-right text-text-subtle-inverse">
-          {timeLabel}
+        <p
+          className={`body-sm-regular whitespace-pre-line text-left ${textColor}`}
+        >
+          <BodyText text={body} />
         </p>
+        {cta && (
+          <Button
+            variant="brand-soft"
+            size="cta"
+            fullWidth
+            onClick={(e) => {
+              e.stopPropagation();
+              if (!isRead) markAsRead({ notificationId: id });
+              router.push(cta.href);
+            }}
+          >
+            {cta.label}
+          </Button>
+        )}
       </div>
     </button>
   );

@@ -39,9 +39,9 @@ const STATUS_CONFIG: Record<
   },
 };
 
-type Props = { item: OwnerGroupBuyManageListItem };
+type Props = { item: OwnerGroupBuyManageListItem; onScanClick?: () => void };
 
-export function ManageGroupBuyItem({ item }: Props) {
+export function ManageGroupBuyItem({ item, onScanClick }: Props) {
   const config = STATUS_CONFIG[item.status];
 
   const dDayLabel =
@@ -60,7 +60,7 @@ export function ManageGroupBuyItem({ item }: Props) {
 
   return (
     <Link
-      href={`/seller/management/${item.groupBuyId}?name=${encodeURIComponent(item.productName)}&price=${item.price}`}
+      href={`/seller/management/${item.groupBuyId}?name=${encodeURIComponent(item.productName)}&price=${item.price}&status=${item.status}${item.requestId != null ? `&requestId=${item.requestId}` : ''}`}
       className="flex flex-col gap-2.5 rounded-2xl bg-white px-4 py-4 shadow-sm"
     >
       {/* 배지 행 */}
@@ -68,20 +68,20 @@ export function ManageGroupBuyItem({ item }: Props) {
         <div className="flex items-center gap-1.5">
           <Badge
             label={config.label}
-            className={`min-w-10 ${config.badgeClassName}`}
+            className={`min-w-[40px] ${config.badgeClassName}`}
             textClassName={config.textClassName}
           />
           {item.status === Status.IN_PROGRESS && dDayLabel && (
             <Badge
               label={dDayLabel}
-              className="min-w-10 bg-surface-brand-lighter"
+              className="min-w-[40px] bg-surface-brand-lighter"
               textClassName="text-text-brand caption-xs-bold"
             />
           )}
           {item.status === Status.ACHIEVED && pickupDDayLabel && (
             <Badge
               label={pickupDDayLabel}
-              className="min-w-10 bg-success-50"
+              className="min-w-[40px] bg-success-50"
               textClassName="text-success-600 caption-xs-bold"
             />
           )}
@@ -108,14 +108,17 @@ export function ManageGroupBuyItem({ item }: Props) {
         <GroupBuyProgressBar achievementRate={item.achievementRate} />
       )}
 
-      {/* 달성: QR 스캔 준비 버튼 */}
+      {/* 달성: QR 스캔하기 버튼 */}
       {item.status === Status.ACHIEVED && (
         <button
           type="button"
-          onClick={(e) => e.preventDefault()}
+          onClick={(e) => {
+            e.preventDefault();
+            onScanClick?.();
+          }}
           className="w-full rounded-xl border border-border-default py-2.5 heading-sm-bold text-text-tertiary"
         >
-          QR 스캔 준비
+          QR 스캔하기
         </button>
       )}
     </Link>

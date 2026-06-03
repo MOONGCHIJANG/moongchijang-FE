@@ -3,8 +3,14 @@
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Icon } from '@iconify/react';
-import { useGetApiV1UsersMe } from '@/api/hooks/auth/auth';
-import { AuthUserRole } from '@/api/generated/api.schemas';
+import {
+  useGetApiV1UsersMe,
+  usePatchApiV1UsersMeRole,
+} from '@/api/hooks/auth/auth';
+import {
+  AuthUserRole,
+  MyPageRoleSwitchRequestRole,
+} from '@/api/generated/api.schemas';
 import { useAuthStore } from '@/store/authStore';
 import Header from '@/components/Header';
 import Modal from '@/components/Modal';
@@ -65,7 +71,17 @@ export default function SettingsPage() {
   const user = meData?.status === 200 ? meData.data?.data : null;
   const isSeller = user?.role === AuthUserRole.SELLER;
 
+  const { mutate: switchRole, isPending: isSwitching } =
+    usePatchApiV1UsersMeRole();
   const storeLogout = useAuthStore((s) => s.logout);
+
+  function handleSwitchToSeller() {
+    if (isSwitching) return;
+    switchRole(
+      { data: { role: MyPageRoleSwitchRequestRole.SELLER } },
+      { onSuccess: () => router.push('/seller') },
+    );
+  }
 
   async function handleLogout() {
     await storeLogout();
@@ -76,17 +92,21 @@ export default function SettingsPage() {
     <div className="min-h-dvh bg-bg-white flex flex-col">
       <Header text="마이페이지" />
 
-      {/* 역할 배너 */}
-      {/* TODO: 사장님 전환 기능 미구현 — 온클릭 핸들러 추가 필요 */}
+      {/* 역할 전환 배너 */}
       {isSeller ? (
-        <div className="bg-surface-brand-lighter px-p6 py-p5 flex items-center justify-between">
+        <button
+          type="button"
+          disabled={isSwitching}
+          onClick={handleSwitchToSeller}
+          className="bg-surface-brand-lighter px-p6 py-p5 flex items-center justify-between w-full"
+        >
           <span className="body-md-semibold text-text-brand">
-            사장님으로 전환하기
+            사장님 화면으로 전환하기
           </span>
           <div className="w-[50px] h-[26px] rounded-full bg-button-primary-fill flex items-center justify-end px-[2px]">
             <div className="w-[22px] h-[22px] rounded-full bg-white" />
           </div>
-        </div>
+        </button>
       ) : (
         <Link
           href="/signup/seller"

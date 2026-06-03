@@ -28,8 +28,12 @@ const TABS = [
 
 type Tab = (typeof TABS)[number];
 
+const HIDDEN_PATHS = [/^\/seller\/management\/[^/]+/];
+
 export const SellerGNB = () => {
   const pathname = usePathname();
+
+  if (HIDDEN_PATHS.some((pattern) => pattern.test(pathname))) return null;
 
   const renderTab = (tab: Tab) => {
     const isActive =

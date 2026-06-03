@@ -6,12 +6,15 @@
 import {
   getGetApiV1AdminSummaryResponseMock,
   getGetApiV1AdminDashboardUnconfirmedOrdersResponseMock,
+  getGetApiV1AdminDashboardUrgentRefundsResponseMock,
   getGetApiV1AdminOrdersResponseMock,
   getGetApiV1AdminOrdersOrderIdResponseMock,
   getGetApiV1AdminCsTicketsResponseMock,
   getGetApiV1AdminCsTicketsTicketIdResponseMock,
   getGetApiV1AdminGroupBuyRequestsResponseMock,
   getGetApiV1AdminGroupBuyRequestsRequestIdResponseMock,
+  getGetApiV1AdminOwnerGroupBuyRequestsResponseMock,
+  getGetApiV1AdminOwnerGroupBuyRequestsRequestIdResponseMock,
   getGetApiV1AdminRefundsResponseMock,
   getGetApiV1AdminSettlementsDashboardResponseMock,
   getGetApiV1AdminSettlementsResponseMock,
@@ -63,6 +66,7 @@ import {
   getGetApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponseMock,
   getGetApiV1OwnerSettlementsMonthlySummaryResponseMock,
   getGetApiV1OwnerSettlementsMonthChipsResponseMock,
+  getGetApiV1OwnerSettlementsItemsResponseMock,
   getGetApiV1OwnerSettlementsRefundRequestsResponseMock,
   getGetApiV1OwnerSettlementsRefundRequestsParticipationIdResponseMock,
   getGetApiV1OwnerGroupBuyRequestsResponseMock,
@@ -92,6 +96,10 @@ export const generatedStaticMockEntries: StaticMockEntry[] = [
     getResponseData: getGetApiV1AdminDashboardUnconfirmedOrdersResponseMock,
   },
   {
+    urlPattern: '/api/v1/admin/dashboard/urgent-refunds',
+    getResponseData: getGetApiV1AdminDashboardUrgentRefundsResponseMock,
+  },
+  {
     urlPattern: '/api/v1/admin/orders',
     getResponseData: getGetApiV1AdminOrdersResponseMock,
   },
@@ -114,6 +122,14 @@ export const generatedStaticMockEntries: StaticMockEntry[] = [
   {
     urlPattern: '/api/v1/admin/group-buy-requests/:requestId',
     getResponseData: getGetApiV1AdminGroupBuyRequestsRequestIdResponseMock,
+  },
+  {
+    urlPattern: '/api/v1/admin/owner-group-buy-requests',
+    getResponseData: getGetApiV1AdminOwnerGroupBuyRequestsResponseMock,
+  },
+  {
+    urlPattern: '/api/v1/admin/owner-group-buy-requests/:requestId',
+    getResponseData: getGetApiV1AdminOwnerGroupBuyRequestsRequestIdResponseMock,
   },
   {
     urlPattern: '/api/v1/admin/refunds',
@@ -272,6 +288,10 @@ export const generatedStaticMockEntries: StaticMockEntry[] = [
   {
     urlPattern: '/api/v1/owner/settlements/month-chips',
     getResponseData: getGetApiV1OwnerSettlementsMonthChipsResponseMock,
+  },
+  {
+    urlPattern: '/api/v1/owner/settlements/items',
+    getResponseData: getGetApiV1OwnerSettlementsItemsResponseMock,
   },
   {
     urlPattern: '/api/v1/owner/settlements/refund-requests',

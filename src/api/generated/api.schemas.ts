@@ -1715,6 +1715,16 @@ export const NotificationDeeplinkType = {
 12=REQUEST_NEW_PARTICIPANT_IMMEDIATE
 13=REQUEST_TARGET_ACHIEVED_IMMEDIATE
 14=REQUEST_DEADLINE_MINUS_3_DAYS
+15=OWNER_PICKUP_SAME_DAY_MORNING
+16=OWNER_PICKUP_DAY_BEFORE_MORNING
+17=OWNER_GROUPBUY_ACHIEVED_IMMEDIATE
+18=OWNER_GROUPBUY_FAILED_IMMEDIATE
+19=OWNER_CLOSE_REQUEST_APPROVED_IMMEDIATE
+20=OWNER_CLOSE_REQUEST_REJECTED_IMMEDIATE
+21=OWNER_OPEN_REQUEST_APPROVED_IMMEDIATE
+22=OWNER_OPEN_REQUEST_REJECTED_IMMEDIATE
+23=OWNER_ORDER_CONFIRM_REQUIRED_IMMEDIATE
+24=OWNER_ORDER_CANCELLED_IMMEDIATE
 
  */
 export type NotificationTriggerType =
@@ -1735,6 +1745,21 @@ export const NotificationTriggerType = {
   REQUEST_NEW_PARTICIPANT_IMMEDIATE: 'REQUEST_NEW_PARTICIPANT_IMMEDIATE',
   REQUEST_TARGET_ACHIEVED_IMMEDIATE: 'REQUEST_TARGET_ACHIEVED_IMMEDIATE',
   REQUEST_DEADLINE_MINUS_3_DAYS: 'REQUEST_DEADLINE_MINUS_3_DAYS',
+  OWNER_PICKUP_SAME_DAY_MORNING: 'OWNER_PICKUP_SAME_DAY_MORNING',
+  OWNER_PICKUP_DAY_BEFORE_MORNING: 'OWNER_PICKUP_DAY_BEFORE_MORNING',
+  OWNER_GROUPBUY_ACHIEVED_IMMEDIATE: 'OWNER_GROUPBUY_ACHIEVED_IMMEDIATE',
+  OWNER_GROUPBUY_FAILED_IMMEDIATE: 'OWNER_GROUPBUY_FAILED_IMMEDIATE',
+  OWNER_CLOSE_REQUEST_APPROVED_IMMEDIATE:
+    'OWNER_CLOSE_REQUEST_APPROVED_IMMEDIATE',
+  OWNER_CLOSE_REQUEST_REJECTED_IMMEDIATE:
+    'OWNER_CLOSE_REQUEST_REJECTED_IMMEDIATE',
+  OWNER_OPEN_REQUEST_APPROVED_IMMEDIATE:
+    'OWNER_OPEN_REQUEST_APPROVED_IMMEDIATE',
+  OWNER_OPEN_REQUEST_REJECTED_IMMEDIATE:
+    'OWNER_OPEN_REQUEST_REJECTED_IMMEDIATE',
+  OWNER_ORDER_CONFIRM_REQUIRED_IMMEDIATE:
+    'OWNER_ORDER_CONFIRM_REQUIRED_IMMEDIATE',
+  OWNER_ORDER_CANCELLED_IMMEDIATE: 'OWNER_ORDER_CANCELLED_IMMEDIATE',
 } as const;
 
 export type NotificationSection =
@@ -1762,7 +1787,7 @@ export interface NotificationItemResponse {
   /** @nullable */
   targetId?: number | null;
   deeplinkType: NotificationDeeplinkType;
-  /** 알림 트리거 타입(1~14 시나리오 식별). 기존 데이터는 null일 수 있습니다. */
+  /** 알림 트리거 타입(1~24 시나리오 식별). 기존 데이터는 null일 수 있습니다. */
   triggerType?: NotificationTriggerType | null;
   /** 딥링크 파라미터. PICKUP_GUIDE는 participationId, GROUPBUY_DETAIL/MY_APPLYING은 groupBuyId, REQUEST_STATUS는 requestId를 사용합니다. */
   deeplinkParams: NotificationItemResponseDeeplinkParams;
@@ -2125,7 +2150,16 @@ export const OwnerGroupBuyManageListItemStatus = {
 } as const;
 
 export interface OwnerGroupBuyManageListItem {
-  groupBuyId: number;
+  /**
+   * 실제 공구 항목일 때 사용하는 공구 ID. PENDING_APPROVAL 항목에서는 null
+   * @nullable
+   */
+  groupBuyId?: number | null;
+  /**
+   * 승인대기(PENDING_APPROVAL) 항목일 때 사용하는 공구 개설 요청 ID. 실제 공구 항목에서는 null
+   * @nullable
+   */
+  requestId?: number | null;
   productName: string;
   price: number;
   pickupDate: string;
@@ -2200,6 +2234,18 @@ export const OwnerGroupBuyCloseReasonType = {
   OTHER: 'OTHER',
 } as const;
 
+/**
+ * 사장님 공구 마감 요청 검토 상태
+ */
+export type GroupBuyCloseRequestReviewStatus =
+  (typeof GroupBuyCloseRequestReviewStatus)[keyof typeof GroupBuyCloseRequestReviewStatus];
+
+export const GroupBuyCloseRequestReviewStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+} as const;
+
 export interface OwnerGroupBuyCloseRequest {
   reason: OwnerGroupBuyCloseReasonType;
   /**
@@ -2208,6 +2254,42 @@ export interface OwnerGroupBuyCloseRequest {
    * @nullable
    */
   reasonDetail?: string | null;
+}
+
+export interface AdminOwnerGroupBuyCloseRequestReject {
+  /**
+   * 운영자 반려 사유
+   * @maxLength 200
+   */
+  rejectionReason: string;
+}
+
+/**
+ * 처리 후 공구 상태
+ */
+export type AdminOwnerGroupBuyCloseRequestActionGroupBuyStatus =
+  (typeof AdminOwnerGroupBuyCloseRequestActionGroupBuyStatus)[keyof typeof AdminOwnerGroupBuyCloseRequestActionGroupBuyStatus];
+
+export const AdminOwnerGroupBuyCloseRequestActionGroupBuyStatus = {
+  IN_PROGRESS: 'IN_PROGRESS',
+  ACHIEVED: 'ACHIEVED',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED',
+  CLOSED: 'CLOSED',
+} as const;
+
+export interface AdminOwnerGroupBuyCloseRequestAction {
+  /** 마감 요청을 처리한 공구 ID */
+  groupBuyId: number;
+  reviewStatus: GroupBuyCloseRequestReviewStatus;
+  /** 처리 후 공구 상태 */
+  groupBuyStatus: AdminOwnerGroupBuyCloseRequestActionGroupBuyStatus;
+}
+
+export interface ApiResponseAdminOwnerGroupBuyCloseRequestAction {
+  success: boolean;
+  data: AdminOwnerGroupBuyCloseRequestAction;
+  error: unknown | null;
 }
 
 export interface OwnerSettlementMonthlySummary {
@@ -2237,6 +2319,39 @@ export interface OwnerSettlementMonthChipList {
 export interface ApiResponseOwnerSettlementMonthChipList {
   success: boolean;
   data: OwnerSettlementMonthChipList;
+  error: unknown | null;
+}
+
+/**
+ * 사장님 공구 정산 상태
+ */
+export type OwnerSettlementStatus =
+  (typeof OwnerSettlementStatus)[keyof typeof OwnerSettlementStatus];
+
+export const OwnerSettlementStatus = {
+  SETTLEMENT_COMPLETED: 'SETTLEMENT_COMPLETED',
+  SETTLEMENT_PENDING: 'SETTLEMENT_PENDING',
+  REFUND_PROCESSING: 'REFUND_PROCESSING',
+} as const;
+
+export interface OwnerSettlementItem {
+  groupBuyId: number;
+  productName: string;
+  participantCount: number;
+  pickupDate: string;
+  amount: number;
+  settlementStatus: OwnerSettlementStatus;
+}
+
+export interface OwnerSettlementItemList {
+  year: number;
+  month: number;
+  items: OwnerSettlementItem[];
+}
+
+export interface ApiResponseOwnerSettlementItemList {
+  success: boolean;
+  data: OwnerSettlementItemList;
   error: unknown | null;
 }
 
@@ -2608,6 +2723,55 @@ export type ApiResponseAdminDashboardUnconfirmedOrdersData = {
 export interface ApiResponseAdminDashboardUnconfirmedOrders {
   success: boolean;
   data: ApiResponseAdminDashboardUnconfirmedOrdersData;
+  error: unknown | null;
+}
+
+/**
+ * 환불 케이스
+ */
+export type AdminDashboardUrgentRefundItemCaseFilter =
+  (typeof AdminDashboardUrgentRefundItemCaseFilter)[keyof typeof AdminDashboardUrgentRefundItemCaseFilter];
+
+export const AdminDashboardUrgentRefundItemCaseFilter = {
+  ALL: 'ALL',
+  PRE_ACHIEVEMENT_FREE_CANCEL: 'PRE_ACHIEVEMENT_FREE_CANCEL',
+  POST_ACHIEVEMENT_CANCEL: 'POST_ACHIEVEMENT_CANCEL',
+  PICKUP_PERIOD_NO_SHOW: 'PICKUP_PERIOD_NO_SHOW',
+  OWNER_FAULT_CANCEL: 'OWNER_FAULT_CANCEL',
+  TARGET_NOT_MET: 'TARGET_NOT_MET',
+  DISPUTE_OR_DROPOUT_REFUND: 'DISPUTE_OR_DROPOUT_REFUND',
+} as const;
+
+export interface AdminDashboardUrgentRefundItem {
+  /** 환불 요청 ID. 현재는 participationId와 동일 */
+  requestId: number;
+  /** 환불 케이스 */
+  caseFilter: AdminDashboardUrgentRefundItemCaseFilter;
+  consumerName: string;
+  groupBuyName: string;
+  /** 승인 전에는 환불 가능 예상 금액, 승인 후에는 승인 환불 금액 */
+  refundAmount: number;
+  /** 환불 요청 일시 */
+  requestedAt: string;
+  /** 요청 후 경과 시간(시간) */
+  slaElapsedHours: number;
+}
+
+export type ApiResponseAdminDashboardUrgentRefundsData = {
+  /** 요청 후 1시간을 초과한 환불 요청 건수 */
+  totalUrgentCount: number;
+  /** 긴급 환불 요청 존재 여부 */
+  hasUrgentRefunds: boolean;
+  content: AdminDashboardUrgentRefundItem[];
+  totalElements: number;
+  totalPages: number;
+  number: number;
+  size: number;
+};
+
+export interface ApiResponseAdminDashboardUrgentRefunds {
+  success: boolean;
+  data: ApiResponseAdminDashboardUrgentRefundsData;
   error: unknown | null;
 }
 
@@ -3191,6 +3355,203 @@ export type ApiResponseAdminGroupBuyRequestActionData = {
 export interface ApiResponseAdminGroupBuyRequestAction {
   success: boolean;
   data: ApiResponseAdminGroupBuyRequestActionData;
+  error: unknown | null;
+}
+
+/**
+ * 사장님 요청 공구 구분 칩
+ */
+export type AdminOwnerGroupBuyRequestListItemRequestType =
+  (typeof AdminOwnerGroupBuyRequestListItemRequestType)[keyof typeof AdminOwnerGroupBuyRequestListItemRequestType];
+
+export const AdminOwnerGroupBuyRequestListItemRequestType = {
+  OWNER: 'OWNER',
+} as const;
+
+export type AdminOwnerGroupBuyRequestListItemStatus =
+  (typeof AdminOwnerGroupBuyRequestListItemStatus)[keyof typeof AdminOwnerGroupBuyRequestListItemStatus];
+
+export const AdminOwnerGroupBuyRequestListItemStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+} as const;
+
+export interface AdminOwnerGroupBuyRequestListItem {
+  requestId: number;
+  /** 사장님 요청 공구 구분 칩 */
+  requestType: AdminOwnerGroupBuyRequestListItemRequestType;
+  productName: string;
+  storeName: string;
+  /** @nullable */
+  ownerName?: string | null;
+  /** @nullable */
+  originalPrice: number | null;
+  price: number;
+  /**
+   * 정가 대비 할인율(%)
+   * @nullable
+   */
+  discountRate?: number | null;
+  targetQuantity: number;
+  pickupDate: string;
+  /** @nullable */
+  requestedAt?: string | null;
+  /** 요청 생성 후 경과한 검토 시간(분) */
+  reviewElapsedMinutes: number;
+  status: AdminOwnerGroupBuyRequestListItemStatus;
+  /** 승인/반려 작업 가능 여부 */
+  actionable: boolean;
+  /** @nullable */
+  approvedGroupBuyId?: number | null;
+}
+
+export type ApiResponseAdminOwnerGroupBuyRequestPageData = {
+  content: AdminOwnerGroupBuyRequestListItem[];
+  totalElements: number;
+  totalPages: number;
+  number: number;
+  size: number;
+};
+
+export interface ApiResponseAdminOwnerGroupBuyRequestPage {
+  success: boolean;
+  data: ApiResponseAdminOwnerGroupBuyRequestPageData;
+  error: unknown | null;
+}
+
+/**
+ * 사장님 요청 공구 구분 칩
+ */
+export type AdminOwnerGroupBuyRequestDetailRequestType =
+  (typeof AdminOwnerGroupBuyRequestDetailRequestType)[keyof typeof AdminOwnerGroupBuyRequestDetailRequestType];
+
+export const AdminOwnerGroupBuyRequestDetailRequestType = {
+  OWNER: 'OWNER',
+} as const;
+
+export type AdminOwnerGroupBuyRequestDetailStatus =
+  (typeof AdminOwnerGroupBuyRequestDetailStatus)[keyof typeof AdminOwnerGroupBuyRequestDetailStatus];
+
+export const AdminOwnerGroupBuyRequestDetailStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+} as const;
+
+export interface AdminOwnerGroupBuyRequestOwner {
+  /** @nullable */
+  ownerId?: number | null;
+  /** @nullable */
+  nickname?: string | null;
+  /** @nullable */
+  phoneNumber?: string | null;
+  /** @nullable */
+  email?: string | null;
+}
+
+export interface AdminOwnerGroupBuyRequestStore {
+  storeId: number;
+  storeName: string;
+  address: string;
+  /** @nullable */
+  phoneNumber?: string | null;
+}
+
+export interface AdminOwnerGroupBuyRequestProduct {
+  productName: string;
+  productDescription: string;
+  /** @nullable */
+  originalPrice?: number | null;
+  price: number;
+  /**
+   * 정가 대비 할인율(%)
+   * @nullable
+   */
+  discountRate?: number | null;
+  targetQuantity: number;
+  maxQuantity: number;
+  /** @nullable */
+  perUserLimit?: number | null;
+}
+
+export interface AdminOwnerGroupBuyRequestRecruitment {
+  /**
+   * 승인 후 생성된 공구의 모집 시작일시. 승인 전 요청은 null
+   * @nullable
+   */
+  recruitmentStartAt?: string | null;
+  /** 모집 마감일시 */
+  deadline: string;
+  pickupDate: string;
+  pickupTimeStart: string;
+  pickupTimeEnd: string;
+  pickupLocation: string;
+  /** @nullable */
+  pickupContact?: string | null;
+}
+
+export interface AdminOwnerGroupBuyRequestImage {
+  imageUrl: string;
+  sortOrder: number;
+}
+
+export interface AdminOwnerGroupBuyRequestDetail {
+  requestId: number;
+  /** 사장님 요청 공구 구분 칩 */
+  requestType: AdminOwnerGroupBuyRequestDetailRequestType;
+  status: AdminOwnerGroupBuyRequestDetailStatus;
+  owner: AdminOwnerGroupBuyRequestOwner;
+  store: AdminOwnerGroupBuyRequestStore;
+  product: AdminOwnerGroupBuyRequestProduct;
+  recruitment: AdminOwnerGroupBuyRequestRecruitment;
+  images: AdminOwnerGroupBuyRequestImage[];
+  /** 승인 확인 팝업에 표시할 이미지 장수 */
+  imageCount: number;
+  /**
+   * @maxLength 200
+   * @nullable
+   */
+  rejectionReason?: string | null;
+  /** @nullable */
+  approvedGroupBuyId?: number | null;
+  /** @nullable */
+  reviewedAt?: string | null;
+  /** @nullable */
+  requestedAt?: string | null;
+  /** 승인/반려 작업 가능 여부 */
+  actionable: boolean;
+}
+
+export interface ApiResponseAdminOwnerGroupBuyRequestDetail {
+  success: boolean;
+  data: AdminOwnerGroupBuyRequestDetail;
+  error: unknown | null;
+}
+
+export interface AdminOwnerGroupBuyRequestReject {
+  /** @maxLength 200 */
+  rejectionReason: string;
+}
+
+export type ApiResponseAdminOwnerGroupBuyRequestActionDataStatus =
+  (typeof ApiResponseAdminOwnerGroupBuyRequestActionDataStatus)[keyof typeof ApiResponseAdminOwnerGroupBuyRequestActionDataStatus];
+
+export const ApiResponseAdminOwnerGroupBuyRequestActionDataStatus = {
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+} as const;
+
+export type ApiResponseAdminOwnerGroupBuyRequestActionData = {
+  requestId: number;
+  status: ApiResponseAdminOwnerGroupBuyRequestActionDataStatus;
+  /** @nullable */
+  groupBuyId?: number | null;
+};
+
+export interface ApiResponseAdminOwnerGroupBuyRequestAction {
+  success: boolean;
+  data: ApiResponseAdminOwnerGroupBuyRequestActionData;
   error: unknown | null;
 }
 
@@ -3903,6 +4264,14 @@ export type GetApiV1AdminDashboardUnconfirmedOrdersParams = {
   size?: SizeParameter;
 };
 
+export type GetApiV1AdminDashboardUrgentRefundsParams = {
+  page?: PageParameter;
+  /**
+   * @maximum 100
+   */
+  size?: SizeParameter;
+};
+
 export type GetApiV1AdminOrdersParams = {
   /**
    * OVERDUE_48H=48시간 초과, PENDING=확정 대기, CONFIRMED=확정 완료, ALL=전체
@@ -3961,8 +4330,11 @@ export type GetApiV1GroupBuysGroupBuyIdCheckoutParams = {
 
 export type GetApiV1NotificationsParams = {
   /**
-   * 알림 카테고리 필터
-   */
+ * 알림 카테고리 필터
+- 소비자 역할: `ALL`, `WISH`, `APPLY`, `PICKUP`, `REQUEST`
+- 사장님 역할: `ALL`, `TODAY_PICKUP`, `REMINDER`, `CONFIRMED`, `CANCELLED`
+
+ */
   category?: GetApiV1NotificationsCategory;
   /**
    * 다음 페이지 조회 커서. 형식: `{occurredAt}|{id}`
@@ -3985,6 +4357,10 @@ export const GetApiV1NotificationsCategory = {
   APPLY: 'APPLY',
   PICKUP: 'PICKUP',
   REQUEST: 'REQUEST',
+  TODAY_PICKUP: 'TODAY_PICKUP',
+  REMINDER: 'REMINDER',
+  CONFIRMED: 'CONFIRMED',
+  CANCELLED: 'CANCELLED',
 } as const;
 
 export type GetApiV1UsersMeParticipationsParams = {
@@ -4039,6 +4415,19 @@ export const GetApiV1OwnerGroupBuysManageFilter = {
 } as const;
 
 export type GetApiV1OwnerSettlementsMonthlySummaryParams = {
+  year: number;
+  /**
+   * @minimum 1
+   * @maximum 12
+   */
+  month: number;
+};
+
+export type GetApiV1OwnerSettlementsItemsParams = {
+  /**
+   * @minimum 2000
+   * @maximum 2100
+   */
   year: number;
   /**
    * @minimum 1
@@ -4107,6 +4496,31 @@ export const GetApiV1AdminGroupBuyRequestsStatus = {
   IN_REVIEW: 'IN_REVIEW',
   IN_CONTACT: 'IN_CONTACT',
   OPENED: 'OPENED',
+  REJECTED: 'REJECTED',
+} as const;
+
+export type GetApiV1AdminOwnerGroupBuyRequestsParams = {
+  /**
+   * 미입력 시 전체 조회
+   */
+  status?: GetApiV1AdminOwnerGroupBuyRequestsStatus;
+  /**
+   * 요청 ID, 공구명, 사장님 닉네임, 매장명 검색어
+   */
+  keyword?: string;
+  page?: PageParameter;
+  /**
+   * @maximum 100
+   */
+  size?: SizeParameter;
+};
+
+export type GetApiV1AdminOwnerGroupBuyRequestsStatus =
+  (typeof GetApiV1AdminOwnerGroupBuyRequestsStatus)[keyof typeof GetApiV1AdminOwnerGroupBuyRequestsStatus];
+
+export const GetApiV1AdminOwnerGroupBuyRequestsStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
   REJECTED: 'REJECTED',
 } as const;
 

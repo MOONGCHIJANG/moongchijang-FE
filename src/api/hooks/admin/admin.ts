@@ -23,14 +23,21 @@ import type {
   AdminGroupBuyRequestApprove,
   AdminGroupBuyRequestReject,
   AdminManualRefund,
+  AdminOwnerGroupBuyCloseRequestReject,
+  AdminOwnerGroupBuyRequestReject,
   AdminRequestStatusUpdate,
   ApiResponseAdminCsTicketDetail,
   ApiResponseAdminCsTicketPage,
   ApiResponseAdminDashboardSummary,
   ApiResponseAdminDashboardUnconfirmedOrders,
+  ApiResponseAdminDashboardUrgentRefunds,
   ApiResponseAdminGroupBuyRequestAction,
   ApiResponseAdminOrderDetail,
   ApiResponseAdminOrderPage,
+  ApiResponseAdminOwnerGroupBuyCloseRequestAction,
+  ApiResponseAdminOwnerGroupBuyRequestAction,
+  ApiResponseAdminOwnerGroupBuyRequestDetail,
+  ApiResponseAdminOwnerGroupBuyRequestPage,
   ApiResponseAdminRefundPage,
   ApiResponseAdminRequestDetail,
   ApiResponseAdminRequestPage,
@@ -43,13 +50,16 @@ import type {
   ForbiddenResponse,
   GetApiV1AdminCsTicketsParams,
   GetApiV1AdminDashboardUnconfirmedOrdersParams,
+  GetApiV1AdminDashboardUrgentRefundsParams,
   GetApiV1AdminGroupBuyRequestsParams,
   GetApiV1AdminOrdersParams,
+  GetApiV1AdminOwnerGroupBuyRequestsParams,
   GetApiV1AdminRefundsParams,
   GetApiV1AdminSettlementsDashboardParams,
   GetApiV1AdminSettlementsParams,
   NotFoundResponse,
   SuccessNoDataResponse,
+  UnauthorizedResponse,
 } from '../api.schemas';
 
 import { customFetch } from '../../../lib/custom-fetch';
@@ -445,6 +455,221 @@ export function useGetApiV1AdminDashboardUnconfirmedOrders<
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getGetApiV1AdminDashboardUnconfirmedOrdersQueryOptions(
+    params,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * 요청 후 1시간을 초과한 REFUND_PENDING 환불 요청을 조회한다.
+ * @summary 대시보드 긴급 환불 요청 조회 (운영자)
+ */
+export type getApiV1AdminDashboardUrgentRefundsResponse200 = {
+  data: ApiResponseAdminDashboardUrgentRefunds;
+  status: 200;
+};
+
+export type getApiV1AdminDashboardUrgentRefundsResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type getApiV1AdminDashboardUrgentRefundsResponseSuccess =
+  getApiV1AdminDashboardUrgentRefundsResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1AdminDashboardUrgentRefundsResponseError =
+  getApiV1AdminDashboardUrgentRefundsResponse403 & {
+    headers: Headers;
+  };
+
+export type getApiV1AdminDashboardUrgentRefundsResponse =
+  | getApiV1AdminDashboardUrgentRefundsResponseSuccess
+  | getApiV1AdminDashboardUrgentRefundsResponseError;
+
+export const getGetApiV1AdminDashboardUrgentRefundsUrl = (
+  params?: GetApiV1AdminDashboardUrgentRefundsParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/admin/dashboard/urgent-refunds?${stringifiedParams}`
+    : `/api/v1/admin/dashboard/urgent-refunds`;
+};
+
+export const getApiV1AdminDashboardUrgentRefunds = async (
+  params?: GetApiV1AdminDashboardUrgentRefundsParams,
+  options?: RequestInit,
+): Promise<getApiV1AdminDashboardUrgentRefundsResponse> => {
+  return customFetch<getApiV1AdminDashboardUrgentRefundsResponse>(
+    getGetApiV1AdminDashboardUrgentRefundsUrl(params),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
+
+export const getGetApiV1AdminDashboardUrgentRefundsQueryKey = (
+  params?: GetApiV1AdminDashboardUrgentRefundsParams,
+) => {
+  return [
+    `/api/v1/admin/dashboard/urgent-refunds`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetApiV1AdminDashboardUrgentRefundsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiV1AdminDashboardUrgentRefunds>>,
+  TError = ForbiddenResponse,
+>(
+  params?: GetApiV1AdminDashboardUrgentRefundsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1AdminDashboardUrgentRefunds>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetApiV1AdminDashboardUrgentRefundsQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiV1AdminDashboardUrgentRefunds>>
+  > = ({ signal }) =>
+    getApiV1AdminDashboardUrgentRefunds(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiV1AdminDashboardUrgentRefunds>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiV1AdminDashboardUrgentRefundsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiV1AdminDashboardUrgentRefunds>>
+>;
+export type GetApiV1AdminDashboardUrgentRefundsQueryError = ForbiddenResponse;
+
+export function useGetApiV1AdminDashboardUrgentRefunds<
+  TData = Awaited<ReturnType<typeof getApiV1AdminDashboardUrgentRefunds>>,
+  TError = ForbiddenResponse,
+>(
+  params: undefined | GetApiV1AdminDashboardUrgentRefundsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1AdminDashboardUrgentRefunds>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1AdminDashboardUrgentRefunds>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1AdminDashboardUrgentRefunds>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1AdminDashboardUrgentRefunds<
+  TData = Awaited<ReturnType<typeof getApiV1AdminDashboardUrgentRefunds>>,
+  TError = ForbiddenResponse,
+>(
+  params?: GetApiV1AdminDashboardUrgentRefundsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1AdminDashboardUrgentRefunds>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1AdminDashboardUrgentRefunds>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1AdminDashboardUrgentRefunds>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1AdminDashboardUrgentRefunds<
+  TData = Awaited<ReturnType<typeof getApiV1AdminDashboardUrgentRefunds>>,
+  TError = ForbiddenResponse,
+>(
+  params?: GetApiV1AdminDashboardUrgentRefundsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1AdminDashboardUrgentRefunds>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary 대시보드 긴급 환불 요청 조회 (운영자)
+ */
+
+export function useGetApiV1AdminDashboardUrgentRefunds<
+  TData = Awaited<ReturnType<typeof getApiV1AdminDashboardUrgentRefunds>>,
+  TError = ForbiddenResponse,
+>(
+  params?: GetApiV1AdminDashboardUrgentRefundsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1AdminDashboardUrgentRefunds>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiV1AdminDashboardUrgentRefundsQueryOptions(
     params,
     options,
   );
@@ -1834,6 +2059,393 @@ export const usePatchApiV1AdminCsTicketsTicketId = <
   );
 };
 /**
+ * `OTHER` 사유로 접수된 사장님 공구 마감 요청을 승인한다.
+승인 시 공구는 실제로 CLOSED 상태로 전환되고 사장님에게 승인 알림이 발송된다.
+
+ * @summary 사장님 공구 마감 요청 승인 (운영자)
+ */
+export type postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponse200 =
+  {
+    data: ApiResponseAdminOwnerGroupBuyCloseRequestAction;
+    status: 200;
+  };
+
+export type postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponse400 =
+  {
+    data: BadRequestResponse;
+    status: 400;
+  };
+
+export type postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponse401 =
+  {
+    data: UnauthorizedResponse;
+    status: 401;
+  };
+
+export type postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponse403 =
+  {
+    data: ForbiddenResponse;
+    status: 403;
+  };
+
+export type postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponse404 =
+  {
+    data: NotFoundResponse;
+    status: 404;
+  };
+
+export type postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponseSuccess =
+  postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponse200 & {
+    headers: Headers;
+  };
+export type postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponseError =
+  (
+    | postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponse400
+    | postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponse401
+    | postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponse403
+    | postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponse404
+  ) & {
+    headers: Headers;
+  };
+
+export type postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponse =
+  | postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponseSuccess
+  | postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponseError;
+
+export const getPostApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveUrl =
+  (groupBuyId: number) => {
+    return `/api/v1/admin/owner-group-buys/${groupBuyId}/close-requests/approve`;
+  };
+
+export const postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApprove =
+  async (
+    groupBuyId: number,
+    options?: RequestInit,
+  ): Promise<postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponse> => {
+    return customFetch<postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponse>(
+      getPostApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveUrl(
+        groupBuyId,
+      ),
+      {
+        ...options,
+        method: 'POST',
+      },
+    );
+  };
+
+export const getPostApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveMutationOptions =
+  <
+    TError =
+      | BadRequestResponse
+      | UnauthorizedResponse
+      | ForbiddenResponse
+      | NotFoundResponse,
+    TContext = unknown,
+  >(options?: {
+    mutation?: UseMutationOptions<
+      Awaited<
+        ReturnType<
+          typeof postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApprove
+        >
+      >,
+      TError,
+      { groupBuyId: number },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  }): UseMutationOptions<
+    Awaited<
+      ReturnType<
+        typeof postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApprove
+      >
+    >,
+    TError,
+    { groupBuyId: number },
+    TContext
+  > => {
+    const mutationKey = [
+      'postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApprove',
+    ];
+    const { mutation: mutationOptions, request: requestOptions } = options
+      ? options.mutation &&
+        'mutationKey' in options.mutation &&
+        options.mutation.mutationKey
+        ? options
+        : { ...options, mutation: { ...options.mutation, mutationKey } }
+      : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+      Awaited<
+        ReturnType<
+          typeof postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApprove
+        >
+      >,
+      { groupBuyId: number }
+    > = (props) => {
+      const { groupBuyId } = props ?? {};
+
+      return postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApprove(
+        groupBuyId,
+        requestOptions,
+      );
+    };
+
+    return { mutationFn, ...mutationOptions };
+  };
+
+export type PostApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveMutationResult =
+  NonNullable<
+    Awaited<
+      ReturnType<
+        typeof postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApprove
+      >
+    >
+  >;
+
+export type PostApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveMutationError =
+
+    | BadRequestResponse
+    | UnauthorizedResponse
+    | ForbiddenResponse
+    | NotFoundResponse;
+
+/**
+ * @summary 사장님 공구 마감 요청 승인 (운영자)
+ */
+export const usePostApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApprove = <
+  TError =
+    | BadRequestResponse
+    | UnauthorizedResponse
+    | ForbiddenResponse
+    | NotFoundResponse,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<
+        ReturnType<
+          typeof postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApprove
+        >
+      >,
+      TError,
+      { groupBuyId: number },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<
+    ReturnType<
+      typeof postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApprove
+    >
+  >,
+  TError,
+  { groupBuyId: number },
+  TContext
+> => {
+  return useMutation(
+    getPostApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveMutationOptions(
+      options,
+    ),
+    queryClient,
+  );
+};
+/**
+ * `OTHER` 사유로 접수된 사장님 공구 마감 요청을 반려한다.
+반려 시 공구 상태는 유지되며 반려 사유가 저장되고 사장님에게 반려 알림이 발송된다.
+
+ * @summary 사장님 공구 마감 요청 반려 (운영자)
+ */
+export type postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponse200 =
+  {
+    data: ApiResponseAdminOwnerGroupBuyCloseRequestAction;
+    status: 200;
+  };
+
+export type postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponse400 =
+  {
+    data: BadRequestResponse;
+    status: 400;
+  };
+
+export type postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponse401 =
+  {
+    data: UnauthorizedResponse;
+    status: 401;
+  };
+
+export type postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponse403 =
+  {
+    data: ForbiddenResponse;
+    status: 403;
+  };
+
+export type postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponse404 =
+  {
+    data: NotFoundResponse;
+    status: 404;
+  };
+
+export type postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponseSuccess =
+  postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponse200 & {
+    headers: Headers;
+  };
+export type postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponseError =
+  (
+    | postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponse400
+    | postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponse401
+    | postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponse403
+    | postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponse404
+  ) & {
+    headers: Headers;
+  };
+
+export type postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponse =
+  | postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponseSuccess
+  | postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponseError;
+
+export const getPostApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectUrl = (
+  groupBuyId: number,
+) => {
+  return `/api/v1/admin/owner-group-buys/${groupBuyId}/close-requests/reject`;
+};
+
+export const postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsReject = async (
+  groupBuyId: number,
+  adminOwnerGroupBuyCloseRequestReject: AdminOwnerGroupBuyCloseRequestReject,
+  options?: RequestInit,
+): Promise<postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponse> => {
+  return customFetch<postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponse>(
+    getPostApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectUrl(groupBuyId),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(adminOwnerGroupBuyCloseRequestReject),
+    },
+  );
+};
+
+export const getPostApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectMutationOptions =
+  <
+    TError =
+      | BadRequestResponse
+      | UnauthorizedResponse
+      | ForbiddenResponse
+      | NotFoundResponse,
+    TContext = unknown,
+  >(options?: {
+    mutation?: UseMutationOptions<
+      Awaited<
+        ReturnType<
+          typeof postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsReject
+        >
+      >,
+      TError,
+      { groupBuyId: number; data: AdminOwnerGroupBuyCloseRequestReject },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  }): UseMutationOptions<
+    Awaited<
+      ReturnType<
+        typeof postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsReject
+      >
+    >,
+    TError,
+    { groupBuyId: number; data: AdminOwnerGroupBuyCloseRequestReject },
+    TContext
+  > => {
+    const mutationKey = [
+      'postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsReject',
+    ];
+    const { mutation: mutationOptions, request: requestOptions } = options
+      ? options.mutation &&
+        'mutationKey' in options.mutation &&
+        options.mutation.mutationKey
+        ? options
+        : { ...options, mutation: { ...options.mutation, mutationKey } }
+      : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+      Awaited<
+        ReturnType<
+          typeof postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsReject
+        >
+      >,
+      { groupBuyId: number; data: AdminOwnerGroupBuyCloseRequestReject }
+    > = (props) => {
+      const { groupBuyId, data } = props ?? {};
+
+      return postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsReject(
+        groupBuyId,
+        data,
+        requestOptions,
+      );
+    };
+
+    return { mutationFn, ...mutationOptions };
+  };
+
+export type PostApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectMutationResult =
+  NonNullable<
+    Awaited<
+      ReturnType<
+        typeof postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsReject
+      >
+    >
+  >;
+export type PostApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectMutationBody =
+  AdminOwnerGroupBuyCloseRequestReject;
+export type PostApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectMutationError =
+
+    | BadRequestResponse
+    | UnauthorizedResponse
+    | ForbiddenResponse
+    | NotFoundResponse;
+
+/**
+ * @summary 사장님 공구 마감 요청 반려 (운영자)
+ */
+export const usePostApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsReject = <
+  TError =
+    | BadRequestResponse
+    | UnauthorizedResponse
+    | ForbiddenResponse
+    | NotFoundResponse,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<
+        ReturnType<
+          typeof postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsReject
+        >
+      >,
+      TError,
+      { groupBuyId: number; data: AdminOwnerGroupBuyCloseRequestReject },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<
+    ReturnType<typeof postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsReject>
+  >,
+  TError,
+  { groupBuyId: number; data: AdminOwnerGroupBuyCloseRequestReject },
+  TContext
+> => {
+  return useMutation(
+    getPostApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectMutationOptions(
+      options,
+    ),
+    queryClient,
+  );
+};
+/**
  * @summary 공구 요청 목록 조회 (운영자)
  */
 export type getApiV1AdminGroupBuyRequestsResponse200 = {
@@ -2647,6 +3259,744 @@ export const usePostApiV1AdminGroupBuyRequestsRequestIdReject = <
 > => {
   return useMutation(
     getPostApiV1AdminGroupBuyRequestsRequestIdRejectMutationOptions(options),
+    queryClient,
+  );
+};
+/**
+ * @summary 사장님 공구 개설 요청 목록 조회
+ */
+export type getApiV1AdminOwnerGroupBuyRequestsResponse200 = {
+  data: ApiResponseAdminOwnerGroupBuyRequestPage;
+  status: 200;
+};
+
+export type getApiV1AdminOwnerGroupBuyRequestsResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type getApiV1AdminOwnerGroupBuyRequestsResponseSuccess =
+  getApiV1AdminOwnerGroupBuyRequestsResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1AdminOwnerGroupBuyRequestsResponseError =
+  getApiV1AdminOwnerGroupBuyRequestsResponse403 & {
+    headers: Headers;
+  };
+
+export type getApiV1AdminOwnerGroupBuyRequestsResponse =
+  | getApiV1AdminOwnerGroupBuyRequestsResponseSuccess
+  | getApiV1AdminOwnerGroupBuyRequestsResponseError;
+
+export const getGetApiV1AdminOwnerGroupBuyRequestsUrl = (
+  params?: GetApiV1AdminOwnerGroupBuyRequestsParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/admin/owner-group-buy-requests?${stringifiedParams}`
+    : `/api/v1/admin/owner-group-buy-requests`;
+};
+
+export const getApiV1AdminOwnerGroupBuyRequests = async (
+  params?: GetApiV1AdminOwnerGroupBuyRequestsParams,
+  options?: RequestInit,
+): Promise<getApiV1AdminOwnerGroupBuyRequestsResponse> => {
+  return customFetch<getApiV1AdminOwnerGroupBuyRequestsResponse>(
+    getGetApiV1AdminOwnerGroupBuyRequestsUrl(params),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
+
+export const getGetApiV1AdminOwnerGroupBuyRequestsQueryKey = (
+  params?: GetApiV1AdminOwnerGroupBuyRequestsParams,
+) => {
+  return [
+    `/api/v1/admin/owner-group-buy-requests`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetApiV1AdminOwnerGroupBuyRequestsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiV1AdminOwnerGroupBuyRequests>>,
+  TError = ForbiddenResponse,
+>(
+  params?: GetApiV1AdminOwnerGroupBuyRequestsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1AdminOwnerGroupBuyRequests>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetApiV1AdminOwnerGroupBuyRequestsQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiV1AdminOwnerGroupBuyRequests>>
+  > = ({ signal }) =>
+    getApiV1AdminOwnerGroupBuyRequests(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiV1AdminOwnerGroupBuyRequests>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiV1AdminOwnerGroupBuyRequestsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiV1AdminOwnerGroupBuyRequests>>
+>;
+export type GetApiV1AdminOwnerGroupBuyRequestsQueryError = ForbiddenResponse;
+
+export function useGetApiV1AdminOwnerGroupBuyRequests<
+  TData = Awaited<ReturnType<typeof getApiV1AdminOwnerGroupBuyRequests>>,
+  TError = ForbiddenResponse,
+>(
+  params: undefined | GetApiV1AdminOwnerGroupBuyRequestsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1AdminOwnerGroupBuyRequests>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1AdminOwnerGroupBuyRequests>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1AdminOwnerGroupBuyRequests>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1AdminOwnerGroupBuyRequests<
+  TData = Awaited<ReturnType<typeof getApiV1AdminOwnerGroupBuyRequests>>,
+  TError = ForbiddenResponse,
+>(
+  params?: GetApiV1AdminOwnerGroupBuyRequestsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1AdminOwnerGroupBuyRequests>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1AdminOwnerGroupBuyRequests>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1AdminOwnerGroupBuyRequests>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1AdminOwnerGroupBuyRequests<
+  TData = Awaited<ReturnType<typeof getApiV1AdminOwnerGroupBuyRequests>>,
+  TError = ForbiddenResponse,
+>(
+  params?: GetApiV1AdminOwnerGroupBuyRequestsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1AdminOwnerGroupBuyRequests>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary 사장님 공구 개설 요청 목록 조회
+ */
+
+export function useGetApiV1AdminOwnerGroupBuyRequests<
+  TData = Awaited<ReturnType<typeof getApiV1AdminOwnerGroupBuyRequests>>,
+  TError = ForbiddenResponse,
+>(
+  params?: GetApiV1AdminOwnerGroupBuyRequestsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1AdminOwnerGroupBuyRequests>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiV1AdminOwnerGroupBuyRequestsQueryOptions(
+    params,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary 사장님 공구 개설 요청 상세 조회
+ */
+export type getApiV1AdminOwnerGroupBuyRequestsRequestIdResponse200 = {
+  data: ApiResponseAdminOwnerGroupBuyRequestDetail;
+  status: 200;
+};
+
+export type getApiV1AdminOwnerGroupBuyRequestsRequestIdResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type getApiV1AdminOwnerGroupBuyRequestsRequestIdResponseSuccess =
+  getApiV1AdminOwnerGroupBuyRequestsRequestIdResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1AdminOwnerGroupBuyRequestsRequestIdResponseError =
+  getApiV1AdminOwnerGroupBuyRequestsRequestIdResponse404 & {
+    headers: Headers;
+  };
+
+export type getApiV1AdminOwnerGroupBuyRequestsRequestIdResponse =
+  | getApiV1AdminOwnerGroupBuyRequestsRequestIdResponseSuccess
+  | getApiV1AdminOwnerGroupBuyRequestsRequestIdResponseError;
+
+export const getGetApiV1AdminOwnerGroupBuyRequestsRequestIdUrl = (
+  requestId: number,
+) => {
+  return `/api/v1/admin/owner-group-buy-requests/${requestId}`;
+};
+
+export const getApiV1AdminOwnerGroupBuyRequestsRequestId = async (
+  requestId: number,
+  options?: RequestInit,
+): Promise<getApiV1AdminOwnerGroupBuyRequestsRequestIdResponse> => {
+  return customFetch<getApiV1AdminOwnerGroupBuyRequestsRequestIdResponse>(
+    getGetApiV1AdminOwnerGroupBuyRequestsRequestIdUrl(requestId),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
+
+export const getGetApiV1AdminOwnerGroupBuyRequestsRequestIdQueryKey = (
+  requestId: number,
+) => {
+  return [`/api/v1/admin/owner-group-buy-requests/${requestId}`] as const;
+};
+
+export const getGetApiV1AdminOwnerGroupBuyRequestsRequestIdQueryOptions = <
+  TData = Awaited<
+    ReturnType<typeof getApiV1AdminOwnerGroupBuyRequestsRequestId>
+  >,
+  TError = NotFoundResponse,
+>(
+  requestId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1AdminOwnerGroupBuyRequestsRequestId>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetApiV1AdminOwnerGroupBuyRequestsRequestIdQueryKey(requestId);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiV1AdminOwnerGroupBuyRequestsRequestId>>
+  > = ({ signal }) =>
+    getApiV1AdminOwnerGroupBuyRequestsRequestId(requestId, {
+      signal,
+      ...requestOptions,
+    });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!requestId,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiV1AdminOwnerGroupBuyRequestsRequestId>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiV1AdminOwnerGroupBuyRequestsRequestIdQueryResult =
+  NonNullable<
+    Awaited<ReturnType<typeof getApiV1AdminOwnerGroupBuyRequestsRequestId>>
+  >;
+export type GetApiV1AdminOwnerGroupBuyRequestsRequestIdQueryError =
+  NotFoundResponse;
+
+export function useGetApiV1AdminOwnerGroupBuyRequestsRequestId<
+  TData = Awaited<
+    ReturnType<typeof getApiV1AdminOwnerGroupBuyRequestsRequestId>
+  >,
+  TError = NotFoundResponse,
+>(
+  requestId: number,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1AdminOwnerGroupBuyRequestsRequestId>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<
+            ReturnType<typeof getApiV1AdminOwnerGroupBuyRequestsRequestId>
+          >,
+          TError,
+          Awaited<
+            ReturnType<typeof getApiV1AdminOwnerGroupBuyRequestsRequestId>
+          >
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1AdminOwnerGroupBuyRequestsRequestId<
+  TData = Awaited<
+    ReturnType<typeof getApiV1AdminOwnerGroupBuyRequestsRequestId>
+  >,
+  TError = NotFoundResponse,
+>(
+  requestId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1AdminOwnerGroupBuyRequestsRequestId>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<
+            ReturnType<typeof getApiV1AdminOwnerGroupBuyRequestsRequestId>
+          >,
+          TError,
+          Awaited<
+            ReturnType<typeof getApiV1AdminOwnerGroupBuyRequestsRequestId>
+          >
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiV1AdminOwnerGroupBuyRequestsRequestId<
+  TData = Awaited<
+    ReturnType<typeof getApiV1AdminOwnerGroupBuyRequestsRequestId>
+  >,
+  TError = NotFoundResponse,
+>(
+  requestId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1AdminOwnerGroupBuyRequestsRequestId>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary 사장님 공구 개설 요청 상세 조회
+ */
+
+export function useGetApiV1AdminOwnerGroupBuyRequestsRequestId<
+  TData = Awaited<
+    ReturnType<typeof getApiV1AdminOwnerGroupBuyRequestsRequestId>
+  >,
+  TError = NotFoundResponse,
+>(
+  requestId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiV1AdminOwnerGroupBuyRequestsRequestId>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions =
+    getGetApiV1AdminOwnerGroupBuyRequestsRequestIdQueryOptions(
+      requestId,
+      options,
+    );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * 요청에 저장된 상품/가격/모집/픽업/이미지 정보로 공구를 생성한다.
+ * @summary 사장님 공구 개설 요청 승인 및 공구 생성
+ */
+export type postApiV1AdminOwnerGroupBuyRequestsRequestIdApproveResponse201 = {
+  data: ApiResponseAdminOwnerGroupBuyRequestAction;
+  status: 201;
+};
+
+export type postApiV1AdminOwnerGroupBuyRequestsRequestIdApproveResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type postApiV1AdminOwnerGroupBuyRequestsRequestIdApproveResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type postApiV1AdminOwnerGroupBuyRequestsRequestIdApproveResponseSuccess =
+  postApiV1AdminOwnerGroupBuyRequestsRequestIdApproveResponse201 & {
+    headers: Headers;
+  };
+export type postApiV1AdminOwnerGroupBuyRequestsRequestIdApproveResponseError = (
+  | postApiV1AdminOwnerGroupBuyRequestsRequestIdApproveResponse400
+  | postApiV1AdminOwnerGroupBuyRequestsRequestIdApproveResponse404
+) & {
+  headers: Headers;
+};
+
+export type postApiV1AdminOwnerGroupBuyRequestsRequestIdApproveResponse =
+  | postApiV1AdminOwnerGroupBuyRequestsRequestIdApproveResponseSuccess
+  | postApiV1AdminOwnerGroupBuyRequestsRequestIdApproveResponseError;
+
+export const getPostApiV1AdminOwnerGroupBuyRequestsRequestIdApproveUrl = (
+  requestId: number,
+) => {
+  return `/api/v1/admin/owner-group-buy-requests/${requestId}/approve`;
+};
+
+export const postApiV1AdminOwnerGroupBuyRequestsRequestIdApprove = async (
+  requestId: number,
+  options?: RequestInit,
+): Promise<postApiV1AdminOwnerGroupBuyRequestsRequestIdApproveResponse> => {
+  return customFetch<postApiV1AdminOwnerGroupBuyRequestsRequestIdApproveResponse>(
+    getPostApiV1AdminOwnerGroupBuyRequestsRequestIdApproveUrl(requestId),
+    {
+      ...options,
+      method: 'POST',
+    },
+  );
+};
+
+export const getPostApiV1AdminOwnerGroupBuyRequestsRequestIdApproveMutationOptions =
+  <
+    TError = BadRequestResponse | NotFoundResponse,
+    TContext = unknown,
+  >(options?: {
+    mutation?: UseMutationOptions<
+      Awaited<
+        ReturnType<typeof postApiV1AdminOwnerGroupBuyRequestsRequestIdApprove>
+      >,
+      TError,
+      { requestId: number },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  }): UseMutationOptions<
+    Awaited<
+      ReturnType<typeof postApiV1AdminOwnerGroupBuyRequestsRequestIdApprove>
+    >,
+    TError,
+    { requestId: number },
+    TContext
+  > => {
+    const mutationKey = ['postApiV1AdminOwnerGroupBuyRequestsRequestIdApprove'];
+    const { mutation: mutationOptions, request: requestOptions } = options
+      ? options.mutation &&
+        'mutationKey' in options.mutation &&
+        options.mutation.mutationKey
+        ? options
+        : { ...options, mutation: { ...options.mutation, mutationKey } }
+      : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+      Awaited<
+        ReturnType<typeof postApiV1AdminOwnerGroupBuyRequestsRequestIdApprove>
+      >,
+      { requestId: number }
+    > = (props) => {
+      const { requestId } = props ?? {};
+
+      return postApiV1AdminOwnerGroupBuyRequestsRequestIdApprove(
+        requestId,
+        requestOptions,
+      );
+    };
+
+    return { mutationFn, ...mutationOptions };
+  };
+
+export type PostApiV1AdminOwnerGroupBuyRequestsRequestIdApproveMutationResult =
+  NonNullable<
+    Awaited<
+      ReturnType<typeof postApiV1AdminOwnerGroupBuyRequestsRequestIdApprove>
+    >
+  >;
+
+export type PostApiV1AdminOwnerGroupBuyRequestsRequestIdApproveMutationError =
+  | BadRequestResponse
+  | NotFoundResponse;
+
+/**
+ * @summary 사장님 공구 개설 요청 승인 및 공구 생성
+ */
+export const usePostApiV1AdminOwnerGroupBuyRequestsRequestIdApprove = <
+  TError = BadRequestResponse | NotFoundResponse,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<
+        ReturnType<typeof postApiV1AdminOwnerGroupBuyRequestsRequestIdApprove>
+      >,
+      TError,
+      { requestId: number },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<
+    ReturnType<typeof postApiV1AdminOwnerGroupBuyRequestsRequestIdApprove>
+  >,
+  TError,
+  { requestId: number },
+  TContext
+> => {
+  return useMutation(
+    getPostApiV1AdminOwnerGroupBuyRequestsRequestIdApproveMutationOptions(
+      options,
+    ),
+    queryClient,
+  );
+};
+/**
+ * @summary 사장님 공구 개설 요청 반려
+ */
+export type postApiV1AdminOwnerGroupBuyRequestsRequestIdRejectResponse200 = {
+  data: ApiResponseAdminOwnerGroupBuyRequestAction;
+  status: 200;
+};
+
+export type postApiV1AdminOwnerGroupBuyRequestsRequestIdRejectResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type postApiV1AdminOwnerGroupBuyRequestsRequestIdRejectResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type postApiV1AdminOwnerGroupBuyRequestsRequestIdRejectResponseSuccess =
+  postApiV1AdminOwnerGroupBuyRequestsRequestIdRejectResponse200 & {
+    headers: Headers;
+  };
+export type postApiV1AdminOwnerGroupBuyRequestsRequestIdRejectResponseError = (
+  | postApiV1AdminOwnerGroupBuyRequestsRequestIdRejectResponse400
+  | postApiV1AdminOwnerGroupBuyRequestsRequestIdRejectResponse404
+) & {
+  headers: Headers;
+};
+
+export type postApiV1AdminOwnerGroupBuyRequestsRequestIdRejectResponse =
+  | postApiV1AdminOwnerGroupBuyRequestsRequestIdRejectResponseSuccess
+  | postApiV1AdminOwnerGroupBuyRequestsRequestIdRejectResponseError;
+
+export const getPostApiV1AdminOwnerGroupBuyRequestsRequestIdRejectUrl = (
+  requestId: number,
+) => {
+  return `/api/v1/admin/owner-group-buy-requests/${requestId}/reject`;
+};
+
+export const postApiV1AdminOwnerGroupBuyRequestsRequestIdReject = async (
+  requestId: number,
+  adminOwnerGroupBuyRequestReject: AdminOwnerGroupBuyRequestReject,
+  options?: RequestInit,
+): Promise<postApiV1AdminOwnerGroupBuyRequestsRequestIdRejectResponse> => {
+  return customFetch<postApiV1AdminOwnerGroupBuyRequestsRequestIdRejectResponse>(
+    getPostApiV1AdminOwnerGroupBuyRequestsRequestIdRejectUrl(requestId),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(adminOwnerGroupBuyRequestReject),
+    },
+  );
+};
+
+export const getPostApiV1AdminOwnerGroupBuyRequestsRequestIdRejectMutationOptions =
+  <
+    TError = BadRequestResponse | NotFoundResponse,
+    TContext = unknown,
+  >(options?: {
+    mutation?: UseMutationOptions<
+      Awaited<
+        ReturnType<typeof postApiV1AdminOwnerGroupBuyRequestsRequestIdReject>
+      >,
+      TError,
+      { requestId: number; data: AdminOwnerGroupBuyRequestReject },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  }): UseMutationOptions<
+    Awaited<
+      ReturnType<typeof postApiV1AdminOwnerGroupBuyRequestsRequestIdReject>
+    >,
+    TError,
+    { requestId: number; data: AdminOwnerGroupBuyRequestReject },
+    TContext
+  > => {
+    const mutationKey = ['postApiV1AdminOwnerGroupBuyRequestsRequestIdReject'];
+    const { mutation: mutationOptions, request: requestOptions } = options
+      ? options.mutation &&
+        'mutationKey' in options.mutation &&
+        options.mutation.mutationKey
+        ? options
+        : { ...options, mutation: { ...options.mutation, mutationKey } }
+      : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+      Awaited<
+        ReturnType<typeof postApiV1AdminOwnerGroupBuyRequestsRequestIdReject>
+      >,
+      { requestId: number; data: AdminOwnerGroupBuyRequestReject }
+    > = (props) => {
+      const { requestId, data } = props ?? {};
+
+      return postApiV1AdminOwnerGroupBuyRequestsRequestIdReject(
+        requestId,
+        data,
+        requestOptions,
+      );
+    };
+
+    return { mutationFn, ...mutationOptions };
+  };
+
+export type PostApiV1AdminOwnerGroupBuyRequestsRequestIdRejectMutationResult =
+  NonNullable<
+    Awaited<
+      ReturnType<typeof postApiV1AdminOwnerGroupBuyRequestsRequestIdReject>
+    >
+  >;
+export type PostApiV1AdminOwnerGroupBuyRequestsRequestIdRejectMutationBody =
+  AdminOwnerGroupBuyRequestReject;
+export type PostApiV1AdminOwnerGroupBuyRequestsRequestIdRejectMutationError =
+  | BadRequestResponse
+  | NotFoundResponse;
+
+/**
+ * @summary 사장님 공구 개설 요청 반려
+ */
+export const usePostApiV1AdminOwnerGroupBuyRequestsRequestIdReject = <
+  TError = BadRequestResponse | NotFoundResponse,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<
+        ReturnType<typeof postApiV1AdminOwnerGroupBuyRequestsRequestIdReject>
+      >,
+      TError,
+      { requestId: number; data: AdminOwnerGroupBuyRequestReject },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<
+    ReturnType<typeof postApiV1AdminOwnerGroupBuyRequestsRequestIdReject>
+  >,
+  TError,
+  { requestId: number; data: AdminOwnerGroupBuyRequestReject },
+  TContext
+> => {
+  return useMutation(
+    getPostApiV1AdminOwnerGroupBuyRequestsRequestIdRejectMutationOptions(
+      options,
+    ),
     queryClient,
   );
 };

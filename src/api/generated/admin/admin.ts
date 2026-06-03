@@ -7,14 +7,21 @@ import type {
   AdminGroupBuyRequestApprove,
   AdminGroupBuyRequestReject,
   AdminManualRefund,
+  AdminOwnerGroupBuyCloseRequestReject,
+  AdminOwnerGroupBuyRequestReject,
   AdminRequestStatusUpdate,
   ApiResponseAdminCsTicketDetail,
   ApiResponseAdminCsTicketPage,
   ApiResponseAdminDashboardSummary,
   ApiResponseAdminDashboardUnconfirmedOrders,
+  ApiResponseAdminDashboardUrgentRefunds,
   ApiResponseAdminGroupBuyRequestAction,
   ApiResponseAdminOrderDetail,
   ApiResponseAdminOrderPage,
+  ApiResponseAdminOwnerGroupBuyCloseRequestAction,
+  ApiResponseAdminOwnerGroupBuyRequestAction,
+  ApiResponseAdminOwnerGroupBuyRequestDetail,
+  ApiResponseAdminOwnerGroupBuyRequestPage,
   ApiResponseAdminRefundPage,
   ApiResponseAdminRequestDetail,
   ApiResponseAdminRequestPage,
@@ -27,13 +34,16 @@ import type {
   ForbiddenResponse,
   GetApiV1AdminCsTicketsParams,
   GetApiV1AdminDashboardUnconfirmedOrdersParams,
+  GetApiV1AdminDashboardUrgentRefundsParams,
   GetApiV1AdminGroupBuyRequestsParams,
   GetApiV1AdminOrdersParams,
+  GetApiV1AdminOwnerGroupBuyRequestsParams,
   GetApiV1AdminRefundsParams,
   GetApiV1AdminSettlementsDashboardParams,
   GetApiV1AdminSettlementsParams,
   NotFoundResponse,
   SuccessNoDataResponse,
+  UnauthorizedResponse,
 } from '../api.schemas';
 
 import { customFetch } from '../../../lib/custom-fetch';
@@ -132,6 +142,64 @@ export const getApiV1AdminDashboardUnconfirmedOrders = async (
 ): Promise<getApiV1AdminDashboardUnconfirmedOrdersResponse> => {
   return customFetch<getApiV1AdminDashboardUnconfirmedOrdersResponse>(
     getGetApiV1AdminDashboardUnconfirmedOrdersUrl(params),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
+
+/**
+ * 요청 후 1시간을 초과한 REFUND_PENDING 환불 요청을 조회한다.
+ * @summary 대시보드 긴급 환불 요청 조회 (운영자)
+ */
+export type getApiV1AdminDashboardUrgentRefundsResponse200 = {
+  data: ApiResponseAdminDashboardUrgentRefunds;
+  status: 200;
+};
+
+export type getApiV1AdminDashboardUrgentRefundsResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type getApiV1AdminDashboardUrgentRefundsResponseSuccess =
+  getApiV1AdminDashboardUrgentRefundsResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1AdminDashboardUrgentRefundsResponseError =
+  getApiV1AdminDashboardUrgentRefundsResponse403 & {
+    headers: Headers;
+  };
+
+export type getApiV1AdminDashboardUrgentRefundsResponse =
+  | getApiV1AdminDashboardUrgentRefundsResponseSuccess
+  | getApiV1AdminDashboardUrgentRefundsResponseError;
+
+export const getGetApiV1AdminDashboardUrgentRefundsUrl = (
+  params?: GetApiV1AdminDashboardUrgentRefundsParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/admin/dashboard/urgent-refunds?${stringifiedParams}`
+    : `/api/v1/admin/dashboard/urgent-refunds`;
+};
+
+export const getApiV1AdminDashboardUrgentRefunds = async (
+  params?: GetApiV1AdminDashboardUrgentRefundsParams,
+  options?: RequestInit,
+): Promise<getApiV1AdminDashboardUrgentRefundsResponse> => {
+  return customFetch<getApiV1AdminDashboardUrgentRefundsResponse>(
+    getGetApiV1AdminDashboardUrgentRefundsUrl(params),
     {
       ...options,
       method: 'GET',
@@ -597,6 +665,157 @@ export const patchApiV1AdminCsTicketsTicketId = async (
 };
 
 /**
+ * `OTHER` 사유로 접수된 사장님 공구 마감 요청을 승인한다.
+승인 시 공구는 실제로 CLOSED 상태로 전환되고 사장님에게 승인 알림이 발송된다.
+
+ * @summary 사장님 공구 마감 요청 승인 (운영자)
+ */
+export type postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponse200 =
+  {
+    data: ApiResponseAdminOwnerGroupBuyCloseRequestAction;
+    status: 200;
+  };
+
+export type postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponse400 =
+  {
+    data: BadRequestResponse;
+    status: 400;
+  };
+
+export type postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponse401 =
+  {
+    data: UnauthorizedResponse;
+    status: 401;
+  };
+
+export type postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponse403 =
+  {
+    data: ForbiddenResponse;
+    status: 403;
+  };
+
+export type postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponse404 =
+  {
+    data: NotFoundResponse;
+    status: 404;
+  };
+
+export type postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponseSuccess =
+  postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponse200 & {
+    headers: Headers;
+  };
+export type postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponseError =
+  (
+    | postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponse400
+    | postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponse401
+    | postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponse403
+    | postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponse404
+  ) & {
+    headers: Headers;
+  };
+
+export type postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponse =
+  | postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponseSuccess
+  | postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponseError;
+
+export const getPostApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveUrl =
+  (groupBuyId: number) => {
+    return `/api/v1/admin/owner-group-buys/${groupBuyId}/close-requests/approve`;
+  };
+
+export const postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApprove =
+  async (
+    groupBuyId: number,
+    options?: RequestInit,
+  ): Promise<postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponse> => {
+    return customFetch<postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponse>(
+      getPostApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveUrl(
+        groupBuyId,
+      ),
+      {
+        ...options,
+        method: 'POST',
+      },
+    );
+  };
+
+/**
+ * `OTHER` 사유로 접수된 사장님 공구 마감 요청을 반려한다.
+반려 시 공구 상태는 유지되며 반려 사유가 저장되고 사장님에게 반려 알림이 발송된다.
+
+ * @summary 사장님 공구 마감 요청 반려 (운영자)
+ */
+export type postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponse200 =
+  {
+    data: ApiResponseAdminOwnerGroupBuyCloseRequestAction;
+    status: 200;
+  };
+
+export type postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponse400 =
+  {
+    data: BadRequestResponse;
+    status: 400;
+  };
+
+export type postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponse401 =
+  {
+    data: UnauthorizedResponse;
+    status: 401;
+  };
+
+export type postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponse403 =
+  {
+    data: ForbiddenResponse;
+    status: 403;
+  };
+
+export type postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponse404 =
+  {
+    data: NotFoundResponse;
+    status: 404;
+  };
+
+export type postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponseSuccess =
+  postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponse200 & {
+    headers: Headers;
+  };
+export type postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponseError =
+  (
+    | postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponse400
+    | postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponse401
+    | postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponse403
+    | postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponse404
+  ) & {
+    headers: Headers;
+  };
+
+export type postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponse =
+  | postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponseSuccess
+  | postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponseError;
+
+export const getPostApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectUrl = (
+  groupBuyId: number,
+) => {
+  return `/api/v1/admin/owner-group-buys/${groupBuyId}/close-requests/reject`;
+};
+
+export const postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsReject = async (
+  groupBuyId: number,
+  adminOwnerGroupBuyCloseRequestReject: AdminOwnerGroupBuyCloseRequestReject,
+  options?: RequestInit,
+): Promise<postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponse> => {
+  return customFetch<postApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponse>(
+    getPostApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectUrl(groupBuyId),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(adminOwnerGroupBuyCloseRequestReject),
+    },
+  );
+};
+
+/**
  * @summary 공구 요청 목록 조회 (운영자)
  */
 export type getApiV1AdminGroupBuyRequestsResponse200 = {
@@ -841,6 +1060,216 @@ export const postApiV1AdminGroupBuyRequestsRequestIdReject = async (
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...options?.headers },
       body: JSON.stringify(adminGroupBuyRequestReject),
+    },
+  );
+};
+
+/**
+ * @summary 사장님 공구 개설 요청 목록 조회
+ */
+export type getApiV1AdminOwnerGroupBuyRequestsResponse200 = {
+  data: ApiResponseAdminOwnerGroupBuyRequestPage;
+  status: 200;
+};
+
+export type getApiV1AdminOwnerGroupBuyRequestsResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type getApiV1AdminOwnerGroupBuyRequestsResponseSuccess =
+  getApiV1AdminOwnerGroupBuyRequestsResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1AdminOwnerGroupBuyRequestsResponseError =
+  getApiV1AdminOwnerGroupBuyRequestsResponse403 & {
+    headers: Headers;
+  };
+
+export type getApiV1AdminOwnerGroupBuyRequestsResponse =
+  | getApiV1AdminOwnerGroupBuyRequestsResponseSuccess
+  | getApiV1AdminOwnerGroupBuyRequestsResponseError;
+
+export const getGetApiV1AdminOwnerGroupBuyRequestsUrl = (
+  params?: GetApiV1AdminOwnerGroupBuyRequestsParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/admin/owner-group-buy-requests?${stringifiedParams}`
+    : `/api/v1/admin/owner-group-buy-requests`;
+};
+
+export const getApiV1AdminOwnerGroupBuyRequests = async (
+  params?: GetApiV1AdminOwnerGroupBuyRequestsParams,
+  options?: RequestInit,
+): Promise<getApiV1AdminOwnerGroupBuyRequestsResponse> => {
+  return customFetch<getApiV1AdminOwnerGroupBuyRequestsResponse>(
+    getGetApiV1AdminOwnerGroupBuyRequestsUrl(params),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
+
+/**
+ * @summary 사장님 공구 개설 요청 상세 조회
+ */
+export type getApiV1AdminOwnerGroupBuyRequestsRequestIdResponse200 = {
+  data: ApiResponseAdminOwnerGroupBuyRequestDetail;
+  status: 200;
+};
+
+export type getApiV1AdminOwnerGroupBuyRequestsRequestIdResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type getApiV1AdminOwnerGroupBuyRequestsRequestIdResponseSuccess =
+  getApiV1AdminOwnerGroupBuyRequestsRequestIdResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1AdminOwnerGroupBuyRequestsRequestIdResponseError =
+  getApiV1AdminOwnerGroupBuyRequestsRequestIdResponse404 & {
+    headers: Headers;
+  };
+
+export type getApiV1AdminOwnerGroupBuyRequestsRequestIdResponse =
+  | getApiV1AdminOwnerGroupBuyRequestsRequestIdResponseSuccess
+  | getApiV1AdminOwnerGroupBuyRequestsRequestIdResponseError;
+
+export const getGetApiV1AdminOwnerGroupBuyRequestsRequestIdUrl = (
+  requestId: number,
+) => {
+  return `/api/v1/admin/owner-group-buy-requests/${requestId}`;
+};
+
+export const getApiV1AdminOwnerGroupBuyRequestsRequestId = async (
+  requestId: number,
+  options?: RequestInit,
+): Promise<getApiV1AdminOwnerGroupBuyRequestsRequestIdResponse> => {
+  return customFetch<getApiV1AdminOwnerGroupBuyRequestsRequestIdResponse>(
+    getGetApiV1AdminOwnerGroupBuyRequestsRequestIdUrl(requestId),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
+
+/**
+ * 요청에 저장된 상품/가격/모집/픽업/이미지 정보로 공구를 생성한다.
+ * @summary 사장님 공구 개설 요청 승인 및 공구 생성
+ */
+export type postApiV1AdminOwnerGroupBuyRequestsRequestIdApproveResponse201 = {
+  data: ApiResponseAdminOwnerGroupBuyRequestAction;
+  status: 201;
+};
+
+export type postApiV1AdminOwnerGroupBuyRequestsRequestIdApproveResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type postApiV1AdminOwnerGroupBuyRequestsRequestIdApproveResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type postApiV1AdminOwnerGroupBuyRequestsRequestIdApproveResponseSuccess =
+  postApiV1AdminOwnerGroupBuyRequestsRequestIdApproveResponse201 & {
+    headers: Headers;
+  };
+export type postApiV1AdminOwnerGroupBuyRequestsRequestIdApproveResponseError = (
+  | postApiV1AdminOwnerGroupBuyRequestsRequestIdApproveResponse400
+  | postApiV1AdminOwnerGroupBuyRequestsRequestIdApproveResponse404
+) & {
+  headers: Headers;
+};
+
+export type postApiV1AdminOwnerGroupBuyRequestsRequestIdApproveResponse =
+  | postApiV1AdminOwnerGroupBuyRequestsRequestIdApproveResponseSuccess
+  | postApiV1AdminOwnerGroupBuyRequestsRequestIdApproveResponseError;
+
+export const getPostApiV1AdminOwnerGroupBuyRequestsRequestIdApproveUrl = (
+  requestId: number,
+) => {
+  return `/api/v1/admin/owner-group-buy-requests/${requestId}/approve`;
+};
+
+export const postApiV1AdminOwnerGroupBuyRequestsRequestIdApprove = async (
+  requestId: number,
+  options?: RequestInit,
+): Promise<postApiV1AdminOwnerGroupBuyRequestsRequestIdApproveResponse> => {
+  return customFetch<postApiV1AdminOwnerGroupBuyRequestsRequestIdApproveResponse>(
+    getPostApiV1AdminOwnerGroupBuyRequestsRequestIdApproveUrl(requestId),
+    {
+      ...options,
+      method: 'POST',
+    },
+  );
+};
+
+/**
+ * @summary 사장님 공구 개설 요청 반려
+ */
+export type postApiV1AdminOwnerGroupBuyRequestsRequestIdRejectResponse200 = {
+  data: ApiResponseAdminOwnerGroupBuyRequestAction;
+  status: 200;
+};
+
+export type postApiV1AdminOwnerGroupBuyRequestsRequestIdRejectResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type postApiV1AdminOwnerGroupBuyRequestsRequestIdRejectResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type postApiV1AdminOwnerGroupBuyRequestsRequestIdRejectResponseSuccess =
+  postApiV1AdminOwnerGroupBuyRequestsRequestIdRejectResponse200 & {
+    headers: Headers;
+  };
+export type postApiV1AdminOwnerGroupBuyRequestsRequestIdRejectResponseError = (
+  | postApiV1AdminOwnerGroupBuyRequestsRequestIdRejectResponse400
+  | postApiV1AdminOwnerGroupBuyRequestsRequestIdRejectResponse404
+) & {
+  headers: Headers;
+};
+
+export type postApiV1AdminOwnerGroupBuyRequestsRequestIdRejectResponse =
+  | postApiV1AdminOwnerGroupBuyRequestsRequestIdRejectResponseSuccess
+  | postApiV1AdminOwnerGroupBuyRequestsRequestIdRejectResponseError;
+
+export const getPostApiV1AdminOwnerGroupBuyRequestsRequestIdRejectUrl = (
+  requestId: number,
+) => {
+  return `/api/v1/admin/owner-group-buy-requests/${requestId}/reject`;
+};
+
+export const postApiV1AdminOwnerGroupBuyRequestsRequestIdReject = async (
+  requestId: number,
+  adminOwnerGroupBuyRequestReject: AdminOwnerGroupBuyRequestReject,
+  options?: RequestInit,
+): Promise<postApiV1AdminOwnerGroupBuyRequestsRequestIdRejectResponse> => {
+  return customFetch<postApiV1AdminOwnerGroupBuyRequestsRequestIdRejectResponse>(
+    getPostApiV1AdminOwnerGroupBuyRequestsRequestIdRejectUrl(requestId),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(adminOwnerGroupBuyRequestReject),
     },
   );
 };

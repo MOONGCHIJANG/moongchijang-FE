@@ -80,7 +80,18 @@ export const GetApiV1OwnerGroupBuysManageResponse = zod.object({
   success: zod.boolean(),
   data: zod.array(
     zod.object({
-      groupBuyId: zod.number(),
+      groupBuyId: zod
+        .number()
+        .nullish()
+        .describe(
+          '실제 공구 항목일 때 사용하는 공구 ID. PENDING_APPROVAL 항목에서는 null',
+        ),
+      requestId: zod
+        .number()
+        .nullish()
+        .describe(
+          '승인대기(PENDING_APPROVAL) 항목일 때 사용하는 공구 개설 요청 ID. 실제 공구 항목에서는 null',
+        ),
       productName: zod.string(),
       price: zod.number(),
       pickupDate: zod.iso.date(),
@@ -202,6 +213,9 @@ export const PostApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse =
   });
 
 /**
+ * 사장님 공구 마감 요청을 접수한다.
+`SOLD_OUT`, `STORE_CONDITION`은 즉시 마감 처리되며, `OTHER`는 즉시 마감되지 않고 운영자 검토 대기 상태로 저장된다.
+
  * @summary 사장님 공구 마감 요청
  */
 export const PostApiV1OwnerGroupBuysGroupBuyIdCloseRequestsParams = zod.object({
@@ -262,6 +276,47 @@ export const GetApiV1OwnerSettlementsMonthChipsResponse = zod.object({
         year: zod.number(),
         month: zod.number(),
         label: zod.string(),
+      }),
+    ),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * @summary 사장님 정산 공구 카드 목록 조회
+ */
+export const getApiV1OwnerSettlementsItemsQueryYearMin = 2000;
+export const getApiV1OwnerSettlementsItemsQueryYearMax = 2100;
+
+export const getApiV1OwnerSettlementsItemsQueryMonthMax = 12;
+
+export const GetApiV1OwnerSettlementsItemsQueryParams = zod.object({
+  year: zod
+    .number()
+    .min(getApiV1OwnerSettlementsItemsQueryYearMin)
+    .max(getApiV1OwnerSettlementsItemsQueryYearMax),
+  month: zod.number().min(1).max(getApiV1OwnerSettlementsItemsQueryMonthMax),
+});
+
+export const GetApiV1OwnerSettlementsItemsResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    year: zod.number(),
+    month: zod.number(),
+    items: zod.array(
+      zod.object({
+        groupBuyId: zod.number(),
+        productName: zod.string(),
+        participantCount: zod.number(),
+        pickupDate: zod.iso.date(),
+        amount: zod.number(),
+        settlementStatus: zod
+          .enum([
+            'SETTLEMENT_COMPLETED',
+            'SETTLEMENT_PENDING',
+            'REFUND_PROCESSING',
+          ])
+          .describe('사장님 공구 정산 상태'),
       }),
     ),
   }),

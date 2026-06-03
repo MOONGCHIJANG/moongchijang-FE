@@ -556,6 +556,10 @@ function InProgressDetailView({
           setExtStart(s);
           setExtEnd(e);
         }}
+        existingStartDate={detail?.recruitmentStartDate}
+        existingEndDate={detail?.recruitmentEndDate}
+        confirmLabel="기간 연장 완료"
+        pendingLabel="연장기간을 선택해주세요"
       />
 
       <Modal

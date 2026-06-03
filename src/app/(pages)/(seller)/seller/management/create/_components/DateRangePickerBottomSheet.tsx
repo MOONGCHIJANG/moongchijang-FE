@@ -12,6 +12,10 @@ interface Props {
   startDate: string;
   endDate: string;
   onSelect: (start: string, end: string) => void;
+  existingStartDate?: string;
+  existingEndDate?: string;
+  confirmLabel?: string;
+  pendingLabel?: string;
 }
 
 const DAYS = ['일', '월', '화', '수', '목', '금', '토'];
@@ -34,6 +38,10 @@ export function DateRangePickerBottomSheet({
   startDate,
   endDate,
   onSelect,
+  existingStartDate,
+  existingEndDate,
+  confirmLabel = '이 기간으로 할래요!',
+  pendingLabel = '기간을 설정해주세요',
 }: Props) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -78,12 +86,13 @@ export function DateRangePickerBottomSheet({
     if (date < today) return;
     const key = toKey(view.year, view.month, day);
 
-    if (!tempStart || (tempStart && tempEnd)) {
+    if (!tempStart || tempStart !== tempEnd) {
+      // 선택 없음 or 범위 선택 완료 → 하루 단일 선택으로 초기화
       setTempStart(key);
-      setTempEnd('');
+      setTempEnd(key);
     } else {
+      // 단일 날짜 선택 상태 → 두 번째 클릭으로 범위 확장
       if (key < tempStart) {
-        setTempEnd(tempStart);
         setTempStart(key);
       } else {
         setTempEnd(key);
@@ -100,6 +109,13 @@ export function DateRangePickerBottomSheet({
   const isStart = (day: number) =>
     toKey(view.year, view.month, day) === tempStart;
   const isEnd = (day: number) => toKey(view.year, view.month, day) === tempEnd;
+
+  const isExtensionMode = !!(existingStartDate && existingEndDate);
+  const isExistingRange = (day: number) => {
+    if (!isExtensionMode) return false;
+    const key = toKey(view.year, view.month, day);
+    return key >= existingStartDate! && key <= existingEndDate!;
+  };
 
   const total = daysInMonth(view.year, view.month);
   const offset = firstDay(view.year, view.month);
@@ -165,6 +181,7 @@ export function DateRangePickerBottomSheet({
             const start = isStart(day);
             const end = isEnd(day);
             const inRange = isInRange(day);
+            const existingRange = isExistingRange(day);
 
             return (
               <button
@@ -174,9 +191,9 @@ export function DateRangePickerBottomSheet({
                 disabled={past}
                 className={cn(
                   'relative mx-auto flex h-11 w-12.5 flex-col items-center justify-center rounded-small heading-md-medium transition-colors',
-                  start || end
+                  start || end || inRange
                     ? 'bg-surface-brand text-text-basic-inverse'
-                    : inRange
+                    : isExtensionMode && existingRange
                       ? 'bg-surface-brand-lighter text-text-brand'
                       : past
                         ? 'cursor-not-allowed text-text-subtle-inverse'
@@ -203,7 +220,7 @@ export function DateRangePickerBottomSheet({
               }
             }}
           >
-            {canConfirm ? '이 기간으로 할래요!' : '기간을 설정해주세요'}
+            {canConfirm ? confirmLabel : pendingLabel}
           </Button>
         </div>
       </div>

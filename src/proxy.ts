@@ -39,7 +39,7 @@ export function proxy(request: NextRequest) {
     response.cookies.set('pendingRedirect', pathname, {
       path: '/',
       maxAge: 60 * 5,
-      sameSite: 'strict',
+      sameSite: 'lax',
     });
     return response;
   }

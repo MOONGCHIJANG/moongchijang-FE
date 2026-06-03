@@ -28,11 +28,8 @@ export function proxy(request: NextRequest) {
 
   // 보호 경로 정보
   const protectedPaths = ['/item', '/payment', '/notifications'];
-  const excludedPaths = ['/payment/redirect'];
 
-  const isProtected =
-    protectedPaths.some((p) => pathname.startsWith(p)) &&
-    !excludedPaths.some((p) => pathname.startsWith(p));
+  const isProtected = protectedPaths.some((p) => pathname.startsWith(p));
 
   if (isProtected && !token) {
     const response = NextResponse.redirect(new URL('/login', request.url));

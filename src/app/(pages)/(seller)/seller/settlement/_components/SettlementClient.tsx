@@ -4,17 +4,12 @@ import { useState } from 'react';
 import {
   useGetApiV1OwnerSettlementsMonthlySummary,
   useGetApiV1OwnerSettlementsMonthChips,
-  useGetApiV1OwnerSettlementsRefundRequests,
   useGetApiV1OwnerGroupBuysManage,
 } from '@/api/hooks/owner/owner';
-import {
-  GetApiV1OwnerGroupBuysManageFilter,
-  GetApiV1OwnerSettlementsRefundRequestsTab,
-} from '@/api/hooks/api.schemas';
+import { GetApiV1OwnerGroupBuysManageFilter } from '@/api/hooks/api.schemas';
 import { SellerTopBar } from '../../_components/SellerTopBar';
 import { MonthSummarySection } from './MonthSummarySection';
 import { MonthChipList } from './MonthChipList';
-import { RefundBanner } from './RefundBanner';
 import { SettlementGroupBuyList } from './SettlementGroupBuyList';
 
 export function SettlementClient() {
@@ -41,11 +36,6 @@ export function SettlementClient() {
       },
     );
 
-  const { data: refundResponse } = useGetApiV1OwnerSettlementsRefundRequests(
-    { tab: GetApiV1OwnerSettlementsRefundRequestsTab.PENDING },
-    { query: { queryKey: ['ownerSettlementsRefundRequests', 'PENDING'] } },
-  );
-
   const { data: groupBuysResponse, isLoading: groupBuysLoading } =
     useGetApiV1OwnerGroupBuysManage(
       { filter: GetApiV1OwnerGroupBuysManageFilter.ACHIEVED },
@@ -54,9 +44,6 @@ export function SettlementClient() {
 
   const summary =
     summaryResponse?.status === 200 ? summaryResponse.data.data : null;
-
-  const pendingCount =
-    refundResponse?.status === 200 ? refundResponse.data.data.pendingCount : 0;
 
   const achievedItems =
     groupBuysResponse?.status === 200 ? groupBuysResponse.data.data : [];
@@ -91,9 +78,6 @@ export function SettlementClient() {
             />
           </div>
         )}
-
-        {/* 환불 요청 확인 배너 */}
-        {pendingCount > 0 && <RefundBanner pendingCount={pendingCount} />}
 
         {/* 공구 목록 */}
         <SettlementGroupBuyList

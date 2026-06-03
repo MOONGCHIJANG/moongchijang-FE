@@ -52,7 +52,7 @@ export function SettlementGroupBuyList({ items, isLoading }: Props) {
               </div>
               <Badge
                 label="정산대기"
-                className="min-w-10 bg-primary-50"
+                className="min-w-[40px] bg-primary-50"
                 textClassName="caption-xs-bold text-text-brand"
               />
             </div>

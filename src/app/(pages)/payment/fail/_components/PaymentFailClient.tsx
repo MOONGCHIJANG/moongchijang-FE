@@ -61,7 +61,7 @@ const PaymentFailClient = ({ errorCode, groupBuyId }: Props) => {
           href={`/item/${groupBuyId}`}
           className="w-full py-p4 rounded-2xlarge border border-border-default text-text-secondary body-md-medium cursor-pointer"
         >
-          홈으로
+          돌아가기
         </Link>
       </div>
     </div>

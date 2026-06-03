@@ -38,6 +38,7 @@ import {
   createOwnerGroupBuyCloseMock,
   createOwnerGroupBuyExtensionMock,
   createOwnerGroupBuyRequestCreatedMock,
+  createOwnerGroupBuyRequestDetailMock,
   MOCK_SELLER_HOME_EMPTY,
   createOwnerSettlementMonthChipsMock,
   createOwnerSettlementMonthlySummaryMock,
@@ -641,6 +642,19 @@ const overrideHandlers = [
       return HttpResponse.json(createOwnerGroupBuyExtensionMock(), {
         status: 200,
       });
+    },
+  ),
+
+  // ── 공구 개설 요청 상세 조회 (승인대기) ───────────────────────────────
+  http.get(
+    '*/api/v1/owner/group-buy-requests/:requestId',
+    async ({ params }) => {
+      await delay(400);
+      const requestId = Number(params.requestId);
+      return HttpResponse.json(
+        createOwnerGroupBuyRequestDetailMock(requestId),
+        { status: 200 },
+      );
     },
   ),
 

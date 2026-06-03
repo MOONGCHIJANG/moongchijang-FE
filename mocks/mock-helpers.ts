@@ -578,7 +578,8 @@ const MANAGE_ALL_ITEMS = [
     status: 'ACHIEVED' as const,
   },
   {
-    groupBuyId: 4,
+    groupBuyId: null,
+    requestId: 10,
     productName: '르뱅 초코칩쿠키 세트',
     price: 22_000,
     pickupDate: '2026-06-20',
@@ -608,6 +609,35 @@ export function createOwnerGroupBuysManageMock(filter = 'ALL') {
       ? MANAGE_ALL_ITEMS
       : MANAGE_ALL_ITEMS.filter((i) => i.status === filter);
   return { ...base, success: true, data, error: null };
+}
+
+export function createOwnerGroupBuyRequestDetailMock(requestId: number) {
+  return {
+    success: true,
+    data: {
+      requestId,
+      storeId: 3,
+      storeName: '르뱅쿠키 홍대점',
+      productName: '르뱅 초코칩쿠키 세트',
+      productDescription: '버터 듬뿍 수제 초코칩쿠키 5개입 세트입니다.',
+      price: 22_000,
+      targetQuantity: 20,
+      maxQuantity: 30,
+      thumbnailUrl: '',
+      imageUrls: [],
+      deadline: '2026-06-30T23:59:59',
+      pickupDate: '2026-07-05',
+      pickupTimeStart: '10:00',
+      pickupTimeEnd: '18:00',
+      pickupLocation: '서울 마포구 양화로 165',
+      status: 'PENDING' as const,
+      rejectionReason: null,
+      approvedGroupBuyId: null,
+      reviewedAt: null,
+      requestedAt: '2026-06-10T09:00:00Z',
+    },
+    error: null,
+  };
 }
 
 export function createOwnerGroupBuyCloseMock() {
@@ -885,6 +915,7 @@ const REFUND_DETAIL_FIXTURES: Record<number, object> = {
     paymentAmount: 24_000,
     penaltyAmount: 2_400,
     refundExpectedAmount: 21_600,
+    refundReasonLabel: '단순 변심',
     refundReasonDetail: '일정 변경으로 픽업이 어려워졌어요. 변경 부탁드립니다.',
     status: 'PENDING' as const,
   },
@@ -897,6 +928,7 @@ const REFUND_DETAIL_FIXTURES: Record<number, object> = {
     paymentAmount: 18_000,
     penaltyAmount: 0,
     refundExpectedAmount: 18_000,
+    refundReasonLabel: '상품 불만족',
     refundReasonDetail: null,
     status: 'COMPLETED' as const,
   },
@@ -909,6 +941,7 @@ const REFUND_DETAIL_FIXTURES: Record<number, object> = {
     paymentAmount: 32_000,
     penaltyAmount: 3_200,
     refundExpectedAmount: 28_800,
+    refundReasonLabel: '픽업 불가',
     refundReasonDetail: '개인 사정으로 픽업이 불가능해졌습니다.',
     status: 'COMPLETED' as const,
   },

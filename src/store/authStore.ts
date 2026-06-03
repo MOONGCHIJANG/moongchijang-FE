@@ -1,8 +1,5 @@
 import { create } from 'zustand';
-import {
-  postApiV1AuthLogout,
-  deleteApiV1UsersMeRole,
-} from '@/api/generated/auth/auth';
+import { deleteApiV1UsersMeRole } from '@/api/generated/auth/auth';
 import { WithdrawRequest } from '@/api/generated/api.schemas';
 import { tokenStorage } from '@/lib/token';
 import posthog from 'posthog-js';

@@ -111,6 +111,7 @@ const TopInfo = ({ data }: Props) => {
           <p className="text-text-disabled caption-sm-bold">픽업 일시</p>
           <p className="caption-sm-medium">
             {formatPickupDate(data.pickupDate)}
+            {` `}
             {formatPickupTime(data.pickupTimeStart)}~
             {formatPickupTime(data.pickupTimeEnd)}
           </p>

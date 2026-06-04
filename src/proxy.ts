@@ -27,7 +27,7 @@ export function proxy(request: NextRequest) {
   // → 추후 Route Handler 완성 후 SignupEmailClient에서 처리 예정
 
   // 보호 경로 정보
-  const protectedPaths = ['/item', '/payment', '/notifications'];
+  const protectedPaths = ['/item', '/payment', '/notifications', '/seller'];
 
   const isProtected = protectedPaths.some((p) => pathname.startsWith(p));
 
@@ -48,6 +48,8 @@ export const config = {
     '/payment/complete',
     '/payment/fail',
     '/notifications',
+    '/seller',
+    '/seller/:path*',
     '/login',
     '/login/:path*',
     '/signup/email',

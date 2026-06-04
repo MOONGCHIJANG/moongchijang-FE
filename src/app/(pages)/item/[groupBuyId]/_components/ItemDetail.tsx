@@ -25,17 +25,24 @@ const ItemDetail = ({ data }: Props) => {
   );
 
   // 스크롤 위치에 따라 탭 변경
+  const isScrollingRef = useRef(false);
+  const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   useEffect(() => {
+    const THRESHOLD = 112;
+
     const handleScroll = () => {
-      const descTop = descriptionRef.current?.getBoundingClientRect().top ?? 0;
+      if (isScrollingRef.current) return;
+
       const guideTop = guidelinesRef.current?.getBoundingClientRect().top ?? 0;
 
-      if (descTop <= 56 && guideTop > 56) {
-        setActiveTab('description');
-      } else if (guideTop <= 56) {
+      if (guideTop <= THRESHOLD) {
         setActiveTab('guidelines');
+      } else {
+        setActiveTab('description');
       }
     };
+
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -57,12 +64,22 @@ const ItemDetail = ({ data }: Props) => {
   // 탭 클릭 시 해당 섹션으로 스크롤
   const handleTabClick = useCallback((tab: 'description' | 'guidelines') => {
     setActiveTab(tab);
-    const yOffset = -56;
+    isScrollingRef.current = true;
+
+    if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+
+    const OFFSET = 112;
     const target =
       tab === 'description' ? descriptionRef.current : guidelinesRef.current;
+
     if (target) {
-      const y = target.getBoundingClientRect().top + window.scrollY + yOffset;
-      window.scrollTo({ top: y, behavior: 'smooth' });
+      const y = target.getBoundingClientRect().top + window.scrollY - OFFSET;
+      window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+
+      // 스크롤 완료 후 감지 재활성화
+      scrollTimerRef.current = setTimeout(() => {
+        isScrollingRef.current = false;
+      }, 800);
     }
   }, []);
 
@@ -72,7 +89,7 @@ const ItemDetail = ({ data }: Props) => {
       <div
         ref={descriptionRef}
         id="description-section"
-        className="pt-8 px-4 scroll-mt-16"
+        className="pt-8 px-4 scroll-mt-28"
       >
         <div className="flex flex-col gap-g4">
           <div className="flex flex-col gap-1">
@@ -134,7 +151,11 @@ const ItemDetail = ({ data }: Props) => {
           {data.productDescription}
         </div>
       </div>
-      <div ref={guidelinesRef} id="guidelines-section" className="scroll-mt-16">
+      <div
+        ref={guidelinesRef}
+        id="guidelines-section"
+        className="scroll-mt-28 -mt-0"
+      >
         <GuideLine />
       </div>
     </>

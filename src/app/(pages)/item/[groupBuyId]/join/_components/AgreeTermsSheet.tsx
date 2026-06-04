@@ -70,9 +70,12 @@ const AgreeTermsSheet = ({ isOpen, onClose, onConfirm, groupBuyId }: Props) => {
                 onClick={() => toggle(key)}
               >
                 <CheckboxIcon checked={checked[key]} />
-                <span className="body-lg-regular text-text-subtle">
-                  {label}
-                </span>
+                <div className="flex gap-g1 items-start">
+                  <span className="body-sm-bold text-text-error">*</span>
+                  <span className="body-lg-regular text-text-subtle">
+                    {label}
+                  </span>
+                </div>
               </button>
               {routeKey && (
                 <button

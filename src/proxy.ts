@@ -28,6 +28,7 @@ export function proxy(request: NextRequest) {
 
   // 보호 경로 정보
   const protectedPaths = ['/item', '/payment', '/notifications'];
+
   const isProtected = protectedPaths.some((p) => pathname.startsWith(p));
 
   if (isProtected && !token) {
@@ -35,7 +36,7 @@ export function proxy(request: NextRequest) {
     response.cookies.set('pendingRedirect', pathname, {
       path: '/',
       maxAge: 60 * 5,
-      sameSite: 'strict',
+      sameSite: 'lax',
     });
     return response;
   }
@@ -44,7 +45,8 @@ export function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     '/item/:path*/join',
-    '/payment/:path*',
+    '/payment/complete',
+    '/payment/fail',
     '/notifications',
     '/login',
     '/login/:path*',

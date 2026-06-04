@@ -52,7 +52,6 @@ const TRIGGER_ICON_MAP: Partial<Record<NotificationTriggerType, string>> = {
   [NotificationTriggerType.OWNER_OPEN_REQUEST_REJECTED_IMMEDIATE]: 'x',
   [NotificationTriggerType.OWNER_ORDER_CONFIRM_REQUIRED_IMMEDIATE]: 'hand',
   [NotificationTriggerType.OWNER_ORDER_CANCELLED_IMMEDIATE]: 'x',
-  [NotificationTriggerType.OWNER_FAULT_CANCEL]: 'x',
   [NotificationTriggerType.WISH_DEADLINE_MINUS_3_DAYS]: 'heart',
   [NotificationTriggerType.WISH_DEADLINE_MINUS_1_DAY]: 'heart',
   [NotificationTriggerType.WISH_TARGET_ACHIEVED_IMMEDIATE]: 'party',

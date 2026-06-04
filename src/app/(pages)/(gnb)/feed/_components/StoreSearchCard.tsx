@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import type { ApiResponseStoreSearchListDataStoresItem } from '@/api/generated/api.schemas';
 
 interface StoreSearchCardProps {
-  store: ApiResponseStoreSearchListDataStoresItem & { thumbnailUrl?: string };
+  store: ApiResponseStoreSearchListDataStoresItem;
   isSelected: boolean;
   onClick: () => void;
 }
@@ -25,7 +25,7 @@ export const StoreSearchCard = ({
   >
     <div className="w-2/5 h-24 shrink-0 bg-surface-elevated relative overflow-hidden">
       <Image
-        src={store.thumbnailUrl ?? '/images/img1.jpg'}
+        src={store.imageUrl ?? '/images/bakery-store.png'}
         alt={store.storeName ?? ''}
         fill
         className="object-cover"

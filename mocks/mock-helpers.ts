@@ -127,7 +127,7 @@ export function createStoreSearchMock() {
           max: 127.2,
           fractionDigits: 6,
         }),
-        thumbnailUrl: faker.helpers.arrayElement(MOCK_IMAGES),
+        imageUrl: faker.helpers.arrayElement(MOCK_IMAGES),
       })),
     },
     error: null,
@@ -826,7 +826,10 @@ export function createOwnerSettlementMonthChipsMock() {
   };
 }
 
-export function createOwnerSettlementMonthlySummaryMock(year: number, month: number) {
+export function createOwnerSettlementMonthlySummaryMock(
+  year: number,
+  month: number,
+) {
   const base = getGetApiV1OwnerSettlementsMonthlySummaryResponseMock();
   const summaries: Record<string, { gross: number; fee: number }> = {
     '2026-5': { gross: 1_328_000, fee: 304_000 },
@@ -893,11 +896,13 @@ const REFUND_ITEMS = [
 export function createOwnerRefundRequestsMock(tab = 'ALL') {
   const base = getGetApiV1OwnerSettlementsRefundRequestsResponseMock();
   const items =
-    tab === 'ALL'
-      ? REFUND_ITEMS
-      : REFUND_ITEMS.filter((i) => i.status === tab);
-  const pendingCount = REFUND_ITEMS.filter((i) => i.status === 'PENDING').length;
-  const completedCount = REFUND_ITEMS.filter((i) => i.status === 'COMPLETED').length;
+    tab === 'ALL' ? REFUND_ITEMS : REFUND_ITEMS.filter((i) => i.status === tab);
+  const pendingCount = REFUND_ITEMS.filter(
+    (i) => i.status === 'PENDING',
+  ).length;
+  const completedCount = REFUND_ITEMS.filter(
+    (i) => i.status === 'COMPLETED',
+  ).length;
   return {
     ...base,
     success: true,
@@ -954,10 +959,10 @@ const REFUND_DETAIL_FIXTURES: Record<number, object> = {
 };
 
 export function createOwnerRefundDetailMock(participationId: number) {
-  const base = getGetApiV1OwnerSettlementsRefundRequestsParticipationIdResponseMock();
+  const base =
+    getGetApiV1OwnerSettlementsRefundRequestsParticipationIdResponseMock();
   const fixture =
-    REFUND_DETAIL_FIXTURES[participationId] ??
-    REFUND_DETAIL_FIXTURES[101];
+    REFUND_DETAIL_FIXTURES[participationId] ?? REFUND_DETAIL_FIXTURES[101];
   return { ...base, success: true, data: fixture, error: null };
 }
 

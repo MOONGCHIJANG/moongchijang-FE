@@ -70,7 +70,8 @@ export default function SettingsPage() {
 
   const { data: meData } = useGetApiV1UsersMe();
   const user = meData?.status === 200 ? meData.data?.data : null;
-  const isSeller = user?.role === AuthUserRole.SELLER;
+  const isSeller =
+    user?.role === AuthUserRole.SELLER || user?.hasSellerRole === true;
 
   const { mutate: switchRole, isPending: isSwitching } =
     usePatchApiV1UsersMeRole();

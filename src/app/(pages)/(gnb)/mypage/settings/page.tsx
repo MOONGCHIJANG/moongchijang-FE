@@ -80,6 +80,10 @@ export default function SettingsPage() {
 
   function handleSwitchToSeller() {
     if (isSwitching) return;
+    if (user?.role === AuthUserRole.SELLER) {
+      router.push('/seller');
+      return;
+    }
     switchRole(
       { data: { role: MyPageRoleSwitchRequestRole.SELLER } },
       {
@@ -107,6 +111,7 @@ export default function SettingsPage() {
         <RoleSwitchBanner
           label="사장님 화면으로 전환하기"
           onClick={handleSwitchToSeller}
+          isOn={user?.role === AuthUserRole.SELLER}
           disabled={isSwitching}
         />
       ) : (

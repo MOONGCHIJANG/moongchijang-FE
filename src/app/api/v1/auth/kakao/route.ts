@@ -1,4 +1,5 @@
 import { serverFetchRaw } from '@/lib/fetcher';
+import { applyRefreshTokenCookie } from '@/lib/cookie';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
@@ -12,20 +13,7 @@ export async function POST(req: NextRequest) {
   if (result.status === 200) {
     const response = NextResponse.json(result.data, { status: 200 });
 
-    const setCookie = result.headers?.get('set-cookie');
-    if (setCookie) {
-      const match = setCookie.match(/refreshToken=([^;]+)/);
-      const refreshToken = match ? match[1] : null;
-      if (refreshToken) {
-        response.cookies.set('refreshToken', refreshToken, {
-          httpOnly: true,
-          path: '/',
-          sameSite: 'strict',
-          maxAge: 60 * 60 * 24 * 14,
-          secure: process.env.NODE_ENV === 'production',
-        });
-      }
-    }
+    applyRefreshTokenCookie(response, result.headers?.get('set-cookie'));
 
     return response;
   }

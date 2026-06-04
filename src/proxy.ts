@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { setRefreshTokenCookie } from '@/lib/cookie';
 
 /*
  * 보호 경로 추가 방법:
@@ -111,13 +112,7 @@ export async function proxy(request: NextRequest) {
         secure: process.env.NODE_ENV === 'production',
       });
       if (rotated.newRefreshToken) {
-        response.cookies.set('refreshToken', rotated.newRefreshToken, {
-          httpOnly: true,
-          path: '/',
-          sameSite: 'strict',
-          maxAge: 60 * 60 * 24 * 14,
-          secure: process.env.NODE_ENV === 'production',
-        });
+        setRefreshTokenCookie(response, rotated.newRefreshToken);
       }
     }
 

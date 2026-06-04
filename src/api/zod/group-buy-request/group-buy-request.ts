@@ -36,6 +36,10 @@ export const GetApiV1StoresSearchResponse = zod.object({
             lotAddress: zod.string().nullish().describe('지번 주소'),
             latitude: zod.number().optional().describe('위도'),
             longitude: zod.number().optional().describe('경도'),
+            imageUrl: zod
+              .string()
+              .nullish()
+              .describe('추천 매장 표시용 이미지 URL'),
           }),
         )
         .optional()
@@ -445,6 +449,10 @@ export const PostApiV1GroupBuyOpenRequestsStoreRecommendationsResponse =
               lotAddress: zod.string().nullish().describe('지번 주소'),
               latitude: zod.number().describe('위도'),
               longitude: zod.number().describe('경도'),
+              imageUrl: zod
+                .string()
+                .nullish()
+                .describe('추천 매장 표시용 이미지 URL'),
               category: zod.string().describe('네이버 Local Search 카테고리'),
               addressMatched: zod
                 .boolean()

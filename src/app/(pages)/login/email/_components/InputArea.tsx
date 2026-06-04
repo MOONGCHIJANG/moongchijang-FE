@@ -59,7 +59,9 @@ const InputArea = () => {
         logEvent('login', { method: 'email' });
         setIsLoggedIn(true);
         const redirect = redirectStorage.consume();
-        router.push(redirect ?? '/feed');
+        const role = data?.data?.user?.role;
+        const defaultRedirect = role === 'SELLER' ? '/seller' : '/feed';
+        router.push(redirect ?? defaultRedirect);
       } else {
         logEvent('login_fail', { reason: 'wrong_password' });
         setErrorMessage('이메일 또는 비밀번호를 확인해주세요.');

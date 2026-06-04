@@ -62,7 +62,8 @@ export default function KakaoCallbackPage() {
 
         useAuthStore.getState().setIsLoggedIn(true);
         const redirect = redirectStorage.consume();
-        router.replace(redirect ?? '/feed');
+        const defaultRedirect = user.role === 'SELLER' ? '/seller' : '/feed';
+        router.replace(redirect ?? defaultRedirect);
       } catch {
         router.replace('/login');
       }

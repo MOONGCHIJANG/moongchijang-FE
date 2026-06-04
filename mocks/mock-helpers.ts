@@ -28,6 +28,16 @@ import {
 } from '../src/api/generated/group-buy-request/group-buy-request.msw';
 import { getGetApiV1UsersMeResponseMock } from '../src/api/generated/auth/auth.msw';
 import {
+  getGetApiV1OwnerGroupBuysResponseMock,
+  getGetApiV1OwnerGroupBuysSummaryResponseMock,
+  getGetApiV1OwnerGroupBuysManageResponseMock,
+  getGetApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponseMock,
+  getGetApiV1OwnerSettlementsMonthlySummaryResponseMock,
+  getGetApiV1OwnerSettlementsMonthChipsResponseMock,
+  getGetApiV1OwnerSettlementsRefundRequestsResponseMock,
+  getGetApiV1OwnerSettlementsRefundRequestsParticipationIdResponseMock,
+} from '../src/api/generated/owner/owner.msw';
+import {
   getGetApiV1UsersMeTabsCountsResponseMock,
   getGetApiV1UsersMeParticipationsResponseMock,
   getGetApiV1UsersMeParticipationsPickupWaitingResponseMock,
@@ -530,6 +540,425 @@ export function createGroupBuyRequestDetailMock(requestId: number) {
     data: fixture,
     error: null,
   };
+}
+
+// 전체 관리 목록 픽스처 — 필터별로 잘라 쓴다
+const MANAGE_ALL_ITEMS = [
+  {
+    groupBuyId: 1,
+    productName: '버터 크루아상 3개입',
+    price: 18_000,
+    pickupDate: '2026-06-10',
+    deadlineDday: 3,
+    achievementRate: 72,
+    currentQuantity: 7,
+    targetQuantity: 10,
+    status: 'IN_PROGRESS' as const,
+  },
+  {
+    groupBuyId: 2,
+    productName: '소금빵 5개입',
+    price: 14_500,
+    pickupDate: '2026-06-15',
+    deadlineDday: 0,
+    achievementRate: 45,
+    currentQuantity: 4,
+    targetQuantity: 9,
+    status: 'IN_PROGRESS' as const,
+  },
+  {
+    groupBuyId: 3,
+    productName: '말차 라떼 케이크',
+    price: 32_000,
+    pickupDate: '2026-06-05',
+    deadlineDday: 2,
+    achievementRate: 100,
+    currentQuantity: 12,
+    targetQuantity: 12,
+    status: 'ACHIEVED' as const,
+  },
+  {
+    groupBuyId: null,
+    requestId: 10,
+    productName: '르뱅 초코칩쿠키 세트',
+    price: 22_000,
+    pickupDate: '2026-06-20',
+    deadlineDday: null,
+    achievementRate: null,
+    currentQuantity: null,
+    targetQuantity: null,
+    status: 'PENDING_APPROVAL' as const,
+  },
+  {
+    groupBuyId: 5,
+    productName: '두쫀 쌀쿠키 박스',
+    price: 16_000,
+    pickupDate: '2026-05-10',
+    deadlineDday: null,
+    achievementRate: null,
+    currentQuantity: null,
+    targetQuantity: null,
+    status: 'ENDED' as const,
+  },
+];
+
+export function createOwnerGroupBuysManageMock(filter = 'ALL') {
+  const base = getGetApiV1OwnerGroupBuysManageResponseMock();
+  const data =
+    filter === 'ALL'
+      ? MANAGE_ALL_ITEMS
+      : MANAGE_ALL_ITEMS.filter((i) => i.status === filter);
+  return { ...base, success: true, data, error: null };
+}
+
+export function createOwnerGroupBuyRequestDetailMock(requestId: number) {
+  return {
+    success: true,
+    data: {
+      requestId,
+      storeId: 3,
+      storeName: '르뱅쿠키 홍대점',
+      productName: '르뱅 초코칩쿠키 세트',
+      productDescription: '버터 듬뿍 수제 초코칩쿠키 5개입 세트입니다.',
+      price: 22_000,
+      targetQuantity: 20,
+      maxQuantity: 30,
+      thumbnailUrl: '',
+      imageUrls: [],
+      deadline: '2026-06-30T23:59:59',
+      pickupDate: '2026-07-05',
+      pickupTimeStart: '10:00',
+      pickupTimeEnd: '18:00',
+      pickupLocation: '서울 마포구 양화로 165',
+      status: 'PENDING' as const,
+      rejectionReason: null,
+      approvedGroupBuyId: null,
+      reviewedAt: null,
+      requestedAt: '2026-06-10T09:00:00Z',
+    },
+    error: null,
+  };
+}
+
+export function createOwnerGroupBuyCloseMock() {
+  return { success: true, data: {}, error: null };
+}
+
+export function createOwnerGroupBuyExtensionMock() {
+  return { success: true, data: {}, error: null };
+}
+
+export function createOwnerGroupBuyRequestCreatedMock() {
+  return {
+    success: true,
+    data: {
+      requestId: faker.number.int({ min: 100, max: 999 }),
+      status: 'PENDING' as const,
+    },
+    error: null,
+  };
+}
+
+export function createOwnerGroupBuysMock() {
+  const base = getGetApiV1OwnerGroupBuysResponseMock();
+  return {
+    ...base,
+    success: true,
+    data: Array.from({ length: 3 }, (_, i) => {
+      const targetQuantity = koFaker.groupBuy.quantity();
+      const achievementRate = koFaker.groupBuy.achievementRate();
+      return {
+        groupBuyId: i + 1,
+        productName: koFaker.product.name(),
+        achievementRate,
+        currentQuantity: Math.floor(targetQuantity * (achievementRate / 100)),
+        targetQuantity,
+        price: koFaker.product.price(),
+        deadline: koFaker.groupBuy.deadline(),
+        status: 'IN_PROGRESS' as const,
+      };
+    }),
+    error: null,
+  };
+}
+
+// ── 분기 확인용: true(빈 상태) / false(데이터 있음, 기본값) ──────────
+export const MOCK_SELLER_HOME_EMPTY = false;
+
+export function createOwnerGroupBuysSummaryMock() {
+  const base = getGetApiV1OwnerGroupBuysSummaryResponseMock();
+  if (MOCK_SELLER_HOME_EMPTY) {
+    return {
+      ...base,
+      success: true,
+      data: {
+        ongoingCount: 0,
+        achievedCount: 0,
+        todayPickupUserCount: 0,
+        settlementExpectedAmount: 0,
+        isEmpty: true,
+      },
+      error: null,
+    };
+  }
+  return {
+    ...base,
+    success: true,
+    data: {
+      ongoingCount: 2,
+      achievedCount: 1,
+      todayPickupUserCount: 12,
+      settlementExpectedAmount: 1_280_000,
+      isEmpty: false,
+    },
+    error: null,
+  };
+}
+
+const KOREAN_NAMES = [
+  '김민지',
+  '이지현',
+  '박서연',
+  '최수민',
+  '정다은',
+  '이준서',
+  '김태양',
+  '박지훈',
+  '한소희',
+  '윤서준',
+];
+const PAYMENT_METHODS = ['카드', '카카오페이', '네이버페이', '토스페이'];
+
+function koreanPhone(): string {
+  return `010-${faker.string.numeric(4)}-${faker.string.numeric(4)}`;
+}
+
+export function createOwnerGroupBuyManageDetailMock(
+  status: 'IN_PROGRESS' | 'ACHIEVED' = 'IN_PROGRESS',
+) {
+  const base =
+    getGetApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponseMock();
+  const productName = koFaker.product.name();
+  const pickupTime = koFaker.groupBuy.pickupTime();
+
+  const participants = [
+    {
+      name: faker.helpers.arrayElement(KOREAN_NAMES),
+      phoneNumber: koreanPhone(),
+      productName,
+      quantity: 2,
+      paymentMethod: faker.helpers.arrayElement(PAYMENT_METHODS),
+      paymentStatus: 'PAYMENT_COMPLETED',
+      pickupTime,
+    },
+    {
+      name: faker.helpers.arrayElement(KOREAN_NAMES),
+      phoneNumber: koreanPhone(),
+      productName,
+      quantity: 1,
+      paymentMethod: faker.helpers.arrayElement(PAYMENT_METHODS),
+      paymentStatus: 'PAYMENT_COMPLETED',
+      pickupTime,
+    },
+    {
+      name: faker.helpers.arrayElement(KOREAN_NAMES),
+      phoneNumber: koreanPhone(),
+      productName,
+      quantity: 3,
+      paymentMethod: faker.helpers.arrayElement(PAYMENT_METHODS),
+      paymentStatus: 'REFUND_REQUESTED',
+      pickupTime,
+    },
+    {
+      name: faker.helpers.arrayElement(KOREAN_NAMES),
+      phoneNumber: koreanPhone(),
+      productName,
+      quantity: 1,
+      paymentMethod: faker.helpers.arrayElement(PAYMENT_METHODS),
+      paymentStatus: 'PAYMENT_COMPLETED',
+      pickupTime,
+    },
+  ];
+
+  const completedCount = participants.filter(
+    (p) => p.paymentStatus === 'PAYMENT_COMPLETED',
+  ).length;
+  const waitingCount = participants.length - completedCount;
+
+  const today = new Date();
+  const sevenDaysAgo = new Date(today);
+  sevenDaysAgo.setDate(today.getDate() - 7);
+
+  return {
+    ...base,
+    success: true,
+    data: {
+      groupBuyId: 1,
+      status,
+      recruitmentStartDate: sevenDaysAgo.toISOString().slice(0, 10),
+      recruitmentEndDate: today.toISOString().slice(0, 10),
+      participantSummary: {
+        totalCount: participants.length,
+        completedCount,
+        waitingCount,
+      },
+      participants,
+    },
+    error: null,
+  };
+}
+
+// ── 정산 ─────────────────────────────────────────────────────────────────
+
+export function createOwnerSettlementMonthChipsMock() {
+  const base = getGetApiV1OwnerSettlementsMonthChipsResponseMock();
+  return {
+    ...base,
+    success: true,
+    data: {
+      chips: [
+        { year: 2026, month: 5, label: '2026년 5월' },
+        { year: 2026, month: 4, label: '2026년 4월' },
+        { year: 2026, month: 3, label: '2026년 3월' },
+      ],
+    },
+    error: null,
+  };
+}
+
+export function createOwnerSettlementMonthlySummaryMock(year: number, month: number) {
+  const base = getGetApiV1OwnerSettlementsMonthlySummaryResponseMock();
+  const summaries: Record<string, { gross: number; fee: number }> = {
+    '2026-5': { gross: 1_328_000, fee: 304_000 },
+    '2026-4': { gross: 980_000, fee: 120_000 },
+    '2026-3': { gross: 540_000, fee: 0 },
+  };
+  const key = `${year}-${month}`;
+  const { gross, fee } = summaries[key] ?? { gross: 0, fee: 0 };
+  return {
+    ...base,
+    success: true,
+    data: {
+      year,
+      month,
+      grossRevenueAmount: gross,
+      refundFeeAmount: fee,
+      settlementExpectedAmount: gross - fee,
+    },
+    error: null,
+  };
+}
+
+// ── 환불 요청 목록 픽스처 ─────────────────────────────────────────────────
+
+const REFUND_ITEMS = [
+  {
+    participationId: 101,
+    groupBuyId: 3,
+    productName: '초코 크루아상&소금빵 세트',
+    paymentAmount: 24_000,
+    requesterName: '김민지',
+    requesterCode: 'P001',
+    refundReasonLabel: '단순 변심',
+    requestedDate: '2026-05-02',
+    status: 'PENDING' as const,
+    exceeded24Hours: true,
+  },
+  {
+    participationId: 102,
+    groupBuyId: 3,
+    productName: '딸기 타르트',
+    paymentAmount: 18_000,
+    requesterName: '이준서',
+    requesterCode: 'P002',
+    refundReasonLabel: '상품 불만족',
+    requestedDate: '2026-05-02',
+    status: 'COMPLETED' as const,
+    exceeded24Hours: false,
+  },
+  {
+    participationId: 103,
+    groupBuyId: 1,
+    productName: '말차 라떼 케이크',
+    paymentAmount: 32_000,
+    requesterName: '박서연',
+    requesterCode: 'P003',
+    refundReasonLabel: '픽업 불가',
+    requestedDate: '2026-05-03',
+    status: 'COMPLETED' as const,
+    exceeded24Hours: false,
+  },
+];
+
+export function createOwnerRefundRequestsMock(tab = 'ALL') {
+  const base = getGetApiV1OwnerSettlementsRefundRequestsResponseMock();
+  const items =
+    tab === 'ALL'
+      ? REFUND_ITEMS
+      : REFUND_ITEMS.filter((i) => i.status === tab);
+  const pendingCount = REFUND_ITEMS.filter((i) => i.status === 'PENDING').length;
+  const completedCount = REFUND_ITEMS.filter((i) => i.status === 'COMPLETED').length;
+  return {
+    ...base,
+    success: true,
+    data: {
+      pendingCount,
+      completedCount,
+      hasPendingItems: pendingCount > 0,
+      items,
+    },
+    error: null,
+  };
+}
+
+const REFUND_DETAIL_FIXTURES: Record<number, object> = {
+  101: {
+    participationId: 101,
+    groupBuyId: 3,
+    productName: '초코 크루아상&소금빵 세트',
+    requesterName: '김민지',
+    requestedDate: '2026-05-02',
+    paymentAmount: 24_000,
+    penaltyAmount: 2_400,
+    refundExpectedAmount: 21_600,
+    refundReasonLabel: '단순 변심',
+    refundReasonDetail: '일정 변경으로 픽업이 어려워졌어요. 변경 부탁드립니다.',
+    status: 'PENDING' as const,
+  },
+  102: {
+    participationId: 102,
+    groupBuyId: 3,
+    productName: '딸기 타르트',
+    requesterName: '이준서',
+    requestedDate: '2026-05-02',
+    paymentAmount: 18_000,
+    penaltyAmount: 0,
+    refundExpectedAmount: 18_000,
+    refundReasonLabel: '상품 불만족',
+    refundReasonDetail: null,
+    status: 'COMPLETED' as const,
+  },
+  103: {
+    participationId: 103,
+    groupBuyId: 1,
+    productName: '말차 라떼 케이크',
+    requesterName: '박서연',
+    requestedDate: '2026-05-03',
+    paymentAmount: 32_000,
+    penaltyAmount: 3_200,
+    refundExpectedAmount: 28_800,
+    refundReasonLabel: '픽업 불가',
+    refundReasonDetail: '개인 사정으로 픽업이 불가능해졌습니다.',
+    status: 'COMPLETED' as const,
+  },
+};
+
+export function createOwnerRefundDetailMock(participationId: number) {
+  const base = getGetApiV1OwnerSettlementsRefundRequestsParticipationIdResponseMock();
+  const fixture =
+    REFUND_DETAIL_FIXTURES[participationId] ??
+    REFUND_DETAIL_FIXTURES[101];
+  return { ...base, success: true, data: fixture, error: null };
 }
 
 export function createGroupBuysFeedMock() {

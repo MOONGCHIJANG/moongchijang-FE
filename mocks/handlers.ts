@@ -31,6 +31,19 @@ import {
   MOCK_HAS_PICKUP_WAITING,
   createGroupBuyRequestListMock,
   createGroupBuyRequestDetailMock,
+  createOwnerGroupBuysMock,
+  createOwnerGroupBuysSummaryMock,
+  createOwnerGroupBuysManageMock,
+  createOwnerGroupBuyManageDetailMock,
+  createOwnerGroupBuyCloseMock,
+  createOwnerGroupBuyExtensionMock,
+  createOwnerGroupBuyRequestCreatedMock,
+  createOwnerGroupBuyRequestDetailMock,
+  MOCK_SELLER_HOME_EMPTY,
+  createOwnerSettlementMonthChipsMock,
+  createOwnerSettlementMonthlySummaryMock,
+  createOwnerRefundRequestsMock,
+  createOwnerRefundDetailMock,
 } from './mock-helpers';
 import { formatDeadline } from '@/lib/date';
 
@@ -288,7 +301,32 @@ const overrideHandlers = [
     await delay(500);
     const body = (await request.json()) as { email: string; password: string };
 
-    if (body.email !== 'test@test.com' || body.password !== 'Test1234!') {
+    const ACCOUNTS = {
+      'test@test.com': {
+        password: 'Test1234!',
+        id: 1,
+        nickname: '테스트유저',
+        role: 'BUYER',
+        accessToken: 'mock-access-token',
+      },
+      'admin@test.com': {
+        password: 'Admin1234!',
+        id: 2,
+        nickname: '운영자',
+        role: 'ADMIN',
+        accessToken: 'mock-admin-access-token',
+      },
+      'seller@test.com': {
+        password: 'Seller1234!',
+        id: 3,
+        nickname: '테스트사장님',
+        role: 'SELLER',
+        accessToken: 'mock-seller-access-token',
+      },
+    } as const;
+
+    const account = ACCOUNTS[body.email as keyof typeof ACCOUNTS];
+    if (!account || account.password !== body.password) {
       return HttpResponse.json(
         {
           success: false,
@@ -302,16 +340,16 @@ const overrideHandlers = [
       {
         success: true,
         data: {
-          accessToken: 'mock-access-token',
+          accessToken: account.accessToken,
           tokenType: 'Bearer',
           expiresIn: 3600,
           isNewUser: false,
           user: {
-            id: 1,
+            id: account.id,
             provider: 'EMAIL',
-            email: 'test@test.com',
-            nickname: '테스트유저',
-            role: 'BUYER',
+            email: body.email,
+            nickname: account.nickname,
+            role: account.role,
             signupCompleted: true,
             deletedAt: null,
             createdAt: new Date().toISOString(),
@@ -320,7 +358,13 @@ const overrideHandlers = [
         },
         error: null,
       },
-      { status: 200 },
+      {
+        status: 200,
+        headers: {
+          'set-cookie':
+            'refreshToken=mock-refresh-token; Path=/; SameSite=Strict; Max-Age=1209600',
+        },
+      },
     );
   }),
   // 피드용 가장 가까운 픽업 QR 조회
@@ -548,6 +592,294 @@ const overrideHandlers = [
       { success: true, data: null, error: null },
       { status: 200 },
     );
+  }),
+
+  // ── 사장님 홈 ─────────────────────────────────────────────────────────
+  // ── 사장님 홈 ─────────────────────────────────────────────────────────
+  // 분기 확인: mock-helpers.ts 의 MOCK_SELLER_HOME_EMPTY 를 true/false 로 토글
+  http.get('*/api/v1/owner/group-buys/summary', async () => {
+    await delay(500);
+    return HttpResponse.json(createOwnerGroupBuysSummaryMock(), {
+      status: 200,
+    });
+  }),
+
+  http.get('*/api/v1/owner/group-buys', async () => {
+    await delay(500);
+    // 빈 상태일 때는 빈 배열 반환
+    if (MOCK_SELLER_HOME_EMPTY) {
+      return HttpResponse.json(
+        { success: true, data: [], error: null },
+        { status: 200 },
+      );
+    }
+    return HttpResponse.json(createOwnerGroupBuysMock(), { status: 200 });
+  }),
+
+  // ── 공구 관리 목록 (탭 필터 반영) ──────────────────────────────────────
+  http.get('*/api/v1/owner/group-buys/manage', async ({ request }) => {
+    await delay(500);
+    const url = new URL(request.url);
+    const filter = url.searchParams.get('filter') ?? 'ALL';
+    return HttpResponse.json(createOwnerGroupBuysManageMock(filter), {
+      status: 200,
+    });
+  }),
+
+  // ── 공구 마감 / 기간 연장 요청 ────────────────────────────────────────
+  http.post(
+    '*/api/v1/owner/group-buys/:groupBuyId/close-requests',
+    async () => {
+      await delay(500);
+      return HttpResponse.json(createOwnerGroupBuyCloseMock(), { status: 200 });
+    },
+  ),
+
+  http.post(
+    '*/api/v1/owner/group-buys/:groupBuyId/extension-requests',
+    async () => {
+      await delay(500);
+      return HttpResponse.json(createOwnerGroupBuyExtensionMock(), {
+        status: 200,
+      });
+    },
+  ),
+
+  // ── 공구 개설 요청 상세 조회 (승인대기) ───────────────────────────────
+  http.get(
+    '*/api/v1/owner/group-buy-requests/:requestId',
+    async ({ params }) => {
+      await delay(400);
+      const requestId = Number(params.requestId);
+      return HttpResponse.json(
+        createOwnerGroupBuyRequestDetailMock(requestId),
+        { status: 200 },
+      );
+    },
+  ),
+
+  // ── 공구 개설 요청 제출 ────────────────────────────────────────────────
+  http.post('*/api/v1/owner/group-buy-requests', async () => {
+    await delay(800);
+    return HttpResponse.json(createOwnerGroupBuyRequestCreatedMock(), {
+      status: 201,
+    });
+  }),
+
+  http.get(
+    '*/api/v1/owner/group-buys/:groupBuyId/manage/in-progress',
+    async () => {
+      await delay(500);
+      return HttpResponse.json(
+        createOwnerGroupBuyManageDetailMock('IN_PROGRESS'),
+        { status: 200 },
+      );
+    },
+  ),
+
+  http.get(
+    '*/api/v1/owner/group-buys/:groupBuyId/manage/achieved',
+    async () => {
+      await delay(500);
+      return HttpResponse.json(
+        createOwnerGroupBuyManageDetailMock('ACHIEVED'),
+        { status: 200 },
+      );
+    },
+  ),
+
+  // ── 정산 ─────────────────────────────────────────────────────────────
+  http.get('*/api/v1/owner/settlements/month-chips', async () => {
+    await delay(300);
+    return HttpResponse.json(createOwnerSettlementMonthChipsMock(), { status: 200 });
+  }),
+
+  http.get('*/api/v1/owner/settlements/monthly-summary', async ({ request }) => {
+    await delay(400);
+    const url = new URL(request.url);
+    const year = parseInt(url.searchParams.get('year') ?? '2026', 10);
+    const month = parseInt(url.searchParams.get('month') ?? '5', 10);
+    return HttpResponse.json(
+      createOwnerSettlementMonthlySummaryMock(year, month),
+      { status: 200 },
+    );
+  }),
+
+  http.get('*/api/v1/owner/settlements/refund-requests', async ({ request }) => {
+    await delay(400);
+    const url = new URL(request.url);
+    const tab = url.searchParams.get('tab') ?? 'ALL';
+    return HttpResponse.json(createOwnerRefundRequestsMock(tab), { status: 200 });
+  }),
+
+  http.get(
+    '*/api/v1/owner/settlements/refund-requests/:participationId',
+    async ({ params }) => {
+      await delay(300);
+      const participationId = Number(params.participationId);
+      return HttpResponse.json(
+        createOwnerRefundDetailMock(participationId),
+        { status: 200 },
+      );
+    },
+  ),
+
+  http.post(
+    '*/api/v1/owner/settlements/refund-requests/:participationId/review-submissions',
+    async () => {
+      await delay(500);
+      return HttpResponse.json(
+        { success: true, data: { participationId: 101, processed: true }, error: null },
+        { status: 200 },
+      );
+    },
+  ),
+
+  // ── 알림 (사장님용 픽스처) ─────────────────────────────────────────────
+  http.get('*/api/v1/notifications', async () => {
+    await delay(300);
+    const hoursAgo = (h: number) =>
+      new Date(Date.now() - h * 3_600_000).toISOString();
+    return HttpResponse.json({
+      success: true,
+      data: {
+        items: [
+          {
+            id: 1,
+            type: 'PICKUP',
+            title: '오늘 픽업일이에요!',
+            body: '소금빵 45개 / 14:00~16:00',
+            isRead: false,
+            occurredAt: hoursAgo(3),
+            triggerType: 'OWNER_PICKUP_SAME_DAY_MORNING',
+            deeplinkType: 'GROUPBUY_DETAIL',
+            deeplinkParams: { groupBuyId: '1' },
+            section: 'TODAY',
+            targetId: 1,
+          },
+          {
+            id: 2,
+            type: 'PICKUP',
+            title: '내일 픽업 안내드려요',
+            body: '크루아상 30개 / 14:00~16:00',
+            isRead: false,
+            occurredAt: hoursAgo(8),
+            triggerType: 'OWNER_PICKUP_DAY_BEFORE_MORNING',
+            deeplinkType: 'GROUPBUY_DETAIL',
+            deeplinkParams: { groupBuyId: '2' },
+            section: 'TODAY',
+            targetId: 2,
+          },
+          {
+            id: 3,
+            type: 'REQUEST',
+            title: '공구가 달성됐어요! 🎉',
+            body: '마카롱 25개 주문이 달성됐습니다.',
+            isRead: true,
+            occurredAt: hoursAgo(12),
+            triggerType: 'OWNER_GROUPBUY_ACHIEVED_IMMEDIATE',
+            deeplinkType: 'GROUPBUY_DETAIL',
+            deeplinkParams: { groupBuyId: '3' },
+            section: 'YESTERDAY',
+            targetId: 3,
+          },
+          {
+            id: 4,
+            type: 'REQUEST',
+            title: '공구가 미달됐어요',
+            body: '유기농 통밀 베이글 6개 세트 공구가 목표 미달로 종료됐어요.',
+            isRead: true,
+            occurredAt: '2026-05-13T08:00:00Z',
+            triggerType: 'OWNER_GROUPBUY_FAILED_IMMEDIATE',
+            deeplinkType: 'GROUPBUY_DETAIL',
+            deeplinkParams: { groupBuyId: '4' },
+            section: 'OLDER',
+            targetId: 4,
+          },
+          {
+            id: 5,
+            type: 'REQUEST',
+            title: '공구 조기 마감 요청이 수락됐어요',
+            body: '유기농 통밀 베이글 6개 세트 조기 마감 요청이 승인됐어요.',
+            isRead: true,
+            occurredAt: '2026-05-13T09:00:00Z',
+            triggerType: 'OWNER_CLOSE_REQUEST_APPROVED_IMMEDIATE',
+            deeplinkType: 'GROUPBUY_DETAIL',
+            deeplinkParams: { groupBuyId: '4' },
+            section: 'OLDER',
+            targetId: 4,
+          },
+          {
+            id: 6,
+            type: 'REQUEST',
+            title: '공구 조기 마감 요청이 거절됐어요',
+            body: '곡선 밀 앙금 단팥빵 10개 조기 마감 요청이 거절됐어요.',
+            isRead: true,
+            occurredAt: '2026-04-07T10:00:00Z',
+            triggerType: 'OWNER_CLOSE_REQUEST_REJECTED_IMMEDIATE',
+            deeplinkType: 'GROUPBUY_DETAIL',
+            deeplinkParams: { groupBuyId: '5' },
+            section: 'OLDER',
+            targetId: 5,
+          },
+          {
+            id: 7,
+            type: 'REQUEST',
+            title: '공구 개설 요청이 승인됐어요',
+            body: '두쫀쿠키 공구 개설 요청이 승인됐어요.',
+            isRead: true,
+            occurredAt: '2026-04-06T10:00:00Z',
+            triggerType: 'OWNER_OPEN_REQUEST_APPROVED_IMMEDIATE',
+            deeplinkType: 'GROUPBUY_DETAIL',
+            deeplinkParams: { groupBuyId: '6' },
+            section: 'OLDER',
+            targetId: 6,
+          },
+          {
+            id: 8,
+            type: 'REQUEST',
+            title: '공구 개설 요청이 거절됐어요',
+            body: '크림치즈베이글 공구 개설 요청이 거절됐어요.',
+            isRead: true,
+            occurredAt: '2026-04-05T10:00:00Z',
+            triggerType: 'OWNER_OPEN_REQUEST_REJECTED_IMMEDIATE',
+            deeplinkType: 'GROUPBUY_DETAIL',
+            deeplinkParams: { groupBuyId: '7' },
+            section: 'OLDER',
+            targetId: 7,
+          },
+          {
+            id: 9,
+            type: 'REQUEST',
+            title: '주문 확인이 필요해요',
+            body: '말차 라떼 케이크 주문을 확인해 주세요.',
+            isRead: true,
+            occurredAt: '2026-04-04T10:00:00Z',
+            triggerType: 'OWNER_ORDER_CONFIRM_REQUIRED_IMMEDIATE',
+            deeplinkType: 'GROUPBUY_DETAIL',
+            deeplinkParams: { groupBuyId: '8' },
+            section: 'OLDER',
+            targetId: 8,
+          },
+          {
+            id: 10,
+            type: 'REQUEST',
+            title: '주문이 취소됐어요',
+            body: '소금빵 5개입 주문이 취소됐어요.',
+            isRead: true,
+            occurredAt: '2026-04-03T10:00:00Z',
+            triggerType: 'OWNER_ORDER_CANCELLED_IMMEDIATE',
+            deeplinkType: 'GROUPBUY_DETAIL',
+            deeplinkParams: { groupBuyId: '9' },
+            section: 'OLDER',
+            targetId: 9,
+          },
+        ],
+        nextCursor: null,
+        hasNext: false,
+      },
+      error: null,
+    });
   }),
 ];
 

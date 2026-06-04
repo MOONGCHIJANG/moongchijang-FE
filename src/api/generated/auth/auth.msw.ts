@@ -207,6 +207,15 @@ export const getGetApiV1UsersMeResponseMock = (
   ...overrideResponse,
 });
 
+export const getDeleteApiV1UsersMeResponseMock = (
+  overrideResponse: Partial<Extract<SuccessNoDataResponse, object>> = {},
+): SuccessNoDataResponse => ({
+  success: faker.datatype.boolean(),
+  data: {},
+  error: {},
+  ...overrideResponse,
+});
+
 export const getPatchApiV1UsersMeRoleResponseMock = (
   overrideResponse: Partial<Extract<ApiResponseUserInfo, object>> = {},
 ): ApiResponseUserInfo => ({
@@ -275,15 +284,6 @@ export const getPatchApiV1UsersMeRoleResponseMock = (
     createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z',
     updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z',
   },
-  error: {},
-  ...overrideResponse,
-});
-
-export const getDeleteApiV1UsersMeRoleResponseMock = (
-  overrideResponse: Partial<Extract<SuccessNoDataResponse, object>> = {},
-): SuccessNoDataResponse => ({
-  success: faker.datatype.boolean(),
-  data: {},
   error: {},
   ...overrideResponse,
 });
@@ -916,6 +916,30 @@ export const getGetApiV1UsersMeMockHandler = (
   );
 };
 
+export const getDeleteApiV1UsersMeMockHandler = (
+  overrideResponse?:
+    | SuccessNoDataResponse
+    | ((
+        info: Parameters<Parameters<typeof http.delete>[1]>[0],
+      ) => Promise<SuccessNoDataResponse> | SuccessNoDataResponse),
+  options?: RequestHandlerOptions,
+) => {
+  return http.delete(
+    '*/api/v1/users/me',
+    async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getDeleteApiV1UsersMeResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
+
 export const getPatchApiV1UsersMeRoleMockHandler = (
   overrideResponse?:
     | ApiResponseUserInfo
@@ -933,30 +957,6 @@ export const getPatchApiV1UsersMeRoleMockHandler = (
             ? await overrideResponse(info)
             : overrideResponse
           : getPatchApiV1UsersMeRoleResponseMock(),
-        { status: 200 },
-      );
-    },
-    options,
-  );
-};
-
-export const getDeleteApiV1UsersMeRoleMockHandler = (
-  overrideResponse?:
-    | SuccessNoDataResponse
-    | ((
-        info: Parameters<Parameters<typeof http.delete>[1]>[0],
-      ) => Promise<SuccessNoDataResponse> | SuccessNoDataResponse),
-  options?: RequestHandlerOptions,
-) => {
-  return http.delete(
-    '*/api/v1/users/me/role',
-    async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
-      return HttpResponse.json(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === 'function'
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getDeleteApiV1UsersMeRoleResponseMock(),
         { status: 200 },
       );
     },
@@ -1604,8 +1604,8 @@ export const getAuthMock = () => [
   getPostApiV1AuthRefreshMockHandler(),
   getPostApiV1AuthLogoutMockHandler(),
   getGetApiV1UsersMeMockHandler(),
+  getDeleteApiV1UsersMeMockHandler(),
   getPatchApiV1UsersMeRoleMockHandler(),
-  getDeleteApiV1UsersMeRoleMockHandler(),
   getGetApiV1UsersMeWithdrawalContextMockHandler(),
   getGetApiV1UsersNicknameAvailabilityMockHandler(),
   getPatchApiV1UsersMeAdditionalInfoMockHandler(),

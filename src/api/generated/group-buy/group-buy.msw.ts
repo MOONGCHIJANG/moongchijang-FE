@@ -299,6 +299,13 @@ export const getPostApiV1SearchResponseMock = (
           ]),
           latitude: faker.number.float({ fractionDigits: 2 }),
           longitude: faker.number.float({ fractionDigits: 2 }),
+          imageUrl: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([
+              faker.string.alpha({ length: { min: 10, max: 20 } }),
+              null,
+            ]),
+            undefined,
+          ]),
         })),
         undefined,
       ]),

@@ -9,7 +9,7 @@ import { notFound } from 'next/navigation';
 import ViewerToast from './_components/ViewerToast';
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
-import { cookies } from 'next/headers';
+import { getServerAccessToken } from '@/lib/server-auth';
 
 interface Props {
   params: Promise<{ groupBuyId: string }>;
@@ -67,7 +67,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 const page = async ({ params }: Props) => {
   const { groupBuyId } = await params;
-  const token = (await cookies()).get('accessToken')?.value;
+  const token = await getServerAccessToken();
   const responseData = await serverFetch<ApiResponseGroupBuyDetailResponse>(
     `/api/v1/group-buys/${groupBuyId}`,
     token,

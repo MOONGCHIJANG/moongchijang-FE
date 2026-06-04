@@ -4,8 +4,14 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'outline' | 'ghost' | 'tertiary' | 'black';
-  size?: 'sm' | 'md' | 'lg';
+  variant?:
+    | 'primary'
+    | 'outline'
+    | 'ghost'
+    | 'tertiary'
+    | 'black'
+    | 'brand-soft';
+  size?: 'sm' | 'md' | 'lg' | 'cta';
   fullWidth?: boolean;
 }
 
@@ -18,12 +24,15 @@ const variants = {
   tertiary: 'bg-surface-default text-text-tertiary active:brightness-95',
   black:
     'bg-button-natural text-text-basic-inverse active:brightness-90 disabled:bg-surface-muted disabled:text-text-disabled',
+  'brand-soft':
+    'bg-surface-brand-lighter text-text-brand active:brightness-95 disabled:bg-surface-muted disabled:text-text-disabled',
 };
 
 const sizes = {
   sm: 'h-10 px-2 caption-sm-bold rounded-large gap-1.5',
   md: 'h-11 px-4 heading-sm-bold rounded-xl gap-2.5',
   lg: 'h-14 px-6 py-2.5 heading-md-semibold rounded-lg gap-1',
+  cta: 'min-w-10 px-1.5 py-[5px] text-[10px] font-bold leading-4 rounded-md gap-2',
 };
 
 export const Button = ({

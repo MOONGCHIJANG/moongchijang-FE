@@ -14,16 +14,24 @@ export async function POST(req: NextRequest) {
       data?: {
         accessToken: string;
         expiresIn: number;
-        user?: { signupCompleted: boolean };
+        user?: { signupCompleted: boolean; role: string };
       };
     };
 
-    const signupCompleted = data?.data?.user?.signupCompleted ?? true;
+    const user = data?.data?.user;
+    const signupCompleted = user?.signupCompleted ?? true;
+    const role = user?.role;
+
+    const redirectTo = !signupCompleted
+      ? '/signup/email?step=profile'
+      : role === 'SELLER'
+        ? '/seller'
+        : null;
 
     const response = NextResponse.json(
       {
         ...(result.data as object),
-        redirectTo: signupCompleted ? null : '/signup/email?step=profile',
+        redirectTo,
       },
       { status: 200 },
     );

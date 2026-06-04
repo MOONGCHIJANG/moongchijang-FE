@@ -9,6 +9,7 @@ import {
   usePatchApiV1UsersMeRole,
 } from '@/api/hooks/auth/auth';
 import { MyPageRoleSwitchRequestRole } from '@/api/generated/api.schemas';
+import { refreshAccessToken } from '@/lib/token';
 import { useAuthStore } from '@/store/authStore';
 import Header from '@/components/Header';
 import Modal from '@/components/Modal';
@@ -76,7 +77,14 @@ export default function SellerMyPage() {
     if (isSwitching) return;
     switchRole(
       { data: { role: MyPageRoleSwitchRequestRole.BUYER } },
-      { onSuccess: () => router.push('/feed') },
+      {
+        onSuccess: async () => {
+          // 전환 직후 메모리 accessToken은 옛 역할이므로, 빈 토큰 윈도우 없이
+          // 새 역할 토큰으로 즉시 교체 (로그인 상태 깜빡임 방지)
+          await refreshAccessToken();
+          router.push('/feed');
+        },
+      },
     );
   }
 

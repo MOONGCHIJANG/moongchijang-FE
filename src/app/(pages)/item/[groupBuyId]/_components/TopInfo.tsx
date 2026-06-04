@@ -16,8 +16,7 @@ const TopInfo = ({ data }: Props) => {
   const [isShared, setIsShared] = React.useState(false);
 
   useEffect(() => {
-    const itemStatus =
-      new Date(data.deadline) > new Date() ? 'open' : 'closed';
+    const itemStatus = new Date(data.deadline) > new Date() ? 'open' : 'closed';
     logEvent('view_item', {
       item_id: data.id,
       item_name: data.productName,
@@ -38,6 +37,7 @@ const TopInfo = ({ data }: Props) => {
             width={400}
             height={260}
             className="h-65 w-auto rounded-3xlarge bg-gray-100 object-cover"
+            style={{ width: 'auto' }}
             loading="eager"
           />
         ) : (

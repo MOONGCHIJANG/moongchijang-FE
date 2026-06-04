@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import Header from '@/components/Header';
@@ -152,7 +153,16 @@ export default function PickupPage() {
           {/* 상단 카드 + QR 버튼 */}
           <div className="flex flex-col gap-g3">
             <div className="flex border border-border-subtle rounded-3xlarge overflow-hidden">
-              <div className="w-[116px] h-[107px] shrink-0 bg-surface-muted" />
+              <div className="w-[116px] h-[107px] shrink-0 bg-surface-muted relative overflow-hidden">
+                {pickup.thumbnailUrl && (
+                  <Image
+                    src={pickup.thumbnailUrl}
+                    alt={pickup.productName}
+                    fill
+                    className="object-cover"
+                  />
+                )}
+              </div>
               <div className="flex-1 flex flex-col justify-center gap-g1 px-p5 py-p3 min-w-0">
                 <span className="body-sm-medium text-text-tertiary">
                   {pickupDateTime}

@@ -51,12 +51,45 @@ async function refreshTokens(refreshToken: string): Promise<{
   return { accessToken, expiresIn, newRefreshToken: match ? match[1] : null };
 }
 
+async function getUserRole(accessToken: string): Promise<string | null> {
+  const res = await fetch(`${BASE}/api/v1/users/me`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  }).catch(() => null);
+
+  if (!res?.ok) return null;
+
+  const json = await res.json().catch(() => null);
+  return json?.data?.role ?? null;
+}
+
 export async function proxy(request: NextRequest) {
   const refreshToken = request.cookies.get('refreshToken')?.value;
   const { pathname } = request.nextUrl;
 
-  // 로그인 유저가 /login 접근 시 /feed로 redirect
+  // 로그인 유저가 /login 접근 시 역할에 따라 redirect
   if (pathname.startsWith('/login') && refreshToken) {
+    let accessToken = request.cookies.get('accessToken')?.value;
+    let rotated: Awaited<ReturnType<typeof refreshTokens>> = null;
+
+    if (!accessToken) {
+      rotated = await refreshTokens(refreshToken);
+      accessToken = rotated?.accessToken;
+    }
+
+    if (accessToken) {
+      const role = await getUserRole(accessToken);
+      const targetUrl = role === 'SELLER' ? '/seller' : '/feed';
+      const response = NextResponse.redirect(new URL(targetUrl, request.url));
+
+      if (rotated) {
+        setAccessTokenCookie(response, rotated.accessToken, rotated.expiresIn);
+        if (rotated.newRefreshToken) {
+          setRefreshTokenCookie(response, rotated.newRefreshToken);
+        }
+      }
+      return response;
+    }
+
     return NextResponse.redirect(new URL('/feed', request.url));
   }
 

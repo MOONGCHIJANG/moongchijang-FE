@@ -1,7 +1,12 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { getServerUserRole } from '@/lib/server-auth';
+import { AuthUserRole } from '@/api/generated/api.schemas';
 
-export default function NotFound() {
+export default async function NotFound() {
+  const role = await getServerUserRole();
+  const homeHref = role === AuthUserRole.SELLER ? '/seller' : '/feed';
+
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center gap-g6 px-p6 pb-[74px]">
       <div className="flex flex-col items-center gap-g4">
@@ -20,7 +25,7 @@ export default function NotFound() {
         </p>
       </div>
       <Link
-        href="/feed"
+        href={homeHref}
         className="rounded-xl bg-button-primary-fill px-8 py-3 heading-sm-bold text-white"
       >
         홈으로 가기

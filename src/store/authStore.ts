@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import {
-  deleteApiV1UsersMeRole,
+  deleteApiV1UsersMe,
   deleteApiV1UsersMeSeller,
 } from '@/api/generated/auth/auth';
 import {
@@ -34,7 +34,7 @@ export const useAuthStore = create<AuthState>()((set) => ({
     if (process.env.NODE_ENV !== 'development') posthog.reset();
   },
   deleteAccount: async (withdrawRequest?: WithdrawRequest) => {
-    const res = await deleteApiV1UsersMeRole(withdrawRequest).catch(() => null);
+    const res = await deleteApiV1UsersMe(withdrawRequest).catch(() => null);
     if (!res || res.status !== 200) return false;
     tokenStorage.remove();
     set({ isLoggedIn: false });

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { setRefreshTokenCookie } from '@/lib/cookie';
+import { setAccessTokenCookie, setRefreshTokenCookie } from '@/lib/cookie';
 
 /*
  * 보호 경로 추가 방법:
@@ -103,14 +103,7 @@ export async function proxy(request: NextRequest) {
     });
 
     if (rotated) {
-      // 짧은 수명 accessToken 캐시 쿠키 (만료 시 다음 진입에서 재발급)
-      response.cookies.set('accessToken', rotated.accessToken, {
-        httpOnly: true,
-        path: '/',
-        sameSite: 'strict',
-        maxAge: Math.max(0, rotated.expiresIn - 30),
-        secure: process.env.NODE_ENV === 'production',
-      });
+      setAccessTokenCookie(response, rotated.accessToken, rotated.expiresIn);
       if (rotated.newRefreshToken) {
         setRefreshTokenCookie(response, rotated.newRefreshToken);
       }

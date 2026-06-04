@@ -35,7 +35,7 @@ export const SearchBar = ({
         type="text"
         value={value}
         placeholder={placeholder}
-        className="w-full bg-transparent body-sm-regular text-text-basic outline-none placeholder:text-text-disabled placeholder:text-[12px] placeholder:font-medium placeholder:leading-[18px] font-pretendard"
+        className="h-full w-full bg-transparent text-[12px]! font-medium! py-0 leading-normal outline-none placeholder:text-text-disabled placeholder:text-[12px] placeholder:font-medium placeholder:leading-normal font-pretendard"
         onChange={(e) => onChange?.(e.target.value)}
         onKeyDown={(e) => {
           if (e.key === 'Enter') onEnter?.(value);

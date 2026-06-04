@@ -14,7 +14,9 @@ import type {
 import { customFetch } from '../../../lib/custom-fetch';
 
 /**
- * 썸네일(최대 1장), 상품 이미지(최대 10장)에 대한 업로드 URL을 발급한다.
+ * 인증된 사용자의 현재 역할이 BUYER, SELLER, ADMIN 중 하나이면 호출할 수 있다.
+썸네일(최대 1장), 상품 이미지(최대 10장)에 대한 업로드 URL을 발급한다.
+
  * @summary S3 이미지 업로드용 Presigned URL 발급
  */
 export type postApiV1ImagesPresignedUrlsResponse200 = {
@@ -67,7 +69,9 @@ export const postApiV1ImagesPresignedUrls = async (
 };
 
 /**
- * 요청한 S3 key 목록을 삭제한다. 허용된 prefix 범위의 key만 삭제 가능하다.
+ * 인증된 사용자의 현재 역할이 BUYER, SELLER, ADMIN 중 하나이면 호출할 수 있다.
+요청한 S3 key 목록을 삭제한다. 허용된 prefix 범위의 key만 삭제 가능하다.
+
  * @summary S3 업로드 이미지 삭제
  */
 export type deleteApiV1ImagesResponse200 = {

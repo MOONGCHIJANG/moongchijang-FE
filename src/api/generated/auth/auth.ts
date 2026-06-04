@@ -197,6 +197,69 @@ export const getApiV1UsersMe = async (
 };
 
 /**
+ * 소비자 현재 역할(BUYER)에서 회원 탈퇴를 처리한다.
+- 탈퇴 진입 컨텍스트 조회 결과와 무관하게 실행 시점 최종 검증을 다시 수행한다.
+- 수령 예정 공구(달성 완료 + 픽업 미완료)가 있으면 탈퇴할 수 없다.
+- 참여 중 공구(PAID_WAITING_GOAL)는 자동 취소된다.
+- 찜 목록은 모두 삭제된다.
+- 동일 계정은 탈퇴 후 30일 이후 재가입 가능하다.
+- 최종 검증 실패 시 409 에러를 반환한다. (예: WITHDRAWAL_BLOCKED_PENDING_PICKUP)
+
+ * @summary 회원 탈퇴
+ */
+export type deleteApiV1UsersMeResponse200 = {
+  data: SuccessNoDataResponse;
+  status: 200;
+};
+
+export type deleteApiV1UsersMeResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type deleteApiV1UsersMeResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type deleteApiV1UsersMeResponse409 = {
+  data: ConflictResponse;
+  status: 409;
+};
+
+export type deleteApiV1UsersMeResponseSuccess =
+  deleteApiV1UsersMeResponse200 & {
+    headers: Headers;
+  };
+export type deleteApiV1UsersMeResponseError = (
+  | deleteApiV1UsersMeResponse401
+  | deleteApiV1UsersMeResponse403
+  | deleteApiV1UsersMeResponse409
+) & {
+  headers: Headers;
+};
+
+export type deleteApiV1UsersMeResponse =
+  | deleteApiV1UsersMeResponseSuccess
+  | deleteApiV1UsersMeResponseError;
+
+export const getDeleteApiV1UsersMeUrl = () => {
+  return `/api/v1/users/me`;
+};
+
+export const deleteApiV1UsersMe = async (
+  withdrawRequest?: WithdrawRequest,
+  options?: RequestInit,
+): Promise<deleteApiV1UsersMeResponse> => {
+  return customFetch<deleteApiV1UsersMeResponse>(getDeleteApiV1UsersMeUrl(), {
+    ...options,
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(withdrawRequest),
+  });
+};
+
+/**
  * 소비자/사장님 모드를 전환한다.
  * @summary 마이페이지 역할 전환
  */
@@ -251,66 +314,6 @@ export const patchApiV1UsersMeRole = async (
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', ...options?.headers },
       body: JSON.stringify(myPageRoleSwitchRequest),
-    },
-  );
-};
-
-/**
- * 회원 탈퇴를 처리한다.
-- 탈퇴 진입 컨텍스트 조회 결과와 무관하게 실행 시점 최종 검증을 다시 수행한다.
-- 수령 예정 공구(달성 완료 + 픽업 미완료)가 있으면 탈퇴할 수 없다.
-- 참여 중 공구(PAID_WAITING_GOAL)는 자동 취소된다.
-- 찜 목록은 모두 삭제된다.
-- 동일 계정은 탈퇴 후 30일 이후 재가입 가능하다.
-- 최종 검증 실패 시 409 에러를 반환한다. (예: WITHDRAWAL_BLOCKED_PENDING_PICKUP)
-
- * @summary 회원 탈퇴
- */
-export type deleteApiV1UsersMeRoleResponse200 = {
-  data: SuccessNoDataResponse;
-  status: 200;
-};
-
-export type deleteApiV1UsersMeRoleResponse401 = {
-  data: UnauthorizedResponse;
-  status: 401;
-};
-
-export type deleteApiV1UsersMeRoleResponse409 = {
-  data: ConflictResponse;
-  status: 409;
-};
-
-export type deleteApiV1UsersMeRoleResponseSuccess =
-  deleteApiV1UsersMeRoleResponse200 & {
-    headers: Headers;
-  };
-export type deleteApiV1UsersMeRoleResponseError = (
-  | deleteApiV1UsersMeRoleResponse401
-  | deleteApiV1UsersMeRoleResponse409
-) & {
-  headers: Headers;
-};
-
-export type deleteApiV1UsersMeRoleResponse =
-  | deleteApiV1UsersMeRoleResponseSuccess
-  | deleteApiV1UsersMeRoleResponseError;
-
-export const getDeleteApiV1UsersMeRoleUrl = () => {
-  return `/api/v1/users/me/role`;
-};
-
-export const deleteApiV1UsersMeRole = async (
-  withdrawRequest?: WithdrawRequest,
-  options?: RequestInit,
-): Promise<deleteApiV1UsersMeRoleResponse> => {
-  return customFetch<deleteApiV1UsersMeRoleResponse>(
-    getDeleteApiV1UsersMeRoleUrl(),
-    {
-      ...options,
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json', ...options?.headers },
-      body: JSON.stringify(withdrawRequest),
     },
   );
 };
@@ -497,7 +500,8 @@ export const patchApiV1UsersMeAdditionalInfo = async (
 };
 
 /**
- * 사업자등록번호를 조회해 상태를 반환한다.
+ * 사장님 가입 진행 중 사업자등록번호를 조회해 상태를 반환한다.
+현재 활성 역할이 SELLER가 아니어도, 사장님 가입 흐름에서는 호출할 수 있다.
 - `VALID`: 정상 사업자(계속사업자)
 - `CLOSED`: 휴업/폐업
 - `NOT_FOUND`: 조회 불가/미확인
@@ -554,7 +558,9 @@ export const postApiV1UsersMeSellerBusinessRegistrationLookup = async (
 };
 
 /**
- * 사장님 가입의 사업자 정보를 저장한다.
+ * 사장님 가입 진행 중 사업자 정보를 저장한다.
+현재 활성 역할이 SELLER가 아니어도, 사장님 가입 흐름에서는 호출할 수 있다.
+
  * @summary 사장님 사업자 정보 저장
  */
 export type patchApiV1UsersMeSellerBusinessInfoResponse200 = {
@@ -607,7 +613,9 @@ export const patchApiV1UsersMeSellerBusinessInfo = async (
 };
 
 /**
- * 사장님 정산 정보를 저장하고 사장님 가입 완료 상태를 반영한다.
+ * 사장님 가입 진행 중 정산 정보를 저장하고 사장님 가입 완료 상태를 반영한다.
+현재 활성 역할이 SELLER가 아니어도, 사장님 가입 흐름에서는 호출할 수 있다.
+
  * @summary 사장님 정산 정보 저장
  */
 export type patchApiV1UsersMeSellerSettlementInfoResponse200 = {
@@ -660,7 +668,7 @@ export const patchApiV1UsersMeSellerSettlementInfo = async (
 };
 
 /**
- * 사장님의 현재 입금 계좌 정보를 조회한다.
+ * 현재 활성 역할이 SELLER일 때 사장님의 현재 입금 계좌 정보를 조회한다.
  * @summary 사장님 입금 계좌 조회
  */
 export type getApiV1UsersMeSellerSettlementAccountResponse200 = {
@@ -716,7 +724,7 @@ export const getApiV1UsersMeSellerSettlementAccount = async (
 };
 
 /**
- * 사장님의 입금 계좌 정보를 변경한다.
+ * 현재 활성 역할이 SELLER일 때 사장님의 입금 계좌 정보를 변경한다.
  * @summary 사장님 입금 계좌 변경
  */
 export type patchApiV1UsersMeSellerSettlementAccountResponse200 = {
@@ -781,7 +789,7 @@ export const patchApiV1UsersMeSellerSettlementAccount = async (
 };
 
 /**
- * 사장님의 현재 사업자 정보를 조회한다.
+ * 현재 활성 역할이 SELLER일 때 사장님의 현재 사업자 정보를 조회한다.
  * @summary 사장님 사업자 정보 조회
  */
 export type getApiV1UsersMeSellerBusinessProfileResponse200 = {
@@ -837,7 +845,7 @@ export const getApiV1UsersMeSellerBusinessProfile = async (
 };
 
 /**
- * 사장님의 사업자 정보를 변경한다.
+ * 현재 활성 역할이 SELLER일 때 사장님의 사업자 정보를 변경한다.
  * @summary 사장님 사업자 정보 변경
  */
 export type patchApiV1UsersMeSellerBusinessProfileResponse200 = {
@@ -902,7 +910,7 @@ export const patchApiV1UsersMeSellerBusinessProfile = async (
 };
 
 /**
- * 사장님 회원 탈퇴를 처리한다.
+ * 현재 활성 역할이 SELLER일 때 사장님 회원 탈퇴를 처리한다.
 - 탈퇴 진입 컨텍스트 조회 결과와 무관하게 실행 시점 최종 검증을 다시 수행한다.
 - 개설된 공구(IN_PROGRESS)가 있으면 탈퇴할 수 없다.
 - 달성 완료/완료 공구(ACHIEVED, COMPLETED)에 픽업 미완료 참여가 있으면 탈퇴할 수 없다.

@@ -857,6 +857,10 @@ export const PostApiV1SearchResponse = zod.object({
             lotAddress: zod.string().nullish(),
             latitude: zod.number(),
             longitude: zod.number(),
+            imageUrl: zod
+              .string()
+              .nullish()
+              .describe('추천 매장 표시용 이미지 URL'),
           }),
         )
         .nullish()

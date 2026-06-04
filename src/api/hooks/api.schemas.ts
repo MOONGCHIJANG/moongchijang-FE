@@ -3724,6 +3724,11 @@ export interface RecommendedStoreDto {
   lotAddress?: string | null;
   latitude: number;
   longitude: number;
+  /**
+   * 추천 매장 표시용 이미지 URL
+   * @nullable
+   */
+  imageUrl?: string | null;
 }
 
 export type ApiResponseSearchAnalysisData = {
@@ -3788,6 +3793,11 @@ export type ApiResponseStoreSearchListDataStoresItem = {
   latitude?: number;
   /** 경도 */
   longitude?: number;
+  /**
+   * 추천 매장 표시용 이미지 URL
+   * @nullable
+   */
+  imageUrl?: string | null;
 };
 
 export type ApiResponseStoreSearchListData = {
@@ -4018,6 +4028,11 @@ export type ApiResponseStoreRecommendationDataStoresItem = {
   latitude: number;
   /** 경도 */
   longitude: number;
+  /**
+   * 추천 매장 표시용 이미지 URL
+   * @nullable
+   */
+  imageUrl?: string | null;
   /** 네이버 Local Search 카테고리 */
   category: string;
   /** 주소가 요청 region을 포함하는지 여부 */

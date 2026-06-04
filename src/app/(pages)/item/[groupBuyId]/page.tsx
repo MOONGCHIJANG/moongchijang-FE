@@ -17,11 +17,9 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { groupBuyId } = await params;
-  const token = (await cookies()).get('accessToken')?.value;
   try {
     const responseData = await serverFetch<ApiResponseGroupBuyDetailResponse>(
       `/api/v1/group-buys/${groupBuyId}`,
-      token,
     );
     const data = responseData.data;
     const title = `[뭉치장] ${data.productName} 공구 같이 뭉쳐서 구매하자!`;

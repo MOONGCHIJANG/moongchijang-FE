@@ -48,18 +48,18 @@ export const FeedTopBar = ({
         </button>
       </div>
 
-      <div className="flex items-center gap-3">
-        <button
-          onClick={onNotificationClick}
-          className="flex h-6 w-6 items-center justify-center"
-          type="button"
-        >
-          <Icon
-            icon="iconamoon:notification"
-            className="h-6 w-6 text-text-basic"
-          />
-        </button>
-        {showQr && (
+      {showQr && (
+        <div className="flex items-center gap-3">
+          <button
+            onClick={onNotificationClick}
+            className="flex h-6 w-6 items-center justify-center"
+            type="button"
+          >
+            <Icon
+              icon="iconamoon:notification"
+              className="h-6 w-6 text-text-basic"
+            />
+          </button>
           <button
             onClick={onQrClick}
             className="flex h-6 w-6 items-center justify-center"
@@ -70,8 +70,8 @@ export const FeedTopBar = ({
               className="h-6 w-6 text-text-basic"
             />
           </button>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

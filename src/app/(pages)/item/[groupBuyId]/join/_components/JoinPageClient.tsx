@@ -186,7 +186,7 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
         productAmount={productAmount}
         feeAmount={feeAmount}
         totalAmount={totalAmount}
-        productImage={groupBuy.imageUrls[0] || ''}
+        productImage={groupBuy.thumbnailUrl || ''}
       />
       <AgreeTermsSheet
         isOpen={isTermsSheetOpen}

@@ -61,3 +61,15 @@ export function formatPickupDateTime(dateStr: string, timeStr: string) {
   const days = ['일', '월', '화', '수', '목', '금', '토'];
   return `${date.getMonth() + 1}월 ${date.getDate()}일 (${days[date.getDay()]}) ${formatTime(timeStr)}`;
 }
+
+export function formatPickupDateTimeRange(
+  dateStr: string,
+  startTimeStr: string,
+  endTimeStr: string,
+) {
+  const date = parseDate(dateStr);
+  if (isNaN(date.getTime()))
+    return `${formatTime(startTimeStr)} ~ ${formatTime(endTimeStr)}`;
+  const days = ['일', '월', '화', '수', '목', '금', '토'];
+  return `${date.getMonth() + 1}월 ${date.getDate()}일 (${days[date.getDay()]}) ${formatTime(startTimeStr)} ~ ${formatTime(endTimeStr)}`;
+}

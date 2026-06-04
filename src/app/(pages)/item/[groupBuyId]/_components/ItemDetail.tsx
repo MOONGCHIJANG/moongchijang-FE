@@ -142,6 +142,7 @@ const ItemDetail = ({ data }: Props) => {
                 width={400}
                 height={260}
                 className="h-65 w-auto rounded-3xlarge bg-gray-100 object-cover"
+                style={{ width: 'auto' }}
               />
             ))}
           </div>

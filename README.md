@@ -1,11 +1,42 @@
-# moongchijang-FE
+# 🥐 뭉치장 — 줄서는 대신 함께 뭉치는 베이커리 공동구매 장터
 
-## 환경
+**뭉치장** 프론트엔드 레포지토리입니다.
 
-- **Node.js** – ^20 또는 ^22 권장
-- **패키지 매니저** – [pnpm](https://pnpm.io)
+## 📍 주요 기능
 
-## 기술 스택
+### 🛍️ 소비자
+
+**1️⃣ 지역 기반 공구 피드**
+
+동네를 선택하면 해당 지역에서 진행 중인 공구를 모아볼 수 있습니다. 달성률·마감일 등 참여 판단에 필요한 정보를 한눈에 확인할 수 있습니다.
+
+**2️⃣ 공구 참여 & 결제**
+
+공구 상세 페이지에서 수량을 선택하고 포트원 결제를 통해 바로 참여할 수 있습니다. 결제 완료 후 참여 내역과 픽업 일정이 마이페이지에 자동으로 등록됩니다.
+
+**3️⃣ QR 픽업 시스템**
+
+픽업일이 되면 QR 코드가 활성화됩니다. 매장에서 QR을 제시해 예약 확인 없이 빠르게 픽업할 수 있습니다.
+
+**4️⃣ 공구 요청**
+
+원하는 상품의 공구가 없다면 직접 요청할 수 있습니다. 요청 현황을 통해 검토 진행 상태를 확인할 수 있습니다.
+
+**5️⃣ 찜 & 알림**
+
+관심 있는 공구를 찜해두고, 마감이 임박하면 알림으로 다시 상기할 수 있습니다.
+
+### 🏷️ 사장님
+
+**6️⃣ 공구 개설 & 관리**
+
+판매자는 상품·수량·픽업 일정을 등록해 공구를 개설하고, 달성 현황과 주문 내역을 실시간으로 관리할 수 있습니다.
+
+**7️⃣ 정산**
+
+완료된 공구의 정산 내역을 월별로 확인하고, 환불 요청을 처리할 수 있습니다.
+
+## ⚙️ 기술 스택
 
 | 분류          | 라이브러리                           |
 | ------------- | ------------------------------------ |
@@ -19,84 +50,27 @@
 | UI 문서       | Storybook 10                         |
 | 코드 품질     | ESLint, Prettier, Husky, lint-staged |
 
-## 시작하기
+## 🏗️ 아키텍처 특징
 
-### 의존성 설치
+### Orval 기반 API 코드 자동 생성
 
-```bash
-pnpm install
-```
+Orval로 OpenAPI 스펙 하나에서 fetch 클라이언트·React Query 훅·Zod 스키마·MSW 핸들러를 동시에 생성합니다. `pnpm generate` 한 번으로 네 가지가 함께 갱신되고, 타입 불일치는 컴파일 에러로 즉시 드러납니다. 같은 스펙에서 나온 MSW 핸들러로 백엔드 없이 UI를 먼저 개발하고, 실서버 연동 시에도 동일한 타입을 그대로 사용하기 때문에 연동 단계에서 구조가 어긋나는 상황이 발생하지 않습니다.
 
-### 환경변수 설정
+### Orval 2차 코드젠 — Static 데모 배포
 
-```bash
-cp .env.example .env
-```
+Orval이 생성한 MSW 응답 팩토리를 `scripts/generate-static-registry.ts`가 다시 파싱해 URL 패턴·응답 함수 매핑 테이블(`index.static.ts`)을 자동 생성합니다. 이를 통해 Service Worker 없이 서버 사이드에서 팩토리를 직접 실행할 수 있어, 별도 서버 없이 빌드 산출물만으로 정적 호스팅에 데모를 배포할 수 있습니다.
 
-`.env` 주요 변수:
+## 🌐 API 모드
 
-| 변수                       | 설명                                   |
-| -------------------------- | -------------------------------------- |
-| `NEXT_PUBLIC_API_MODE`     | `mock` \| `static` \| `real`           |
-| `NEXT_PUBLIC_API_BASE_URL` | API 서버 주소                          |
-| `SWAGGER_URL`              | Orval 코드 생성 시 사용할 Swagger 주소 |
+`NEXT_PUBLIC_API_MODE` 값 하나로 API 호출 방식을 전환합니다.
 
-## 스크립트
+| 모드 | 설명 |
+| --- | --- |
+| `mock` | MSW + Express 목서버(`:9090`)와 함께 실행. 백엔드 없이 UI 개발 가능 |
+| `static` | 별도 서버 없이 Orval 생성 응답 팩토리를 정적으로 반환. Vercel 등 정적 호스팅에 데모 배포 가능 |
+| `real` | 모든 요청을 실서버로 전송 |
 
-| 명령어           | 설명                            |
-| ---------------- | ------------------------------- |
-| `pnpm dev`       | 개발 서버 실행 (real 모드)      |
-| `pnpm dev:mock`  | 개발 서버 + Mock 서버 동시 실행 |
-| `pnpm build`     | 프로덕션 빌드                   |
-| `pnpm start`     | 빌드된 앱 실행                  |
-| `pnpm generate`  | Orval API 코드 재생성           |
-| `pnpm lint`      | ESLint 실행                     |
-| `pnpm storybook` | Storybook 실행                  |
-
-## API 모드
-
-`NEXT_PUBLIC_API_MODE` 값에 따라 API 호출 방식이 달라집니다.
-
-### `mock` — 로컬 개발
-
-```bash
-pnpm dev:mock
-```
-
-MSW + Express 목서버(`:9090`)를 Next.js 개발 서버와 함께 실행합니다. `mocks/handlers.ts`에서 응답을 오버라이드할 수 있습니다.
-
-### `static` — 데모 배포
-
-별도 서버 없이 Orval이 생성한 mock 데이터를 정적으로 반환합니다. `NEXT_PUBLIC_API_BASE_URL`을 배포된 앱 자신의 URL로 설정하면 클라이언트 요청이 Route Handler를 통해 static registry로 연결됩니다.
-
-```
-NEXT_PUBLIC_API_MODE=static
-NEXT_PUBLIC_API_BASE_URL=https://배포-앱-주소
-```
-
-### `real` — 프로덕션
-
-모든 요청을 실서버로 전송합니다.
-
-## API 코드 생성
-
-Swagger 스펙 변경 후 아래 명령어로 재생성합니다.
-
-```bash
-pnpm generate
-```
-
-생성 결과물:
-
-- `src/api/generated/` — fetch 함수, 타입, MSW mock factory
-- `src/api/zod/` — Zod 스키마
-
-> `src/api/generated/`와 `src/api/zod/`는 자동 생성 파일이므로 직접 수정하지 않습니다.
-
-## 배포
-
-AWS Amplify 기반. `amplify.yml`에 빌드 설정이 정의되어 있습니다.
-
-## Jira 연동
-
-브랜치명에 `MCJ-XX`를 포함하면 Jira 티켓과 자동으로 연결됩니다.
+## 🎉 Contributors
+| <img src="https://github.com/leemanjae02.png" width="100"> | <img src="https://github.com/sunhwaaRj.png" width="100"> | <img src="https://github.com/jmlee2147.png" width="100"> |
+| :---: | :---: | :---: |
+| [**leemanjae02**](https://github.com/leemanjae02) | [**sunhwaaRj**](https://github.com/sunhwaaRj) | [**jmlee2147**](https://github.com/jmlee2147) |

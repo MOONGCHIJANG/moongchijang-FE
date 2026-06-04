@@ -255,8 +255,8 @@ export default function WithdrawPage() {
         title="정말 탈퇴할까요?"
         description={
           isSeller
-            ? `탈퇴 시 사장님으로 진행한 정보를 포함해\n모든 정보가 삭제되며 복구가 불가해요`
-            : `탈퇴 시 소비자로 진행한 정보를 포함해\n모든 정보가 삭제되며 복구가 불가해요.`
+            ? '탈퇴 시 사장님으로 진행한 정보를 포함해 모든 정보가 삭제되며 복구가 불가해요'
+            : '탈퇴 시 소비자로 진행한 정보를 포함해 모든 정보가 삭제되며 복구가 불가해요.'
         }
         confirmLabel="탈퇴하기"
         cancelLabel="다시 생각하기"
@@ -270,8 +270,8 @@ export default function WithdrawPage() {
         title="탈퇴가 불가해요"
         description={
           isSeller
-            ? `개설된 공구가 있어 탈퇴가 불가해요.\n뭉치장 카카오톡 채널로 문의해주세요.`
-            : `수령 예정인 공구가 있어요.\n뭉치장 카카오톡 채널로 문의해주세요.`
+            ? '개설된 공구가 있어 탈퇴가 불가해요. 뭉치장 카카오톡 채널로 문의해주세요.'
+            : '수령 예정인 공구가 있어요. 뭉치장 카카오톡 채널로 문의해주세요.'
         }
         confirmLabel="확인"
         onConfirm={() => setShowBlockedModal(false)}

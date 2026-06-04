@@ -785,12 +785,18 @@ export function createOwnerGroupBuyManageDetailMock(
   ).length;
   const waitingCount = participants.length - completedCount;
 
+  const today = new Date();
+  const sevenDaysAgo = new Date(today);
+  sevenDaysAgo.setDate(today.getDate() - 7);
+
   return {
     ...base,
     success: true,
     data: {
       groupBuyId: 1,
       status,
+      recruitmentStartDate: sevenDaysAgo.toISOString().slice(0, 10),
+      recruitmentEndDate: today.toISOString().slice(0, 10),
       participantSummary: {
         totalCount: participants.length,
         completedCount,

@@ -14,7 +14,17 @@ export async function POST(req: NextRequest) {
 
     const setCookie = result.headers?.get('set-cookie');
     if (setCookie) {
-      response.headers.append('set-cookie', setCookie);
+      const match = setCookie.match(/refreshToken=([^;]+)/);
+      const refreshToken = match ? match[1] : null;
+      if (refreshToken) {
+        response.cookies.set('refreshToken', refreshToken, {
+          httpOnly: true,
+          path: '/',
+          sameSite: 'strict',
+          maxAge: 60 * 60 * 24 * 14,
+          secure: process.env.NODE_ENV === 'production',
+        });
+      }
     }
 
     return response;

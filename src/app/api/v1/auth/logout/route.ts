@@ -1,4 +1,5 @@
 import { serverFetchRaw } from '@/lib/fetcher';
+import { clearAuthCookies } from '@/lib/cookie';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
@@ -14,14 +15,9 @@ export async function POST(req: NextRequest) {
     }).catch(() => {});
   }
 
-  // 프론트 refreshToken 쿠키 삭제
+  // 프론트 인증 쿠키 삭제 (refreshToken + accessToken)
   const response = NextResponse.json({ success: true }, { status: 200 });
-  response.cookies.set('refreshToken', '', {
-    httpOnly: true,
-    path: '/',
-    maxAge: 0,
-    sameSite: 'strict',
-  });
+  clearAuthCookies(response);
 
   return response;
 }

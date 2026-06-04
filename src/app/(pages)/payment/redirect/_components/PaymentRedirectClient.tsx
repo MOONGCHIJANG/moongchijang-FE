@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { postApiV1PaymentsPortoneComplete } from '@/api/generated/participation/participation';
 import { PaymentConfirmedResponse } from '@/api/schemas/participation';
 import { useAuthStore } from '@/store/authStore';
+import { useRef } from 'react';
 
 type Props = {
   paymentId?: string;
@@ -20,9 +21,11 @@ const PaymentRedirectClient = ({
   message,
 }: Props) => {
   const isInitialized = useAuthStore((state) => state.isInitialized);
+  const hasProcessed = useRef(false);
 
   useEffect(() => {
-    if (!isInitialized) return;
+    if (!isInitialized || hasProcessed.current) return;
+    hasProcessed.current = true;
 
     const process = async () => {
       // 포트원 실패 콜백 (code 있음)

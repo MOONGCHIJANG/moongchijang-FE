@@ -7,7 +7,7 @@ export function setRefreshTokenCookie(
   response.cookies.set('refreshToken', token, {
     httpOnly: true,
     path: '/',
-    sameSite: 'strict',
+    sameSite: 'lax',
     maxAge: 60 * 60 * 24 * 14,
     secure: process.env.NODE_ENV === 'production',
   });
@@ -31,7 +31,7 @@ export function setAccessTokenCookie(
   response.cookies.set('accessToken', token, {
     httpOnly: true,
     path: '/',
-    sameSite: 'strict',
+    sameSite: 'lax',
     maxAge: Math.max(0, expiresIn - 30),
     secure: process.env.NODE_ENV === 'production',
   });
@@ -43,7 +43,7 @@ export function clearAuthCookies(response: NextResponse): void {
     response.cookies.set(name, '', {
       httpOnly: true,
       path: '/',
-      sameSite: 'strict',
+      sameSite: 'lax',
       maxAge: 0,
     });
   }

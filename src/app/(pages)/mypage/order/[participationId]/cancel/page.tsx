@@ -118,7 +118,7 @@ export default function CancelPage({
                 alt={item.productName}
                 width={64}
                 height={64}
-                className="w-16 h-16 rounded-2xlarge bg-surface-default shrink-0"
+                className="w-16 h-16 rounded-2xlarge bg-surface-default shrink-0 object-cover"
               />
               <div className="flex flex-col gap-p3">
                 <p className="heading-md-bold text-text-basic">

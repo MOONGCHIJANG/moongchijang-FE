@@ -157,7 +157,7 @@ export default function PickupPage() {
                 {pickup.thumbnailUrl && (
                   <Image
                     src={pickup.thumbnailUrl}
-                    alt={pickup.productName}
+                    alt={pickup.productName || ''}
                     fill
                     className="object-cover"
                   />

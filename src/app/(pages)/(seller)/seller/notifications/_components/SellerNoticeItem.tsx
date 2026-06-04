@@ -17,12 +17,11 @@ type Cta = { label: string } & (
 );
 
 const ICON_ALT: Partial<Record<NotificationTriggerType, string>> = {
-  [NotificationTriggerType.PICKUP_SAME_DAY_MORNING]: '오늘 픽업 알림',
-  [NotificationTriggerType.PICKUP_DAY_BEFORE_MORNING]: '내일 픽업 알림',
-  [NotificationTriggerType.REQUEST_TARGET_ACHIEVED_IMMEDIATE]: '공구 확정 알림',
-  [NotificationTriggerType.REQUEST_OPENED_IMMEDIATE]: '공구 개설 알림',
-  [NotificationTriggerType.REQUEST_REJECTED_IMMEDIATE]: '공구 취소 알림',
-  [NotificationTriggerType.REQUEST_DEADLINE_MINUS_3_DAYS]: '마감 임박 알림',
+  [NotificationTriggerType.OWNER_PICKUP_SAME_DAY_MORNING]: '오늘 픽업 알림',
+  [NotificationTriggerType.OWNER_PICKUP_DAY_BEFORE_MORNING]: '내일 픽업 알림',
+  [NotificationTriggerType.OWNER_GROUPBUY_ACHIEVED_IMMEDIATE]: '공구 확정 알림',
+  [NotificationTriggerType.OWNER_CLOSE_REQUEST_APPROVED_IMMEDIATE]: '공구 개설 알림',
+  [NotificationTriggerType.OWNER_CLOSE_REQUEST_REJECTED_IMMEDIATE]: '공구 취소 알림',
 };
 
 function resolveCta(
@@ -34,12 +33,11 @@ function resolveCta(
     : '/seller';
 
   switch (triggerType) {
-    case NotificationTriggerType.PICKUP_SAME_DAY_MORNING:
+    case NotificationTriggerType.OWNER_PICKUP_SAME_DAY_MORNING:
       return { label: 'QR 스캔 열기', action: 'qr' as const };
-    case NotificationTriggerType.PICKUP_DAY_BEFORE_MORNING:
+    case NotificationTriggerType.OWNER_PICKUP_DAY_BEFORE_MORNING:
       return { label: '예약자 명단 보기', href: groupBuyPath };
-    case NotificationTriggerType.REQUEST_TARGET_ACHIEVED_IMMEDIATE:
-    case NotificationTriggerType.REQUEST_OPENED_IMMEDIATE:
+    case NotificationTriggerType.OWNER_GROUPBUY_ACHIEVED_IMMEDIATE:
       return { label: '준비 부탁드려요', href: groupBuyPath };
     default:
       return null;

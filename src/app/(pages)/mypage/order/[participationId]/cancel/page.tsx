@@ -12,6 +12,7 @@ import Header from '@/components/Header';
 import { Button } from '@/components/Button';
 import { ToastBlack } from '@/components/ToastBlack';
 import { formatShortDate } from '@/lib/date';
+import Image from 'next/image';
 
 function formatAmount(n: number): string {
   return n.toLocaleString('ko-KR') + '원';
@@ -112,7 +113,13 @@ export default function CancelPage({
               취소 공구 상품
             </p>
             <div className="flex items-center gap-g3">
-              <div className="w-16 h-16 rounded-2xlarge bg-surface-default shrink-0" />
+              <Image
+                src={item.thumbnailUrl || '/images/owner.svg'}
+                alt={item.productName}
+                width={64}
+                height={64}
+                className="w-16 h-16 rounded-2xlarge bg-surface-default shrink-0"
+              />
               <div className="flex flex-col gap-p3">
                 <p className="heading-md-bold text-text-basic">
                   {item.productName}

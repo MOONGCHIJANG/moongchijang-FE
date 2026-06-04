@@ -1,5 +1,6 @@
 import { Icon } from '@iconify/react';
 import type { ApiResponseGroupBuyDetailResponseData } from '@/api/generated/api.schemas';
+import { formatPickupDateTimeRange } from '@/lib/date';
 
 type Props = {
   groupBuy: ApiResponseGroupBuyDetailResponseData;
@@ -28,9 +29,12 @@ const ItemSummary = ({ groupBuy }: Props) => {
             />
             <p className="text-text-brand body-md-bold">픽업 일시</p>
           </div>
-          <p className="body-md-regular">
-            {groupBuy.pickupDate} {groupBuy.pickupTimeStart} ~{' '}
-            {groupBuy.pickupTimeEnd}
+          <p className="min-w-0 flex-1 text-right body-md-regular wrap-break-word">
+            {formatPickupDateTimeRange(
+              groupBuy.pickupDate,
+              groupBuy.pickupTimeStart,
+              groupBuy.pickupTimeEnd,
+            )}
           </p>
         </div>
       </div>

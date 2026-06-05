@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useQueryClient } from '@tanstack/react-query';
 import { Icon } from '@iconify/react';
 import Header from '@/components/Header';
@@ -17,6 +18,7 @@ import {
   GetApiV1WishlistsSort,
 } from '@/api/generated/api.schemas';
 import { logEvent } from '@/lib/analytics';
+import { useAuthStore } from '@/store/authStore';
 
 type WishlistFilter =
   (typeof GetApiV1WishlistsFilter)[keyof typeof GetApiV1WishlistsFilter];
@@ -42,6 +44,40 @@ const WishlistSkeleton = () => (
 );
 
 export function FavoriteClient() {
+  const { isLoggedIn, isInitialized } = useAuthStore();
+
+  if (!isInitialized) return null;
+
+  if (!isLoggedIn) {
+    return (
+      <div className="flex flex-col h-full min-h-[calc(100dvh-58px)]">
+        <Header text="찜" showBackButton={false} />
+        <div className="flex-1 flex flex-col items-center justify-center pb-[58px]">
+          <div className="flex flex-col items-center gap-g4">
+            <Image
+              src="/icons/moongchinyang.svg"
+              alt=""
+              width={51}
+              height={65}
+              className="mb-g4 w-20 h-25"
+            />
+            <span className="heading-md-semibold text-text-basic">
+              찜한 상품을 확인하려면&#160;
+              <Link href="/login" className="text-brand-primary">
+                로그인
+              </Link>
+              이 필요해요🥐
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return <FavoriteListContent />;
+}
+
+function FavoriteListContent() {
   const queryClient = useQueryClient();
   const [filter, setFilter] = useState<WishlistFilter>(
     GetApiV1WishlistsFilter.ALL,

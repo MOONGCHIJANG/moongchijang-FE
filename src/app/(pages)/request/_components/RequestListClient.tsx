@@ -48,9 +48,9 @@ export function RequestListClient() {
   // 비로그인 안내
   if (!isLoggedIn) {
     return (
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col h-full min-h-[calc(100dvh-58px)]">
         <Header text="공구 요청하기" showBackButton={false} />
-        <div className="flex flex-col items-center justify-center h-full pb-[74px]">
+        <div className="flex-1 flex flex-col items-center justify-center pb-[58px]">
           <div className="flex flex-col items-center gap-g4">
             <Image
               src="/icons/moongchinyang.svg"

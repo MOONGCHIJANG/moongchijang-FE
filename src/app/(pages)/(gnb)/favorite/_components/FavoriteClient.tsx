@@ -3,6 +3,7 @@
 import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { Icon } from '@iconify/react';
 import Header from '@/components/Header';
@@ -45,6 +46,7 @@ const WishlistSkeleton = () => (
 
 export function FavoriteClient() {
   const { isLoggedIn, isInitialized } = useAuthStore();
+  const pathname = usePathname();
 
   if (!isInitialized) return null;
 
@@ -63,7 +65,10 @@ export function FavoriteClient() {
             />
             <span className="heading-md-semibold text-text-basic">
               찜한 상품을 확인하려면&#160;
-              <Link href="/login" className="text-brand-primary">
+              <Link
+                href={`/login?redirect=${encodeURIComponent(pathname)}`}
+                className="text-brand-primary"
+              >
                 로그인
               </Link>
               이 필요해요🥐

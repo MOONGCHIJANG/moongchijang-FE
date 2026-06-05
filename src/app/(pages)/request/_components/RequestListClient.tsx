@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { Icon } from '@iconify/react';
 import Header from '@/components/Header';
 import { Button } from '@/components/Button';
@@ -32,6 +33,7 @@ function RequestListSkeleton() {
 
 export function RequestListClient() {
   const { isLoggedIn, isInitialized } = useAuthStore();
+  const pathname = usePathname();
 
   const { data, isLoading, isError } = useGetApiV1GroupBuyRequests({
     query: { enabled: isLoggedIn }, // 로그인 시에만 호출
@@ -61,7 +63,10 @@ export function RequestListClient() {
             />
             <span className="heading-md-semibold text-text-basic">
               공구를 개설하려면&#160;
-              <Link href="/login" className="text-brand-primary">
+              <Link
+                href={`/login?redirect=${encodeURIComponent(pathname)}`}
+                className="text-brand-primary"
+              >
                 로그인
               </Link>
               이 필요해요🥐

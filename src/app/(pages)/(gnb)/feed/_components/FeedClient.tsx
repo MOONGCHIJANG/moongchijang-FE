@@ -266,6 +266,11 @@ export function FeedClient() {
       params.set('bakery', searchAnalysis.detectedProduct);
     if (searchAnalysis?.detectedRegion)
       params.set('neighborhood', searchAnalysis.detectedRegion);
+
+    if (searchAnalysis?.detectedProduct && searchAnalysis?.detectedRegion) {
+      params.set('step', 'stores');
+    }
+
     const qs = params.toString();
     router.push(`/feed/request${qs ? `?${qs}` : ''}`);
   }, [router, searchAnalysis, searchKeyword]);
@@ -379,32 +384,28 @@ export function FeedClient() {
               searchAnalysis?.uiState ===
                 ApiResponseSearchAnalysisDataUiState.EMPTY_CAN_REQUEST) ? (
               <>
-                {searchAnalysis.searchCase ===
-                  ApiResponseSearchAnalysisDataSearchCase.PRODUCT_ONLY && (
+                {searchAnalysis.detectedProduct &&
+                !searchAnalysis.detectedRegion ? (
                   <GroupBuyRequestCard
                     icon="/icons/search.svg"
-                    title={`찾으시는 ${searchAnalysis.detectedProduct ?? searchKeyword} 공구가\n없나요?`}
+                    title={`찾으시는 ${searchAnalysis.detectedProduct} 공구가\n없나요?`}
                     onRequest={handleOpenRequestSheet}
                   />
-                )}
-                {searchAnalysis.searchCase ===
-                  ApiResponseSearchAnalysisDataSearchCase.NEIGHBORHOOD_ONLY && (
+                ) : !searchAnalysis.detectedProduct &&
+                  searchAnalysis.detectedRegion ? (
                   <GroupBuyRequestCard
                     icon="/icons/search.svg"
-                    title={`찾으시는 ${searchAnalysis.detectedRegion ?? searchKeyword} 공구가\n없나요?`}
+                    title={`찾으시는 ${searchAnalysis.detectedRegion} 공구가\n없나요?`}
                     onRequest={handleOpenRequestSheet}
                   />
-                )}
-                {searchAnalysis.searchCase ===
-                  ApiResponseSearchAnalysisDataSearchCase.BOTH_DETECTED && (
+                ) : searchAnalysis.detectedProduct &&
+                  searchAnalysis.detectedRegion ? (
                   <GroupBuyRequestCard
                     icon="/icons/search.svg"
-                    title={`찾으시는 ${searchAnalysis.detectedProduct ?? searchKeyword} 공구가\n없나요?`}
+                    title={`찾으시는 ${searchAnalysis.detectedProduct} 공구가\n없나요?`}
                     onRequest={handleOpenRequestSheet}
                   />
-                )}
-                {searchAnalysis.searchCase ===
-                  ApiResponseSearchAnalysisDataSearchCase.NONE_DETECTED && (
+                ) : (
                   <GroupBuyRequestCard onRequest={handleOpenRequestSheet} />
                 )}
               </>

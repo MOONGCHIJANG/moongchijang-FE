@@ -28,11 +28,13 @@ function isLoginRequired(pathname: string): boolean {
   return false;
 }
 
-async function refreshTokens(refreshToken: string): Promise<{
+type Rotated = {
   accessToken: string;
   expiresIn: number;
   newRefreshToken: string | null;
-} | null> {
+} | null;
+
+async function refreshTokens(refreshToken: string): Promise<Rotated> {
   const res = await fetch(`${BASE}/api/v1/auth/refresh`, {
     method: 'POST',
     headers: { Cookie: `refreshToken=${refreshToken}` },
@@ -45,10 +47,26 @@ async function refreshTokens(refreshToken: string): Promise<{
   const expiresIn = json?.data?.expiresIn;
   if (!accessToken || !expiresIn) return null;
 
-  const setCookie = res.headers.get('set-cookie');
-  const match = setCookie?.match(/refreshToken=([^;]+)/);
-
+  const match = res.headers.get('set-cookie')?.match(/refreshToken=([^;]+)/);
   return { accessToken, expiresIn, newRefreshToken: match ? match[1] : null };
+}
+
+async function resolveAccessToken(
+  request: NextRequest,
+  refreshToken: string,
+): Promise<{ accessToken: string | null; rotated: Rotated }> {
+  const accessToken = request.cookies.get('accessToken')?.value ?? null;
+  if (accessToken) return { accessToken, rotated: null };
+
+  const rotated = await refreshTokens(refreshToken);
+  return { accessToken: rotated?.accessToken ?? null, rotated };
+}
+
+function applyRotation(response: NextResponse, rotated: Rotated): void {
+  if (!rotated) return;
+  setAccessTokenCookie(response, rotated.accessToken, rotated.expiresIn);
+  if (rotated.newRefreshToken)
+    setRefreshTokenCookie(response, rotated.newRefreshToken);
 }
 
 async function getUserRole(accessToken: string): Promise<string | null> {
@@ -57,40 +75,63 @@ async function getUserRole(accessToken: string): Promise<string | null> {
   }).catch(() => null);
 
   if (!res?.ok) return null;
-
   const json = await res.json().catch(() => null);
   return json?.data?.role ?? null;
+}
+
+function roleHomePath(role: string | null): string {
+  if (role === 'ADMIN') return '/admin/dashboard';
+  if (role === 'SELLER') return '/seller';
+  return '/feed';
 }
 
 export async function proxy(request: NextRequest) {
   const refreshToken = request.cookies.get('refreshToken')?.value;
   const { pathname } = request.nextUrl;
 
-  // 로그인 유저가 /login 접근 시 역할에 따라 redirect
-  if (pathname.startsWith('/login') && refreshToken) {
-    let accessToken = request.cookies.get('accessToken')?.value;
-    let rotated: Awaited<ReturnType<typeof refreshTokens>> = null;
-
-    if (!accessToken) {
-      rotated = await refreshTokens(refreshToken);
-      accessToken = rotated?.accessToken;
-    }
-
+  // 로그인 유저가 /login 또는 /admin/login 접근 시 역할에 따라 redirect
+  if (
+    (pathname.startsWith('/login') || pathname === '/admin/login') &&
+    refreshToken
+  ) {
+    const { accessToken, rotated } = await resolveAccessToken(
+      request,
+      refreshToken,
+    );
     if (accessToken) {
       const role = await getUserRole(accessToken);
-      const targetUrl = role === 'SELLER' ? '/seller' : '/feed';
-      const response = NextResponse.redirect(new URL(targetUrl, request.url));
-
-      if (rotated) {
-        setAccessTokenCookie(response, rotated.accessToken, rotated.expiresIn);
-        if (rotated.newRefreshToken) {
-          setRefreshTokenCookie(response, rotated.newRefreshToken);
-        }
-      }
+      const response = NextResponse.redirect(
+        new URL(roleHomePath(role), request.url),
+      );
+      applyRotation(response, rotated);
       return response;
     }
+    if (pathname.startsWith('/login')) {
+      return NextResponse.redirect(new URL('/feed', request.url));
+    }
+  }
 
-    return NextResponse.redirect(new URL('/feed', request.url));
+  // /admin 보호 경로 (admin/login 제외)
+  if (pathname.startsWith('/admin') && pathname !== '/admin/login') {
+    if (!refreshToken) {
+      return NextResponse.redirect(new URL('/admin/login', request.url));
+    }
+    const { accessToken, rotated } = await resolveAccessToken(
+      request,
+      refreshToken,
+    );
+    if (!accessToken) {
+      return NextResponse.redirect(new URL('/admin/login', request.url));
+    }
+    const role = await getUserRole(accessToken);
+    if (role !== 'ADMIN') {
+      return NextResponse.redirect(new URL(roleHomePath(role), request.url));
+    }
+    if (rotated) {
+      const response = NextResponse.next();
+      applyRotation(response, rotated);
+      return response;
+    }
   }
 
   // 토큰 없이 /signup/email?step=profile 접근 시 /login으로
@@ -119,29 +160,19 @@ export async function proxy(request: NextRequest) {
     // 클라이언트가 임의로 보낸 x-access-token 을 신뢰하지 않도록 제거
     requestHeaders.delete('x-access-token');
 
-    let rotated: Awaited<ReturnType<typeof refreshTokens>> = null;
-
+    let rotated: Rotated = null;
     if (refreshToken) {
       // 유효한 accessToken 쿠키가 있으면 재발급 없이 사용 (rotation 빈도 최소화)
-      let accessToken = request.cookies.get('accessToken')?.value;
-      if (!accessToken) {
-        rotated = await refreshTokens(refreshToken);
-        accessToken = rotated?.accessToken;
-      }
-      if (accessToken) requestHeaders.set('x-access-token', accessToken);
+      const resolved = await resolveAccessToken(request, refreshToken);
+      rotated = resolved.rotated;
+      if (resolved.accessToken)
+        requestHeaders.set('x-access-token', resolved.accessToken);
     }
 
     const response = NextResponse.next({
       request: { headers: requestHeaders },
     });
-
-    if (rotated) {
-      setAccessTokenCookie(response, rotated.accessToken, rotated.expiresIn);
-      if (rotated.newRefreshToken) {
-        setRefreshTokenCookie(response, rotated.newRefreshToken);
-      }
-    }
-
+    applyRotation(response, rotated);
     return response;
   }
 }
@@ -158,5 +189,7 @@ export const config = {
     '/login',
     '/login/:path*',
     '/signup/email',
+    '/admin/login',
+    '/admin/:path*',
   ],
 };

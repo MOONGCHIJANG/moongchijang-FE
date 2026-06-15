@@ -33,7 +33,6 @@ export default function AdminAuthenticatedLayout({
     logout(undefined, {
       onSettled: () => {
         tokenStorage.remove();
-        document.cookie = 'isAdmin=; path=/; SameSite=Strict; Max-Age=0';
         setIsLoggedIn(false);
         router.push('/admin/login');
       },

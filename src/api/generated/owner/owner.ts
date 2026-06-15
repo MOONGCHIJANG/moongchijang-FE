@@ -13,6 +13,7 @@ import type {
   ApiResponseOwnerRefundRequestDetail,
   ApiResponseOwnerRefundRequestList,
   ApiResponseOwnerRefundReviewSubmit,
+  ApiResponseOwnerSettlementItemList,
   ApiResponseOwnerSettlementMonthChipList,
   ApiResponseOwnerSettlementMonthlySummary,
   ApiResponsePickupScheduleList,
@@ -23,6 +24,7 @@ import type {
   GetApiV1OwnerGroupBuyRequestsParams,
   GetApiV1OwnerGroupBuysManageParams,
   GetApiV1OwnerReservationsParams,
+  GetApiV1OwnerSettlementsItemsParams,
   GetApiV1OwnerSettlementsMonthlySummaryParams,
   GetApiV1OwnerSettlementsRefundRequestsParams,
   NotFoundResponse,
@@ -422,6 +424,9 @@ export const postApiV1OwnerGroupBuysGroupBuyIdExtensionRequests = async (
 };
 
 /**
+ * 사장님 공구 마감 요청을 접수한다.
+`SOLD_OUT`, `STORE_CONDITION`은 즉시 마감 처리되며, `OTHER`는 즉시 마감되지 않고 운영자 검토 대기 상태로 저장된다.
+
  * @summary 사장님 공구 마감 요청
  */
 export type postApiV1OwnerGroupBuysGroupBuyIdCloseRequestsResponse200 = {
@@ -600,6 +605,76 @@ export const getApiV1OwnerSettlementsMonthChips = async (
 ): Promise<getApiV1OwnerSettlementsMonthChipsResponse> => {
   return customFetch<getApiV1OwnerSettlementsMonthChipsResponse>(
     getGetApiV1OwnerSettlementsMonthChipsUrl(),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
+
+/**
+ * @summary 사장님 정산 공구 카드 목록 조회
+ */
+export type getApiV1OwnerSettlementsItemsResponse200 = {
+  data: ApiResponseOwnerSettlementItemList;
+  status: 200;
+};
+
+export type getApiV1OwnerSettlementsItemsResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type getApiV1OwnerSettlementsItemsResponse401 = {
+  data: UnauthorizedResponse;
+  status: 401;
+};
+
+export type getApiV1OwnerSettlementsItemsResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type getApiV1OwnerSettlementsItemsResponseSuccess =
+  getApiV1OwnerSettlementsItemsResponse200 & {
+    headers: Headers;
+  };
+export type getApiV1OwnerSettlementsItemsResponseError = (
+  | getApiV1OwnerSettlementsItemsResponse400
+  | getApiV1OwnerSettlementsItemsResponse401
+  | getApiV1OwnerSettlementsItemsResponse403
+) & {
+  headers: Headers;
+};
+
+export type getApiV1OwnerSettlementsItemsResponse =
+  | getApiV1OwnerSettlementsItemsResponseSuccess
+  | getApiV1OwnerSettlementsItemsResponseError;
+
+export const getGetApiV1OwnerSettlementsItemsUrl = (
+  params: GetApiV1OwnerSettlementsItemsParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/owner/settlements/items?${stringifiedParams}`
+    : `/api/v1/owner/settlements/items`;
+};
+
+export const getApiV1OwnerSettlementsItems = async (
+  params: GetApiV1OwnerSettlementsItemsParams,
+  options?: RequestInit,
+): Promise<getApiV1OwnerSettlementsItemsResponse> => {
+  return customFetch<getApiV1OwnerSettlementsItemsResponse>(
+    getGetApiV1OwnerSettlementsItemsUrl(params),
     {
       ...options,
       method: 'GET',
@@ -884,7 +959,7 @@ export const getApiV1OwnerGroupBuyRequests = async (
  * 사장님이 본인 매장에 대한 공구 개설 요청을 제출한다.
 - SELLER 권한만 요청할 수 있다.
 - storeId는 요청자에게 연결된 매장이어야 한다.
-- imageUrls의 첫 번째 이미지를 대표 이미지(thumbnailUrl)로 저장한다.
+- imageUrls의 첫 번째 key를 대표 이미지(thumbnailKey)로 저장한다.
 - 희망 공구 기간은 현재 시각 기준 최소 7일 이상이어야 한다.
 
  * @summary 사장님 공구 개설 요청 제출

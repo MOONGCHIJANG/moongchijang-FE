@@ -133,8 +133,9 @@ export const GetApiV1PickupsMeNearestQrResponse = zod.object({
 });
 
 /**
- * SELLER 권한 사용자가 본인 매장 공구의 소비자 QR을 스캔하면 READY → PICKED_UP으로 자동 전환한다.
-ADMIN 권한 사용자는 운영 대리 처리 용도로 매장 소속 검증 없이 처리할 수 있다.
+ * 현재 활성 역할이 SELLER 또는 ADMIN일 때만 호출할 수 있다.
+SELLER 역할 사용자가 본인 매장 공구의 소비자 QR을 스캔하면 READY → PICKED_UP으로 자동 전환한다.
+ADMIN 역할 사용자는 운영 대리 처리 용도로 매장 소속 검증 없이 처리할 수 있다.
 응답에는 사장님 스캔 결과 화면에 필요한 유저이름, 상품명, 수량, 픽업 상태를 포함한다.
 
  * @summary QR 코드 스캔 검증 및 수령 처리

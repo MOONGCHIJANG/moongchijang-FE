@@ -83,6 +83,9 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
           agreedNoWithdrawal: true,
         },
       );
+      if (orderRes.status === 409) {
+        throw new Error('이미 참여한 공구입니다.');
+      }
       if (orderRes.status !== 200) throw new Error('결제 주문 생성 실패');
 
       const orderParsed = PaymentOrderCreatedResponse.safeParse(orderRes.data);
@@ -186,7 +189,7 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
         productAmount={productAmount}
         feeAmount={feeAmount}
         totalAmount={totalAmount}
-        productImage={groupBuy.imageUrls[0] || ''}
+        productImage={groupBuy.thumbnailUrl || ''}
       />
       <AgreeTermsSheet
         isOpen={isTermsSheetOpen}

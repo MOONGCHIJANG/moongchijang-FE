@@ -1,6 +1,7 @@
 // src/app/api/v1/auth/email/signup/route.ts
 
 import { serverFetchRaw } from '@/lib/fetcher';
+import { applyRefreshTokenCookie } from '@/lib/cookie';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
@@ -14,10 +15,7 @@ export async function POST(req: NextRequest) {
   if (result.status === 200) {
     const response = NextResponse.json(result.data, { status: 200 });
 
-    const setCookie = result.headers?.get('set-cookie');
-    if (setCookie) {
-      response.headers.append('set-cookie', setCookie);
-    }
+    applyRefreshTokenCookie(response, result.headers?.get('set-cookie'));
 
     return response;
   }

@@ -325,16 +325,16 @@ export const getApiV1GroupBuysGroupBuyIdShare = async (
 };
 
 /**
- * 검색어를 입력하면 동네/베이커리 키워드를 AI로 분석하고 최근 검색어로 저장한다.
-분석 결과에 따라 4가지 케이스로 분기한다.
+ * 검색어를 ngram FULLTEXT 인덱스 두 축(상품명 / 매장·주소)에 각각 매칭해 동네/상품 키워드 검출 여부를 판정하고
+최근 검색어로 저장한다. 두 인덱스 매칭 결과 조합에 따라 4가지 케이스로 분기한다.
 자체 검색 결과가 없을 때 제공되는 recommendedStores는 Naver Local Search 결과 중
 베이커리/디저트 도메인으로 분류된 매장만 반환한다.
-- case 1: 베이커리 인식, 동네 미인식
-- case 2: 동네 인식, 베이커리 미인식
-- case 3: 동네+베이커리 모두 인식
-- case 4: 모두 인식 불가
+- PRODUCT_ONLY: 상품명 인덱스만 매치
+- NEIGHBORHOOD_ONLY: 매장/주소 인덱스만 매치
+- BOTH_DETECTED: 두 인덱스 모두 매치
+- NONE_DETECTED: 두 인덱스 모두 미매치
 
- * @summary 검색 실행 및 AI 키워드 분석 (1.1.4-1)
+ * @summary 검색 실행 및 FULLTEXT 기반 분류 (1.1.4-1)
  */
 export type postApiV1SearchResponse200 = {
   data: ApiResponseSearchAnalysis;

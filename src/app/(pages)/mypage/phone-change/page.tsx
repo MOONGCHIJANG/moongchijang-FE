@@ -187,12 +187,10 @@ export default function PhoneChangePage() {
           </div>
         </div>
         <div className="flex flex-col gap-g3">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center gap-g2">
             <p className="caption-sm-medium text-text-disabled">인증번호</p>
-            {codeSent && (
-              <span
-                className={`caption-sm-medium ${timeLeft === 0 ? 'text-text-error' : 'text-text-brand'}`}
-              >
+            {codeSent && timeLeft > 0 && (
+              <span className="caption-sm-medium text-text-brand">
                 {formatTimer(timeLeft)}
               </span>
             )}

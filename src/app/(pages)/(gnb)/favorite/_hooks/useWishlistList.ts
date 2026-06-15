@@ -18,6 +18,7 @@ export function useWishlistList(
   filter: GetApiV1WishlistsFilter,
   sort: GetApiV1WishlistsSort,
   excludeClosed?: boolean,
+  options?: { enabled?: boolean },
 ) {
   const baseParams = useMemo(
     () => ({
@@ -49,6 +50,7 @@ export function useWishlistList(
       if (!d) return undefined;
       return d.number + 1 < d.totalPages ? d.number + 1 : undefined;
     },
+    ...options,
   });
 
   const items = useMemo<WishlistItemResponse[]>(

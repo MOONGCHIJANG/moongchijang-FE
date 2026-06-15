@@ -7,6 +7,7 @@ import { faker } from '@faker-js/faker';
 import { HttpResponse, http } from 'msw';
 import type { RequestHandlerOptions } from 'msw';
 
+import { OwnerSettlementStatus } from '../api.schemas';
 import type {
   ApiResponseOwnerGroupBuyList,
   ApiResponseOwnerGroupBuyManageDetail,
@@ -18,6 +19,7 @@ import type {
   ApiResponseOwnerRefundRequestDetail,
   ApiResponseOwnerRefundRequestList,
   ApiResponseOwnerRefundReviewSubmit,
+  ApiResponseOwnerSettlementItemList,
   ApiResponseOwnerSettlementMonthChipList,
   ApiResponseOwnerSettlementMonthlySummary,
   ApiResponsePickupScheduleList,
@@ -96,7 +98,14 @@ export const getGetApiV1OwnerGroupBuysManageResponseMock = (
     { length: faker.number.int({ min: 1, max: 10 }) },
     (_, i) => i + 1,
   ).map(() => ({
-    groupBuyId: faker.number.int(),
+    groupBuyId: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([faker.number.int(), null]),
+      undefined,
+    ]),
+    requestId: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([faker.number.int(), null]),
+      undefined,
+    ]),
     productName: faker.string.alpha({ length: { min: 10, max: 20 } }),
     price: faker.number.int(),
     pickupDate: faker.date.past().toISOString().slice(0, 10),
@@ -143,6 +152,8 @@ export const getGetApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponseMock = (
       'ENDED',
       'PENDING_APPROVAL',
     ] as const),
+    recruitmentStartDate: faker.date.past().toISOString().slice(0, 10),
+    recruitmentEndDate: faker.date.past().toISOString().slice(0, 10),
     participantSummary: {
       totalCount: faker.number.int(),
       completedCount: faker.number.int(),
@@ -180,6 +191,8 @@ export const getGetApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponseMock = (
       'ENDED',
       'PENDING_APPROVAL',
     ] as const),
+    recruitmentStartDate: faker.date.past().toISOString().slice(0, 10),
+    recruitmentEndDate: faker.date.past().toISOString().slice(0, 10),
     participantSummary: {
       totalCount: faker.number.int(),
       completedCount: faker.number.int(),
@@ -252,6 +265,33 @@ export const getGetApiV1OwnerSettlementsMonthChipsResponseMock = (
       year: faker.number.int(),
       month: faker.number.int(),
       label: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    })),
+  },
+  error: {},
+  ...overrideResponse,
+});
+
+export const getGetApiV1OwnerSettlementsItemsResponseMock = (
+  overrideResponse: Partial<
+    Extract<ApiResponseOwnerSettlementItemList, object>
+  > = {},
+): ApiResponseOwnerSettlementItemList => ({
+  success: faker.datatype.boolean(),
+  data: {
+    year: faker.number.int(),
+    month: faker.number.int(),
+    items: Array.from(
+      { length: faker.number.int({ min: 1, max: 10 }) },
+      (_, i) => i + 1,
+    ).map(() => ({
+      groupBuyId: faker.number.int(),
+      productName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      participantCount: faker.number.int(),
+      pickupDate: faker.date.past().toISOString().slice(0, 10),
+      amount: faker.number.int(),
+      settlementStatus: faker.helpers.arrayElement(
+        Object.values(OwnerSettlementStatus),
+      ),
     })),
   },
   error: {},
@@ -773,6 +813,32 @@ export const getGetApiV1OwnerSettlementsMonthChipsMockHandler = (
   );
 };
 
+export const getGetApiV1OwnerSettlementsItemsMockHandler = (
+  overrideResponse?:
+    | ApiResponseOwnerSettlementItemList
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) =>
+        | Promise<ApiResponseOwnerSettlementItemList>
+        | ApiResponseOwnerSettlementItemList),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    '*/api/v1/owner/settlements/items',
+    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getGetApiV1OwnerSettlementsItemsResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
+
 export const getGetApiV1OwnerSettlementsRefundRequestsMockHandler = (
   overrideResponse?:
     | ApiResponseOwnerRefundRequestList
@@ -990,6 +1056,7 @@ export const getOwnerMock = () => [
   getPostApiV1OwnerGroupBuysGroupBuyIdCloseRequestsMockHandler(),
   getGetApiV1OwnerSettlementsMonthlySummaryMockHandler(),
   getGetApiV1OwnerSettlementsMonthChipsMockHandler(),
+  getGetApiV1OwnerSettlementsItemsMockHandler(),
   getGetApiV1OwnerSettlementsRefundRequestsMockHandler(),
   getGetApiV1OwnerSettlementsRefundRequestsParticipationIdMockHandler(),
   getPostApiV1OwnerSettlementsRefundRequestsParticipationIdReviewSubmissionsMockHandler(),

@@ -80,7 +80,18 @@ export const GetApiV1OwnerGroupBuysManageResponse = zod.object({
   success: zod.boolean(),
   data: zod.array(
     zod.object({
-      groupBuyId: zod.number(),
+      groupBuyId: zod
+        .number()
+        .nullish()
+        .describe(
+          '실제 공구 항목일 때 사용하는 공구 ID. PENDING_APPROVAL 항목에서는 null',
+        ),
+      requestId: zod
+        .number()
+        .nullish()
+        .describe(
+          '승인대기(PENDING_APPROVAL) 항목일 때 사용하는 공구 개설 요청 ID. 실제 공구 항목에서는 null',
+        ),
       productName: zod.string(),
       price: zod.number(),
       pickupDate: zod.iso.date(),
@@ -120,6 +131,8 @@ export const GetApiV1OwnerGroupBuysGroupBuyIdManageInProgressResponse =
         'ENDED',
         'PENDING_APPROVAL',
       ]),
+      recruitmentStartDate: zod.iso.date(),
+      recruitmentEndDate: zod.iso.date(),
       participantSummary: zod.object({
         totalCount: zod.number(),
         completedCount: zod.number(),
@@ -159,6 +172,8 @@ export const GetApiV1OwnerGroupBuysGroupBuyIdManageAchievedResponse =
         'ENDED',
         'PENDING_APPROVAL',
       ]),
+      recruitmentStartDate: zod.iso.date(),
+      recruitmentEndDate: zod.iso.date(),
       participantSummary: zod.object({
         totalCount: zod.number(),
         completedCount: zod.number(),
@@ -202,6 +217,9 @@ export const PostApiV1OwnerGroupBuysGroupBuyIdExtensionRequestsResponse =
   });
 
 /**
+ * 사장님 공구 마감 요청을 접수한다.
+`SOLD_OUT`, `STORE_CONDITION`은 즉시 마감 처리되며, `OTHER`는 즉시 마감되지 않고 운영자 검토 대기 상태로 저장된다.
+
  * @summary 사장님 공구 마감 요청
  */
 export const PostApiV1OwnerGroupBuysGroupBuyIdCloseRequestsParams = zod.object({
@@ -262,6 +280,47 @@ export const GetApiV1OwnerSettlementsMonthChipsResponse = zod.object({
         year: zod.number(),
         month: zod.number(),
         label: zod.string(),
+      }),
+    ),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * @summary 사장님 정산 공구 카드 목록 조회
+ */
+export const getApiV1OwnerSettlementsItemsQueryYearMin = 2000;
+export const getApiV1OwnerSettlementsItemsQueryYearMax = 2100;
+
+export const getApiV1OwnerSettlementsItemsQueryMonthMax = 12;
+
+export const GetApiV1OwnerSettlementsItemsQueryParams = zod.object({
+  year: zod
+    .number()
+    .min(getApiV1OwnerSettlementsItemsQueryYearMin)
+    .max(getApiV1OwnerSettlementsItemsQueryYearMax),
+  month: zod.number().min(1).max(getApiV1OwnerSettlementsItemsQueryMonthMax),
+});
+
+export const GetApiV1OwnerSettlementsItemsResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    year: zod.number(),
+    month: zod.number(),
+    items: zod.array(
+      zod.object({
+        groupBuyId: zod.number(),
+        productName: zod.string(),
+        participantCount: zod.number(),
+        pickupDate: zod.iso.date(),
+        amount: zod.number(),
+        settlementStatus: zod
+          .enum([
+            'SETTLEMENT_COMPLETED',
+            'SETTLEMENT_PENDING',
+            'REFUND_PROCESSING',
+          ])
+          .describe('사장님 공구 정산 상태'),
       }),
     ),
   }),
@@ -407,7 +466,7 @@ export const GetApiV1OwnerGroupBuyRequestsResponse = zod.object({
  * 사장님이 본인 매장에 대한 공구 개설 요청을 제출한다.
 - SELLER 권한만 요청할 수 있다.
 - storeId는 요청자에게 연결된 매장이어야 한다.
-- imageUrls의 첫 번째 이미지를 대표 이미지(thumbnailUrl)로 저장한다.
+- imageUrls의 첫 번째 key를 대표 이미지(thumbnailKey)로 저장한다.
 - 희망 공구 기간은 현재 시각 기준 최소 7일 이상이어야 한다.
 
  * @summary 사장님 공구 개설 요청 제출
@@ -447,7 +506,7 @@ export const PostApiV1OwnerGroupBuyRequestsBody = zod.object({
     .array(zod.string())
     .min(1)
     .max(postApiV1OwnerGroupBuyRequestsBodyImageUrlsMax)
-    .describe('상품 이미지 URL 목록. 첫 번째 이미지를 대표 이미지로 사용한다.'),
+    .describe('상품 이미지 S3 key 목록. 첫 번째 key를 대표 이미지로 사용한다.'),
   pickupDate: zod.iso.date().describe('픽업일. 공구 마감일 이후여야 한다.'),
   pickupTimeStart: zod.iso.time({}),
   pickupTimeEnd: zod.iso.time({}),

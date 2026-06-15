@@ -7,19 +7,27 @@ import { faker } from '@faker-js/faker';
 import { HttpResponse, http } from 'msw';
 import type { RequestHandlerOptions } from 'msw';
 
+import { GroupBuyCloseRequestReviewStatus } from '../api.schemas';
 import type {
+  ApiResponseAdminCsTicketDetail,
+  ApiResponseAdminCsTicketPage,
   ApiResponseAdminDashboardSummary,
-  ApiResponseAdminGroupBuyDetail,
-  ApiResponseAdminGroupBuyList,
+  ApiResponseAdminDashboardUnconfirmedOrders,
+  ApiResponseAdminDashboardUrgentRefunds,
   ApiResponseAdminGroupBuyRequestAction,
+  ApiResponseAdminOrderDetail,
   ApiResponseAdminOrderPage,
+  ApiResponseAdminOwnerGroupBuyCloseRequestAction,
+  ApiResponseAdminOwnerGroupBuyRequestAction,
+  ApiResponseAdminOwnerGroupBuyRequestDetail,
+  ApiResponseAdminOwnerGroupBuyRequestPage,
   ApiResponseAdminRefundPage,
   ApiResponseAdminRequestDetail,
   ApiResponseAdminRequestPage,
-  ApiResponseGroupBuyId,
+  ApiResponseAdminSettlementDashboard,
+  ApiResponseAdminSettlementDetail,
+  ApiResponseAdminSettlementPage,
   ApiResponseGroupBuyRequestDetail,
-  ApiResponseSettlementId,
-  ApiResponseSettlementPage,
   SuccessNoDataResponse,
 } from '../api.schemas';
 
@@ -40,6 +48,93 @@ export const getGetApiV1AdminSummaryResponseMock = (
     todayCompletedRefundCount: faker.number.int(),
     todayCompletedApprovalCount: faker.number.int(),
     hasOrderOver48h: faker.datatype.boolean(),
+  },
+  error: {},
+  ...overrideResponse,
+});
+
+export const getGetApiV1AdminDashboardUnconfirmedOrdersResponseMock = (
+  overrideResponse: Partial<
+    Extract<ApiResponseAdminDashboardUnconfirmedOrders, object>
+  > = {},
+): ApiResponseAdminDashboardUnconfirmedOrders => ({
+  success: faker.datatype.boolean(),
+  data: {
+    totalUnconfirmedCount: faker.number.int(),
+    overdueCount: faker.number.int(),
+    hasOverdue: faker.datatype.boolean(),
+    content: Array.from(
+      { length: faker.number.int({ min: 1, max: 10 }) },
+      (_, i) => i + 1,
+    ).map(() => ({
+      orderId: faker.number.int(),
+      groupBuyId: faker.number.int(),
+      productName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      storeName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      achievedAt: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.date.past().toISOString().slice(0, 19) + 'Z',
+          null,
+        ]),
+        undefined,
+      ]),
+      finalQuantity: faker.number.int(),
+      pendingRefundCount: faker.number.int(),
+      pickupDate: faker.date.past().toISOString().slice(0, 10),
+      elapsedHours: faker.number.int(),
+      overdue: faker.datatype.boolean(),
+      progressRate: faker.number.int(),
+      ownerContacted: faker.datatype.boolean(),
+      ownerContactedAt: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.date.past().toISOString().slice(0, 19) + 'Z',
+          null,
+        ]),
+        undefined,
+      ]),
+    })),
+    totalElements: faker.number.int(),
+    totalPages: faker.number.int(),
+    number: faker.number.int(),
+    size: faker.number.int(),
+  },
+  error: {},
+  ...overrideResponse,
+});
+
+export const getGetApiV1AdminDashboardUrgentRefundsResponseMock = (
+  overrideResponse: Partial<
+    Extract<ApiResponseAdminDashboardUrgentRefunds, object>
+  > = {},
+): ApiResponseAdminDashboardUrgentRefunds => ({
+  success: faker.datatype.boolean(),
+  data: {
+    totalUrgentCount: faker.number.int(),
+    hasUrgentRefunds: faker.datatype.boolean(),
+    content: Array.from(
+      { length: faker.number.int({ min: 1, max: 10 }) },
+      (_, i) => i + 1,
+    ).map(() => ({
+      requestId: faker.number.int(),
+      caseFilter: faker.helpers.arrayElement([
+        'ALL',
+        'PRE_ACHIEVEMENT_FREE_CANCEL',
+        'POST_ACHIEVEMENT_CANCEL',
+        'PICKUP_PERIOD_NO_SHOW',
+        'OWNER_FAULT_CANCEL',
+        'TARGET_NOT_MET',
+        'DISPUTE_OR_DROPOUT_REFUND',
+      ] as const),
+      consumerName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      groupBuyName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      refundAmount: faker.number.int(),
+      requestedAt: faker.date.past().toISOString().slice(0, 19) + 'Z',
+      slaElapsedHours: faker.number.int(),
+    })),
+    totalElements: faker.number.int(),
+    totalPages: faker.number.int(),
+    number: faker.number.int(),
+    size: faker.number.int(),
   },
   error: {},
   ...overrideResponse,
@@ -99,6 +194,687 @@ export const getGetApiV1AdminOrdersResponseMock = (
   error: {},
   ...overrideResponse,
 });
+
+export const getGetApiV1AdminOrdersOrderIdResponseMock = (
+  overrideResponse: Partial<Extract<ApiResponseAdminOrderDetail, object>> = {},
+): ApiResponseAdminOrderDetail => ({
+  success: faker.datatype.boolean(),
+  data: {
+    orderId: faker.number.int(),
+    groupBuyId: faker.number.int(),
+    productName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    productDescription: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    storeName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    storeAddress: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    storePhoneNumber: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        null,
+      ]),
+      undefined,
+    ]),
+    achievedAt: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.date.past().toISOString().slice(0, 19) + 'Z',
+        null,
+      ]),
+      undefined,
+    ]),
+    finalQuantity: faker.number.int(),
+    targetQuantity: faker.number.int(),
+    pendingRefundCount: faker.number.int(),
+    pickupDate: faker.date.past().toISOString().slice(0, 10),
+    pickupTimeStart: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    pickupTimeEnd: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    pickupLocation: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    pickupContact: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        null,
+      ]),
+      undefined,
+    ]),
+    elapsedHours: faker.number.int(),
+    progressRate: faker.number.int(),
+    orderStatus: faker.helpers.arrayElement([
+      'PENDING',
+      'CONFIRMED',
+      'CANCELLED',
+    ] as const),
+    ownerContactedAt: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.date.past().toISOString().slice(0, 19) + 'Z',
+        null,
+      ]),
+      undefined,
+    ]),
+    orderConfirmedAt: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.date.past().toISOString().slice(0, 19) + 'Z',
+        null,
+      ]),
+      undefined,
+    ]),
+    orderCancelledAt: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.date.past().toISOString().slice(0, 19) + 'Z',
+        null,
+      ]),
+      undefined,
+    ]),
+    actionable: faker.datatype.boolean(),
+  },
+  error: {},
+  ...overrideResponse,
+});
+
+export const getPostApiV1AdminOrdersOrderIdOwnerContactResponseMock = (
+  overrideResponse: Partial<Extract<ApiResponseAdminOrderDetail, object>> = {},
+): ApiResponseAdminOrderDetail => ({
+  success: faker.datatype.boolean(),
+  data: {
+    orderId: faker.number.int(),
+    groupBuyId: faker.number.int(),
+    productName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    productDescription: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    storeName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    storeAddress: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    storePhoneNumber: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        null,
+      ]),
+      undefined,
+    ]),
+    achievedAt: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.date.past().toISOString().slice(0, 19) + 'Z',
+        null,
+      ]),
+      undefined,
+    ]),
+    finalQuantity: faker.number.int(),
+    targetQuantity: faker.number.int(),
+    pendingRefundCount: faker.number.int(),
+    pickupDate: faker.date.past().toISOString().slice(0, 10),
+    pickupTimeStart: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    pickupTimeEnd: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    pickupLocation: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    pickupContact: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        null,
+      ]),
+      undefined,
+    ]),
+    elapsedHours: faker.number.int(),
+    progressRate: faker.number.int(),
+    orderStatus: faker.helpers.arrayElement([
+      'PENDING',
+      'CONFIRMED',
+      'CANCELLED',
+    ] as const),
+    ownerContactedAt: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.date.past().toISOString().slice(0, 19) + 'Z',
+        null,
+      ]),
+      undefined,
+    ]),
+    orderConfirmedAt: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.date.past().toISOString().slice(0, 19) + 'Z',
+        null,
+      ]),
+      undefined,
+    ]),
+    orderCancelledAt: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.date.past().toISOString().slice(0, 19) + 'Z',
+        null,
+      ]),
+      undefined,
+    ]),
+    actionable: faker.datatype.boolean(),
+  },
+  error: {},
+  ...overrideResponse,
+});
+
+export const getPostApiV1AdminOrdersOrderIdConfirmResponseMock = (
+  overrideResponse: Partial<Extract<ApiResponseAdminOrderDetail, object>> = {},
+): ApiResponseAdminOrderDetail => ({
+  success: faker.datatype.boolean(),
+  data: {
+    orderId: faker.number.int(),
+    groupBuyId: faker.number.int(),
+    productName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    productDescription: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    storeName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    storeAddress: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    storePhoneNumber: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        null,
+      ]),
+      undefined,
+    ]),
+    achievedAt: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.date.past().toISOString().slice(0, 19) + 'Z',
+        null,
+      ]),
+      undefined,
+    ]),
+    finalQuantity: faker.number.int(),
+    targetQuantity: faker.number.int(),
+    pendingRefundCount: faker.number.int(),
+    pickupDate: faker.date.past().toISOString().slice(0, 10),
+    pickupTimeStart: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    pickupTimeEnd: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    pickupLocation: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    pickupContact: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        null,
+      ]),
+      undefined,
+    ]),
+    elapsedHours: faker.number.int(),
+    progressRate: faker.number.int(),
+    orderStatus: faker.helpers.arrayElement([
+      'PENDING',
+      'CONFIRMED',
+      'CANCELLED',
+    ] as const),
+    ownerContactedAt: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.date.past().toISOString().slice(0, 19) + 'Z',
+        null,
+      ]),
+      undefined,
+    ]),
+    orderConfirmedAt: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.date.past().toISOString().slice(0, 19) + 'Z',
+        null,
+      ]),
+      undefined,
+    ]),
+    orderCancelledAt: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.date.past().toISOString().slice(0, 19) + 'Z',
+        null,
+      ]),
+      undefined,
+    ]),
+    actionable: faker.datatype.boolean(),
+  },
+  error: {},
+  ...overrideResponse,
+});
+
+export const getPostApiV1AdminOrdersOrderIdCancelResponseMock = (
+  overrideResponse: Partial<Extract<ApiResponseAdminOrderDetail, object>> = {},
+): ApiResponseAdminOrderDetail => ({
+  success: faker.datatype.boolean(),
+  data: {
+    orderId: faker.number.int(),
+    groupBuyId: faker.number.int(),
+    productName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    productDescription: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    storeName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    storeAddress: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    storePhoneNumber: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        null,
+      ]),
+      undefined,
+    ]),
+    achievedAt: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.date.past().toISOString().slice(0, 19) + 'Z',
+        null,
+      ]),
+      undefined,
+    ]),
+    finalQuantity: faker.number.int(),
+    targetQuantity: faker.number.int(),
+    pendingRefundCount: faker.number.int(),
+    pickupDate: faker.date.past().toISOString().slice(0, 10),
+    pickupTimeStart: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    pickupTimeEnd: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    pickupLocation: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    pickupContact: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        null,
+      ]),
+      undefined,
+    ]),
+    elapsedHours: faker.number.int(),
+    progressRate: faker.number.int(),
+    orderStatus: faker.helpers.arrayElement([
+      'PENDING',
+      'CONFIRMED',
+      'CANCELLED',
+    ] as const),
+    ownerContactedAt: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.date.past().toISOString().slice(0, 19) + 'Z',
+        null,
+      ]),
+      undefined,
+    ]),
+    orderConfirmedAt: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.date.past().toISOString().slice(0, 19) + 'Z',
+        null,
+      ]),
+      undefined,
+    ]),
+    orderCancelledAt: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.date.past().toISOString().slice(0, 19) + 'Z',
+        null,
+      ]),
+      undefined,
+    ]),
+    actionable: faker.datatype.boolean(),
+  },
+  error: {},
+  ...overrideResponse,
+});
+
+export const getGetApiV1AdminCsTicketsResponseMock = (
+  overrideResponse: Partial<Extract<ApiResponseAdminCsTicketPage, object>> = {},
+): ApiResponseAdminCsTicketPage => ({
+  success: faker.datatype.boolean(),
+  data: {
+    content: Array.from(
+      { length: faker.number.int({ min: 1, max: 10 }) },
+      (_, i) => i + 1,
+    ).map(() => ({
+      ticketId: faker.number.int(),
+      type: faker.helpers.arrayElement([
+        'REFUND',
+        'ORDER',
+        'PICKUP',
+        'ACCOUNT',
+        'ETC',
+      ] as const),
+      title: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      consumerId: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.number.int(), null]),
+        undefined,
+      ]),
+      consumerName: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          null,
+        ]),
+        undefined,
+      ]),
+      groupBuyId: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.number.int(), null]),
+        undefined,
+      ]),
+      groupBuyName: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          null,
+        ]),
+        undefined,
+      ]),
+      priority: faker.helpers.arrayElement([
+        'LOW',
+        'MEDIUM',
+        'HIGH',
+        'URGENT',
+      ] as const),
+      assigneeName: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          null,
+        ]),
+        undefined,
+      ]),
+      createdAt: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.date.past().toISOString().slice(0, 19) + 'Z',
+          null,
+        ]),
+        undefined,
+      ]),
+      slaHours: faker.number.int(),
+      status: faker.helpers.arrayElement([
+        'RECEIVED',
+        'IN_PROGRESS',
+        'COMPLETED',
+      ] as const),
+      actionable: faker.datatype.boolean(),
+    })),
+    totalElements: faker.number.int(),
+    totalPages: faker.number.int(),
+    number: faker.number.int(),
+    size: faker.number.int(),
+  },
+  error: {},
+  ...overrideResponse,
+});
+
+export const getGetApiV1AdminCsTicketsTicketIdResponseMock = (
+  overrideResponse: Partial<
+    Extract<ApiResponseAdminCsTicketDetail, object>
+  > = {},
+): ApiResponseAdminCsTicketDetail => ({
+  success: faker.datatype.boolean(),
+  data: {
+    ticketId: faker.number.int(),
+    type: faker.helpers.arrayElement([
+      'REFUND',
+      'ORDER',
+      'PICKUP',
+      'ACCOUNT',
+      'ETC',
+    ] as const),
+    title: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    description: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    priority: faker.helpers.arrayElement([
+      'LOW',
+      'MEDIUM',
+      'HIGH',
+      'URGENT',
+    ] as const),
+    status: faker.helpers.arrayElement([
+      'RECEIVED',
+      'IN_PROGRESS',
+      'COMPLETED',
+    ] as const),
+    createdAt: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.date.past().toISOString().slice(0, 19) + 'Z',
+        null,
+      ]),
+      undefined,
+    ]),
+    updatedAt: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.date.past().toISOString().slice(0, 19) + 'Z',
+        null,
+      ]),
+      undefined,
+    ]),
+    slaHours: faker.number.int(),
+    consumer: faker.helpers.arrayElement([
+      {
+        ...{
+          userId: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([faker.number.int(), null]),
+            undefined,
+          ]),
+          nickname: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([
+              faker.string.alpha({ length: { min: 10, max: 20 } }),
+              null,
+            ]),
+            undefined,
+          ]),
+          email: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([
+              faker.string.alpha({ length: { min: 10, max: 20 } }),
+              null,
+            ]),
+            undefined,
+          ]),
+          phoneNumber: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([
+              faker.string.alpha({ length: { min: 10, max: 20 } }),
+              null,
+            ]),
+            undefined,
+          ]),
+        },
+      },
+      null,
+    ]),
+    owner: faker.helpers.arrayElement([
+      {
+        ...{
+          storeId: faker.number.int(),
+          storeName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+          storePhoneNumber: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([
+              faker.string.alpha({ length: { min: 10, max: 20 } }),
+              null,
+            ]),
+            undefined,
+          ]),
+        },
+      },
+      null,
+    ]),
+    groupBuy: faker.helpers.arrayElement([
+      {
+        ...{
+          groupBuyId: faker.number.int(),
+          productName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+          storeName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+        },
+      },
+      null,
+    ]),
+    refundParticipationId: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([faker.number.int(), null]),
+      undefined,
+    ]),
+    assigneeName: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        null,
+      ]),
+      undefined,
+    ]),
+    processingMemo: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        null,
+      ]),
+      undefined,
+    ]),
+    resolvedAt: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.date.past().toISOString().slice(0, 19) + 'Z',
+        null,
+      ]),
+      undefined,
+    ]),
+    actionable: faker.datatype.boolean(),
+  },
+  error: {},
+  ...overrideResponse,
+});
+
+export const getPatchApiV1AdminCsTicketsTicketIdResponseMock = (
+  overrideResponse: Partial<
+    Extract<ApiResponseAdminCsTicketDetail, object>
+  > = {},
+): ApiResponseAdminCsTicketDetail => ({
+  success: faker.datatype.boolean(),
+  data: {
+    ticketId: faker.number.int(),
+    type: faker.helpers.arrayElement([
+      'REFUND',
+      'ORDER',
+      'PICKUP',
+      'ACCOUNT',
+      'ETC',
+    ] as const),
+    title: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    description: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    priority: faker.helpers.arrayElement([
+      'LOW',
+      'MEDIUM',
+      'HIGH',
+      'URGENT',
+    ] as const),
+    status: faker.helpers.arrayElement([
+      'RECEIVED',
+      'IN_PROGRESS',
+      'COMPLETED',
+    ] as const),
+    createdAt: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.date.past().toISOString().slice(0, 19) + 'Z',
+        null,
+      ]),
+      undefined,
+    ]),
+    updatedAt: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.date.past().toISOString().slice(0, 19) + 'Z',
+        null,
+      ]),
+      undefined,
+    ]),
+    slaHours: faker.number.int(),
+    consumer: faker.helpers.arrayElement([
+      {
+        ...{
+          userId: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([faker.number.int(), null]),
+            undefined,
+          ]),
+          nickname: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([
+              faker.string.alpha({ length: { min: 10, max: 20 } }),
+              null,
+            ]),
+            undefined,
+          ]),
+          email: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([
+              faker.string.alpha({ length: { min: 10, max: 20 } }),
+              null,
+            ]),
+            undefined,
+          ]),
+          phoneNumber: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([
+              faker.string.alpha({ length: { min: 10, max: 20 } }),
+              null,
+            ]),
+            undefined,
+          ]),
+        },
+      },
+      null,
+    ]),
+    owner: faker.helpers.arrayElement([
+      {
+        ...{
+          storeId: faker.number.int(),
+          storeName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+          storePhoneNumber: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([
+              faker.string.alpha({ length: { min: 10, max: 20 } }),
+              null,
+            ]),
+            undefined,
+          ]),
+        },
+      },
+      null,
+    ]),
+    groupBuy: faker.helpers.arrayElement([
+      {
+        ...{
+          groupBuyId: faker.number.int(),
+          productName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+          storeName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+        },
+      },
+      null,
+    ]),
+    refundParticipationId: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([faker.number.int(), null]),
+      undefined,
+    ]),
+    assigneeName: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        null,
+      ]),
+      undefined,
+    ]),
+    processingMemo: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        null,
+      ]),
+      undefined,
+    ]),
+    resolvedAt: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.date.past().toISOString().slice(0, 19) + 'Z',
+        null,
+      ]),
+      undefined,
+    ]),
+    actionable: faker.datatype.boolean(),
+  },
+  error: {},
+  ...overrideResponse,
+});
+
+export const getPostApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponseMock =
+  (
+    overrideResponse: Partial<
+      Extract<ApiResponseAdminOwnerGroupBuyCloseRequestAction, object>
+    > = {},
+  ): ApiResponseAdminOwnerGroupBuyCloseRequestAction => ({
+    success: faker.datatype.boolean(),
+    data: {
+      groupBuyId: faker.number.int(),
+      reviewStatus: faker.helpers.arrayElement(
+        Object.values(GroupBuyCloseRequestReviewStatus),
+      ),
+      groupBuyStatus: faker.helpers.arrayElement([
+        'IN_PROGRESS',
+        'ACHIEVED',
+        'COMPLETED',
+        'FAILED',
+        'CLOSED',
+      ] as const),
+    },
+    error: {},
+    ...overrideResponse,
+  });
+
+export const getPostApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponseMock =
+  (
+    overrideResponse: Partial<
+      Extract<ApiResponseAdminOwnerGroupBuyCloseRequestAction, object>
+    > = {},
+  ): ApiResponseAdminOwnerGroupBuyCloseRequestAction => ({
+    success: faker.datatype.boolean(),
+    data: {
+      groupBuyId: faker.number.int(),
+      reviewStatus: faker.helpers.arrayElement(
+        Object.values(GroupBuyCloseRequestReviewStatus),
+      ),
+      groupBuyStatus: faker.helpers.arrayElement([
+        'IN_PROGRESS',
+        'ACHIEVED',
+        'COMPLETED',
+        'FAILED',
+        'CLOSED',
+      ] as const),
+    },
+    error: {},
+    ...overrideResponse,
+  });
 
 export const getGetApiV1AdminGroupBuyRequestsResponseMock = (
   overrideResponse: Partial<Extract<ApiResponseAdminRequestPage, object>> = {},
@@ -423,114 +1199,236 @@ export const getPostApiV1AdminGroupBuyRequestsRequestIdRejectResponseMock = (
   ...overrideResponse,
 });
 
-export const getGetApiV1AdminGroupBuysResponseMock = (
-  overrideResponse: Partial<Extract<ApiResponseAdminGroupBuyList, object>> = {},
-): ApiResponseAdminGroupBuyList => ({
-  success: faker.datatype.boolean(),
-  data: Array.from(
-    { length: faker.number.int({ min: 1, max: 10 }) },
-    (_, i) => i + 1,
-  ).map(() => ({
-    groupBuyId: faker.number.int(),
-    storeName: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    productName: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    status: faker.helpers.arrayElement(['IN_PROGRESS', 'ACHIEVED'] as const),
-    deadline: faker.date.past().toISOString().slice(0, 10),
-    achievementRate: faker.number.int(),
-    currentQuantity: faker.number.int(),
-    targetQuantity: faker.number.int(),
-    remainingQuantity: faker.number.int(),
-    isOrderConfirmed: faker.datatype.boolean(),
-    isOrderSheetSent: faker.datatype.boolean(),
-  })),
-  error: {},
-  ...overrideResponse,
-});
-
-export const getPostApiV1AdminGroupBuysResponseMock = (
-  overrideResponse: Partial<Extract<ApiResponseGroupBuyId, object>> = {},
-): ApiResponseGroupBuyId => ({
-  success: faker.datatype.boolean(),
-  data: { groupBuyId: faker.number.int() },
-  error: {},
-  ...overrideResponse,
-});
-
-export const getGetApiV1AdminGroupBuysGroupBuyIdResponseMock = (
+export const getGetApiV1AdminOwnerGroupBuyRequestsResponseMock = (
   overrideResponse: Partial<
-    Extract<ApiResponseAdminGroupBuyDetail, object>
+    Extract<ApiResponseAdminOwnerGroupBuyRequestPage, object>
   > = {},
-): ApiResponseAdminGroupBuyDetail => ({
+): ApiResponseAdminOwnerGroupBuyRequestPage => ({
   success: faker.datatype.boolean(),
   data: {
-    groupBuyId: faker.number.int(),
-    requestId: faker.helpers.arrayElement([
-      faker.helpers.arrayElement([faker.number.int(), null]),
-      null,
-    ]),
-    storeId: faker.number.int(),
-    storeName: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    productName: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    productDescription: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    price: faker.number.int(),
-    targetQuantity: faker.number.int(),
-    maxQuantity: faker.helpers.arrayElement([
-      faker.helpers.arrayElement([faker.number.int(), null]),
-      null,
-    ]),
-    currentQuantity: faker.number.int(),
-    remainingQuantity: faker.number.int(),
-    achievementRate: faker.number.int(),
-    notice: faker.helpers.arrayElement([
-      faker.helpers.arrayElement([
-        faker.string.alpha({ length: { min: 10, max: 20 } }),
+    content: Array.from(
+      { length: faker.number.int({ min: 1, max: 10 }) },
+      (_, i) => i + 1,
+    ).map(() => ({
+      requestId: faker.number.int(),
+      requestType: faker.helpers.arrayElement(['OWNER'] as const),
+      productName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      storeName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      ownerName: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          null,
+        ]),
+        undefined,
+      ]),
+      originalPrice: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.number.int(), null]),
         null,
       ]),
-      null,
-    ]),
-    status: faker.helpers.arrayElement([
-      'IN_PROGRESS',
-      'ACHIEVED',
-      'FAILED',
-    ] as const),
-    deadline: faker.date.past().toISOString().slice(0, 19) + 'Z',
-    pickupDate: faker.date.past().toISOString().slice(0, 10),
-    pickupTimeStart: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    pickupTimeEnd: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    pickupLocation: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    isOrderConfirmed: faker.datatype.boolean(),
-    isOrderSheetSent: faker.datatype.boolean(),
+      price: faker.number.int(),
+      discountRate: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.number.int(), null]),
+        undefined,
+      ]),
+      targetQuantity: faker.number.int(),
+      pickupDate: faker.date.past().toISOString().slice(0, 10),
+      requestedAt: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.date.past().toISOString().slice(0, 19) + 'Z',
+          null,
+        ]),
+        undefined,
+      ]),
+      reviewElapsedMinutes: faker.number.int(),
+      status: faker.helpers.arrayElement([
+        'PENDING',
+        'APPROVED',
+        'REJECTED',
+      ] as const),
+      actionable: faker.datatype.boolean(),
+      approvedGroupBuyId: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.number.int(), null]),
+        undefined,
+      ]),
+    })),
+    totalElements: faker.number.int(),
+    totalPages: faker.number.int(),
+    number: faker.number.int(),
+    size: faker.number.int(),
   },
   error: {},
   ...overrideResponse,
 });
 
-export const getPatchApiV1AdminGroupBuysGroupBuyIdResponseMock = (
-  overrideResponse: Partial<Extract<SuccessNoDataResponse, object>> = {},
-): SuccessNoDataResponse => ({
+export const getGetApiV1AdminOwnerGroupBuyRequestsRequestIdResponseMock = (
+  overrideResponse: Partial<
+    Extract<ApiResponseAdminOwnerGroupBuyRequestDetail, object>
+  > = {},
+): ApiResponseAdminOwnerGroupBuyRequestDetail => ({
   success: faker.datatype.boolean(),
-  data: {},
+  data: {
+    requestId: faker.number.int(),
+    requestType: faker.helpers.arrayElement(['OWNER'] as const),
+    status: faker.helpers.arrayElement([
+      'PENDING',
+      'APPROVED',
+      'REJECTED',
+    ] as const),
+    owner: {
+      ownerId: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.number.int(), null]),
+        undefined,
+      ]),
+      nickname: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          null,
+        ]),
+        undefined,
+      ]),
+      phoneNumber: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          null,
+        ]),
+        undefined,
+      ]),
+      email: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          null,
+        ]),
+        undefined,
+      ]),
+    },
+    store: {
+      storeId: faker.number.int(),
+      storeName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      address: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      phoneNumber: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          null,
+        ]),
+        undefined,
+      ]),
+    },
+    product: {
+      productName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      productDescription: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      originalPrice: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.number.int(), null]),
+        undefined,
+      ]),
+      price: faker.number.int(),
+      discountRate: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.number.int(), null]),
+        undefined,
+      ]),
+      targetQuantity: faker.number.int(),
+      maxQuantity: faker.number.int(),
+      perUserLimit: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.number.int(), null]),
+        undefined,
+      ]),
+    },
+    recruitment: {
+      recruitmentStartAt: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.date.past().toISOString().slice(0, 19) + 'Z',
+          null,
+        ]),
+        undefined,
+      ]),
+      deadline: faker.date.past().toISOString().slice(0, 19) + 'Z',
+      pickupDate: faker.date.past().toISOString().slice(0, 10),
+      pickupTimeStart: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      pickupTimeEnd: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      pickupLocation: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      pickupContact: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          null,
+        ]),
+        undefined,
+      ]),
+    },
+    images: Array.from(
+      { length: faker.number.int({ min: 1, max: 10 }) },
+      (_, i) => i + 1,
+    ).map(() => ({
+      imageUrl: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      sortOrder: faker.number.int(),
+    })),
+    imageCount: faker.number.int(),
+    rejectionReason: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 200 } }),
+        null,
+      ]),
+      undefined,
+    ]),
+    approvedGroupBuyId: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([faker.number.int(), null]),
+      undefined,
+    ]),
+    reviewedAt: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.date.past().toISOString().slice(0, 19) + 'Z',
+        null,
+      ]),
+      undefined,
+    ]),
+    requestedAt: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([
+        faker.date.past().toISOString().slice(0, 19) + 'Z',
+        null,
+      ]),
+      undefined,
+    ]),
+    actionable: faker.datatype.boolean(),
+  },
   error: {},
   ...overrideResponse,
 });
 
-export const getPostApiV1AdminGroupBuysGroupBuyIdOrderConfirmResponseMock = (
-  overrideResponse: Partial<Extract<SuccessNoDataResponse, object>> = {},
-): SuccessNoDataResponse => ({
-  success: faker.datatype.boolean(),
-  data: {},
-  error: {},
-  ...overrideResponse,
-});
+export const getPostApiV1AdminOwnerGroupBuyRequestsRequestIdApproveResponseMock =
+  (
+    overrideResponse: Partial<
+      Extract<ApiResponseAdminOwnerGroupBuyRequestAction, object>
+    > = {},
+  ): ApiResponseAdminOwnerGroupBuyRequestAction => ({
+    success: faker.datatype.boolean(),
+    data: {
+      requestId: faker.number.int(),
+      status: faker.helpers.arrayElement(['APPROVED', 'REJECTED'] as const),
+      groupBuyId: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.number.int(), null]),
+        undefined,
+      ]),
+    },
+    error: {},
+    ...overrideResponse,
+  });
 
-export const getPostApiV1AdminGroupBuysGroupBuyIdOrderSheetResponseMock = (
-  overrideResponse: Partial<Extract<SuccessNoDataResponse, object>> = {},
-): SuccessNoDataResponse => ({
-  success: faker.datatype.boolean(),
-  data: {},
-  error: {},
-  ...overrideResponse,
-});
+export const getPostApiV1AdminOwnerGroupBuyRequestsRequestIdRejectResponseMock =
+  (
+    overrideResponse: Partial<
+      Extract<ApiResponseAdminOwnerGroupBuyRequestAction, object>
+    > = {},
+  ): ApiResponseAdminOwnerGroupBuyRequestAction => ({
+    success: faker.datatype.boolean(),
+    data: {
+      requestId: faker.number.int(),
+      status: faker.helpers.arrayElement(['APPROVED', 'REJECTED'] as const),
+      groupBuyId: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.number.int(), null]),
+        undefined,
+      ]),
+    },
+    error: {},
+    ...overrideResponse,
+  });
 
 export const getGetApiV1AdminRefundsResponseMock = (
   overrideResponse: Partial<Extract<ApiResponseAdminRefundPage, object>> = {},
@@ -575,9 +1473,29 @@ export const getPostApiV1AdminRefundsParticipationIdManualResponseMock = (
   ...overrideResponse,
 });
 
+export const getGetApiV1AdminSettlementsDashboardResponseMock = (
+  overrideResponse: Partial<
+    Extract<ApiResponseAdminSettlementDashboard, object>
+  > = {},
+): ApiResponseAdminSettlementDashboard => ({
+  success: faker.datatype.boolean(),
+  data: {
+    year: faker.number.int(),
+    month: faker.number.int(),
+    completedSettlementAmount: faker.number.int(),
+    scheduledSettlementAmount: faker.number.int(),
+    platformFeeAmount: faker.number.int(),
+    totalTransactionAmount: faker.number.int(),
+  },
+  error: {},
+  ...overrideResponse,
+});
+
 export const getGetApiV1AdminSettlementsResponseMock = (
-  overrideResponse: Partial<Extract<ApiResponseSettlementPage, object>> = {},
-): ApiResponseSettlementPage => ({
+  overrideResponse: Partial<
+    Extract<ApiResponseAdminSettlementPage, object>
+  > = {},
+): ApiResponseAdminSettlementPage => ({
   success: faker.datatype.boolean(),
   data: {
     content: Array.from(
@@ -585,57 +1503,51 @@ export const getGetApiV1AdminSettlementsResponseMock = (
       (_, i) => i + 1,
     ).map(() => ({
       settlementId: faker.number.int(),
+      groupBuyId: faker.number.int(),
       storeName: faker.string.alpha({ length: { min: 10, max: 20 } }),
       productName: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      totalAmount: faker.number.int(),
-      escrowStatus: faker.helpers.arrayElement([
-        'HOLDING',
-        'RELEASED',
-      ] as const),
-      scheduledPaymentDate: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([
-          faker.date.past().toISOString().slice(0, 10),
-          null,
-        ]),
-        null,
-      ]),
-      settlementMethod: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([
-          faker.string.alpha({ length: { min: 10, max: 20 } }),
-          null,
-        ]),
-        null,
-      ]),
-      memo: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([
-          faker.string.alpha({ length: { min: 10, max: 20 } }),
-          null,
-        ]),
-        null,
-      ]),
-      createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z',
+      pickupCompletedDate: faker.date.past().toISOString().slice(0, 10),
+      participantCount: faker.number.int(),
+      totalPaymentAmount: faker.number.int(),
+      refundDeductionAmount: faker.number.int(),
+      platformFeeAmount: faker.number.int(),
+      settlementAmount: faker.number.int(),
+      scheduledSettlementDate: faker.date.past().toISOString().slice(0, 10),
+      status: faker.helpers.arrayElement(['SCHEDULED', 'COMPLETED'] as const),
+      actionable: faker.datatype.boolean(),
     })),
     totalElements: faker.number.int(),
     totalPages: faker.number.int(),
+    number: faker.number.int(),
+    size: faker.number.int(),
   },
   error: {},
   ...overrideResponse,
 });
 
-export const getPostApiV1AdminSettlementsResponseMock = (
-  overrideResponse: Partial<Extract<ApiResponseSettlementId, object>> = {},
-): ApiResponseSettlementId => ({
+export const getGetApiV1AdminSettlementsSettlementIdResponseMock = (
+  overrideResponse: Partial<
+    Extract<ApiResponseAdminSettlementDetail, object>
+  > = {},
+): ApiResponseAdminSettlementDetail => ({
   success: faker.datatype.boolean(),
-  data: { settlementId: faker.number.int() },
-  error: {},
-  ...overrideResponse,
-});
-
-export const getPostApiV1AdminSettlementsSettlementIdReleaseResponseMock = (
-  overrideResponse: Partial<Extract<SuccessNoDataResponse, object>> = {},
-): SuccessNoDataResponse => ({
-  success: faker.datatype.boolean(),
-  data: {},
+  data: {
+    ...{
+      settlementId: faker.number.int(),
+      groupBuyId: faker.number.int(),
+      storeName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      productName: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      pickupCompletedDate: faker.date.past().toISOString().slice(0, 10),
+      participantCount: faker.number.int(),
+      totalPaymentAmount: faker.number.int(),
+      refundDeductionAmount: faker.number.int(),
+      platformFeeAmount: faker.number.int(),
+      settlementAmount: faker.number.int(),
+      scheduledSettlementDate: faker.date.past().toISOString().slice(0, 10),
+      status: faker.helpers.arrayElement(['SCHEDULED', 'COMPLETED'] as const),
+      actionable: faker.datatype.boolean(),
+    },
+  },
   error: {},
   ...overrideResponse,
 });
@@ -666,6 +1578,58 @@ export const getGetApiV1AdminSummaryMockHandler = (
   );
 };
 
+export const getGetApiV1AdminDashboardUnconfirmedOrdersMockHandler = (
+  overrideResponse?:
+    | ApiResponseAdminDashboardUnconfirmedOrders
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) =>
+        | Promise<ApiResponseAdminDashboardUnconfirmedOrders>
+        | ApiResponseAdminDashboardUnconfirmedOrders),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    '*/api/v1/admin/dashboard/unconfirmed-orders',
+    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getGetApiV1AdminDashboardUnconfirmedOrdersResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
+
+export const getGetApiV1AdminDashboardUrgentRefundsMockHandler = (
+  overrideResponse?:
+    | ApiResponseAdminDashboardUrgentRefunds
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) =>
+        | Promise<ApiResponseAdminDashboardUrgentRefunds>
+        | ApiResponseAdminDashboardUrgentRefunds),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    '*/api/v1/admin/dashboard/urgent-refunds',
+    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getGetApiV1AdminDashboardUrgentRefundsResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
+
 export const getGetApiV1AdminOrdersMockHandler = (
   overrideResponse?:
     | ApiResponseAdminOrderPage
@@ -689,6 +1653,234 @@ export const getGetApiV1AdminOrdersMockHandler = (
     options,
   );
 };
+
+export const getGetApiV1AdminOrdersOrderIdMockHandler = (
+  overrideResponse?:
+    | ApiResponseAdminOrderDetail
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) => Promise<ApiResponseAdminOrderDetail> | ApiResponseAdminOrderDetail),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    '*/api/v1/admin/orders/:orderId',
+    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getGetApiV1AdminOrdersOrderIdResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
+
+export const getPostApiV1AdminOrdersOrderIdOwnerContactMockHandler = (
+  overrideResponse?:
+    | ApiResponseAdminOrderDetail
+    | ((
+        info: Parameters<Parameters<typeof http.post>[1]>[0],
+      ) => Promise<ApiResponseAdminOrderDetail> | ApiResponseAdminOrderDetail),
+  options?: RequestHandlerOptions,
+) => {
+  return http.post(
+    '*/api/v1/admin/orders/:orderId/owner-contact',
+    async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getPostApiV1AdminOrdersOrderIdOwnerContactResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
+
+export const getPostApiV1AdminOrdersOrderIdConfirmMockHandler = (
+  overrideResponse?:
+    | ApiResponseAdminOrderDetail
+    | ((
+        info: Parameters<Parameters<typeof http.post>[1]>[0],
+      ) => Promise<ApiResponseAdminOrderDetail> | ApiResponseAdminOrderDetail),
+  options?: RequestHandlerOptions,
+) => {
+  return http.post(
+    '*/api/v1/admin/orders/:orderId/confirm',
+    async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getPostApiV1AdminOrdersOrderIdConfirmResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
+
+export const getPostApiV1AdminOrdersOrderIdCancelMockHandler = (
+  overrideResponse?:
+    | ApiResponseAdminOrderDetail
+    | ((
+        info: Parameters<Parameters<typeof http.post>[1]>[0],
+      ) => Promise<ApiResponseAdminOrderDetail> | ApiResponseAdminOrderDetail),
+  options?: RequestHandlerOptions,
+) => {
+  return http.post(
+    '*/api/v1/admin/orders/:orderId/cancel',
+    async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getPostApiV1AdminOrdersOrderIdCancelResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
+
+export const getGetApiV1AdminCsTicketsMockHandler = (
+  overrideResponse?:
+    | ApiResponseAdminCsTicketPage
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) =>
+        | Promise<ApiResponseAdminCsTicketPage>
+        | ApiResponseAdminCsTicketPage),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    '*/api/v1/admin/cs-tickets',
+    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getGetApiV1AdminCsTicketsResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
+
+export const getGetApiV1AdminCsTicketsTicketIdMockHandler = (
+  overrideResponse?:
+    | ApiResponseAdminCsTicketDetail
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) =>
+        | Promise<ApiResponseAdminCsTicketDetail>
+        | ApiResponseAdminCsTicketDetail),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    '*/api/v1/admin/cs-tickets/:ticketId',
+    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getGetApiV1AdminCsTicketsTicketIdResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
+
+export const getPatchApiV1AdminCsTicketsTicketIdMockHandler = (
+  overrideResponse?:
+    | ApiResponseAdminCsTicketDetail
+    | ((
+        info: Parameters<Parameters<typeof http.patch>[1]>[0],
+      ) =>
+        | Promise<ApiResponseAdminCsTicketDetail>
+        | ApiResponseAdminCsTicketDetail),
+  options?: RequestHandlerOptions,
+) => {
+  return http.patch(
+    '*/api/v1/admin/cs-tickets/:ticketId',
+    async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getPatchApiV1AdminCsTicketsTicketIdResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
+
+export const getPostApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveMockHandler =
+  (
+    overrideResponse?:
+      | ApiResponseAdminOwnerGroupBuyCloseRequestAction
+      | ((
+          info: Parameters<Parameters<typeof http.post>[1]>[0],
+        ) =>
+          | Promise<ApiResponseAdminOwnerGroupBuyCloseRequestAction>
+          | ApiResponseAdminOwnerGroupBuyCloseRequestAction),
+    options?: RequestHandlerOptions,
+  ) => {
+    return http.post(
+      '*/api/v1/admin/owner-group-buys/:groupBuyId/close-requests/approve',
+      async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+        return HttpResponse.json(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === 'function'
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getPostApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveResponseMock(),
+          { status: 200 },
+        );
+      },
+      options,
+    );
+  };
+
+export const getPostApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectMockHandler =
+  (
+    overrideResponse?:
+      | ApiResponseAdminOwnerGroupBuyCloseRequestAction
+      | ((
+          info: Parameters<Parameters<typeof http.post>[1]>[0],
+        ) =>
+          | Promise<ApiResponseAdminOwnerGroupBuyCloseRequestAction>
+          | ApiResponseAdminOwnerGroupBuyCloseRequestAction),
+    options?: RequestHandlerOptions,
+  ) => {
+    return http.post(
+      '*/api/v1/admin/owner-group-buys/:groupBuyId/close-requests/reject',
+      async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+        return HttpResponse.json(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === 'function'
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getPostApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectResponseMock(),
+          { status: 200 },
+        );
+      },
+      options,
+    );
+  };
 
 export const getGetApiV1AdminGroupBuyRequestsMockHandler = (
   overrideResponse?:
@@ -818,25 +2010,25 @@ export const getPostApiV1AdminGroupBuyRequestsRequestIdRejectMockHandler = (
   );
 };
 
-export const getGetApiV1AdminGroupBuysMockHandler = (
+export const getGetApiV1AdminOwnerGroupBuyRequestsMockHandler = (
   overrideResponse?:
-    | ApiResponseAdminGroupBuyList
+    | ApiResponseAdminOwnerGroupBuyRequestPage
     | ((
         info: Parameters<Parameters<typeof http.get>[1]>[0],
       ) =>
-        | Promise<ApiResponseAdminGroupBuyList>
-        | ApiResponseAdminGroupBuyList),
+        | Promise<ApiResponseAdminOwnerGroupBuyRequestPage>
+        | ApiResponseAdminOwnerGroupBuyRequestPage),
   options?: RequestHandlerOptions,
 ) => {
   return http.get(
-    '*/api/v1/admin/group-buys',
+    '*/api/v1/admin/owner-group-buy-requests',
     async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
       return HttpResponse.json(
         overrideResponse !== undefined
           ? typeof overrideResponse === 'function'
             ? await overrideResponse(info)
             : overrideResponse
-          : getGetApiV1AdminGroupBuysResponseMock(),
+          : getGetApiV1AdminOwnerGroupBuyRequestsResponseMock(),
         { status: 200 },
       );
     },
@@ -844,49 +2036,25 @@ export const getGetApiV1AdminGroupBuysMockHandler = (
   );
 };
 
-export const getPostApiV1AdminGroupBuysMockHandler = (
+export const getGetApiV1AdminOwnerGroupBuyRequestsRequestIdMockHandler = (
   overrideResponse?:
-    | ApiResponseGroupBuyId
-    | ((
-        info: Parameters<Parameters<typeof http.post>[1]>[0],
-      ) => Promise<ApiResponseGroupBuyId> | ApiResponseGroupBuyId),
-  options?: RequestHandlerOptions,
-) => {
-  return http.post(
-    '*/api/v1/admin/group-buys',
-    async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
-      return HttpResponse.json(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === 'function'
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getPostApiV1AdminGroupBuysResponseMock(),
-        { status: 201 },
-      );
-    },
-    options,
-  );
-};
-
-export const getGetApiV1AdminGroupBuysGroupBuyIdMockHandler = (
-  overrideResponse?:
-    | ApiResponseAdminGroupBuyDetail
+    | ApiResponseAdminOwnerGroupBuyRequestDetail
     | ((
         info: Parameters<Parameters<typeof http.get>[1]>[0],
       ) =>
-        | Promise<ApiResponseAdminGroupBuyDetail>
-        | ApiResponseAdminGroupBuyDetail),
+        | Promise<ApiResponseAdminOwnerGroupBuyRequestDetail>
+        | ApiResponseAdminOwnerGroupBuyRequestDetail),
   options?: RequestHandlerOptions,
 ) => {
   return http.get(
-    '*/api/v1/admin/group-buys/:groupBuyId',
+    '*/api/v1/admin/owner-group-buy-requests/:requestId',
     async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
       return HttpResponse.json(
         overrideResponse !== undefined
           ? typeof overrideResponse === 'function'
             ? await overrideResponse(info)
             : overrideResponse
-          : getGetApiV1AdminGroupBuysGroupBuyIdResponseMock(),
+          : getGetApiV1AdminOwnerGroupBuyRequestsRequestIdResponseMock(),
         { status: 200 },
       );
     },
@@ -894,77 +2062,59 @@ export const getGetApiV1AdminGroupBuysGroupBuyIdMockHandler = (
   );
 };
 
-export const getPatchApiV1AdminGroupBuysGroupBuyIdMockHandler = (
-  overrideResponse?:
-    | SuccessNoDataResponse
-    | ((
-        info: Parameters<Parameters<typeof http.patch>[1]>[0],
-      ) => Promise<SuccessNoDataResponse> | SuccessNoDataResponse),
-  options?: RequestHandlerOptions,
-) => {
-  return http.patch(
-    '*/api/v1/admin/group-buys/:groupBuyId',
-    async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
-      return HttpResponse.json(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === 'function'
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getPatchApiV1AdminGroupBuysGroupBuyIdResponseMock(),
-        { status: 200 },
-      );
-    },
-    options,
-  );
-};
+export const getPostApiV1AdminOwnerGroupBuyRequestsRequestIdApproveMockHandler =
+  (
+    overrideResponse?:
+      | ApiResponseAdminOwnerGroupBuyRequestAction
+      | ((
+          info: Parameters<Parameters<typeof http.post>[1]>[0],
+        ) =>
+          | Promise<ApiResponseAdminOwnerGroupBuyRequestAction>
+          | ApiResponseAdminOwnerGroupBuyRequestAction),
+    options?: RequestHandlerOptions,
+  ) => {
+    return http.post(
+      '*/api/v1/admin/owner-group-buy-requests/:requestId/approve',
+      async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+        return HttpResponse.json(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === 'function'
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getPostApiV1AdminOwnerGroupBuyRequestsRequestIdApproveResponseMock(),
+          { status: 201 },
+        );
+      },
+      options,
+    );
+  };
 
-export const getPostApiV1AdminGroupBuysGroupBuyIdOrderConfirmMockHandler = (
-  overrideResponse?:
-    | SuccessNoDataResponse
-    | ((
-        info: Parameters<Parameters<typeof http.post>[1]>[0],
-      ) => Promise<SuccessNoDataResponse> | SuccessNoDataResponse),
-  options?: RequestHandlerOptions,
-) => {
-  return http.post(
-    '*/api/v1/admin/group-buys/:groupBuyId/order-confirm',
-    async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
-      return HttpResponse.json(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === 'function'
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getPostApiV1AdminGroupBuysGroupBuyIdOrderConfirmResponseMock(),
-        { status: 200 },
-      );
-    },
-    options,
-  );
-};
-
-export const getPostApiV1AdminGroupBuysGroupBuyIdOrderSheetMockHandler = (
-  overrideResponse?:
-    | SuccessNoDataResponse
-    | ((
-        info: Parameters<Parameters<typeof http.post>[1]>[0],
-      ) => Promise<SuccessNoDataResponse> | SuccessNoDataResponse),
-  options?: RequestHandlerOptions,
-) => {
-  return http.post(
-    '*/api/v1/admin/group-buys/:groupBuyId/order-sheet',
-    async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
-      return HttpResponse.json(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === 'function'
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getPostApiV1AdminGroupBuysGroupBuyIdOrderSheetResponseMock(),
-        { status: 200 },
-      );
-    },
-    options,
-  );
-};
+export const getPostApiV1AdminOwnerGroupBuyRequestsRequestIdRejectMockHandler =
+  (
+    overrideResponse?:
+      | ApiResponseAdminOwnerGroupBuyRequestAction
+      | ((
+          info: Parameters<Parameters<typeof http.post>[1]>[0],
+        ) =>
+          | Promise<ApiResponseAdminOwnerGroupBuyRequestAction>
+          | ApiResponseAdminOwnerGroupBuyRequestAction),
+    options?: RequestHandlerOptions,
+  ) => {
+    return http.post(
+      '*/api/v1/admin/owner-group-buy-requests/:requestId/reject',
+      async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+        return HttpResponse.json(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === 'function'
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getPostApiV1AdminOwnerGroupBuyRequestsRequestIdRejectResponseMock(),
+          { status: 200 },
+        );
+      },
+      options,
+    );
+  };
 
 export const getGetApiV1AdminRefundsMockHandler = (
   overrideResponse?:
@@ -1014,12 +2164,40 @@ export const getPostApiV1AdminRefundsParticipationIdManualMockHandler = (
   );
 };
 
-export const getGetApiV1AdminSettlementsMockHandler = (
+export const getGetApiV1AdminSettlementsDashboardMockHandler = (
   overrideResponse?:
-    | ApiResponseSettlementPage
+    | ApiResponseAdminSettlementDashboard
     | ((
         info: Parameters<Parameters<typeof http.get>[1]>[0],
-      ) => Promise<ApiResponseSettlementPage> | ApiResponseSettlementPage),
+      ) =>
+        | Promise<ApiResponseAdminSettlementDashboard>
+        | ApiResponseAdminSettlementDashboard),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    '*/api/v1/admin/settlements/dashboard',
+    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getGetApiV1AdminSettlementsDashboardResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
+
+export const getGetApiV1AdminSettlementsMockHandler = (
+  overrideResponse?:
+    | ApiResponseAdminSettlementPage
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) =>
+        | Promise<ApiResponseAdminSettlementPage>
+        | ApiResponseAdminSettlementPage),
   options?: RequestHandlerOptions,
 ) => {
   return http.get(
@@ -1038,47 +2216,25 @@ export const getGetApiV1AdminSettlementsMockHandler = (
   );
 };
 
-export const getPostApiV1AdminSettlementsMockHandler = (
+export const getGetApiV1AdminSettlementsSettlementIdMockHandler = (
   overrideResponse?:
-    | ApiResponseSettlementId
+    | ApiResponseAdminSettlementDetail
     | ((
-        info: Parameters<Parameters<typeof http.post>[1]>[0],
-      ) => Promise<ApiResponseSettlementId> | ApiResponseSettlementId),
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) =>
+        | Promise<ApiResponseAdminSettlementDetail>
+        | ApiResponseAdminSettlementDetail),
   options?: RequestHandlerOptions,
 ) => {
-  return http.post(
-    '*/api/v1/admin/settlements',
-    async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+  return http.get(
+    '*/api/v1/admin/settlements/:settlementId',
+    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
       return HttpResponse.json(
         overrideResponse !== undefined
           ? typeof overrideResponse === 'function'
             ? await overrideResponse(info)
             : overrideResponse
-          : getPostApiV1AdminSettlementsResponseMock(),
-        { status: 201 },
-      );
-    },
-    options,
-  );
-};
-
-export const getPostApiV1AdminSettlementsSettlementIdReleaseMockHandler = (
-  overrideResponse?:
-    | SuccessNoDataResponse
-    | ((
-        info: Parameters<Parameters<typeof http.post>[1]>[0],
-      ) => Promise<SuccessNoDataResponse> | SuccessNoDataResponse),
-  options?: RequestHandlerOptions,
-) => {
-  return http.post(
-    '*/api/v1/admin/settlements/:settlementId/release',
-    async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
-      return HttpResponse.json(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === 'function'
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getPostApiV1AdminSettlementsSettlementIdReleaseResponseMock(),
+          : getGetApiV1AdminSettlementsSettlementIdResponseMock(),
         { status: 200 },
       );
     },
@@ -1087,21 +2243,30 @@ export const getPostApiV1AdminSettlementsSettlementIdReleaseMockHandler = (
 };
 export const getAdminMock = () => [
   getGetApiV1AdminSummaryMockHandler(),
+  getGetApiV1AdminDashboardUnconfirmedOrdersMockHandler(),
+  getGetApiV1AdminDashboardUrgentRefundsMockHandler(),
   getGetApiV1AdminOrdersMockHandler(),
+  getGetApiV1AdminOrdersOrderIdMockHandler(),
+  getPostApiV1AdminOrdersOrderIdOwnerContactMockHandler(),
+  getPostApiV1AdminOrdersOrderIdConfirmMockHandler(),
+  getPostApiV1AdminOrdersOrderIdCancelMockHandler(),
+  getGetApiV1AdminCsTicketsMockHandler(),
+  getGetApiV1AdminCsTicketsTicketIdMockHandler(),
+  getPatchApiV1AdminCsTicketsTicketIdMockHandler(),
+  getPostApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsApproveMockHandler(),
+  getPostApiV1AdminOwnerGroupBuysGroupBuyIdCloseRequestsRejectMockHandler(),
   getGetApiV1AdminGroupBuyRequestsMockHandler(),
   getGetApiV1AdminGroupBuyRequestsRequestIdMockHandler(),
   getPatchApiV1AdminGroupBuyRequestsRequestIdStatusMockHandler(),
   getPostApiV1AdminGroupBuyRequestsRequestIdApproveMockHandler(),
   getPostApiV1AdminGroupBuyRequestsRequestIdRejectMockHandler(),
-  getGetApiV1AdminGroupBuysMockHandler(),
-  getPostApiV1AdminGroupBuysMockHandler(),
-  getGetApiV1AdminGroupBuysGroupBuyIdMockHandler(),
-  getPatchApiV1AdminGroupBuysGroupBuyIdMockHandler(),
-  getPostApiV1AdminGroupBuysGroupBuyIdOrderConfirmMockHandler(),
-  getPostApiV1AdminGroupBuysGroupBuyIdOrderSheetMockHandler(),
+  getGetApiV1AdminOwnerGroupBuyRequestsMockHandler(),
+  getGetApiV1AdminOwnerGroupBuyRequestsRequestIdMockHandler(),
+  getPostApiV1AdminOwnerGroupBuyRequestsRequestIdApproveMockHandler(),
+  getPostApiV1AdminOwnerGroupBuyRequestsRequestIdRejectMockHandler(),
   getGetApiV1AdminRefundsMockHandler(),
   getPostApiV1AdminRefundsParticipationIdManualMockHandler(),
+  getGetApiV1AdminSettlementsDashboardMockHandler(),
   getGetApiV1AdminSettlementsMockHandler(),
-  getPostApiV1AdminSettlementsMockHandler(),
-  getPostApiV1AdminSettlementsSettlementIdReleaseMockHandler(),
+  getGetApiV1AdminSettlementsSettlementIdMockHandler(),
 ];

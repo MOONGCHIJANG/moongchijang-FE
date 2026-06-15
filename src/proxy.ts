@@ -189,7 +189,6 @@ export const config = {
     '/login',
     '/login/:path*',
     '/signup/email',
-    '/admin/login',
     '/admin/:path*',
   ],
 };

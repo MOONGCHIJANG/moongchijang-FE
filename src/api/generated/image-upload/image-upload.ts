@@ -8,7 +8,7 @@ import type {
   BadRequestResponse,
   ImageDeleteRequest,
   ImagePresignedUploadRequest,
-  UnauthorizedResponse,
+  UnauthorizedResponse
 } from '../api.schemas';
 
 import { customFetch } from '../../../lib/custom-fetch';
@@ -20,53 +20,49 @@ import { customFetch } from '../../../lib/custom-fetch';
  * @summary S3 이미지 업로드용 Presigned URL 발급
  */
 export type postApiV1ImagesPresignedUrlsResponse200 = {
-  data: ApiResponseImagePresignedUpload;
-  status: 200;
-};
+  data: ApiResponseImagePresignedUpload
+  status: 200
+}
 
 export type postApiV1ImagesPresignedUrlsResponse400 = {
-  data: BadRequestResponse;
-  status: 400;
-};
+  data: BadRequestResponse
+  status: 400
+}
 
 export type postApiV1ImagesPresignedUrlsResponse401 = {
-  data: UnauthorizedResponse;
-  status: 401;
-};
+  data: UnauthorizedResponse
+  status: 401
+}
 
-export type postApiV1ImagesPresignedUrlsResponseSuccess =
-  postApiV1ImagesPresignedUrlsResponse200 & {
-    headers: Headers;
-  };
-export type postApiV1ImagesPresignedUrlsResponseError = (
-  | postApiV1ImagesPresignedUrlsResponse400
-  | postApiV1ImagesPresignedUrlsResponse401
-) & {
+export type postApiV1ImagesPresignedUrlsResponseSuccess = (postApiV1ImagesPresignedUrlsResponse200) & {
+  headers: Headers;
+};
+export type postApiV1ImagesPresignedUrlsResponseError = (postApiV1ImagesPresignedUrlsResponse400 | postApiV1ImagesPresignedUrlsResponse401) & {
   headers: Headers;
 };
 
-export type postApiV1ImagesPresignedUrlsResponse =
-  | postApiV1ImagesPresignedUrlsResponseSuccess
-  | postApiV1ImagesPresignedUrlsResponseError;
+export type postApiV1ImagesPresignedUrlsResponse = (postApiV1ImagesPresignedUrlsResponseSuccess | postApiV1ImagesPresignedUrlsResponseError)
 
 export const getPostApiV1ImagesPresignedUrlsUrl = () => {
-  return `/api/v1/images/presigned-urls`;
-};
 
-export const postApiV1ImagesPresignedUrls = async (
-  imagePresignedUploadRequest: ImagePresignedUploadRequest,
-  options?: RequestInit,
-): Promise<postApiV1ImagesPresignedUrlsResponse> => {
-  return customFetch<postApiV1ImagesPresignedUrlsResponse>(
-    getPostApiV1ImagesPresignedUrlsUrl(),
-    {
-      ...options,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...options?.headers },
-      body: JSON.stringify(imagePresignedUploadRequest),
-    },
-  );
-};
+
+
+
+  return `/api/v1/images/presigned-urls`
+}
+
+export const postApiV1ImagesPresignedUrls = async (imagePresignedUploadRequest: ImagePresignedUploadRequest, options?: RequestInit): Promise<postApiV1ImagesPresignedUrlsResponse> => {
+
+  return customFetch<postApiV1ImagesPresignedUrlsResponse>(getPostApiV1ImagesPresignedUrlsUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      imagePresignedUploadRequest,)
+  }
+);}
+
 
 /**
  * 인증된 사용자의 현재 역할이 BUYER, SELLER, ADMIN 중 하나이면 호출할 수 있다.
@@ -75,46 +71,47 @@ export const postApiV1ImagesPresignedUrls = async (
  * @summary S3 업로드 이미지 삭제
  */
 export type deleteApiV1ImagesResponse200 = {
-  data: ApiResponseImageDelete;
-  status: 200;
-};
+  data: ApiResponseImageDelete
+  status: 200
+}
 
 export type deleteApiV1ImagesResponse400 = {
-  data: BadRequestResponse;
-  status: 400;
-};
+  data: BadRequestResponse
+  status: 400
+}
 
 export type deleteApiV1ImagesResponse401 = {
-  data: UnauthorizedResponse;
-  status: 401;
-};
+  data: UnauthorizedResponse
+  status: 401
+}
 
-export type deleteApiV1ImagesResponseSuccess = deleteApiV1ImagesResponse200 & {
+export type deleteApiV1ImagesResponseSuccess = (deleteApiV1ImagesResponse200) & {
   headers: Headers;
 };
-export type deleteApiV1ImagesResponseError = (
-  | deleteApiV1ImagesResponse400
-  | deleteApiV1ImagesResponse401
-) & {
+export type deleteApiV1ImagesResponseError = (deleteApiV1ImagesResponse400 | deleteApiV1ImagesResponse401) & {
   headers: Headers;
 };
 
-export type deleteApiV1ImagesResponse =
-  | deleteApiV1ImagesResponseSuccess
-  | deleteApiV1ImagesResponseError;
+export type deleteApiV1ImagesResponse = (deleteApiV1ImagesResponseSuccess | deleteApiV1ImagesResponseError)
 
 export const getDeleteApiV1ImagesUrl = () => {
-  return `/api/v1/images`;
-};
 
-export const deleteApiV1Images = async (
-  imageDeleteRequest: ImageDeleteRequest,
-  options?: RequestInit,
-): Promise<deleteApiV1ImagesResponse> => {
-  return customFetch<deleteApiV1ImagesResponse>(getDeleteApiV1ImagesUrl(), {
+
+
+
+  return `/api/v1/images`
+}
+
+export const deleteApiV1Images = async (imageDeleteRequest: ImageDeleteRequest, options?: RequestInit): Promise<deleteApiV1ImagesResponse> => {
+
+  return customFetch<deleteApiV1ImagesResponse>(getDeleteApiV1ImagesUrl(),
+  {
     ...options,
     method: 'DELETE',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(imageDeleteRequest),
-  });
-};
+    body: JSON.stringify(
+      imageDeleteRequest,)
+  }
+);}
+
+

@@ -40,7 +40,10 @@ export const GetApiV1ParticipationsParticipationIdPickupResponse = zod.object({
       .number()
       .nullish()
       .describe('당일 픽업 종료까지 남은 분. 당일이 아니면 null'),
-    pickedUpAt: zod.iso.datetime({ offset: true }).nullish(),
+    pickedUpAt: zod.iso
+      .datetime({ offset: true })
+      .nullish()
+      .describe("UTC 기준 픽업 완료 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`"),
   }),
   error: zod.unknown().nullable(),
 });
@@ -76,7 +79,10 @@ export const GetApiV1ParticipationsParticipationIdQrResponse = zod.object({
       .describe(
         'KST 기준 픽업일까지 남은 날짜. 당일이면 0, 지난 픽업일이면 음수',
       ),
-    pickedUpAt: zod.iso.datetime({ offset: true }).nullish(),
+    pickedUpAt: zod.iso
+      .datetime({ offset: true })
+      .nullish()
+      .describe("UTC 기준 픽업 완료 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`"),
   }),
   error: zod.unknown().nullable(),
 });

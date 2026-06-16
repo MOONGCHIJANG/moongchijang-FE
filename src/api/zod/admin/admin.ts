@@ -806,10 +806,18 @@ export const PatchApiV1AdminGroupBuyRequestsRequestIdStatusResponse =
       statusHistory: zod.array(
         zod.object({
           status: zod.enum(['IN_REVIEW', 'IN_CONTACT', 'OPENED', 'REJECTED']),
-          changedAt: zod.iso.datetime({ offset: true }),
+          changedAt: zod.iso
+            .datetime({ offset: true })
+            .describe(
+              "UTC 기준 상태 변경 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`",
+            ),
         }),
       ),
-      createdAt: zod.iso.datetime({ offset: true }),
+      createdAt: zod.iso
+        .datetime({ offset: true })
+        .describe(
+          "UTC 기준 요청 생성 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`",
+        ),
     }),
     error: zod.unknown().nullable(),
   });
@@ -965,7 +973,12 @@ export const GetApiV1AdminOwnerGroupBuyRequestsResponse = zod.object({
         discountRate: zod.number().nullish().describe('정가 대비 할인율(%)'),
         targetQuantity: zod.number(),
         pickupDate: zod.iso.date(),
-        requestedAt: zod.iso.datetime({ offset: true }).nullish(),
+        requestedAt: zod.iso
+          .datetime({ offset: true })
+          .nullish()
+          .describe(
+            "UTC 기준 요청 생성 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`",
+          ),
         reviewElapsedMinutes: zod
           .number()
           .describe('요청 생성 후 경과한 검토 시간(분)'),
@@ -1023,8 +1036,12 @@ export const GetApiV1AdminOwnerGroupBuyRequestsRequestIdResponse = zod.object({
       recruitmentStartAt: zod.iso
         .datetime({ offset: true })
         .nullish()
-        .describe('승인 후 생성된 공구의 모집 시작일시. 승인 전 요청은 null'),
-      deadline: zod.iso.datetime({ offset: true }).describe('모집 마감일시'),
+        .describe(
+          '승인 후 생성된 공구의 KST 기준 모집 시작 일시. 승인 전 요청은 null',
+        ),
+      deadline: zod.iso
+        .datetime({ offset: true })
+        .describe('KST 기준 모집 마감 일시'),
       pickupDate: zod.iso.date(),
       pickupTimeStart: zod.iso.time({}),
       pickupTimeEnd: zod.iso.time({}),
@@ -1045,8 +1062,14 @@ export const GetApiV1AdminOwnerGroupBuyRequestsRequestIdResponse = zod.object({
       )
       .nullish(),
     approvedGroupBuyId: zod.number().nullish(),
-    reviewedAt: zod.iso.datetime({ offset: true }).nullish(),
-    requestedAt: zod.iso.datetime({ offset: true }).nullish(),
+    reviewedAt: zod.iso
+      .datetime({ offset: true })
+      .nullish()
+      .describe("UTC 기준 검토 완료 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`"),
+    requestedAt: zod.iso
+      .datetime({ offset: true })
+      .nullish()
+      .describe("UTC 기준 요청 생성 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`"),
     actionable: zod.boolean().describe('승인\/반려 작업 가능 여부'),
   }),
   error: zod.unknown().nullable(),

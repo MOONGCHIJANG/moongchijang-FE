@@ -92,7 +92,9 @@ export const PostApiV1PaymentsPortoneCompleteResponse = zod.object({
     displayStatus: zod.string(),
     amount: zod.number(),
     method: zod.string().nullish(),
-    approvedAt: zod.iso.datetime({ offset: true }),
+    approvedAt: zod.iso
+      .datetime({ offset: true })
+      .describe("UTC 기준 결제 승인 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`"),
   }),
   error: zod.unknown().nullable(),
 });
@@ -168,8 +170,12 @@ export const PostApiV1ParticipationsParticipationIdCancelResponse = zod.object({
   data: zod.object({
     participationId: zod.number(),
     status: zod.enum(['REFUNDED']),
-    cancelledAt: zod.iso.datetime({ offset: true }),
-    refundedAt: zod.iso.datetime({ offset: true }),
+    cancelledAt: zod.iso
+      .datetime({ offset: true })
+      .describe("UTC 기준 참여 취소 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`"),
+    refundedAt: zod.iso
+      .datetime({ offset: true })
+      .describe("UTC 기준 환불 완료 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`"),
   }),
   error: zod.unknown().nullable(),
 });

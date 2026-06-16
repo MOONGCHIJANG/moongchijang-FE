@@ -59,9 +59,16 @@ export const PostApiV1AuthKakaoResponse = zod.object({
         ),
       signupCompleted: zod.boolean(),
       sellerSignupCompleted: zod.boolean(),
-      deletedAt: zod.iso.datetime({ offset: true }).nullish(),
-      createdAt: zod.iso.datetime({ offset: true }),
-      updatedAt: zod.iso.datetime({ offset: true }),
+      deletedAt: zod.iso
+        .datetime({ offset: true })
+        .nullish()
+        .describe("UTC 기준 삭제 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`"),
+      createdAt: zod.iso
+        .datetime({ offset: true })
+        .describe("UTC 기준 생성 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`"),
+      updatedAt: zod.iso
+        .datetime({ offset: true })
+        .describe("UTC 기준 수정 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`"),
     }),
   }),
   error: zod.unknown().nullable(),
@@ -69,6 +76,8 @@ export const PostApiV1AuthKakaoResponse = zod.object({
 
 /**
  * HttpOnly 쿠키의 refreshToken을 검증해 Access Token을 재발급한다.
+refreshToken 쿠키는 환경별 path를 사용하며, 현재 요청 경로와 동일한 path 기준으로 갱신된다. (prod=`/`, dev=`/dev`)
+
  * @summary Access Token 갱신
  */
 export const PostApiV1AuthRefreshResponse = zod.object({
@@ -83,6 +92,8 @@ export const PostApiV1AuthRefreshResponse = zod.object({
 
 /**
  * Refresh Token을 무효화한다.
+refreshToken 쿠키는 발급 시 사용한 동일 path 기준으로 삭제한다. (prod=`/`, dev=`/dev`)
+
  * @summary 로그아웃
  */
 export const PostApiV1AuthLogoutResponse = zod.object({
@@ -130,9 +141,16 @@ export const GetApiV1UsersMeResponse = zod.object({
       ),
     signupCompleted: zod.boolean(),
     sellerSignupCompleted: zod.boolean(),
-    deletedAt: zod.iso.datetime({ offset: true }).nullish(),
-    createdAt: zod.iso.datetime({ offset: true }),
-    updatedAt: zod.iso.datetime({ offset: true }),
+    deletedAt: zod.iso
+      .datetime({ offset: true })
+      .nullish()
+      .describe("UTC 기준 삭제 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`"),
+    createdAt: zod.iso
+      .datetime({ offset: true })
+      .describe("UTC 기준 생성 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`"),
+    updatedAt: zod.iso
+      .datetime({ offset: true })
+      .describe("UTC 기준 수정 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`"),
   }),
   error: zod.unknown().nullable(),
 });
@@ -217,9 +235,16 @@ export const PatchApiV1UsersMeRoleResponse = zod.object({
       ),
     signupCompleted: zod.boolean(),
     sellerSignupCompleted: zod.boolean(),
-    deletedAt: zod.iso.datetime({ offset: true }).nullish(),
-    createdAt: zod.iso.datetime({ offset: true }),
-    updatedAt: zod.iso.datetime({ offset: true }),
+    deletedAt: zod.iso
+      .datetime({ offset: true })
+      .nullish()
+      .describe("UTC 기준 삭제 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`"),
+    createdAt: zod.iso
+      .datetime({ offset: true })
+      .describe("UTC 기준 생성 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`"),
+    updatedAt: zod.iso
+      .datetime({ offset: true })
+      .describe("UTC 기준 수정 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`"),
   }),
   error: zod.unknown().nullable(),
 });
@@ -895,9 +920,16 @@ export const PostApiV1AuthEmailSignupResponse = zod.object({
         ),
       signupCompleted: zod.boolean(),
       sellerSignupCompleted: zod.boolean(),
-      deletedAt: zod.iso.datetime({ offset: true }).nullish(),
-      createdAt: zod.iso.datetime({ offset: true }),
-      updatedAt: zod.iso.datetime({ offset: true }),
+      deletedAt: zod.iso
+        .datetime({ offset: true })
+        .nullish()
+        .describe("UTC 기준 삭제 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`"),
+      createdAt: zod.iso
+        .datetime({ offset: true })
+        .describe("UTC 기준 생성 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`"),
+      updatedAt: zod.iso
+        .datetime({ offset: true })
+        .describe("UTC 기준 수정 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`"),
     }),
   }),
   error: zod.unknown().nullable(),
@@ -953,9 +985,16 @@ export const PostApiV1AuthEmailLoginResponse = zod.object({
         ),
       signupCompleted: zod.boolean(),
       sellerSignupCompleted: zod.boolean(),
-      deletedAt: zod.iso.datetime({ offset: true }).nullish(),
-      createdAt: zod.iso.datetime({ offset: true }),
-      updatedAt: zod.iso.datetime({ offset: true }),
+      deletedAt: zod.iso
+        .datetime({ offset: true })
+        .nullish()
+        .describe("UTC 기준 삭제 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`"),
+      createdAt: zod.iso
+        .datetime({ offset: true })
+        .describe("UTC 기준 생성 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`"),
+      updatedAt: zod.iso
+        .datetime({ offset: true })
+        .describe("UTC 기준 수정 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`"),
     }),
   }),
   error: zod.unknown().nullable(),

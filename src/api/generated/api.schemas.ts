@@ -25,21 +25,22 @@ export interface KakaoLoginRequest {
   /** 카카오 인가 코드 */
   authorizationCode: string;
   /**
-   * 카카오 인가 요청 시 사용한 redirect URI (서버 검증용)
-   * @nullable
-   */
+     * 카카오 인가 요청 시 사용한 redirect URI (서버 검증용)
+     * @nullable
+     */
   redirectUri?: string | null;
 }
 
-export type AuthUserProvider =
-  (typeof AuthUserProvider)[keyof typeof AuthUserProvider];
+export type AuthUserProvider = typeof AuthUserProvider[keyof typeof AuthUserProvider];
+
 
 export const AuthUserProvider = {
   KAKAO: 'KAKAO',
   EMAIL: 'EMAIL',
 } as const;
 
-export type AuthUserRole = (typeof AuthUserRole)[keyof typeof AuthUserRole];
+export type AuthUserRole = typeof AuthUserRole[keyof typeof AuthUserRole];
+
 
 export const AuthUserRole = {
   BUYER: 'BUYER',
@@ -50,9 +51,8 @@ export const AuthUserRole = {
 /**
  * @nullable
  */
-export type AuthUserLastRole =
-  | (typeof AuthUserLastRole)[keyof typeof AuthUserLastRole]
-  | null;
+export type AuthUserLastRole = typeof AuthUserLastRole[keyof typeof AuthUserLastRole] | null;
+
 
 export const AuthUserLastRole = {
   BUYER: 'BUYER',
@@ -64,9 +64,9 @@ export interface AuthUser {
   id: number;
   provider: AuthUserProvider;
   /**
-   * 소셜 제공자 아이디 (카카오 고유 ID 등)
-   * @nullable
-   */
+     * 소셜 제공자 아이디 (카카오 고유 ID 등)
+     * @nullable
+     */
   providerId?: string | null;
   /** @nullable */
   email?: string | null;
@@ -87,9 +87,14 @@ export interface AuthUser {
   canSwitchToSeller?: boolean;
   signupCompleted: boolean;
   sellerSignupCompleted: boolean;
-  /** @nullable */
+  /**
+     * UTC 기준 삭제 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`
+     * @nullable
+     */
   deletedAt?: string | null;
+  /** UTC 기준 생성 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss` */
   createdAt: string;
+  /** UTC 기준 수정 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss` */
   updatedAt: string;
 }
 
@@ -131,8 +136,8 @@ export interface ApiResponseUserInfo {
 /**
  * 현재 사용자 활성 역할
  */
-export type WithdrawalContextResponseCurrentRole =
-  (typeof WithdrawalContextResponseCurrentRole)[keyof typeof WithdrawalContextResponseCurrentRole];
+export type WithdrawalContextResponseCurrentRole = typeof WithdrawalContextResponseCurrentRole[keyof typeof WithdrawalContextResponseCurrentRole];
+
 
 export const WithdrawalContextResponseCurrentRole = {
   BUYER: 'BUYER',
@@ -143,8 +148,8 @@ export const WithdrawalContextResponseCurrentRole = {
 /**
  * 소비자 탈퇴 차단 사유
  */
-export type BuyerWithdrawalBlockingReason =
-  (typeof BuyerWithdrawalBlockingReason)[keyof typeof BuyerWithdrawalBlockingReason];
+export type BuyerWithdrawalBlockingReason = typeof BuyerWithdrawalBlockingReason[keyof typeof BuyerWithdrawalBlockingReason];
+
 
 export const BuyerWithdrawalBlockingReason = {
   NONE: 'NONE',
@@ -164,8 +169,8 @@ export interface BuyerWithdrawalContext {
 /**
  * 사장님 탈퇴 차단 사유
  */
-export type SellerWithdrawalBlockingReason =
-  (typeof SellerWithdrawalBlockingReason)[keyof typeof SellerWithdrawalBlockingReason];
+export type SellerWithdrawalBlockingReason = typeof SellerWithdrawalBlockingReason[keyof typeof SellerWithdrawalBlockingReason];
+
 
 export const SellerWithdrawalBlockingReason = {
   NONE: 'NONE',
@@ -186,8 +191,8 @@ export interface SellerWithdrawalContext {
 /**
  * 탈퇴 화면 타입
  */
-export type WithdrawalScreenType =
-  (typeof WithdrawalScreenType)[keyof typeof WithdrawalScreenType];
+export type WithdrawalScreenType = typeof WithdrawalScreenType[keyof typeof WithdrawalScreenType];
+
 
 export const WithdrawalScreenType = {
   BUYER_WITHDRAWAL: 'BUYER_WITHDRAWAL',
@@ -240,24 +245,24 @@ export interface ApiResponseSellerBusinessProfile {
 
 export interface AdditionalInfoUpsertRequest {
   /**
-   * 2~10자, 한글/영문/숫자만 허용
-   * @minLength 2
-   * @maxLength 10
-   * @pattern ^[A-Za-z0-9가-힣]{2,10}$
-   */
+     * 2~10자, 한글/영문/숫자만 허용
+     * @minLength 2
+     * @maxLength 10
+     * @pattern ^[A-Za-z0-9가-힣]{2,10}$
+     */
   nickname: string;
   /**
-   * 하이픈 포함 휴대폰 번호 (01X-XXXX-XXXX)
-   * @pattern ^01[0-9]-[0-9]{3,4}-[0-9]{4}$
-   */
+     * 하이픈 포함 휴대폰 번호 (01X-XXXX-XXXX)
+     * @pattern ^01[0-9]-[0-9]{3,4}-[0-9]{4}$
+     */
   phoneNumber: string;
 }
 
 /**
  * 전환할 역할
  */
-export type MyPageRoleSwitchRequestRole =
-  (typeof MyPageRoleSwitchRequestRole)[keyof typeof MyPageRoleSwitchRequestRole];
+export type MyPageRoleSwitchRequestRole = typeof MyPageRoleSwitchRequestRole[keyof typeof MyPageRoleSwitchRequestRole];
+
 
 export const MyPageRoleSwitchRequestRole = {
   BUYER: 'BUYER',
@@ -273,9 +278,8 @@ export interface MyPageRoleSwitchRequest {
  * 탈퇴 사유(선택)
  * @nullable
  */
-export type WithdrawRequestReason =
-  | (typeof WithdrawRequestReason)[keyof typeof WithdrawRequestReason]
-  | null;
+export type WithdrawRequestReason = typeof WithdrawRequestReason[keyof typeof WithdrawRequestReason] | null;
+
 
 export const WithdrawRequestReason = {
   NO_DESIRED_GROUPBUY: 'NO_DESIRED_GROUPBUY',
@@ -286,15 +290,15 @@ export const WithdrawRequestReason = {
 
 export interface WithdrawRequest {
   /**
-   * 탈퇴 사유(선택)
-   * @nullable
-   */
+     * 탈퇴 사유(선택)
+     * @nullable
+     */
   reason?: WithdrawRequestReason;
   /**
-   * 탈퇴 상세 사유 (reason=OTHER 일 때 입력)
-   * @maxLength 500
-   * @nullable
-   */
+     * 탈퇴 상세 사유 (reason=OTHER 일 때 입력)
+     * @maxLength 500
+     * @nullable
+     */
   reasonDetail?: string | null;
 }
 
@@ -302,9 +306,8 @@ export interface WithdrawRequest {
  * 사장님 탈퇴 사유(선택)
  * @nullable
  */
-export type OwnerWithdrawRequestReason =
-  | (typeof OwnerWithdrawRequestReason)[keyof typeof OwnerWithdrawRequestReason]
-  | null;
+export type OwnerWithdrawRequestReason = typeof OwnerWithdrawRequestReason[keyof typeof OwnerWithdrawRequestReason] | null;
+
 
 export const OwnerWithdrawRequestReason = {
   INCONVENIENT_SERVICE: 'INCONVENIENT_SERVICE',
@@ -315,15 +318,15 @@ export const OwnerWithdrawRequestReason = {
 
 export interface OwnerWithdrawRequest {
   /**
-   * 사장님 탈퇴 사유(선택)
-   * @nullable
-   */
+     * 사장님 탈퇴 사유(선택)
+     * @nullable
+     */
   reason?: OwnerWithdrawRequestReason;
   /**
-   * 사장님 탈퇴 상세 사유 (reason=OTHER 일 때 입력)
-   * @maxLength 500
-   * @nullable
-   */
+     * 사장님 탈퇴 상세 사유 (reason=OTHER 일 때 입력)
+     * @maxLength 500
+     * @nullable
+     */
   reasonDetail?: string | null;
 }
 
@@ -353,14 +356,14 @@ export interface ApiResponseAdditionalInfoUpdated {
 
 export interface BusinessRegistrationLookupRequest {
   /**
-   * 사업자등록번호(하이픈 포함/미포함 모두 허용)
-   * @pattern ^\d{3}-?\d{2}-?\d{5}$
-   */
+     * 사업자등록번호(하이픈 포함/미포함 모두 허용)
+     * @pattern ^\d{3}-?\d{2}-?\d{5}$
+     */
   businessRegistrationNumber: string;
 }
 
-export type ApiResponseBusinessRegistrationLookupDataStatus =
-  (typeof ApiResponseBusinessRegistrationLookupDataStatus)[keyof typeof ApiResponseBusinessRegistrationLookupDataStatus];
+export type ApiResponseBusinessRegistrationLookupDataStatus = typeof ApiResponseBusinessRegistrationLookupDataStatus[keyof typeof ApiResponseBusinessRegistrationLookupDataStatus];
+
 
 export const ApiResponseBusinessRegistrationLookupDataStatus = {
   VALID: 'VALID',
@@ -421,8 +424,8 @@ export interface SellerBusinessInfoUpsertRequest {
 
  * @maxLength 80
  */
-export type SellerSettlementInfoUpsertRequestBankCode =
-  (typeof SellerSettlementInfoUpsertRequestBankCode)[keyof typeof SellerSettlementInfoUpsertRequestBankCode];
+export type SellerSettlementInfoUpsertRequestBankCode = typeof SellerSettlementInfoUpsertRequestBankCode[keyof typeof SellerSettlementInfoUpsertRequestBankCode];
+
 
 export const SellerSettlementInfoUpsertRequestBankCode = {
   NONGHYEOP: 'NONGHYEOP',
@@ -576,11 +579,11 @@ export interface ApiResponseEmailVerificationVerified {
 export interface EmailSignupRequest {
   email: string;
   /**
-   * 8~20자, 영문+숫자 포함
-   * @minLength 8
-   * @maxLength 20
-   * @pattern ^(?=.*[A-Za-z])(?=.*[0-9]).{8,20}$
-   */
+     * 8~20자, 영문+숫자 포함
+     * @minLength 8
+     * @maxLength 20
+     * @pattern ^(?=.*[A-Za-z])(?=.*[0-9]).{8,20}$
+     */
   password: string;
   signupToken: string;
 }
@@ -592,10 +595,10 @@ export interface EmailLoginRequest {
 
 export interface NicknameUpdateRequest {
   /**
-   * @minLength 2
-   * @maxLength 10
-   * @pattern ^[A-Za-z0-9가-힣]{2,10}$
-   */
+     * @minLength 2
+     * @maxLength 10
+     * @pattern ^[A-Za-z0-9가-힣]{2,10}$
+     */
   nickname: string;
 }
 
@@ -662,11 +665,11 @@ export interface ApiResponsePhoneVerificationVerified {
 export interface PasswordChangeRequest {
   currentPassword: string;
   /**
-   * 8~20자, 영문+숫자 포함, 이메일 아이디와 동일값 불가
-   * @minLength 8
-   * @maxLength 20
-   * @pattern ^(?=.*[A-Za-z])(?=.*[0-9]).{8,20}$
-   */
+     * 8~20자, 영문+숫자 포함, 이메일 아이디와 동일값 불가
+     * @minLength 8
+     * @maxLength 20
+     * @pattern ^(?=.*[A-Za-z])(?=.*[0-9]).{8,20}$
+     */
   newPassword: string;
 }
 
@@ -684,9 +687,9 @@ export type ApiResponseMyRegionsData = {
   /** 선택한 관심 지역 목록 (등록 순, 시/도 단위) */
   regions: string[];
   /**
-   * 칩에 표시할 첫 번째 지역명. 비어있으면 null
-   * @nullable
-   */
+     * 칩에 표시할 첫 번째 지역명. 비어있으면 null
+     * @nullable
+     */
   primaryRegion: string | null;
   /** primaryRegion 외 추가 지역 수. 예: 서울 외 3곳 → additionalCount=3 */
   additionalCount: number;
@@ -700,13 +703,14 @@ export interface ApiResponseMyRegions {
 
 export interface UpdateRegionsRequest {
   /**
-   * 저장할 시/도 지역 목록. 빈 배열이면 전체 해제
-   * @maxItems 10
-   */
+     * 저장할 시/도 지역 목록. 빈 배열이면 전체 해제
+     * @maxItems 10
+     */
   regions: string[];
 }
 
-export type RegionType = (typeof RegionType)[keyof typeof RegionType];
+export type RegionType = typeof RegionType[keyof typeof RegionType];
+
 
 export const RegionType = {
   NATIONWIDE: 'NATIONWIDE',
@@ -729,7 +733,8 @@ export const RegionType = {
   JEJU: 'JEJU',
 } as const;
 
-export type DistrictType = (typeof DistrictType)[keyof typeof DistrictType];
+export type DistrictType = typeof DistrictType[keyof typeof DistrictType];
+
 
 export const DistrictType = {
   NATIONWIDE: 'NATIONWIDE',
@@ -738,8 +743,7 @@ export const DistrictType = {
   SEOUL_SINSA_APGUJEONG_CHEONGDAM: 'SEOUL_SINSA_APGUJEONG_CHEONGDAM',
   SEOUL_SEOCHO_BANGBAE_GYODAE: 'SEOUL_SEOCHO_BANGBAE_GYODAE',
   SEOUL_JAMSIL_SINCHEON_SONGPA: 'SEOUL_JAMSIL_SINCHEON_SONGPA',
-  SEOUL_JONGNO_JUNGGU_EULJIRO_MYEONGDONG:
-    'SEOUL_JONGNO_JUNGGU_EULJIRO_MYEONGDONG',
+  SEOUL_JONGNO_JUNGGU_EULJIRO_MYEONGDONG: 'SEOUL_JONGNO_JUNGGU_EULJIRO_MYEONGDONG',
   SEOUL_HONGDAE_HAPJEONG_SANGSU_MAPO: 'SEOUL_HONGDAE_HAPJEONG_SANGSU_MAPO',
   SEOUL_SEONGSU_GEONDAE_GWANGJIN: 'SEOUL_SEONGSU_GEONDAE_GWANGJIN',
   SEOUL_ITAEWON_HANNAM_YONGSAN: 'SEOUL_ITAEWON_HANNAM_YONGSAN',
@@ -829,8 +833,7 @@ export const DistrictType = {
   DAEGU_ETC: 'DAEGU_ETC',
   GWANGJU_ALL: 'GWANGJU_ALL',
   GWANGJU_SANGMU_JIGYEONG_SEOGU: 'GWANGJU_SANGMU_JIGYEONG_SEOGU',
-  GWANGJU_DONGMYEONGDONG_CHUNGJANGRO_DONGGU:
-    'GWANGJU_DONGMYEONGDONG_CHUNGJANGRO_DONGGU',
+  GWANGJU_DONGMYEONGDONG_CHUNGJANGRO_DONGGU: 'GWANGJU_DONGMYEONGDONG_CHUNGJANGRO_DONGGU',
   GWANGJU_SUWAN_CHEOMDAN_GWANGSANGU: 'GWANGJU_SUWAN_CHEOMDAN_GWANGSANGU',
   GWANGJU_BONGSEON_NAMGU: 'GWANGJU_BONGSEON_NAMGU',
   GWANGJU_BUKGU: 'GWANGJU_BUKGU',
@@ -857,9 +860,9 @@ export const DistrictType = {
 export interface GroupBuyFeedItemResponse {
   id: number;
   /**
-   * 대표 썸네일 이미지 URL
-   * @nullable
-   */
+     * 대표 썸네일 이미지 URL
+     * @nullable
+     */
   thumbnailUrl: string | null;
   /** 마감 D-day (예: D-3 -> 3) */
   dDay: number;
@@ -887,9 +890,9 @@ export interface GroupBuyFeedItemResponse {
 export interface WishlistItemResponse {
   groupBuyId: number;
   /**
-   * 대표 썸네일 URL
-   * @nullable
-   */
+     * 대표 썸네일 URL
+     * @nullable
+     */
   thumbnailUrl: string | null;
   /** 마감 D-day (예: D-3 -> 3) */
   dDay: number;
@@ -951,9 +954,9 @@ export type ApiResponseGroupBuyDetailResponseData = {
   productName: string;
   productDescription: string;
   /**
-   * 대표 썸네일 이미지 URL
-   * @nullable
-   */
+     * 대표 썸네일 이미지 URL
+     * @nullable
+     */
   thumbnailUrl?: string | null;
   imageUrls: string[];
   price: number;
@@ -1061,38 +1064,38 @@ export interface GroupBuyRequestCreate {
   /** @maxLength 100 */
   storeName: string;
   /**
-   * 매장 주소. roadAddress가 함께 전달되면 서버는 roadAddress를 우선 저장한다.
-   * @maxLength 200
-   * @nullable
-   */
+     * 매장 주소. roadAddress가 함께 전달되면 서버는 roadAddress를 우선 저장한다.
+     * @maxLength 200
+     * @nullable
+     */
   storeAddress?: string | null;
   /**
-   * 네이버 장소 고유 ID
-   * @maxLength 100
-   * @nullable
-   */
+     * 네이버 장소 고유 ID
+     * @maxLength 100
+     * @nullable
+     */
   placeId?: string | null;
   /**
-   * 네이버 장소 도로명 주소
-   * @maxLength 200
-   * @nullable
-   */
+     * 네이버 장소 도로명 주소
+     * @maxLength 200
+     * @nullable
+     */
   roadAddress?: string | null;
   /**
-   * 네이버 장소 지번 주소
-   * @maxLength 200
-   * @nullable
-   */
+     * 네이버 장소 지번 주소
+     * @maxLength 200
+     * @nullable
+     */
   lotAddress?: string | null;
   /**
-   * 네이버 장소 위도
-   * @nullable
-   */
+     * 네이버 장소 위도
+     * @nullable
+     */
   latitude?: number | null;
   /**
-   * 네이버 장소 경도
-   * @nullable
-   */
+     * 네이버 장소 경도
+     * @nullable
+     */
   longitude?: number | null;
   /** @maxLength 100 */
   productName: string;
@@ -1101,9 +1104,9 @@ export interface GroupBuyRequestCreate {
   /** 오늘 이후 날짜 */
   desiredPickupDate: string;
   /**
-   * @maxLength 500
-   * @nullable
-   */
+     * @maxLength 500
+     * @nullable
+     */
   additionalNote?: string | null;
 }
 
@@ -1122,8 +1125,8 @@ export interface ApiResponseRequestId {
 OPENED=공구 개설 완료 / REJECTED=개설 불가
 
  */
-export type GroupBuyRequestDetailStatus =
-  (typeof GroupBuyRequestDetailStatus)[keyof typeof GroupBuyRequestDetailStatus];
+export type GroupBuyRequestDetailStatus = typeof GroupBuyRequestDetailStatus[keyof typeof GroupBuyRequestDetailStatus];
+
 
 export const GroupBuyRequestDetailStatus = {
   IN_REVIEW: 'IN_REVIEW',
@@ -1132,8 +1135,8 @@ export const GroupBuyRequestDetailStatus = {
   REJECTED: 'REJECTED',
 } as const;
 
-export type GroupBuyRequestDetailStatusHistoryItemStatus =
-  (typeof GroupBuyRequestDetailStatusHistoryItemStatus)[keyof typeof GroupBuyRequestDetailStatusHistoryItemStatus];
+export type GroupBuyRequestDetailStatusHistoryItemStatus = typeof GroupBuyRequestDetailStatusHistoryItemStatus[keyof typeof GroupBuyRequestDetailStatusHistoryItemStatus];
+
 
 export const GroupBuyRequestDetailStatusHistoryItemStatus = {
   IN_REVIEW: 'IN_REVIEW',
@@ -1144,6 +1147,7 @@ export const GroupBuyRequestDetailStatusHistoryItemStatus = {
 
 export type GroupBuyRequestDetailStatusHistoryItem = {
   status: GroupBuyRequestDetailStatusHistoryItemStatus;
+  /** UTC 기준 상태 변경 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss` */
   changedAt: string;
 };
 
@@ -1172,16 +1176,17 @@ export interface GroupBuyRequestDetail {
    */
   status: GroupBuyRequestDetailStatus;
   /**
-   * status=REJECTED 시 노출
-   * @nullable
-   */
+     * status=REJECTED 시 노출
+     * @nullable
+     */
   rejectionReason: string | null;
   /**
-   * status=OPENED 시 개설된 공구 id
-   * @nullable
-   */
+     * status=OPENED 시 개설된 공구 id
+     * @nullable
+     */
   openedGroupBuyId: number | null;
   statusHistory: GroupBuyRequestDetailStatusHistoryItem[];
+  /** UTC 기준 요청 생성 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss` */
   createdAt: string;
 }
 
@@ -1264,8 +1269,8 @@ export interface PaymentOrderCreate {
 /**
  * 취소 사유. OTHER 선택 시 reasonDetail 필수.
  */
-export type CancelParticipationRequestReason =
-  (typeof CancelParticipationRequestReason)[keyof typeof CancelParticipationRequestReason];
+export type CancelParticipationRequestReason = typeof CancelParticipationRequestReason[keyof typeof CancelParticipationRequestReason];
+
 
 export const CancelParticipationRequestReason = {
   TIME_UNAVAILABLE: 'TIME_UNAVAILABLE',
@@ -1279,10 +1284,10 @@ export interface CancelParticipationRequest {
   /** 취소 사유. OTHER 선택 시 reasonDetail 필수. */
   reason: CancelParticipationRequestReason;
   /**
-   * 기타 상세 사유
-   * @maxLength 500
-   * @nullable
-   */
+     * 기타 상세 사유
+     * @maxLength 500
+     * @nullable
+     */
   reasonDetail?: string | null;
 }
 
@@ -1326,8 +1331,8 @@ export interface ApiResponsePaymentOrderCreated {
   error: unknown | null;
 }
 
-export type ApiResponsePaymentConfirmedDataParticipationStatus =
-  (typeof ApiResponsePaymentConfirmedDataParticipationStatus)[keyof typeof ApiResponsePaymentConfirmedDataParticipationStatus];
+export type ApiResponsePaymentConfirmedDataParticipationStatus = typeof ApiResponsePaymentConfirmedDataParticipationStatus[keyof typeof ApiResponsePaymentConfirmedDataParticipationStatus];
+
 
 export const ApiResponsePaymentConfirmedDataParticipationStatus = {
   PAID_WAITING_GOAL: 'PAID_WAITING_GOAL',
@@ -1342,6 +1347,7 @@ export type ApiResponsePaymentConfirmedData = {
   amount: number;
   /** @nullable */
   method?: string | null;
+  /** UTC 기준 결제 승인 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss` */
   approvedAt: string;
 };
 
@@ -1351,8 +1357,8 @@ export interface ApiResponsePaymentConfirmed {
   error: unknown | null;
 }
 
-export type ApiResponseCancelParticipationDataStatus =
-  (typeof ApiResponseCancelParticipationDataStatus)[keyof typeof ApiResponseCancelParticipationDataStatus];
+export type ApiResponseCancelParticipationDataStatus = typeof ApiResponseCancelParticipationDataStatus[keyof typeof ApiResponseCancelParticipationDataStatus];
+
 
 export const ApiResponseCancelParticipationDataStatus = {
   REFUNDED: 'REFUNDED',
@@ -1361,7 +1367,9 @@ export const ApiResponseCancelParticipationDataStatus = {
 export type ApiResponseCancelParticipationData = {
   participationId: number;
   status: ApiResponseCancelParticipationDataStatus;
+  /** UTC 기준 참여 취소 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss` */
   cancelledAt: string;
+  /** UTC 기준 환불 완료 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss` */
   refundedAt: string;
 };
 
@@ -1393,8 +1401,8 @@ export interface ApiResponsePortOneWebhook {
 /**
  * PENDING=환불대기 / COMPLETED=환불완료
  */
-export type ApiResponseRefundListDataItemRefundStatus =
-  (typeof ApiResponseRefundListDataItemRefundStatus)[keyof typeof ApiResponseRefundListDataItemRefundStatus];
+export type ApiResponseRefundListDataItemRefundStatus = typeof ApiResponseRefundListDataItemRefundStatus[keyof typeof ApiResponseRefundListDataItemRefundStatus];
+
 
 export const ApiResponseRefundListDataItemRefundStatus = {
   PENDING: 'PENDING',
@@ -1405,9 +1413,8 @@ export const ApiResponseRefundListDataItemRefundStatus = {
  * 취소 사유
  * @nullable
  */
-export type ApiResponseRefundListDataItemCancelReason =
-  | (typeof ApiResponseRefundListDataItemCancelReason)[keyof typeof ApiResponseRefundListDataItemCancelReason]
-  | null;
+export type ApiResponseRefundListDataItemCancelReason = typeof ApiResponseRefundListDataItemCancelReason[keyof typeof ApiResponseRefundListDataItemCancelReason] | null;
+
 
 export const ApiResponseRefundListDataItemCancelReason = {
   TIME_UNAVAILABLE: 'TIME_UNAVAILABLE',
@@ -1420,9 +1427,9 @@ export const ApiResponseRefundListDataItemCancelReason = {
 export type ApiResponseRefundListDataItem = {
   participationId: number;
   /**
-   * 카드 상품 이미지 URL
-   * @nullable
-   */
+     * 카드 상품 이미지 URL
+     * @nullable
+     */
   thumbnailUrl: string | null;
   productName: string;
   storeName: string;
@@ -1437,26 +1444,29 @@ export type ApiResponseRefundListDataItem = {
   /** PENDING=환불대기 / COMPLETED=환불완료 */
   refundStatus: ApiResponseRefundListDataItemRefundStatus;
   /**
-   * 취소 사유
-   * @nullable
-   */
+     * 취소 사유
+     * @nullable
+     */
   cancelReason: ApiResponseRefundListDataItemCancelReason;
   /**
-   * 취소 상세 사유
-   * @nullable
-   */
+     * 취소 상세 사유
+     * @nullable
+     */
   cancelReasonDetail?: string | null;
   /**
-   * 결제 일시
-   * @nullable
-   */
+     * UTC 기준 결제 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`
+     * @nullable
+     */
   paidAt: string | null;
   /**
-   * 결제 수단
-   * @nullable
-   */
+     * 결제 수단
+     * @nullable
+     */
   paymentMethod: string | null;
-  /** @nullable */
+  /**
+     * UTC 기준 환불 완료 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`
+     * @nullable
+     */
   refundedAt?: string | null;
 };
 
@@ -1466,8 +1476,8 @@ export interface ApiResponseRefundList {
   error: unknown | null;
 }
 
-export type ApiResponsePickupInfoDataAvailabilityStatus =
-  (typeof ApiResponsePickupInfoDataAvailabilityStatus)[keyof typeof ApiResponsePickupInfoDataAvailabilityStatus];
+export type ApiResponsePickupInfoDataAvailabilityStatus = typeof ApiResponsePickupInfoDataAvailabilityStatus[keyof typeof ApiResponsePickupInfoDataAvailabilityStatus];
+
 
 export const ApiResponsePickupInfoDataAvailabilityStatus = {
   LOCKED: 'LOCKED',
@@ -1475,8 +1485,8 @@ export const ApiResponsePickupInfoDataAvailabilityStatus = {
   PICKED_UP: 'PICKED_UP',
 } as const;
 
-export type ApiResponsePickupInfoDataPickupStatus =
-  (typeof ApiResponsePickupInfoDataPickupStatus)[keyof typeof ApiResponsePickupInfoDataPickupStatus];
+export type ApiResponsePickupInfoDataPickupStatus = typeof ApiResponsePickupInfoDataPickupStatus[keyof typeof ApiResponsePickupInfoDataPickupStatus];
+
 
 export const ApiResponsePickupInfoDataPickupStatus = {
   NOT_READY: 'NOT_READY',
@@ -1498,14 +1508,14 @@ export type ApiResponsePickupInfoData = {
   /** @nullable */
   longitude?: number | null;
   /**
-   * 대중교통 안내. 현재 저장 원천이 없으면 null
-   * @nullable
-   */
+     * 대중교통 안내. 현재 저장 원천이 없으면 null
+     * @nullable
+     */
   transitInfo?: string | null;
   /**
-   * 픽업 안내 상단 카드 이미지 URL
-   * @nullable
-   */
+     * 픽업 안내 상단 카드 이미지 URL
+     * @nullable
+     */
   thumbnailUrl: string | null;
   productName: string;
   quantity: number;
@@ -1514,11 +1524,14 @@ export type ApiResponsePickupInfoData = {
   pickupTimeEnd: string;
   pickupLocation: string;
   /**
-   * 당일 픽업 종료까지 남은 분. 당일이 아니면 null
-   * @nullable
-   */
+     * 당일 픽업 종료까지 남은 분. 당일이 아니면 null
+     * @nullable
+     */
   remainingMinutes?: number | null;
-  /** @nullable */
+  /**
+     * UTC 기준 픽업 완료 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`
+     * @nullable
+     */
   pickedUpAt?: string | null;
 };
 
@@ -1528,8 +1541,8 @@ export interface ApiResponsePickupInfo {
   error: unknown | null;
 }
 
-export type ApiResponseQrCodeDataAvailabilityStatus =
-  (typeof ApiResponseQrCodeDataAvailabilityStatus)[keyof typeof ApiResponseQrCodeDataAvailabilityStatus];
+export type ApiResponseQrCodeDataAvailabilityStatus = typeof ApiResponseQrCodeDataAvailabilityStatus[keyof typeof ApiResponseQrCodeDataAvailabilityStatus];
+
 
 export const ApiResponseQrCodeDataAvailabilityStatus = {
   LOCKED: 'LOCKED',
@@ -1537,8 +1550,8 @@ export const ApiResponseQrCodeDataAvailabilityStatus = {
   PICKED_UP: 'PICKED_UP',
 } as const;
 
-export type ApiResponseQrCodeDataPickupStatus =
-  (typeof ApiResponseQrCodeDataPickupStatus)[keyof typeof ApiResponseQrCodeDataPickupStatus];
+export type ApiResponseQrCodeDataPickupStatus = typeof ApiResponseQrCodeDataPickupStatus[keyof typeof ApiResponseQrCodeDataPickupStatus];
+
 
 export const ApiResponseQrCodeDataPickupStatus = {
   NOT_READY: 'NOT_READY',
@@ -1554,9 +1567,9 @@ export type ApiResponseQrCodeData = {
   availabilityStatus: ApiResponseQrCodeDataAvailabilityStatus;
   pickupStatus: ApiResponseQrCodeDataPickupStatus;
   /**
-   * 참여자 닉네임
-   * @nullable
-   */
+     * 참여자 닉네임
+     * @nullable
+     */
   userName?: string | null;
   productName: string;
   quantity: number;
@@ -1572,7 +1585,10 @@ export type ApiResponseQrCodeData = {
   pickupTimeEnd: string;
   /** KST 기준 픽업일까지 남은 날짜. 당일이면 0, 지난 픽업일이면 음수 */
   dDay: number;
-  /** @nullable */
+  /**
+     * UTC 기준 픽업 완료 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`
+     * @nullable
+     */
   pickedUpAt?: string | null;
 };
 
@@ -1586,9 +1602,8 @@ export interface ApiResponseQrCode {
  * 후보가 없거나 QR이 잠긴 사유
  * @nullable
  */
-export type ApiResponseNearestPickupQrDataReason =
-  | (typeof ApiResponseNearestPickupQrDataReason)[keyof typeof ApiResponseNearestPickupQrDataReason]
-  | null;
+export type ApiResponseNearestPickupQrDataReason = typeof ApiResponseNearestPickupQrDataReason[keyof typeof ApiResponseNearestPickupQrDataReason] | null;
+
 
 export const ApiResponseNearestPickupQrDataReason = {
   NO_AVAILABLE_PICKUP: 'NO_AVAILABLE_PICKUP',
@@ -1606,9 +1621,9 @@ export type ApiResponseNearestPickupQrDataItem = {
   availabilityStatus: 'LOCKED' | 'AVAILABLE' | 'PICKED_UP';
   pickupStatus: 'NOT_READY' | 'READY' | 'PICKED_UP' | 'NO_SHOW';
   /**
-   * 참여자 닉네임
-   * @nullable
-   */
+     * 참여자 닉네임
+     * @nullable
+     */
   userName?: string | null;
   productName: string;
   quantity: number;
@@ -1616,9 +1631,9 @@ export type ApiResponseNearestPickupQrDataItem = {
   storeAddress: string;
   pickupLocation: string;
   /**
-   * LOCKED 상태에서는 null
-   * @nullable
-   */
+     * LOCKED 상태에서는 null
+     * @nullable
+     */
   qrCode?: string | null;
   pickupDate: string;
   /** 픽업 시작 시각. 예) 13:00 */
@@ -1637,9 +1652,9 @@ export type ApiResponseNearestPickupQrData = {
   /** 당일 픽업 예정 건이 2개 이상이면 true */
   hasMultipleToday: boolean;
   /**
-   * 후보가 없거나 QR이 잠긴 사유
-   * @nullable
-   */
+     * 후보가 없거나 QR이 잠긴 사유
+     * @nullable
+     */
   reason?: ApiResponseNearestPickupQrDataReason;
   /** @nullable */
   item: ApiResponseNearestPickupQrDataItem;
@@ -1651,8 +1666,8 @@ export interface ApiResponseNearestPickupQr {
   error: unknown | null;
 }
 
-export type ApiResponsePickupVerifyDataPickupStatus =
-  (typeof ApiResponsePickupVerifyDataPickupStatus)[keyof typeof ApiResponsePickupVerifyDataPickupStatus];
+export type ApiResponsePickupVerifyDataPickupStatus = typeof ApiResponsePickupVerifyDataPickupStatus[keyof typeof ApiResponsePickupVerifyDataPickupStatus];
+
 
 export const ApiResponsePickupVerifyDataPickupStatus = {
   NOT_READY: 'NOT_READY',
@@ -1679,8 +1694,8 @@ export interface ApiResponsePickupVerify {
   error: unknown | null;
 }
 
-export type NotificationType =
-  (typeof NotificationType)[keyof typeof NotificationType];
+export type NotificationType = typeof NotificationType[keyof typeof NotificationType];
+
 
 export const NotificationType = {
   PICKUP: 'PICKUP',
@@ -1689,8 +1704,8 @@ export const NotificationType = {
   REQUEST: 'REQUEST',
 } as const;
 
-export type NotificationDeeplinkType =
-  (typeof NotificationDeeplinkType)[keyof typeof NotificationDeeplinkType];
+export type NotificationDeeplinkType = typeof NotificationDeeplinkType[keyof typeof NotificationDeeplinkType];
+
 
 export const NotificationDeeplinkType = {
   PICKUP_GUIDE: 'PICKUP_GUIDE',
@@ -1727,8 +1742,8 @@ export const NotificationDeeplinkType = {
 24=OWNER_ORDER_CANCELLED_IMMEDIATE
 
  */
-export type NotificationTriggerType =
-  (typeof NotificationTriggerType)[keyof typeof NotificationTriggerType];
+export type NotificationTriggerType = typeof NotificationTriggerType[keyof typeof NotificationTriggerType];
+
 
 export const NotificationTriggerType = {
   PICKUP_SAME_DAY_MORNING: 'PICKUP_SAME_DAY_MORNING',
@@ -1749,21 +1764,16 @@ export const NotificationTriggerType = {
   OWNER_PICKUP_DAY_BEFORE_MORNING: 'OWNER_PICKUP_DAY_BEFORE_MORNING',
   OWNER_GROUPBUY_ACHIEVED_IMMEDIATE: 'OWNER_GROUPBUY_ACHIEVED_IMMEDIATE',
   OWNER_GROUPBUY_FAILED_IMMEDIATE: 'OWNER_GROUPBUY_FAILED_IMMEDIATE',
-  OWNER_CLOSE_REQUEST_APPROVED_IMMEDIATE:
-    'OWNER_CLOSE_REQUEST_APPROVED_IMMEDIATE',
-  OWNER_CLOSE_REQUEST_REJECTED_IMMEDIATE:
-    'OWNER_CLOSE_REQUEST_REJECTED_IMMEDIATE',
-  OWNER_OPEN_REQUEST_APPROVED_IMMEDIATE:
-    'OWNER_OPEN_REQUEST_APPROVED_IMMEDIATE',
-  OWNER_OPEN_REQUEST_REJECTED_IMMEDIATE:
-    'OWNER_OPEN_REQUEST_REJECTED_IMMEDIATE',
-  OWNER_ORDER_CONFIRM_REQUIRED_IMMEDIATE:
-    'OWNER_ORDER_CONFIRM_REQUIRED_IMMEDIATE',
+  OWNER_CLOSE_REQUEST_APPROVED_IMMEDIATE: 'OWNER_CLOSE_REQUEST_APPROVED_IMMEDIATE',
+  OWNER_CLOSE_REQUEST_REJECTED_IMMEDIATE: 'OWNER_CLOSE_REQUEST_REJECTED_IMMEDIATE',
+  OWNER_OPEN_REQUEST_APPROVED_IMMEDIATE: 'OWNER_OPEN_REQUEST_APPROVED_IMMEDIATE',
+  OWNER_OPEN_REQUEST_REJECTED_IMMEDIATE: 'OWNER_OPEN_REQUEST_REJECTED_IMMEDIATE',
+  OWNER_ORDER_CONFIRM_REQUIRED_IMMEDIATE: 'OWNER_ORDER_CONFIRM_REQUIRED_IMMEDIATE',
   OWNER_ORDER_CANCELLED_IMMEDIATE: 'OWNER_ORDER_CANCELLED_IMMEDIATE',
 } as const;
 
-export type NotificationSection =
-  (typeof NotificationSection)[keyof typeof NotificationSection];
+export type NotificationSection = typeof NotificationSection[keyof typeof NotificationSection];
+
 
 export const NotificationSection = {
   TODAY: 'TODAY',
@@ -1774,7 +1784,7 @@ export const NotificationSection = {
 /**
  * 딥링크 파라미터. PICKUP_GUIDE는 participationId, GROUPBUY_DETAIL/MY_APPLYING은 groupBuyId, REQUEST_STATUS는 requestId를 사용합니다.
  */
-export type NotificationItemResponseDeeplinkParams = { [key: string]: string };
+export type NotificationItemResponseDeeplinkParams = {[key: string]: string};
 
 export interface NotificationItemResponse {
   id: number;
@@ -1817,8 +1827,8 @@ export interface ApiResponseNotificationUnreadCountResponse {
   error: unknown | null;
 }
 
-export type ApiResponseMypageParticipationListDataItemParticipationStatus =
-  (typeof ApiResponseMypageParticipationListDataItemParticipationStatus)[keyof typeof ApiResponseMypageParticipationListDataItemParticipationStatus];
+export type ApiResponseMypageParticipationListDataItemParticipationStatus = typeof ApiResponseMypageParticipationListDataItemParticipationStatus[keyof typeof ApiResponseMypageParticipationListDataItemParticipationStatus];
+
 
 export const ApiResponseMypageParticipationListDataItemParticipationStatus = {
   PENDING: 'PENDING',
@@ -1829,8 +1839,8 @@ export const ApiResponseMypageParticipationListDataItemParticipationStatus = {
   REFUNDED: 'REFUNDED',
 } as const;
 
-export type ApiResponseMypageParticipationListDataItemAchievementStatus =
-  (typeof ApiResponseMypageParticipationListDataItemAchievementStatus)[keyof typeof ApiResponseMypageParticipationListDataItemAchievementStatus];
+export type ApiResponseMypageParticipationListDataItemAchievementStatus = typeof ApiResponseMypageParticipationListDataItemAchievementStatus[keyof typeof ApiResponseMypageParticipationListDataItemAchievementStatus];
+
 
 export const ApiResponseMypageParticipationListDataItemAchievementStatus = {
   BEFORE_ACHIEVED: 'BEFORE_ACHIEVED',
@@ -1840,8 +1850,8 @@ export const ApiResponseMypageParticipationListDataItemAchievementStatus = {
 /**
  * 픽업/참여 상태 조합 기반 화면 표시 상태
  */
-export type ApiResponseMypageParticipationListDataItemDisplayStatus =
-  (typeof ApiResponseMypageParticipationListDataItemDisplayStatus)[keyof typeof ApiResponseMypageParticipationListDataItemDisplayStatus];
+export type ApiResponseMypageParticipationListDataItemDisplayStatus = typeof ApiResponseMypageParticipationListDataItemDisplayStatus[keyof typeof ApiResponseMypageParticipationListDataItemDisplayStatus];
+
 
 export const ApiResponseMypageParticipationListDataItemDisplayStatus = {
   PICKED_UP: 'PICKED_UP',
@@ -1853,8 +1863,8 @@ export const ApiResponseMypageParticipationListDataItemDisplayStatus = {
   CANCELLED: 'CANCELLED',
 } as const;
 
-export type ApiResponseMypageParticipationListDataItemPickupStatus =
-  (typeof ApiResponseMypageParticipationListDataItemPickupStatus)[keyof typeof ApiResponseMypageParticipationListDataItemPickupStatus];
+export type ApiResponseMypageParticipationListDataItemPickupStatus = typeof ApiResponseMypageParticipationListDataItemPickupStatus[keyof typeof ApiResponseMypageParticipationListDataItemPickupStatus];
+
 
 export const ApiResponseMypageParticipationListDataItemPickupStatus = {
   NOT_READY: 'NOT_READY',
@@ -1863,8 +1873,8 @@ export const ApiResponseMypageParticipationListDataItemPickupStatus = {
   NO_SHOW: 'NO_SHOW',
 } as const;
 
-export type ApiResponseMypageParticipationListDataItemQrAvailability =
-  (typeof ApiResponseMypageParticipationListDataItemQrAvailability)[keyof typeof ApiResponseMypageParticipationListDataItemQrAvailability];
+export type ApiResponseMypageParticipationListDataItemQrAvailability = typeof ApiResponseMypageParticipationListDataItemQrAvailability[keyof typeof ApiResponseMypageParticipationListDataItemQrAvailability];
+
 
 export const ApiResponseMypageParticipationListDataItemQrAvailability = {
   UNAVAILABLE: 'UNAVAILABLE',
@@ -1877,17 +1887,17 @@ export type ApiResponseMypageParticipationListDataItem = {
   participationId: number;
   groupBuyId: number;
   /**
-   * 카드 상품 이미지 URL
-   * @nullable
-   */
+     * 카드 상품 이미지 URL
+     * @nullable
+     */
   thumbnailUrl: string | null;
   productName: string;
   participationStatus: ApiResponseMypageParticipationListDataItemParticipationStatus;
   /**
-   * 현재 수량 기준 달성률
-   * @minimum 0
-   * @maximum 100
-   */
+     * 현재 수량 기준 달성률
+     * @minimum 0
+     * @maximum 100
+     */
   achievementRate: number;
   achievementStatus: ApiResponseMypageParticipationListDataItemAchievementStatus;
   /** 픽업/참여 상태 조합 기반 화면 표시 상태 */
@@ -1899,14 +1909,14 @@ export type ApiResponseMypageParticipationListDataItem = {
   pickupLocation: string;
   paymentAmount: number;
   /**
-   * 주문 상세 결제 날짜
-   * @nullable
-   */
+     * 주문 상세 결제 날짜
+     * @nullable
+     */
   paidAt: string | null;
   /**
-   * 결제 내역 결제 수단
-   * @nullable
-   */
+     * 결제 내역 결제 수단
+     * @nullable
+     */
   paymentMethod: string | null;
   quantity: number;
   pickupStatus: ApiResponseMypageParticipationListDataItemPickupStatus;
@@ -1927,8 +1937,8 @@ export interface ApiResponseMypageParticipationList {
   error: unknown | null;
 }
 
-export type ApiResponseMypageGroupBuyRequestListDataItemStatus =
-  (typeof ApiResponseMypageGroupBuyRequestListDataItemStatus)[keyof typeof ApiResponseMypageGroupBuyRequestListDataItemStatus];
+export type ApiResponseMypageGroupBuyRequestListDataItemStatus = typeof ApiResponseMypageGroupBuyRequestListDataItemStatus[keyof typeof ApiResponseMypageGroupBuyRequestListDataItemStatus];
+
 
 export const ApiResponseMypageGroupBuyRequestListDataItemStatus = {
   SUBMITTED: 'SUBMITTED',
@@ -1953,8 +1963,8 @@ export interface ApiResponseMypageGroupBuyRequestList {
   error: unknown | null;
 }
 
-export type ApiResponseParticipationPageDataContentItemAchievementStatus =
-  (typeof ApiResponseParticipationPageDataContentItemAchievementStatus)[keyof typeof ApiResponseParticipationPageDataContentItemAchievementStatus];
+export type ApiResponseParticipationPageDataContentItemAchievementStatus = typeof ApiResponseParticipationPageDataContentItemAchievementStatus[keyof typeof ApiResponseParticipationPageDataContentItemAchievementStatus];
+
 
 export const ApiResponseParticipationPageDataContentItemAchievementStatus = {
   BEFORE_ACHIEVED: 'BEFORE_ACHIEVED',
@@ -2092,8 +2102,8 @@ export interface ApiResponsePickupScheduleList {
   error: unknown | null;
 }
 
-export type ApiResponseOwnerGroupBuyListDataItemStatus =
-  (typeof ApiResponseOwnerGroupBuyListDataItemStatus)[keyof typeof ApiResponseOwnerGroupBuyListDataItemStatus];
+export type ApiResponseOwnerGroupBuyListDataItemStatus = typeof ApiResponseOwnerGroupBuyListDataItemStatus[keyof typeof ApiResponseOwnerGroupBuyListDataItemStatus];
+
 
 export const ApiResponseOwnerGroupBuyListDataItemStatus = {
   IN_PROGRESS: 'IN_PROGRESS',
@@ -2138,8 +2148,8 @@ export interface ApiResponseOwnerGroupBuySummary {
   error: unknown | null;
 }
 
-export type OwnerGroupBuyManageListItemStatus =
-  (typeof OwnerGroupBuyManageListItemStatus)[keyof typeof OwnerGroupBuyManageListItemStatus];
+export type OwnerGroupBuyManageListItemStatus = typeof OwnerGroupBuyManageListItemStatus[keyof typeof OwnerGroupBuyManageListItemStatus];
+
 
 export const OwnerGroupBuyManageListItemStatus = {
   ALL: 'ALL',
@@ -2151,14 +2161,14 @@ export const OwnerGroupBuyManageListItemStatus = {
 
 export interface OwnerGroupBuyManageListItem {
   /**
-   * 실제 공구 항목일 때 사용하는 공구 ID. PENDING_APPROVAL 항목에서는 null
-   * @nullable
-   */
+     * 실제 공구 항목일 때 사용하는 공구 ID. PENDING_APPROVAL 항목에서는 null
+     * @nullable
+     */
   groupBuyId?: number | null;
   /**
-   * 승인대기(PENDING_APPROVAL) 항목일 때 사용하는 공구 개설 요청 ID. 실제 공구 항목에서는 null
-   * @nullable
-   */
+     * 승인대기(PENDING_APPROVAL) 항목일 때 사용하는 공구 개설 요청 ID. 실제 공구 항목에서는 null
+     * @nullable
+     */
   requestId?: number | null;
   productName: string;
   price: number;
@@ -2180,8 +2190,8 @@ export interface ApiResponseOwnerGroupBuyManageList {
   error: unknown | null;
 }
 
-export type OwnerGroupBuyManageDetailStatus =
-  (typeof OwnerGroupBuyManageDetailStatus)[keyof typeof OwnerGroupBuyManageDetailStatus];
+export type OwnerGroupBuyManageDetailStatus = typeof OwnerGroupBuyManageDetailStatus[keyof typeof OwnerGroupBuyManageDetailStatus];
+
 
 export const OwnerGroupBuyManageDetailStatus = {
   ALL: 'ALL',
@@ -2227,8 +2237,8 @@ export interface OwnerGroupBuyExtensionRequest {
   extendedDeadline: string;
 }
 
-export type OwnerGroupBuyCloseReasonType =
-  (typeof OwnerGroupBuyCloseReasonType)[keyof typeof OwnerGroupBuyCloseReasonType];
+export type OwnerGroupBuyCloseReasonType = typeof OwnerGroupBuyCloseReasonType[keyof typeof OwnerGroupBuyCloseReasonType];
+
 
 export const OwnerGroupBuyCloseReasonType = {
   SOLD_OUT: 'SOLD_OUT',
@@ -2239,8 +2249,8 @@ export const OwnerGroupBuyCloseReasonType = {
 /**
  * 사장님 공구 마감 요청 검토 상태
  */
-export type GroupBuyCloseRequestReviewStatus =
-  (typeof GroupBuyCloseRequestReviewStatus)[keyof typeof GroupBuyCloseRequestReviewStatus];
+export type GroupBuyCloseRequestReviewStatus = typeof GroupBuyCloseRequestReviewStatus[keyof typeof GroupBuyCloseRequestReviewStatus];
+
 
 export const GroupBuyCloseRequestReviewStatus = {
   PENDING: 'PENDING',
@@ -2251,26 +2261,26 @@ export const GroupBuyCloseRequestReviewStatus = {
 export interface OwnerGroupBuyCloseRequest {
   reason: OwnerGroupBuyCloseReasonType;
   /**
-   * reason이 OTHER일 때 필수
-   * @maxLength 100
-   * @nullable
-   */
+     * reason이 OTHER일 때 필수
+     * @maxLength 100
+     * @nullable
+     */
   reasonDetail?: string | null;
 }
 
 export interface AdminOwnerGroupBuyCloseRequestReject {
   /**
-   * 운영자 반려 사유
-   * @maxLength 200
-   */
+     * 운영자 반려 사유
+     * @maxLength 200
+     */
   rejectionReason: string;
 }
 
 /**
  * 처리 후 공구 상태
  */
-export type AdminOwnerGroupBuyCloseRequestActionGroupBuyStatus =
-  (typeof AdminOwnerGroupBuyCloseRequestActionGroupBuyStatus)[keyof typeof AdminOwnerGroupBuyCloseRequestActionGroupBuyStatus];
+export type AdminOwnerGroupBuyCloseRequestActionGroupBuyStatus = typeof AdminOwnerGroupBuyCloseRequestActionGroupBuyStatus[keyof typeof AdminOwnerGroupBuyCloseRequestActionGroupBuyStatus];
+
 
 export const AdminOwnerGroupBuyCloseRequestActionGroupBuyStatus = {
   IN_PROGRESS: 'IN_PROGRESS',
@@ -2327,8 +2337,8 @@ export interface ApiResponseOwnerSettlementMonthChipList {
 /**
  * 사장님 공구 정산 상태
  */
-export type OwnerSettlementStatus =
-  (typeof OwnerSettlementStatus)[keyof typeof OwnerSettlementStatus];
+export type OwnerSettlementStatus = typeof OwnerSettlementStatus[keyof typeof OwnerSettlementStatus];
+
 
 export const OwnerSettlementStatus = {
   SETTLEMENT_COMPLETED: 'SETTLEMENT_COMPLETED',
@@ -2357,8 +2367,8 @@ export interface ApiResponseOwnerSettlementItemList {
   error: unknown | null;
 }
 
-export type OwnerRefundRequestListItemStatus =
-  (typeof OwnerRefundRequestListItemStatus)[keyof typeof OwnerRefundRequestListItemStatus];
+export type OwnerRefundRequestListItemStatus = typeof OwnerRefundRequestListItemStatus[keyof typeof OwnerRefundRequestListItemStatus];
+
 
 export const OwnerRefundRequestListItemStatus = {
   PENDING: 'PENDING',
@@ -2391,8 +2401,8 @@ export interface ApiResponseOwnerRefundRequestList {
   error: unknown | null;
 }
 
-export type OwnerRefundRequestDetailStatus =
-  (typeof OwnerRefundRequestDetailStatus)[keyof typeof OwnerRefundRequestDetailStatus];
+export type OwnerRefundRequestDetailStatus = typeof OwnerRefundRequestDetailStatus[keyof typeof OwnerRefundRequestDetailStatus];
+
 
 export const OwnerRefundRequestDetailStatus = {
   PENDING: 'PENDING',
@@ -2419,8 +2429,8 @@ export interface ApiResponseOwnerRefundRequestDetail {
   error: unknown | null;
 }
 
-export type OwnerRefundReviewActionType =
-  (typeof OwnerRefundReviewActionType)[keyof typeof OwnerRefundReviewActionType];
+export type OwnerRefundReviewActionType = typeof OwnerRefundReviewActionType[keyof typeof OwnerRefundReviewActionType];
+
 
 export const OwnerRefundReviewActionType = {
   APPROVE: 'APPROVE',
@@ -2430,10 +2440,10 @@ export const OwnerRefundReviewActionType = {
 export interface OwnerRefundReviewSubmitRequest {
   action: OwnerRefundReviewActionType;
   /**
-   * action이 DISPUTE일 때 입력
-   * @maxLength 500
-   * @nullable
-   */
+     * action이 DISPUTE일 때 입력
+     * @maxLength 500
+     * @nullable
+     */
   disputeReason?: string | null;
 }
 
@@ -2452,49 +2462,49 @@ export interface OwnerGroupBuyRequestCreate {
   /** 요청자가 소속된 매장 ID */
   storeId: number;
   /**
-   * 공구명
-   * @maxLength 30
-   */
+     * 공구명
+     * @maxLength 30
+     */
   productName: string;
   /**
-   * 상품 설명
-   * @maxLength 30
-   */
+     * 상품 설명
+     * @maxLength 30
+     */
   productDescription: string;
   /** 희망 모집 마감일시. 현재 시각 기준 최소 7일 이후여야 한다. */
   deadline: string;
   /**
-   * 상품 정가
-   * @minimum 1
-   * @nullable
-   */
+     * 상품 정가
+     * @minimum 1
+     * @nullable
+     */
   originalPrice?: number | null;
   /**
-   * 공구가
-   * @minimum 1
-   */
+     * 공구가
+     * @minimum 1
+     */
   price: number;
   /**
-   * 목표 수량
-   * @minimum 1
-   */
+     * 목표 수량
+     * @minimum 1
+     */
   targetQuantity: number;
   /**
-   * 최대 수량. 목표 수량 이상이어야 한다.
-   * @minimum 1
-   */
+     * 최대 수량. 목표 수량 이상이어야 한다.
+     * @minimum 1
+     */
   maxQuantity: number;
   /**
-   * 1인 구매 제한 수량
-   * @minimum 1
-   * @nullable
-   */
+     * 1인 구매 제한 수량
+     * @minimum 1
+     * @nullable
+     */
   perUserLimit?: number | null;
   /**
-   * 상품 이미지 S3 key 목록. 첫 번째 key를 대표 이미지로 사용한다.
-   * @minItems 1
-   * @maxItems 5
-   */
+     * 상품 이미지 S3 key 목록. 첫 번째 key를 대표 이미지로 사용한다.
+     * @minItems 1
+     * @maxItems 5
+     */
   imageUrls: string[];
   /** 픽업일. 공구 마감일 이후여야 한다. */
   pickupDate: string;
@@ -2503,14 +2513,14 @@ export interface OwnerGroupBuyRequestCreate {
   /** @maxLength 200 */
   pickupLocation: string;
   /**
-   * @maxLength 20
-   * @nullable
-   */
+     * @maxLength 20
+     * @nullable
+     */
   pickupContact?: string | null;
 }
 
-export type ApiResponseOwnerGroupBuyRequestCreatedDataStatus =
-  (typeof ApiResponseOwnerGroupBuyRequestCreatedDataStatus)[keyof typeof ApiResponseOwnerGroupBuyRequestCreatedDataStatus];
+export type ApiResponseOwnerGroupBuyRequestCreatedDataStatus = typeof ApiResponseOwnerGroupBuyRequestCreatedDataStatus[keyof typeof ApiResponseOwnerGroupBuyRequestCreatedDataStatus];
+
 
 export const ApiResponseOwnerGroupBuyRequestCreatedDataStatus = {
   PENDING: 'PENDING',
@@ -2529,8 +2539,8 @@ export interface ApiResponseOwnerGroupBuyRequestCreated {
   error: unknown | null;
 }
 
-export type ApiResponseOwnerGroupBuyRequestListDataContentItemStatus =
-  (typeof ApiResponseOwnerGroupBuyRequestListDataContentItemStatus)[keyof typeof ApiResponseOwnerGroupBuyRequestListDataContentItemStatus];
+export type ApiResponseOwnerGroupBuyRequestListDataContentItemStatus = typeof ApiResponseOwnerGroupBuyRequestListDataContentItemStatus[keyof typeof ApiResponseOwnerGroupBuyRequestListDataContentItemStatus];
+
 
 export const ApiResponseOwnerGroupBuyRequestListDataContentItemStatus = {
   PENDING: 'PENDING',
@@ -2570,8 +2580,8 @@ export interface ApiResponseOwnerGroupBuyRequestList {
   error: unknown | null;
 }
 
-export type ApiResponseOwnerGroupBuyRequestDetailDataStatus =
-  (typeof ApiResponseOwnerGroupBuyRequestDetailDataStatus)[keyof typeof ApiResponseOwnerGroupBuyRequestDetailDataStatus];
+export type ApiResponseOwnerGroupBuyRequestDetailDataStatus = typeof ApiResponseOwnerGroupBuyRequestDetailDataStatus[keyof typeof ApiResponseOwnerGroupBuyRequestDetailDataStatus];
+
 
 export const ApiResponseOwnerGroupBuyRequestDetailDataStatus = {
   PENDING: 'PENDING',
@@ -2594,6 +2604,7 @@ export type ApiResponseOwnerGroupBuyRequestDetailData = {
   perUserLimit?: number | null;
   thumbnailUrl: string;
   imageUrls: string[];
+  /** KST 기준 모집 마감 일시. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss` */
   deadline: string;
   pickupDate: string;
   pickupTimeStart: string;
@@ -2606,9 +2617,15 @@ export type ApiResponseOwnerGroupBuyRequestDetailData = {
   rejectionReason?: string | null;
   /** @nullable */
   approvedGroupBuyId?: number | null;
-  /** @nullable */
+  /**
+     * UTC 기준 검토 완료 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`
+     * @nullable
+     */
   reviewedAt?: string | null;
-  /** @nullable */
+  /**
+     * UTC 기준 요청 생성 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`
+     * @nullable
+     */
   requestedAt?: string | null;
 };
 
@@ -2618,8 +2635,8 @@ export interface ApiResponseOwnerGroupBuyRequestDetail {
   error: unknown | null;
 }
 
-export type ApiResponseReservationPageDataContentItemStatus =
-  (typeof ApiResponseReservationPageDataContentItemStatus)[keyof typeof ApiResponseReservationPageDataContentItemStatus];
+export type ApiResponseReservationPageDataContentItemStatus = typeof ApiResponseReservationPageDataContentItemStatus[keyof typeof ApiResponseReservationPageDataContentItemStatus];
+
 
 export const ApiResponseReservationPageDataContentItemStatus = {
   WAITING: 'WAITING',
@@ -2687,9 +2704,9 @@ export interface AdminDashboardUnconfirmedOrderItem {
   productName: string;
   storeName: string;
   /**
-   * 공구 달성 일시
-   * @nullable
-   */
+     * 공구 달성 일시
+     * @nullable
+     */
   achievedAt?: string | null;
   /** 최종 참여 수량 */
   finalQuantity: number;
@@ -2731,8 +2748,8 @@ export interface ApiResponseAdminDashboardUnconfirmedOrders {
 /**
  * 환불 케이스
  */
-export type AdminDashboardUrgentRefundItemCaseFilter =
-  (typeof AdminDashboardUrgentRefundItemCaseFilter)[keyof typeof AdminDashboardUrgentRefundItemCaseFilter];
+export type AdminDashboardUrgentRefundItemCaseFilter = typeof AdminDashboardUrgentRefundItemCaseFilter[keyof typeof AdminDashboardUrgentRefundItemCaseFilter];
+
 
 export const AdminDashboardUrgentRefundItemCaseFilter = {
   ALL: 'ALL',
@@ -2777,8 +2794,8 @@ export interface ApiResponseAdminDashboardUrgentRefunds {
   error: unknown | null;
 }
 
-export type AdminOrderListItemOrderStatus =
-  (typeof AdminOrderListItemOrderStatus)[keyof typeof AdminOrderListItemOrderStatus];
+export type AdminOrderListItemOrderStatus = typeof AdminOrderListItemOrderStatus[keyof typeof AdminOrderListItemOrderStatus];
+
 
 export const AdminOrderListItemOrderStatus = {
   PENDING: 'PENDING',
@@ -2793,9 +2810,9 @@ export interface AdminOrderListItem {
   productName: string;
   storeName: string;
   /**
-   * 공구 달성 일시
-   * @nullable
-   */
+     * 공구 달성 일시
+     * @nullable
+     */
   achievedAt?: string | null;
   /** 최종 참여 수량 */
   finalQuantity: number;
@@ -2829,8 +2846,8 @@ export interface ApiResponseAdminOrderPage {
   error: unknown | null;
 }
 
-export type AdminOrderDetailOrderStatus =
-  (typeof AdminOrderDetailOrderStatus)[keyof typeof AdminOrderDetailOrderStatus];
+export type AdminOrderDetailOrderStatus = typeof AdminOrderDetailOrderStatus[keyof typeof AdminOrderDetailOrderStatus];
+
 
 export const AdminOrderDetailOrderStatus = {
   PENDING: 'PENDING',
@@ -2849,9 +2866,9 @@ export interface AdminOrderDetail {
   /** @nullable */
   storePhoneNumber?: string | null;
   /**
-   * 공구 달성 일시
-   * @nullable
-   */
+     * 공구 달성 일시
+     * @nullable
+     */
   achievedAt?: string | null;
   /** 최종 참여 수량 */
   finalQuantity: number;
@@ -2889,8 +2906,8 @@ export interface ApiResponseAdminOrderDetail {
 /**
  * 티켓 유형
  */
-export type AdminCsTicketListItemType =
-  (typeof AdminCsTicketListItemType)[keyof typeof AdminCsTicketListItemType];
+export type AdminCsTicketListItemType = typeof AdminCsTicketListItemType[keyof typeof AdminCsTicketListItemType];
+
 
 export const AdminCsTicketListItemType = {
   REFUND: 'REFUND',
@@ -2900,8 +2917,8 @@ export const AdminCsTicketListItemType = {
   ETC: 'ETC',
 } as const;
 
-export type AdminCsTicketListItemPriority =
-  (typeof AdminCsTicketListItemPriority)[keyof typeof AdminCsTicketListItemPriority];
+export type AdminCsTicketListItemPriority = typeof AdminCsTicketListItemPriority[keyof typeof AdminCsTicketListItemPriority];
+
 
 export const AdminCsTicketListItemPriority = {
   LOW: 'LOW',
@@ -2910,8 +2927,8 @@ export const AdminCsTicketListItemPriority = {
   URGENT: 'URGENT',
 } as const;
 
-export type AdminCsTicketListItemStatus =
-  (typeof AdminCsTicketListItemStatus)[keyof typeof AdminCsTicketListItemStatus];
+export type AdminCsTicketListItemStatus = typeof AdminCsTicketListItemStatus[keyof typeof AdminCsTicketListItemStatus];
+
 
 export const AdminCsTicketListItemStatus = {
   RECEIVED: 'RECEIVED',
@@ -2958,8 +2975,8 @@ export interface ApiResponseAdminCsTicketPage {
   error: unknown | null;
 }
 
-export type AdminCsTicketDetailType =
-  (typeof AdminCsTicketDetailType)[keyof typeof AdminCsTicketDetailType];
+export type AdminCsTicketDetailType = typeof AdminCsTicketDetailType[keyof typeof AdminCsTicketDetailType];
+
 
 export const AdminCsTicketDetailType = {
   REFUND: 'REFUND',
@@ -2969,8 +2986,8 @@ export const AdminCsTicketDetailType = {
   ETC: 'ETC',
 } as const;
 
-export type AdminCsTicketDetailPriority =
-  (typeof AdminCsTicketDetailPriority)[keyof typeof AdminCsTicketDetailPriority];
+export type AdminCsTicketDetailPriority = typeof AdminCsTicketDetailPriority[keyof typeof AdminCsTicketDetailPriority];
+
 
 export const AdminCsTicketDetailPriority = {
   LOW: 'LOW',
@@ -2979,8 +2996,8 @@ export const AdminCsTicketDetailPriority = {
   URGENT: 'URGENT',
 } as const;
 
-export type AdminCsTicketDetailStatus =
-  (typeof AdminCsTicketDetailStatus)[keyof typeof AdminCsTicketDetailStatus];
+export type AdminCsTicketDetailStatus = typeof AdminCsTicketDetailStatus[keyof typeof AdminCsTicketDetailStatus];
+
 
 export const AdminCsTicketDetailStatus = {
   RECEIVED: 'RECEIVED',
@@ -3049,9 +3066,8 @@ export interface ApiResponseAdminCsTicketDetail {
 /**
  * @nullable
  */
-export type AdminCsTicketUpdateRequestStatus =
-  | (typeof AdminCsTicketUpdateRequestStatus)[keyof typeof AdminCsTicketUpdateRequestStatus]
-  | null;
+export type AdminCsTicketUpdateRequestStatus = typeof AdminCsTicketUpdateRequestStatus[keyof typeof AdminCsTicketUpdateRequestStatus] | null;
+
 
 export const AdminCsTicketUpdateRequestStatus = {
   RECEIVED: 'RECEIVED',
@@ -3063,19 +3079,19 @@ export interface AdminCsTicketUpdateRequest {
   /** @nullable */
   status?: AdminCsTicketUpdateRequestStatus;
   /**
-   * @maxLength 50
-   * @nullable
-   */
+     * @maxLength 50
+     * @nullable
+     */
   assigneeName?: string | null;
   /**
-   * @maxLength 1000
-   * @nullable
-   */
+     * @maxLength 1000
+     * @nullable
+     */
   processingMemo?: string | null;
 }
 
-export type ApiResponseAdminRequestPageDataContentItemStatus =
-  (typeof ApiResponseAdminRequestPageDataContentItemStatus)[keyof typeof ApiResponseAdminRequestPageDataContentItemStatus];
+export type ApiResponseAdminRequestPageDataContentItemStatus = typeof ApiResponseAdminRequestPageDataContentItemStatus[keyof typeof ApiResponseAdminRequestPageDataContentItemStatus];
+
 
 export const ApiResponseAdminRequestPageDataContentItemStatus = {
   IN_REVIEW: 'IN_REVIEW',
@@ -3095,19 +3111,19 @@ export type ApiResponseAdminRequestPageDataContentItem = {
   /** @nullable */
   requesterName?: string | null;
   /**
-   * 승인 후 생성된 공구 정가. 승인 전 요청은 null
-   * @nullable
-   */
+     * 승인 후 생성된 공구 정가. 승인 전 요청은 null
+     * @nullable
+     */
   originalPrice?: number | null;
   /**
-   * 승인 후 생성된 공구가. 승인 전 요청은 null
-   * @nullable
-   */
+     * 승인 후 생성된 공구가. 승인 전 요청은 null
+     * @nullable
+     */
   price?: number | null;
   /**
-   * 요청 생성 후 경과한 검토 시간(분)
-   * @nullable
-   */
+     * 요청 생성 후 경과한 검토 시간(분)
+     * @nullable
+     */
   reviewElapsedMinutes?: number | null;
   /** 운영자가 승인/반려 등 후속 작업을 할 수 있는 상태 여부 */
   actionable: boolean;
@@ -3132,9 +3148,8 @@ export interface ApiResponseAdminRequestPage {
 /**
  * @nullable
  */
-export type ApiResponseAdminRequestDetailDataRequesterProvider =
-  | (typeof ApiResponseAdminRequestDetailDataRequesterProvider)[keyof typeof ApiResponseAdminRequestDetailDataRequesterProvider]
-  | null;
+export type ApiResponseAdminRequestDetailDataRequesterProvider = typeof ApiResponseAdminRequestDetailDataRequesterProvider[keyof typeof ApiResponseAdminRequestDetailDataRequesterProvider] | null;
+
 
 export const ApiResponseAdminRequestDetailDataRequesterProvider = {
   KAKAO: 'KAKAO',
@@ -3153,8 +3168,8 @@ export type ApiResponseAdminRequestDetailDataRequester = {
   provider?: ApiResponseAdminRequestDetailDataRequesterProvider;
 };
 
-export type ApiResponseAdminRequestDetailDataStatus =
-  (typeof ApiResponseAdminRequestDetailDataStatus)[keyof typeof ApiResponseAdminRequestDetailDataStatus];
+export type ApiResponseAdminRequestDetailDataStatus = typeof ApiResponseAdminRequestDetailDataStatus[keyof typeof ApiResponseAdminRequestDetailDataStatus];
+
 
 export const ApiResponseAdminRequestDetailDataStatus = {
   IN_REVIEW: 'IN_REVIEW',
@@ -3163,8 +3178,8 @@ export const ApiResponseAdminRequestDetailDataStatus = {
   REJECTED: 'REJECTED',
 } as const;
 
-export type ApiResponseAdminRequestDetailDataStatusHistoryItemStatus =
-  (typeof ApiResponseAdminRequestDetailDataStatusHistoryItemStatus)[keyof typeof ApiResponseAdminRequestDetailDataStatusHistoryItemStatus];
+export type ApiResponseAdminRequestDetailDataStatusHistoryItemStatus = typeof ApiResponseAdminRequestDetailDataStatusHistoryItemStatus[keyof typeof ApiResponseAdminRequestDetailDataStatusHistoryItemStatus];
+
 
 export const ApiResponseAdminRequestDetailDataStatusHistoryItemStatus = {
   IN_REVIEW: 'IN_REVIEW',
@@ -3215,8 +3230,8 @@ export interface ApiResponseAdminRequestDetail {
   error: unknown | null;
 }
 
-export type AdminRequestStatusUpdateTargetStatus =
-  (typeof AdminRequestStatusUpdateTargetStatus)[keyof typeof AdminRequestStatusUpdateTargetStatus];
+export type AdminRequestStatusUpdateTargetStatus = typeof AdminRequestStatusUpdateTargetStatus[keyof typeof AdminRequestStatusUpdateTargetStatus];
+
 
 export const AdminRequestStatusUpdateTargetStatus = {
   IN_REVIEW: 'IN_REVIEW',
@@ -3228,96 +3243,96 @@ export const AdminRequestStatusUpdateTargetStatus = {
 export interface AdminRequestStatusUpdate {
   targetStatus: AdminRequestStatusUpdateTargetStatus;
   /**
-   * targetStatus=REJECTED 시 필수
-   * @maxLength 500
-   * @nullable
-   */
+     * targetStatus=REJECTED 시 필수
+     * @maxLength 500
+     * @nullable
+     */
   rejectionReason?: string | null;
   /**
-   * targetStatus=OPENED 시 필수. 실제 개설된 공구 id이며 존재 검증 후 개설 알림 발송에 사용
-   * @nullable
-   */
+     * targetStatus=OPENED 시 필수. 실제 개설된 공구 id이며 존재 검증 후 개설 알림 발송에 사용
+     * @nullable
+     */
   openedGroupBuyId?: number | null;
 }
 
 export interface AdminGroupBuyRequestApprove {
   /**
-   * 기존 등록 매장을 사용할 때 입력. 없으면 매장명/주소/지역 정보로 신규 매장을 생성
-   * @nullable
-   */
+     * 기존 등록 매장을 사용할 때 입력. 없으면 매장명/주소/지역 정보로 신규 매장을 생성
+     * @nullable
+     */
   storeId?: number | null;
   /**
-   * @maxLength 100
-   * @nullable
-   */
+     * @maxLength 100
+     * @nullable
+     */
   storeName?: string | null;
   /**
-   * @maxLength 200
-   * @nullable
-   */
+     * @maxLength 200
+     * @nullable
+     */
   storeAddress?: string | null;
   /**
-   * @maxLength 20
-   * @nullable
-   */
+     * @maxLength 20
+     * @nullable
+     */
   storePhoneNumber?: string | null;
   /**
-   * 신규 매장 생성 시 필수
-   * @nullable
-   */
+     * 신규 매장 생성 시 필수
+     * @nullable
+     */
   region?: string | null;
   /**
-   * 신규 매장 생성 시 필수
-   * @nullable
-   */
+     * 신규 매장 생성 시 필수
+     * @nullable
+     */
   district?: string | null;
   /** @nullable */
   latitude?: number | null;
   /** @nullable */
   longitude?: number | null;
   /**
-   * 공구 제목
-   * @maxLength 100
-   */
+     * 공구 제목
+     * @maxLength 100
+     */
   productName: string;
   /**
-   * 공구 내용
-   * @maxLength 1000
-   */
+     * 공구 내용
+     * @maxLength 1000
+     */
   productDescription: string;
   /**
-   * 정가
-   * @minimum 1
-   * @nullable
-   */
+     * 정가
+     * @minimum 1
+     * @nullable
+     */
   originalPrice?: number | null;
   /**
-   * 공구가
-   * @minimum 1
-   */
+     * 공구가
+     * @minimum 1
+     */
   price: number;
   /**
-   * 목표 수량
-   * @minimum 1
-   */
+     * 목표 수량
+     * @minimum 1
+     */
   targetQuantity: number;
   /**
-   * 최대 수량. 생략 시 목표 수량과 동일하게 저장
-   * @minimum 1
-   * @nullable
-   */
+     * 최대 수량. 생략 시 목표 수량과 동일하게 저장
+     * @minimum 1
+     * @nullable
+     */
   maxQuantity?: number | null;
   /**
-   * 1인 구매 제한
-   * @minimum 1
-   * @nullable
-   */
+     * 1인 구매 제한
+     * @minimum 1
+     * @nullable
+     */
   perUserLimit?: number | null;
   /**
-   * 상품 이미지 S3 key 목록
-   * @minItems 1
-   * @maxItems 5
-   */
+     * 상품 이미지 S3 key 목록
+     * @minItems 1
+     * @maxItems 5
+     */
   imageUrls: string[];
   recruitmentStartAt: string;
   /** 모집 마감일시 */
@@ -3328,9 +3343,9 @@ export interface AdminGroupBuyRequestApprove {
   /** @maxLength 200 */
   pickupLocation: string;
   /**
-   * @maxLength 20
-   * @nullable
-   */
+     * @maxLength 20
+     * @nullable
+     */
   pickupContact?: string | null;
 }
 
@@ -3339,8 +3354,8 @@ export interface AdminGroupBuyRequestReject {
   rejectionReason: string;
 }
 
-export type ApiResponseAdminGroupBuyRequestActionDataStatus =
-  (typeof ApiResponseAdminGroupBuyRequestActionDataStatus)[keyof typeof ApiResponseAdminGroupBuyRequestActionDataStatus];
+export type ApiResponseAdminGroupBuyRequestActionDataStatus = typeof ApiResponseAdminGroupBuyRequestActionDataStatus[keyof typeof ApiResponseAdminGroupBuyRequestActionDataStatus];
+
 
 export const ApiResponseAdminGroupBuyRequestActionDataStatus = {
   OPENED: 'OPENED',
@@ -3363,15 +3378,15 @@ export interface ApiResponseAdminGroupBuyRequestAction {
 /**
  * 사장님 요청 공구 구분 칩
  */
-export type AdminOwnerGroupBuyRequestListItemRequestType =
-  (typeof AdminOwnerGroupBuyRequestListItemRequestType)[keyof typeof AdminOwnerGroupBuyRequestListItemRequestType];
+export type AdminOwnerGroupBuyRequestListItemRequestType = typeof AdminOwnerGroupBuyRequestListItemRequestType[keyof typeof AdminOwnerGroupBuyRequestListItemRequestType];
+
 
 export const AdminOwnerGroupBuyRequestListItemRequestType = {
   OWNER: 'OWNER',
 } as const;
 
-export type AdminOwnerGroupBuyRequestListItemStatus =
-  (typeof AdminOwnerGroupBuyRequestListItemStatus)[keyof typeof AdminOwnerGroupBuyRequestListItemStatus];
+export type AdminOwnerGroupBuyRequestListItemStatus = typeof AdminOwnerGroupBuyRequestListItemStatus[keyof typeof AdminOwnerGroupBuyRequestListItemStatus];
+
 
 export const AdminOwnerGroupBuyRequestListItemStatus = {
   PENDING: 'PENDING',
@@ -3391,13 +3406,16 @@ export interface AdminOwnerGroupBuyRequestListItem {
   originalPrice: number | null;
   price: number;
   /**
-   * 정가 대비 할인율(%)
-   * @nullable
-   */
+     * 정가 대비 할인율(%)
+     * @nullable
+     */
   discountRate?: number | null;
   targetQuantity: number;
   pickupDate: string;
-  /** @nullable */
+  /**
+     * UTC 기준 요청 생성 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`
+     * @nullable
+     */
   requestedAt?: string | null;
   /** 요청 생성 후 경과한 검토 시간(분) */
   reviewElapsedMinutes: number;
@@ -3425,15 +3443,15 @@ export interface ApiResponseAdminOwnerGroupBuyRequestPage {
 /**
  * 사장님 요청 공구 구분 칩
  */
-export type AdminOwnerGroupBuyRequestDetailRequestType =
-  (typeof AdminOwnerGroupBuyRequestDetailRequestType)[keyof typeof AdminOwnerGroupBuyRequestDetailRequestType];
+export type AdminOwnerGroupBuyRequestDetailRequestType = typeof AdminOwnerGroupBuyRequestDetailRequestType[keyof typeof AdminOwnerGroupBuyRequestDetailRequestType];
+
 
 export const AdminOwnerGroupBuyRequestDetailRequestType = {
   OWNER: 'OWNER',
 } as const;
 
-export type AdminOwnerGroupBuyRequestDetailStatus =
-  (typeof AdminOwnerGroupBuyRequestDetailStatus)[keyof typeof AdminOwnerGroupBuyRequestDetailStatus];
+export type AdminOwnerGroupBuyRequestDetailStatus = typeof AdminOwnerGroupBuyRequestDetailStatus[keyof typeof AdminOwnerGroupBuyRequestDetailStatus];
+
 
 export const AdminOwnerGroupBuyRequestDetailStatus = {
   PENDING: 'PENDING',
@@ -3467,9 +3485,9 @@ export interface AdminOwnerGroupBuyRequestProduct {
   originalPrice?: number | null;
   price: number;
   /**
-   * 정가 대비 할인율(%)
-   * @nullable
-   */
+     * 정가 대비 할인율(%)
+     * @nullable
+     */
   discountRate?: number | null;
   targetQuantity: number;
   maxQuantity: number;
@@ -3479,11 +3497,11 @@ export interface AdminOwnerGroupBuyRequestProduct {
 
 export interface AdminOwnerGroupBuyRequestRecruitment {
   /**
-   * 승인 후 생성된 공구의 모집 시작일시. 승인 전 요청은 null
-   * @nullable
-   */
+     * 승인 후 생성된 공구의 KST 기준 모집 시작 일시. 승인 전 요청은 null
+     * @nullable
+     */
   recruitmentStartAt?: string | null;
-  /** 모집 마감일시 */
+  /** KST 기준 모집 마감 일시 */
   deadline: string;
   pickupDate: string;
   pickupTimeStart: string;
@@ -3511,15 +3529,21 @@ export interface AdminOwnerGroupBuyRequestDetail {
   /** 승인 확인 팝업에 표시할 이미지 장수 */
   imageCount: number;
   /**
-   * @maxLength 200
-   * @nullable
-   */
+     * @maxLength 200
+     * @nullable
+     */
   rejectionReason?: string | null;
   /** @nullable */
   approvedGroupBuyId?: number | null;
-  /** @nullable */
+  /**
+     * UTC 기준 검토 완료 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`
+     * @nullable
+     */
   reviewedAt?: string | null;
-  /** @nullable */
+  /**
+     * UTC 기준 요청 생성 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`
+     * @nullable
+     */
   requestedAt?: string | null;
   /** 승인/반려 작업 가능 여부 */
   actionable: boolean;
@@ -3536,8 +3560,8 @@ export interface AdminOwnerGroupBuyRequestReject {
   rejectionReason: string;
 }
 
-export type ApiResponseAdminOwnerGroupBuyRequestActionDataStatus =
-  (typeof ApiResponseAdminOwnerGroupBuyRequestActionDataStatus)[keyof typeof ApiResponseAdminOwnerGroupBuyRequestActionDataStatus];
+export type ApiResponseAdminOwnerGroupBuyRequestActionDataStatus = typeof ApiResponseAdminOwnerGroupBuyRequestActionDataStatus[keyof typeof ApiResponseAdminOwnerGroupBuyRequestActionDataStatus];
+
 
 export const ApiResponseAdminOwnerGroupBuyRequestActionDataStatus = {
   APPROVED: 'APPROVED',
@@ -3557,8 +3581,8 @@ export interface ApiResponseAdminOwnerGroupBuyRequestAction {
   error: unknown | null;
 }
 
-export type ApiResponseAdminRefundPageDataContentItemRefundStatus =
-  (typeof ApiResponseAdminRefundPageDataContentItemRefundStatus)[keyof typeof ApiResponseAdminRefundPageDataContentItemRefundStatus];
+export type ApiResponseAdminRefundPageDataContentItemRefundStatus = typeof ApiResponseAdminRefundPageDataContentItemRefundStatus[keyof typeof ApiResponseAdminRefundPageDataContentItemRefundStatus];
+
 
 export const ApiResponseAdminRefundPageDataContentItemRefundStatus = {
   WAITING: 'WAITING',
@@ -3589,8 +3613,8 @@ export interface ApiResponseAdminRefundPage {
   error: unknown | null;
 }
 
-export type AdminManualRefundRefundReason =
-  (typeof AdminManualRefundRefundReason)[keyof typeof AdminManualRefundRefundReason];
+export type AdminManualRefundRefundReason = typeof AdminManualRefundRefundReason[keyof typeof AdminManualRefundRefundReason];
+
 
 export const AdminManualRefundRefundReason = {
   NOT_ACHIEVED: 'NOT_ACHIEVED',
@@ -3602,9 +3626,9 @@ export const AdminManualRefundRefundReason = {
 export interface AdminManualRefund {
   refundReason: AdminManualRefundRefundReason;
   /**
-   * @maxLength 100
-   * @nullable
-   */
+     * @maxLength 100
+     * @nullable
+     */
   detailReason?: string | null;
 }
 
@@ -3627,8 +3651,8 @@ export interface ApiResponseAdminSettlementDashboard {
   error: unknown | null;
 }
 
-export type AdminSettlementListItemStatus =
-  (typeof AdminSettlementListItemStatus)[keyof typeof AdminSettlementListItemStatus];
+export type AdminSettlementListItemStatus = typeof AdminSettlementListItemStatus[keyof typeof AdminSettlementListItemStatus];
+
 
 export const AdminSettlementListItemStatus = {
   SCHEDULED: 'SCHEDULED',
@@ -3685,8 +3709,8 @@ export interface ApiResponseAdminSettlementDetail {
 /**
  * FULLTEXT 인덱스 매칭 결과 기반 분류 케이스(상품 인덱스 + 매장/주소 인덱스 hit 조합)
  */
-export type ApiResponseSearchAnalysisDataSearchCase =
-  (typeof ApiResponseSearchAnalysisDataSearchCase)[keyof typeof ApiResponseSearchAnalysisDataSearchCase];
+export type ApiResponseSearchAnalysisDataSearchCase = typeof ApiResponseSearchAnalysisDataSearchCase[keyof typeof ApiResponseSearchAnalysisDataSearchCase];
+
 
 export const ApiResponseSearchAnalysisDataSearchCase = {
   BOTH_DETECTED: 'BOTH_DETECTED',
@@ -3703,8 +3727,8 @@ NEED_REGION/NEED_PRODUCT/NEED_BOTH=추가 키워드 입력 안내 /
 AMBIGUOUS_CONFIRMATION=분류 결과 재확인 필요
 
  */
-export type ApiResponseSearchAnalysisDataUiState =
-  (typeof ApiResponseSearchAnalysisDataUiState)[keyof typeof ApiResponseSearchAnalysisDataUiState];
+export type ApiResponseSearchAnalysisDataUiState = typeof ApiResponseSearchAnalysisDataUiState[keyof typeof ApiResponseSearchAnalysisDataUiState];
+
 
 export const ApiResponseSearchAnalysisDataUiState = {
   RESULTS: 'RESULTS',
@@ -3725,9 +3749,9 @@ export interface RecommendedStoreDto {
   latitude: number;
   longitude: number;
   /**
-   * 추천 매장 표시용 이미지 URL
-   * @nullable
-   */
+     * 추천 매장 표시용 이미지 URL
+     * @nullable
+     */
   imageUrl?: string | null;
 }
 
@@ -3735,14 +3759,14 @@ export type ApiResponseSearchAnalysisData = {
   /** FULLTEXT 인덱스 매칭 결과 기반 분류 케이스(상품 인덱스 + 매장/주소 인덱스 hit 조합) */
   searchCase: ApiResponseSearchAnalysisDataSearchCase;
   /**
-   * 매장/주소 인덱스가 매치된 경우 검색어, 아니면 null
-   * @nullable
-   */
+     * 매장/주소 인덱스가 매치된 경우 검색어, 아니면 null
+     * @nullable
+     */
   detectedRegion?: string | null;
   /**
-   * 상품 인덱스가 매치된 경우 검색어, 아니면 null
-   * @nullable
-   */
+     * 상품 인덱스가 매치된 경우 검색어, 아니면 null
+     * @nullable
+     */
   detectedProduct?: string | null;
   /** FULLTEXT 분류 신뢰도. BOTH=1.0 / 단일 인덱스 매치=0.5 / NONE=0.0 */
   confidence: number;
@@ -3758,9 +3782,9 @@ export type ApiResponseSearchAnalysisData = {
   /** 검색된 공구 카드 목록 */
   results: GroupBuyFeedItemResponse[];
   /**
-   * 검색 결과 0건(EMPTY_CAN_REQUEST) 일 때 동봉되는 동네 매장 추천 목록
-   * @nullable
-   */
+     * 검색 결과 0건(EMPTY_CAN_REQUEST) 일 때 동봉되는 동네 매장 추천 목록
+     * @nullable
+     */
   recommendedStores?: RecommendedStoreDto[] | null;
 };
 
@@ -3785,18 +3809,18 @@ export type ApiResponseStoreSearchListDataStoresItem = {
   /** 도로명 주소. 예) 서울 성북구 화랑로11길 23 */
   roadAddress?: string;
   /**
-   * 지번 주소
-   * @nullable
-   */
+     * 지번 주소
+     * @nullable
+     */
   lotAddress?: string | null;
   /** 위도 */
   latitude?: number;
   /** 경도 */
   longitude?: number;
   /**
-   * 추천 매장 표시용 이미지 URL
-   * @nullable
-   */
+     * 추천 매장 표시용 이미지 URL
+     * @nullable
+     */
   imageUrl?: string | null;
 };
 
@@ -3814,8 +3838,8 @@ export interface ApiResponseStoreSearchList {
 /**
  * 매장 추천 API 전용 단일 지역 코드. 전체/기타 지역 코드는 포함하지 않는다.
  */
-export type StoreRecommendationRegionType =
-  (typeof StoreRecommendationRegionType)[keyof typeof StoreRecommendationRegionType];
+export type StoreRecommendationRegionType = typeof StoreRecommendationRegionType[keyof typeof StoreRecommendationRegionType];
+
 
 export const StoreRecommendationRegionType = {
   SEOUL_GANGNAM: 'SEOUL_GANGNAM',
@@ -4006,9 +4030,9 @@ export const StoreRecommendationRegionType = {
 export interface StoreRecommendationRequest {
   region: StoreRecommendationRegionType;
   /**
-   * 확정된 상품 조건
-   * @maxLength 100
-   */
+     * 확정된 상품 조건
+     * @maxLength 100
+     */
   productName: string;
 }
 
@@ -4020,18 +4044,18 @@ export type ApiResponseStoreRecommendationDataStoresItem = {
   /** 도로명 주소 */
   roadAddress: string;
   /**
-   * 지번 주소
-   * @nullable
-   */
+     * 지번 주소
+     * @nullable
+     */
   lotAddress?: string | null;
   /** 위도 */
   latitude: number;
   /** 경도 */
   longitude: number;
   /**
-   * 추천 매장 표시용 이미지 URL
-   * @nullable
-   */
+     * 추천 매장 표시용 이미지 URL
+     * @nullable
+     */
   imageUrl?: string | null;
   /** 네이버 Local Search 카테고리 */
   category: string;
@@ -4062,8 +4086,8 @@ export interface ApiResponseStoreRecommendation {
 /**
  * 이미지 업로드 카테고리
  */
-export type ImageUploadCategory =
-  (typeof ImageUploadCategory)[keyof typeof ImageUploadCategory];
+export type ImageUploadCategory = typeof ImageUploadCategory[keyof typeof ImageUploadCategory];
+
 
 export const ImageUploadCategory = {
   THUMBNAIL: 'THUMBNAIL',
@@ -4080,9 +4104,9 @@ export interface ImagePresignedUploadItemRequest {
 
 export interface ImagePresignedUploadRequest {
   /**
-   * 공구 ID. 생성 전 단계면 null
-   * @nullable
-   */
+     * 공구 ID. 생성 전 단계면 null
+     * @nullable
+     */
   groupBuyId?: number | null;
   /** 발급 대상 파일 목록 */
   files: ImagePresignedUploadItemRequest[];
@@ -4166,38 +4190,38 @@ export type PageParameter = number;
 export type SizeParameter = number;
 
 export type GetApiV1UsersNicknameAvailabilityParams = {
-  /**
-   * 2~10자, 한글/영문/숫자만 허용
-   * @minLength 2
-   * @maxLength 10
-   * @pattern ^[A-Za-z0-9가-힣]{2,10}$
-   */
-  nickname: string;
+/**
+ * 2~10자, 한글/영문/숫자만 허용
+ * @minLength 2
+ * @maxLength 10
+ * @pattern ^[A-Za-z0-9가-힣]{2,10}$
+ */
+nickname: string;
 };
 
 export type GetApiV1AuthEmailAvailabilityParams = {
-  email: string;
+email: string;
 };
 
 export type GetApiV1GroupBuysParams = {
-  /**
-   * 전체/마감임박/달성임박 단일 선택 칩
-   */
-  filter?: GetApiV1GroupBuysFilter;
-  /**
-   * 지역/세부지역 통합 필터 (복수 선택, 최대 10개, 예: SEOUL_ALL / SEOUL_GANGNAM_YEOKSAM_SAMSEONG)
-   * @maxItems 10
-   */
-  districts?: DistrictType[];
-  page?: PageParameter;
-  /**
-   * @maximum 100
-   */
-  size?: SizeParameter;
+/**
+ * 전체/마감임박/달성임박 단일 선택 칩
+ */
+filter?: GetApiV1GroupBuysFilter;
+/**
+ * 지역/세부지역 통합 필터 (복수 선택, 최대 10개, 예: SEOUL_ALL / SEOUL_GANGNAM_YEOKSAM_SAMSEONG)
+ * @maxItems 10
+ */
+districts?: DistrictType[];
+page?: PageParameter;
+/**
+ * @maximum 100
+ */
+size?: SizeParameter;
 };
 
-export type GetApiV1GroupBuysFilter =
-  (typeof GetApiV1GroupBuysFilter)[keyof typeof GetApiV1GroupBuysFilter];
+export type GetApiV1GroupBuysFilter = typeof GetApiV1GroupBuysFilter[keyof typeof GetApiV1GroupBuysFilter];
+
 
 export const GetApiV1GroupBuysFilter = {
   ALL: 'ALL',
@@ -4206,11 +4230,11 @@ export const GetApiV1GroupBuysFilter = {
 } as const;
 
 export type GetApiV1GroupBuysProgressParams = {
-  /**
-   * 조회할 공구 ID 목록 (양수 ID만 허용, 최대 20개)
-   * @maxItems 20
-   */
-  ids: number[];
+/**
+ * 조회할 공구 ID 목록 (양수 ID만 허용, 최대 20개)
+ * @maxItems 20
+ */
+ids: number[];
 };
 
 export type PostApiV1SearchBody = {
@@ -4219,45 +4243,45 @@ export type PostApiV1SearchBody = {
 };
 
 export type GetApiV1StoresSearchParams = {
-  /**
-   * 매장명 또는 주소 검색어
-   * @minLength 1
-   */
-  keyword: string;
+/**
+ * 매장명 또는 주소 검색어
+ * @minLength 1
+ */
+keyword: string;
 };
 
 export type PostApiV1GroupBuyOpenRequestsBody = {
   /**
-   * 알림 신청 대상 지역(동/구 등)
-   * @maxLength 50
-   */
+     * 알림 신청 대상 지역(동/구 등)
+     * @maxLength 50
+     */
   region: string;
   /**
-   * 알림 신청 대상 상품명
-   * @maxLength 100
-   */
+     * 알림 신청 대상 상품명
+     * @maxLength 100
+     */
   productName: string;
 };
 
 export type GetApiV1WishlistsParams = {
-  /**
-   * ALL=전체 / CLOSING_SOON=마감임박(D-3) / OPEN=모집중
-   */
-  filter?: GetApiV1WishlistsFilter;
-  /**
-   * true면 마감 공고 제외, false면 마감 포함
-   */
-  excludeClosed?: boolean;
-  sort?: GetApiV1WishlistsSort;
-  page?: PageParameter;
-  /**
-   * @maximum 100
-   */
-  size?: SizeParameter;
+/**
+ * ALL=전체 / CLOSING_SOON=마감임박(D-3) / OPEN=모집중
+ */
+filter?: GetApiV1WishlistsFilter;
+/**
+ * true면 마감 공고 제외, false면 마감 포함
+ */
+excludeClosed?: boolean;
+sort?: GetApiV1WishlistsSort;
+page?: PageParameter;
+/**
+ * @maximum 100
+ */
+size?: SizeParameter;
 };
 
-export type GetApiV1WishlistsFilter =
-  (typeof GetApiV1WishlistsFilter)[keyof typeof GetApiV1WishlistsFilter];
+export type GetApiV1WishlistsFilter = typeof GetApiV1WishlistsFilter[keyof typeof GetApiV1WishlistsFilter];
+
 
 export const GetApiV1WishlistsFilter = {
   ALL: 'ALL',
@@ -4265,8 +4289,8 @@ export const GetApiV1WishlistsFilter = {
   OPEN: 'OPEN',
 } as const;
 
-export type GetApiV1WishlistsSort =
-  (typeof GetApiV1WishlistsSort)[keyof typeof GetApiV1WishlistsSort];
+export type GetApiV1WishlistsSort = typeof GetApiV1WishlistsSort[keyof typeof GetApiV1WishlistsSort];
+
 
 export const GetApiV1WishlistsSort = {
   LATEST: 'LATEST',
@@ -4274,35 +4298,35 @@ export const GetApiV1WishlistsSort = {
 } as const;
 
 export type GetApiV1AdminDashboardUnconfirmedOrdersParams = {
-  page?: PageParameter;
-  /**
-   * @maximum 100
-   */
-  size?: SizeParameter;
+page?: PageParameter;
+/**
+ * @maximum 100
+ */
+size?: SizeParameter;
 };
 
 export type GetApiV1AdminDashboardUrgentRefundsParams = {
-  page?: PageParameter;
-  /**
-   * @maximum 100
-   */
-  size?: SizeParameter;
+page?: PageParameter;
+/**
+ * @maximum 100
+ */
+size?: SizeParameter;
 };
 
 export type GetApiV1AdminOrdersParams = {
-  /**
-   * OVERDUE_48H=48시간 초과, PENDING=확정 대기, CONFIRMED=확정 완료, ALL=전체
-   */
-  status?: GetApiV1AdminOrdersStatus;
-  page?: PageParameter;
-  /**
-   * @maximum 100
-   */
-  size?: SizeParameter;
+/**
+ * OVERDUE_48H=48시간 초과, PENDING=확정 대기, CONFIRMED=확정 완료, ALL=전체
+ */
+status?: GetApiV1AdminOrdersStatus;
+page?: PageParameter;
+/**
+ * @maximum 100
+ */
+size?: SizeParameter;
 };
 
-export type GetApiV1AdminOrdersStatus =
-  (typeof GetApiV1AdminOrdersStatus)[keyof typeof GetApiV1AdminOrdersStatus];
+export type GetApiV1AdminOrdersStatus = typeof GetApiV1AdminOrdersStatus[keyof typeof GetApiV1AdminOrdersStatus];
+
 
 export const GetApiV1AdminOrdersStatus = {
   OVERDUE_48H: 'OVERDUE_48H',
@@ -4312,23 +4336,23 @@ export const GetApiV1AdminOrdersStatus = {
 } as const;
 
 export type GetApiV1AdminCsTicketsParams = {
-  /**
-   * RECEIVED=접수, IN_PROGRESS=처리중, COMPLETED=완료, ALL=전체
-   */
-  status?: GetApiV1AdminCsTicketsStatus;
-  /**
-   * 티켓 ID, 제목, 소비자 닉네임/이메일/전화번호, 공구명 검색어
-   */
-  keyword?: string;
-  page?: PageParameter;
-  /**
-   * @maximum 100
-   */
-  size?: SizeParameter;
+/**
+ * RECEIVED=접수, IN_PROGRESS=처리중, COMPLETED=완료, ALL=전체
+ */
+status?: GetApiV1AdminCsTicketsStatus;
+/**
+ * 티켓 ID, 제목, 소비자 닉네임/이메일/전화번호, 공구명 검색어
+ */
+keyword?: string;
+page?: PageParameter;
+/**
+ * @maximum 100
+ */
+size?: SizeParameter;
 };
 
-export type GetApiV1AdminCsTicketsStatus =
-  (typeof GetApiV1AdminCsTicketsStatus)[keyof typeof GetApiV1AdminCsTicketsStatus];
+export type GetApiV1AdminCsTicketsStatus = typeof GetApiV1AdminCsTicketsStatus[keyof typeof GetApiV1AdminCsTicketsStatus];
+
 
 export const GetApiV1AdminCsTicketsStatus = {
   RECEIVED: 'RECEIVED',
@@ -4338,35 +4362,35 @@ export const GetApiV1AdminCsTicketsStatus = {
 } as const;
 
 export type GetApiV1GroupBuysGroupBuyIdCheckoutParams = {
-  /**
-   * 참여 수량
-   * @minimum 1
-   */
-  quantity: number;
+/**
+ * 참여 수량
+ * @minimum 1
+ */
+quantity: number;
 };
 
 export type GetApiV1NotificationsParams = {
-  /**
+/**
  * 알림 카테고리 필터
 - 소비자 역할: `ALL`, `WISH`, `APPLY`, `PICKUP`, `REQUEST`
 - 사장님 역할: `ALL`, `TODAY_PICKUP`, `REMINDER`, `CONFIRMED`, `CANCELLED`
 
  */
-  category?: GetApiV1NotificationsCategory;
-  /**
-   * 다음 페이지 조회 커서. 형식: `{occurredAt}|{id}`
-   */
-  cursor?: string;
-  /**
-   * 조회 개수 (1~100, 기본 20)
-   * @minimum 1
-   * @maximum 100
-   */
-  limit?: number;
+category?: GetApiV1NotificationsCategory;
+/**
+ * 다음 페이지 조회 커서. 형식: `{occurredAt}|{id}`
+ */
+cursor?: string;
+/**
+ * 조회 개수 (1~100, 기본 20)
+ * @minimum 1
+ * @maximum 100
+ */
+limit?: number;
 };
 
-export type GetApiV1NotificationsCategory =
-  (typeof GetApiV1NotificationsCategory)[keyof typeof GetApiV1NotificationsCategory];
+export type GetApiV1NotificationsCategory = typeof GetApiV1NotificationsCategory[keyof typeof GetApiV1NotificationsCategory];
+
 
 export const GetApiV1NotificationsCategory = {
   ALL: 'ALL',
@@ -4381,14 +4405,14 @@ export const GetApiV1NotificationsCategory = {
 } as const;
 
 export type GetApiV1UsersMeParticipationsParams = {
-  /**
-   * IN_PROGRESS=진행 중 / PICKUP_WAITING=픽업 대기 / PICKUP_COMPLETED=픽업 완료 / CANCELLED_OR_REFUNDED=환불·취소
-   */
-  status: GetApiV1UsersMeParticipationsStatus;
+/**
+ * IN_PROGRESS=진행 중 / PICKUP_WAITING=픽업 대기 / PICKUP_COMPLETED=픽업 완료 / CANCELLED_OR_REFUNDED=환불·취소
+ */
+status: GetApiV1UsersMeParticipationsStatus;
 };
 
-export type GetApiV1UsersMeParticipationsStatus =
-  (typeof GetApiV1UsersMeParticipationsStatus)[keyof typeof GetApiV1UsersMeParticipationsStatus];
+export type GetApiV1UsersMeParticipationsStatus = typeof GetApiV1UsersMeParticipationsStatus[keyof typeof GetApiV1UsersMeParticipationsStatus];
+
 
 export const GetApiV1UsersMeParticipationsStatus = {
   IN_PROGRESS: 'IN_PROGRESS',
@@ -4398,30 +4422,30 @@ export const GetApiV1UsersMeParticipationsStatus = {
 } as const;
 
 export type GetApiV1UsersMeParticipationsInProgressParams = {
-  page?: PageParameter;
-  /**
-   * @maximum 100
-   */
-  size?: SizeParameter;
+page?: PageParameter;
+/**
+ * @maximum 100
+ */
+size?: SizeParameter;
 };
 
 export type GetApiV1UsersMeParticipationsPickupWaitingParams = {
-  page?: PageParameter;
-  /**
-   * @maximum 100
-   */
-  size?: SizeParameter;
+page?: PageParameter;
+/**
+ * @maximum 100
+ */
+size?: SizeParameter;
 };
 
 export type GetApiV1OwnerGroupBuysManageParams = {
-  /**
-   * 상태 필터 (기본값 ALL)
-   */
-  filter?: GetApiV1OwnerGroupBuysManageFilter;
+/**
+ * 상태 필터 (기본값 ALL)
+ */
+filter?: GetApiV1OwnerGroupBuysManageFilter;
 };
 
-export type GetApiV1OwnerGroupBuysManageFilter =
-  (typeof GetApiV1OwnerGroupBuysManageFilter)[keyof typeof GetApiV1OwnerGroupBuysManageFilter];
+export type GetApiV1OwnerGroupBuysManageFilter = typeof GetApiV1OwnerGroupBuysManageFilter[keyof typeof GetApiV1OwnerGroupBuysManageFilter];
+
 
 export const GetApiV1OwnerGroupBuysManageFilter = {
   ALL: 'ALL',
@@ -4432,33 +4456,33 @@ export const GetApiV1OwnerGroupBuysManageFilter = {
 } as const;
 
 export type GetApiV1OwnerSettlementsMonthlySummaryParams = {
-  year: number;
-  /**
-   * @minimum 1
-   * @maximum 12
-   */
-  month: number;
+year: number;
+/**
+ * @minimum 1
+ * @maximum 12
+ */
+month: number;
 };
 
 export type GetApiV1OwnerSettlementsItemsParams = {
-  /**
-   * @minimum 2000
-   * @maximum 2100
-   */
-  year: number;
-  /**
-   * @minimum 1
-   * @maximum 12
-   */
-  month: number;
+/**
+ * @minimum 2000
+ * @maximum 2100
+ */
+year: number;
+/**
+ * @minimum 1
+ * @maximum 12
+ */
+month: number;
 };
 
 export type GetApiV1OwnerSettlementsRefundRequestsParams = {
-  tab?: GetApiV1OwnerSettlementsRefundRequestsTab;
+tab?: GetApiV1OwnerSettlementsRefundRequestsTab;
 };
 
-export type GetApiV1OwnerSettlementsRefundRequestsTab =
-  (typeof GetApiV1OwnerSettlementsRefundRequestsTab)[keyof typeof GetApiV1OwnerSettlementsRefundRequestsTab];
+export type GetApiV1OwnerSettlementsRefundRequestsTab = typeof GetApiV1OwnerSettlementsRefundRequestsTab[keyof typeof GetApiV1OwnerSettlementsRefundRequestsTab];
+
 
 export const GetApiV1OwnerSettlementsRefundRequestsTab = {
   ALL: 'ALL',
@@ -4467,24 +4491,24 @@ export const GetApiV1OwnerSettlementsRefundRequestsTab = {
 } as const;
 
 export type GetApiV1OwnerGroupBuyRequestsParams = {
-  page?: PageParameter;
-  /**
-   * @maximum 100
-   */
-  size?: SizeParameter;
+page?: PageParameter;
+/**
+ * @maximum 100
+ */
+size?: SizeParameter;
 };
 
 export type GetApiV1OwnerReservationsParams = {
-  status?: GetApiV1OwnerReservationsStatus;
-  page?: PageParameter;
-  /**
-   * @maximum 100
-   */
-  size?: SizeParameter;
+status?: GetApiV1OwnerReservationsStatus;
+page?: PageParameter;
+/**
+ * @maximum 100
+ */
+size?: SizeParameter;
 };
 
-export type GetApiV1OwnerReservationsStatus =
-  (typeof GetApiV1OwnerReservationsStatus)[keyof typeof GetApiV1OwnerReservationsStatus];
+export type GetApiV1OwnerReservationsStatus = typeof GetApiV1OwnerReservationsStatus[keyof typeof GetApiV1OwnerReservationsStatus];
+
 
 export const GetApiV1OwnerReservationsStatus = {
   ALL: 'ALL',
@@ -4493,20 +4517,20 @@ export const GetApiV1OwnerReservationsStatus = {
 } as const;
 
 export type GetApiV1AdminGroupBuyRequestsParams = {
-  status?: GetApiV1AdminGroupBuyRequestsStatus;
-  /**
-   * 요청 ID, 상품명, 가게명, 요청자 닉네임/이메일/전화번호 검색어
-   */
-  keyword?: string;
-  page?: PageParameter;
-  /**
-   * @maximum 100
-   */
-  size?: SizeParameter;
+status?: GetApiV1AdminGroupBuyRequestsStatus;
+/**
+ * 요청 ID, 상품명, 가게명, 요청자 닉네임/이메일/전화번호 검색어
+ */
+keyword?: string;
+page?: PageParameter;
+/**
+ * @maximum 100
+ */
+size?: SizeParameter;
 };
 
-export type GetApiV1AdminGroupBuyRequestsStatus =
-  (typeof GetApiV1AdminGroupBuyRequestsStatus)[keyof typeof GetApiV1AdminGroupBuyRequestsStatus];
+export type GetApiV1AdminGroupBuyRequestsStatus = typeof GetApiV1AdminGroupBuyRequestsStatus[keyof typeof GetApiV1AdminGroupBuyRequestsStatus];
+
 
 export const GetApiV1AdminGroupBuyRequestsStatus = {
   ALL: 'ALL',
@@ -4517,23 +4541,23 @@ export const GetApiV1AdminGroupBuyRequestsStatus = {
 } as const;
 
 export type GetApiV1AdminOwnerGroupBuyRequestsParams = {
-  /**
-   * 미입력 시 전체 조회
-   */
-  status?: GetApiV1AdminOwnerGroupBuyRequestsStatus;
-  /**
-   * 요청 ID, 공구명, 사장님 닉네임, 매장명 검색어
-   */
-  keyword?: string;
-  page?: PageParameter;
-  /**
-   * @maximum 100
-   */
-  size?: SizeParameter;
+/**
+ * 미입력 시 전체 조회
+ */
+status?: GetApiV1AdminOwnerGroupBuyRequestsStatus;
+/**
+ * 요청 ID, 공구명, 사장님 닉네임, 매장명 검색어
+ */
+keyword?: string;
+page?: PageParameter;
+/**
+ * @maximum 100
+ */
+size?: SizeParameter;
 };
 
-export type GetApiV1AdminOwnerGroupBuyRequestsStatus =
-  (typeof GetApiV1AdminOwnerGroupBuyRequestsStatus)[keyof typeof GetApiV1AdminOwnerGroupBuyRequestsStatus];
+export type GetApiV1AdminOwnerGroupBuyRequestsStatus = typeof GetApiV1AdminOwnerGroupBuyRequestsStatus[keyof typeof GetApiV1AdminOwnerGroupBuyRequestsStatus];
+
 
 export const GetApiV1AdminOwnerGroupBuyRequestsStatus = {
   PENDING: 'PENDING',
@@ -4542,16 +4566,16 @@ export const GetApiV1AdminOwnerGroupBuyRequestsStatus = {
 } as const;
 
 export type GetApiV1AdminRefundsParams = {
-  status?: GetApiV1AdminRefundsStatus;
-  page?: PageParameter;
-  /**
-   * @maximum 100
-   */
-  size?: SizeParameter;
+status?: GetApiV1AdminRefundsStatus;
+page?: PageParameter;
+/**
+ * @maximum 100
+ */
+size?: SizeParameter;
 };
 
-export type GetApiV1AdminRefundsStatus =
-  (typeof GetApiV1AdminRefundsStatus)[keyof typeof GetApiV1AdminRefundsStatus];
+export type GetApiV1AdminRefundsStatus = typeof GetApiV1AdminRefundsStatus[keyof typeof GetApiV1AdminRefundsStatus];
+
 
 export const GetApiV1AdminRefundsStatus = {
   ALL: 'ALL',
@@ -4560,37 +4584,38 @@ export const GetApiV1AdminRefundsStatus = {
 } as const;
 
 export type GetApiV1AdminSettlementsDashboardParams = {
-  year: number;
-  /**
-   * @minimum 1
-   * @maximum 12
-   */
-  month: number;
+year: number;
+/**
+ * @minimum 1
+ * @maximum 12
+ */
+month: number;
 };
 
 export type GetApiV1AdminSettlementsParams = {
-  year: number;
-  /**
-   * @minimum 1
-   * @maximum 12
-   */
-  month: number;
-  /**
-   * SCHEDULED=정산 예정, COMPLETED=정산 완료, ALL=전체
-   */
-  status?: GetApiV1AdminSettlementsStatus;
-  page?: PageParameter;
-  /**
-   * @maximum 100
-   */
-  size?: SizeParameter;
+year: number;
+/**
+ * @minimum 1
+ * @maximum 12
+ */
+month: number;
+/**
+ * SCHEDULED=정산 예정, COMPLETED=정산 완료, ALL=전체
+ */
+status?: GetApiV1AdminSettlementsStatus;
+page?: PageParameter;
+/**
+ * @maximum 100
+ */
+size?: SizeParameter;
 };
 
-export type GetApiV1AdminSettlementsStatus =
-  (typeof GetApiV1AdminSettlementsStatus)[keyof typeof GetApiV1AdminSettlementsStatus];
+export type GetApiV1AdminSettlementsStatus = typeof GetApiV1AdminSettlementsStatus[keyof typeof GetApiV1AdminSettlementsStatus];
+
 
 export const GetApiV1AdminSettlementsStatus = {
   SCHEDULED: 'SCHEDULED',
   COMPLETED: 'COMPLETED',
   ALL: 'ALL',
 } as const;
+

@@ -41,6 +41,7 @@ jobs:
         continue-on-error: true
 
       - name: Create Pull Request
+        id: create-pr
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -57,3 +58,9 @@ jobs:
             - `src/api/hooks` 업데이트
             - `src/api/zod` 업데이트
           base: develop
+
+      - name: Auto-merge PR if build succeeded
+        if: steps.build.outcome == 'success' && steps.create-pr.outputs.pull-request-number != ''
+        run: gh pr merge ${{ steps.create-pr.outputs.pull-request-number }} --squash --delete-branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

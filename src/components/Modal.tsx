@@ -35,7 +35,7 @@ export default function Modal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      className="fixed inset-y-0 left-1/2 -translate-x-1/2 w-full max-w-110 z-50 flex items-center justify-center bg-black/50"
       onClick={(e) => {
         if (e.target === e.currentTarget) onCancel?.();
       }}

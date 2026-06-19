@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { redirectStorage } from '@/lib/redirect';
 import { useAuthStore } from '@/store/authStore';
+import { tokenStorage } from '@/lib/token';
 
 export default function KakaoCallbackPage() {
   const router = useRouter();
@@ -43,7 +44,12 @@ export default function KakaoCallbackPage() {
           return;
         }
 
-        // 토큰은 Route Handler에서 쿠키에 저장 완료
+        const accessToken = data?.data?.accessToken;
+        const expiresIn = data?.data?.expiresIn;
+        if (accessToken && expiresIn) {
+          tokenStorage.set(accessToken, expiresIn);
+        }
+
         // signupCompleted 여부로 이동 분기만 처리
         if (!user.signupCompleted) {
           // 카카오 닉네임 임시 저장
@@ -56,7 +62,8 @@ export default function KakaoCallbackPage() {
 
         useAuthStore.getState().setIsLoggedIn(true);
         const redirect = redirectStorage.consume();
-        router.replace(redirect ?? '/feed');
+        const defaultRedirect = user.role === 'SELLER' ? '/seller' : '/feed';
+        router.replace(redirect ?? defaultRedirect);
       } catch {
         router.replace('/login');
       }

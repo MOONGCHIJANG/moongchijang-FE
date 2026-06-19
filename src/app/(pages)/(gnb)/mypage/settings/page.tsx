@@ -3,11 +3,19 @@
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Icon } from '@iconify/react';
-import { useGetApiV1UsersMe } from '@/api/hooks/auth/auth';
-import { AuthUserRole } from '@/api/generated/api.schemas';
+import {
+  useGetApiV1UsersMe,
+  usePatchApiV1UsersMeRole,
+} from '@/api/hooks/auth/auth';
+import {
+  AuthUserRole,
+  MyPageRoleSwitchRequestRole,
+} from '@/api/generated/api.schemas';
+import { refreshAccessToken } from '@/lib/token';
 import { useAuthStore } from '@/store/authStore';
 import Header from '@/components/Header';
 import Modal from '@/components/Modal';
+import { RoleSwitchBanner } from '@/components/RoleSwitchBanner';
 import { useState } from 'react';
 
 function SettingRow({
@@ -63,9 +71,31 @@ export default function SettingsPage() {
 
   const { data: meData } = useGetApiV1UsersMe();
   const user = meData?.status === 200 ? meData.data?.data : null;
-  const isSeller = user?.role === AuthUserRole.SELLER;
+  const isSeller =
+    user?.role === AuthUserRole.SELLER || user?.hasSellerRole === true;
 
+  const { mutate: switchRole, isPending: isSwitching } =
+    usePatchApiV1UsersMeRole();
   const storeLogout = useAuthStore((s) => s.logout);
+
+  function handleSwitchToSeller() {
+    if (isSwitching) return;
+    if (user?.role === AuthUserRole.SELLER) {
+      router.push('/seller');
+      return;
+    }
+    switchRole(
+      { data: { role: MyPageRoleSwitchRequestRole.SELLER } },
+      {
+        onSuccess: async () => {
+          // 전환 직후 메모리 accessToken은 옛 역할이므로, 빈 토큰 윈도우 없이
+          // 새 역할 토큰으로 즉시 교체 (로그인 상태 깜빡임 방지)
+          await refreshAccessToken();
+          router.push('/seller');
+        },
+      },
+    );
+  }
 
   async function handleLogout() {
     await storeLogout();
@@ -76,17 +106,14 @@ export default function SettingsPage() {
     <div className="min-h-dvh bg-bg-white flex flex-col">
       <Header text="마이페이지" />
 
-      {/* 역할 배너 */}
-      {/* TODO: 사장님 전환 기능 미구현 — 온클릭 핸들러 추가 필요 */}
+      {/* 역할 전환 배너 */}
       {isSeller ? (
-        <div className="bg-surface-brand-lighter px-p6 py-p5 flex items-center justify-between">
-          <span className="body-md-semibold text-text-brand">
-            사장님으로 전환하기
-          </span>
-          <div className="w-[50px] h-[26px] rounded-full bg-button-primary-fill flex items-center justify-end px-[2px]">
-            <div className="w-[22px] h-[22px] rounded-full bg-white" />
-          </div>
-        </div>
+        <RoleSwitchBanner
+          label="사장님 화면으로 전환하기"
+          onClick={handleSwitchToSeller}
+          isOn={user?.role === AuthUserRole.SELLER}
+          disabled={isSwitching}
+        />
       ) : (
         <Link
           href="/signup/seller"

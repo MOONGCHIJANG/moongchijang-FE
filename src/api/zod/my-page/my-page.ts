@@ -268,9 +268,14 @@ export const GetApiV1MypageRefundsResponse = zod.object({
       paidAt: zod.iso
         .datetime({ offset: true })
         .nullable()
-        .describe('결제 일시'),
+        .describe("UTC 기준 결제 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`"),
       paymentMethod: zod.string().nullable().describe('결제 수단'),
-      refundedAt: zod.iso.datetime({ offset: true }).nullish(),
+      refundedAt: zod.iso
+        .datetime({ offset: true })
+        .nullish()
+        .describe(
+          "UTC 기준 환불 완료 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`",
+        ),
     }),
   ),
   error: zod.unknown().nullable(),
@@ -310,9 +315,14 @@ export const GetApiV1UsersMeRefundsResponse = zod.object({
       paidAt: zod.iso
         .datetime({ offset: true })
         .nullable()
-        .describe('결제 일시'),
+        .describe("UTC 기준 결제 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`"),
       paymentMethod: zod.string().nullable().describe('결제 수단'),
-      refundedAt: zod.iso.datetime({ offset: true }).nullish(),
+      refundedAt: zod.iso
+        .datetime({ offset: true })
+        .nullish()
+        .describe(
+          "UTC 기준 환불 완료 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`",
+        ),
     }),
   ),
   error: zod.unknown().nullable(),

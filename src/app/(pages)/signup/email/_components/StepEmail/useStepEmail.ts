@@ -10,6 +10,7 @@ import {
   usePostApiV1AuthEmailVerificationCodes,
   usePostApiV1AuthEmailVerificationCodesVerify,
 } from '@/api/hooks/auth/auth';
+import { tokenStorage } from '@/lib/token';
 
 export type EmailStatus = 'idle' | 'checking' | 'available' | 'duplicated';
 export type CodeStatus = 'idle' | 'sent' | 'verified' | 'invalid' | 'timeout';
@@ -198,6 +199,13 @@ export const useStepEmail = (onNext: () => void) => {
       });
 
       if (res.ok) {
+        const data = await res.json();
+        // 메모리에 토큰 저장
+        const accessToken = data?.data?.accessToken;
+        const expiresIn = data?.data?.expiresIn;
+        if (accessToken && expiresIn) {
+          tokenStorage.set(accessToken, expiresIn);
+        }
         onNext();
       }
       // TODO: 에러 토스트

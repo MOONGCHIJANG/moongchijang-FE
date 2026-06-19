@@ -55,9 +55,8 @@ const PaymentCompleteClient = ({ participationId, groupBuyId }: Props) => {
             <p className="text-text-subtle heading-md-semibold">결제 완료</p>
             <p className="text-black heading-1xl-bold whitespace-break-spaces">{`공구가 달성되면\n알림톡을 보내드릴게요`}</p>
           </div>
-          {/* TODO: 경로 확정 시 수정 */}
           <Link
-            href="/feed"
+            href="/mypage"
             className="flex gap-g2 items-center text-text-brand caption-sm-bold"
           >
             <p>공구 참여 목록 보기</p>

@@ -34,7 +34,7 @@ export const FeedCard = ({
         )}
         <div
           className={cn(
-            'absolute left-0 top-0 min-w-[58px] h-[36px] rounded-br-[16px] px-2 py-1.5 text-center body-md-bold text-text-basic-inverse',
+            'absolute left-0 top-0 flex min-w-[58px] h-[36px] items-center justify-center rounded-br-[16px] px-2 text-center body-md-bold text-text-basic-inverse',
             isUrgent ? 'bg-surface-brand' : 'bg-surface-inverse',
           )}
         >

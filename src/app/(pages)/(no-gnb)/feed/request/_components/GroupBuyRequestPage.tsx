@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { Icon } from '@iconify/react';
 import { Button } from '@/components/Button';
 import Header from '@/components/Header';
@@ -21,6 +21,7 @@ import {
   usePostApiV1GroupBuyRequests,
 } from '@/api/hooks/group-buy-request/group-buy-request';
 import type { ApiResponseStoreSearchListDataStoresItem } from '@/api/generated/api.schemas';
+import { useAuthStore } from '@/store/authStore';
 
 type Step = 'form' | 'stores' | 'complete';
 
@@ -94,7 +95,48 @@ interface GroupBuyRequestPageProps {
   initialSelectedBakery?: string | null;
 }
 
-export const GroupBuyRequestPage = ({
+export const GroupBuyRequestPage = (props: GroupBuyRequestPageProps) => {
+  const { isLoggedIn, isInitialized } = useAuthStore();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  if (!isInitialized) return null;
+
+  if (!isLoggedIn) {
+    const currentUrl = `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
+
+    return (
+      <div className="flex flex-col h-full min-h-[calc(100dvh-58px)]">
+        <Header text="공구 개설 요청" showBackButton={false} />
+        <div className="flex-1 flex flex-col items-center justify-center pb-[58px]">
+          <div className="flex flex-col items-center gap-g4">
+            <Image
+              src="/icons/moongchinyang.svg"
+              alt=""
+              width={51}
+              height={65}
+              className="mb-g4 w-20 h-25"
+            />
+            <span className="heading-md-semibold text-text-basic text-center">
+              공구를 개설하려면&#160;
+              <Link
+                href={`/login?redirect=${encodeURIComponent(currentUrl)}`}
+                className="text-brand-primary"
+              >
+                로그인
+              </Link>
+              이 필요해요🥐
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return <GroupBuyRequestContent {...props} />;
+};
+
+const GroupBuyRequestContent = ({
   detectedBakery,
   detectedNeighborhood,
   initialStep = 'form',

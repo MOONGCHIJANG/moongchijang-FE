@@ -1,0 +1,66 @@
+name: Orval Codegen
+
+on:
+  repository_dispatch:
+    types: [backend-deployed]
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    env:
+      HUSKY: 0
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Generate API code
+        run: pnpm generate
+        env:
+          SWAGGER_URL: ${{ vars.SWAGGER_URL }}
+
+      - name: Build check
+        id: build
+        run: pnpm build
+        continue-on-error: true
+
+      - name: Create Pull Request
+        id: create-pr
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'chore: Orval 자동 코드 생성'
+          branch: chore/orval-auto-generate
+          delete-branch: true
+          title: 'chore: Orval 자동 코드 생성'
+          body: |
+            백엔드 배포 트리거에 의해 자동 생성된 PR입니다.
+
+            ${{ steps.build.outcome == 'failure' && '⚠️ **빌드 실패** — Breaking change 가능성 있습니다. 수동 확인이 필요합니다.' || '✅ 빌드 성공' }}
+
+            - `src/api/generated` 업데이트
+            - `src/api/hooks` 업데이트
+            - `src/api/zod` 업데이트
+          base: develop
+
+      - name: Auto-merge PR if build succeeded
+        if: steps.build.outcome == 'success' && steps.create-pr.outputs.pull-request-number != ''
+        run: gh pr merge ${{ steps.create-pr.outputs.pull-request-number }} --squash --delete-branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

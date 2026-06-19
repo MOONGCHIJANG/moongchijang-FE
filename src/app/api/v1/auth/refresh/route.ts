@@ -1,11 +1,18 @@
 import { serverFetchRaw } from '@/lib/fetcher';
+import {
+  applyRefreshTokenCookie,
+  setAccessTokenCookie,
+  clearAuthCookies,
+} from '@/lib/cookie';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
   const refreshToken = req.cookies.get('refreshToken')?.value;
 
   if (!refreshToken) {
-    return NextResponse.json({ success: false }, { status: 401 });
+    const noToken = NextResponse.json({ success: false }, { status: 401 });
+    clearAuthCookies(noToken);
+    return noToken;
   }
 
   const result = await serverFetchRaw('/api/v1/auth/refresh', undefined, {
@@ -16,39 +23,26 @@ export async function POST(req: NextRequest) {
   });
 
   if (result.status === 200) {
-    const data = result.data as {
-      data?: { accessToken: string; expiresIn: number };
-    };
-
-    const accessToken = data?.data?.accessToken ?? '';
-    const expiresIn = data?.data?.expiresIn ?? 3600;
-
     const response = NextResponse.json(result.data, { status: 200 });
-    response.cookies.set('accessToken', accessToken, {
-      httpOnly: false,
-      maxAge: expiresIn,
-      path: '/',
-      sameSite: 'strict',
-      secure: process.env.NODE_ENV === 'production',
-    });
 
-    // 새 refreshToken도 갱신
-    const setCookie = result.headers?.get('set-cookie');
-    if (setCookie) {
-      const match = setCookie.match(/refreshToken=([^;]+)/);
-      const newRefreshToken = match ? match[1] : null;
-      if (newRefreshToken) {
-        response.cookies.set('refreshToken', newRefreshToken, {
-          httpOnly: true,
-          path: '/',
-          sameSite: 'strict',
-          maxAge: 60 * 60 * 24 * 14,
-        });
+    applyRefreshTokenCookie(response, result.headers?.get('set-cookie'));
+
+    // 역할 전환 등으로 accessToken 이 바뀌면 SSR 가드가 옛 토큰을 쓰지 않도록
+    // accessToken 캐시 쿠키도 새 값으로 갱신한다.
+    const payload = (
+      result.data as {
+        data?: { accessToken?: string; expiresIn?: number };
       }
+    )?.data;
+    if (payload?.accessToken && payload?.expiresIn) {
+      setAccessTokenCookie(response, payload.accessToken, payload.expiresIn);
     }
 
     return response;
   }
 
-  return NextResponse.json(result.data, { status: result.status });
+  // 재발급 실패 시 옛 토큰을 남기면 SSR 가드가 stale 토큰을 신뢰하므로 제거한다.
+  const failure = NextResponse.json(result.data, { status: result.status });
+  clearAuthCookies(failure);
+  return failure;
 }

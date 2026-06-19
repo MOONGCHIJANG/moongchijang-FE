@@ -40,7 +40,10 @@ export const GetApiV1ParticipationsParticipationIdPickupResponse = zod.object({
       .number()
       .nullish()
       .describe('당일 픽업 종료까지 남은 분. 당일이 아니면 null'),
-    pickedUpAt: zod.iso.datetime({ offset: true }).nullish(),
+    pickedUpAt: zod.iso
+      .datetime({ offset: true })
+      .nullish()
+      .describe("UTC 기준 픽업 완료 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`"),
   }),
   error: zod.unknown().nullable(),
 });
@@ -76,7 +79,10 @@ export const GetApiV1ParticipationsParticipationIdQrResponse = zod.object({
       .describe(
         'KST 기준 픽업일까지 남은 날짜. 당일이면 0, 지난 픽업일이면 음수',
       ),
-    pickedUpAt: zod.iso.datetime({ offset: true }).nullish(),
+    pickedUpAt: zod.iso
+      .datetime({ offset: true })
+      .nullish()
+      .describe("UTC 기준 픽업 완료 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`"),
   }),
   error: zod.unknown().nullable(),
 });
@@ -133,8 +139,9 @@ export const GetApiV1PickupsMeNearestQrResponse = zod.object({
 });
 
 /**
- * SELLER 권한 사용자가 본인 매장 공구의 소비자 QR을 스캔하면 READY → PICKED_UP으로 자동 전환한다.
-ADMIN 권한 사용자는 운영 대리 처리 용도로 매장 소속 검증 없이 처리할 수 있다.
+ * 현재 활성 역할이 SELLER 또는 ADMIN일 때만 호출할 수 있다.
+SELLER 역할 사용자가 본인 매장 공구의 소비자 QR을 스캔하면 READY → PICKED_UP으로 자동 전환한다.
+ADMIN 역할 사용자는 운영 대리 처리 용도로 매장 소속 검증 없이 처리할 수 있다.
 응답에는 사장님 스캔 결과 화면에 필요한 유저이름, 상품명, 수량, 픽업 상태를 포함한다.
 
  * @summary QR 코드 스캔 검증 및 수령 처리

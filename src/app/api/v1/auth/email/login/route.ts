@@ -14,33 +14,41 @@ export async function POST(req: NextRequest) {
       data?: {
         accessToken: string;
         expiresIn: number;
-        user?: { signupCompleted: boolean };
+        user?: { signupCompleted: boolean; role: string };
       };
     };
 
-    const accessToken = data?.data?.accessToken ?? '';
-    const expiresIn = data?.data?.expiresIn ?? 3600;
-    const signupCompleted = data?.data?.user?.signupCompleted ?? true;
+    const user = data?.data?.user;
+    const signupCompleted = user?.signupCompleted ?? true;
+    const role = user?.role;
+
+    const redirectTo = !signupCompleted
+      ? '/signup/email?step=profile'
+      : role === 'SELLER'
+        ? '/seller'
+        : null;
 
     const response = NextResponse.json(
       {
         ...(result.data as object),
-        redirectTo: signupCompleted ? null : '/signup/email?step=profile',
+        redirectTo,
       },
       { status: 200 },
     );
 
-    response.cookies.set('accessToken', accessToken, {
-      httpOnly: false, // TODO: customFetch 구조 변경 후 httpOnly: true로 전환 필요
-      maxAge: expiresIn,
-      path: '/',
-      sameSite: 'strict',
-      secure: process.env.NODE_ENV === 'production',
-    });
-
     const setCookie = result.headers?.get('set-cookie');
     if (setCookie) {
-      response.headers.append('set-cookie', setCookie);
+      const match = setCookie.match(/refreshToken=([^;]+)/);
+      const refreshToken = match ? match[1] : null;
+      if (refreshToken) {
+        response.cookies.set('refreshToken', refreshToken, {
+          httpOnly: true,
+          path: '/',
+          sameSite: 'strict',
+          maxAge: 60 * 60 * 24 * 14,
+          secure: process.env.NODE_ENV === 'production',
+        });
+      }
     }
 
     return response;

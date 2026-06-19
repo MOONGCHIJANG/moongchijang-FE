@@ -36,6 +36,10 @@ export const GetApiV1StoresSearchResponse = zod.object({
             lotAddress: zod.string().nullish().describe('지번 주소'),
             latitude: zod.number().optional().describe('위도'),
             longitude: zod.number().optional().describe('경도'),
+            imageUrl: zod
+              .string()
+              .nullish()
+              .describe('추천 매장 표시용 이미지 URL'),
           }),
         )
         .optional()
@@ -132,10 +136,18 @@ export const GetApiV1GroupBuyRequestsResponse = zod.object({
       statusHistory: zod.array(
         zod.object({
           status: zod.enum(['IN_REVIEW', 'IN_CONTACT', 'OPENED', 'REJECTED']),
-          changedAt: zod.iso.datetime({ offset: true }),
+          changedAt: zod.iso
+            .datetime({ offset: true })
+            .describe(
+              "UTC 기준 상태 변경 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`",
+            ),
         }),
       ),
-      createdAt: zod.iso.datetime({ offset: true }),
+      createdAt: zod.iso
+        .datetime({ offset: true })
+        .describe(
+          "UTC 기준 요청 생성 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`",
+        ),
     }),
   ),
   error: zod.unknown().nullable(),
@@ -179,10 +191,16 @@ export const GetApiV1GroupBuyRequestsRequestIdResponse = zod.object({
     statusHistory: zod.array(
       zod.object({
         status: zod.enum(['IN_REVIEW', 'IN_CONTACT', 'OPENED', 'REJECTED']),
-        changedAt: zod.iso.datetime({ offset: true }),
+        changedAt: zod.iso
+          .datetime({ offset: true })
+          .describe(
+            "UTC 기준 상태 변경 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`",
+          ),
       }),
     ),
-    createdAt: zod.iso.datetime({ offset: true }),
+    createdAt: zod.iso
+      .datetime({ offset: true })
+      .describe("UTC 기준 요청 생성 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`"),
   }),
   error: zod.unknown().nullable(),
 });
@@ -445,6 +463,10 @@ export const PostApiV1GroupBuyOpenRequestsStoreRecommendationsResponse =
               lotAddress: zod.string().nullish().describe('지번 주소'),
               latitude: zod.number().describe('위도'),
               longitude: zod.number().describe('경도'),
+              imageUrl: zod
+                .string()
+                .nullish()
+                .describe('추천 매장 표시용 이미지 URL'),
               category: zod.string().describe('네이버 Local Search 카테고리'),
               addressMatched: zod
                 .boolean()

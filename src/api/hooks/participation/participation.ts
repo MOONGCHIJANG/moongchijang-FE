@@ -384,7 +384,7 @@ export const usePostApiV1PaymentsPortoneComplete = <TError = BadRequestResponse 
       return useMutation(getPostApiV1PaymentsPortoneCompleteMutationOptions(options), queryClient);
     }
     /**
- * 웹훅 본문만 신뢰하지 않고 서버에서 PortOne 결제 단건 조회 후 상태를 동기화한다.
+ * 웹훅 signature를 검증한 뒤, 본문만 신뢰하지 않고 서버에서 PortOne 결제 단건 조회 후 상태를 동기화한다. signature 검증이 활성화된 환경에서는 PORTONE_WEBHOOK_SECRET과 웹훅 헤더가 필요하다.
  * @summary PortOne 결제 웹훅 수신
  */
 export type postApiV1PaymentsPortoneWebhookResponse200 = {

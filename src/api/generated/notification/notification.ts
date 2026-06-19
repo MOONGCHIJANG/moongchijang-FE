@@ -16,6 +16,12 @@ import type {
 import { customFetch } from '../../../lib/custom-fetch';
 
 /**
+ * 현재 로그인 사용자의 활성 역할 기준으로 알림 목록을 조회한다.
+- 소비자 역할(BUYER): 소비자 알림만 조회
+- 사장님 역할(SELLER): 사장님 알림만 조회
+- 관리자 역할(ADMIN): 앱 내 알림 API를 사용할 수 없다.
+- 역할에 맞지 않는 `category`를 요청하면 400 오류를 반환한다.
+
  * @summary 알림 목록 조회 (폴링용)
  */
 export type getApiV1NotificationsResponse200 = {
@@ -70,6 +76,10 @@ export const getApiV1Notifications = async (params?: GetApiV1NotificationsParams
 
 
 /**
+ * 현재 로그인 사용자의 활성 역할 기준 scope에 해당하는 미읽음 알림 개수만 조회한다.
+- BUYER면 소비자 알림 개수만 집계
+- SELLER면 사장님 알림 개수만 집계
+
  * @summary 미읽음 알림 개수 조회
  */
 export type getApiV1NotificationsUnreadCountResponse200 = {
@@ -112,6 +122,10 @@ export const getApiV1NotificationsUnreadCount = async ( options?: RequestInit): 
 
 
 /**
+ * 현재 로그인 사용자의 활성 역할 기준 scope에 해당하는 알림만 전체 읽음 처리한다.
+- BUYER면 소비자 알림만 읽음 처리
+- SELLER면 사장님 알림만 읽음 처리
+
  * @summary 전체 알림 읽음 처리
  */
 export type patchApiV1NotificationsReadAllResponse200 = {
@@ -154,6 +168,7 @@ export const patchApiV1NotificationsReadAll = async ( options?: RequestInit): Pr
 
 
 /**
+ * 현재 로그인 사용자의 활성 역할 scope에 속한 본인 알림만 읽음 처리할 수 있다.
  * @summary 알림 단건 읽음 처리
  */
 export type patchApiV1NotificationsNotificationIdReadResponse200 = {

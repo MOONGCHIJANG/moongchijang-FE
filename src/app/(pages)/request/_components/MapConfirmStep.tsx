@@ -53,7 +53,7 @@ export const MapConfirmStep = ({
       </header>
 
       {/* 지도 영역 */}
-      <div className="mx-4 mt-3 h-[226px] rounded-medium overflow-hidden">
+      <div className="mx-4 mt-3 h-[226px] rounded-medium overflow-hidden isolate">
         {store?.latitude && store?.longitude && (
           <NaverMap
             center={{ lat: store.latitude, lng: store.longitude }}

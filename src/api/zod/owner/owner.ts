@@ -542,7 +542,9 @@ export const GetApiV1OwnerGroupBuyRequestsRequestIdResponse = zod.object({
     perUserLimit: zod.number().nullish(),
     thumbnailUrl: zod.string(),
     imageUrls: zod.array(zod.string()),
-    deadline: zod.iso.datetime({ offset: true }),
+    deadline: zod.iso
+      .datetime({ offset: true })
+      .describe("KST 기준 모집 마감 일시. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`"),
     pickupDate: zod.iso.date(),
     pickupTimeStart: zod.iso.time({}),
     pickupTimeEnd: zod.iso.time({}),
@@ -551,8 +553,14 @@ export const GetApiV1OwnerGroupBuyRequestsRequestIdResponse = zod.object({
     status: zod.enum(['PENDING', 'APPROVED', 'REJECTED']),
     rejectionReason: zod.string().nullish(),
     approvedGroupBuyId: zod.number().nullish(),
-    reviewedAt: zod.iso.datetime({ offset: true }).nullish(),
-    requestedAt: zod.iso.datetime({ offset: true }).nullish(),
+    reviewedAt: zod.iso
+      .datetime({ offset: true })
+      .nullish()
+      .describe("UTC 기준 검토 완료 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`"),
+    requestedAt: zod.iso
+      .datetime({ offset: true })
+      .nullish()
+      .describe("UTC 기준 요청 생성 시각. 응답 형식은 `yyyy-MM-dd'T'HH:mm:ss`"),
   }),
   error: zod.unknown().nullable(),
 });

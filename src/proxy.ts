@@ -100,11 +100,14 @@ export async function proxy(request: NextRequest) {
     );
     if (accessToken) {
       const role = await getUserRole(accessToken);
-      const response = NextResponse.redirect(
-        new URL(roleHomePath(role), request.url),
-      );
-      applyRotation(response, rotated);
-      return response;
+      if (role !== null) {
+        const response = NextResponse.redirect(
+          new URL(roleHomePath(role), request.url),
+        );
+        applyRotation(response, rotated);
+        return response;
+      }
+      // role null (users/me 일시 장애) → 로그인 페이지 그대로 노출
     }
     if (pathname.startsWith('/login')) {
       return NextResponse.redirect(new URL('/feed', request.url));

@@ -5,8 +5,6 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Input from '@/components/Input';
 import { Button } from '@/components/Button';
-import { usePostApiV1AuthEmailLogin } from '@/api/hooks/auth/auth';
-import { AuthUserRole } from '@/api/generated/api.schemas';
 import { useAuthStore } from '@/store/authStore';
 import { tokenStorage } from '@/lib/token';
 
@@ -15,35 +13,39 @@ export default function AdminLoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [isPending, setIsPending] = useState(false);
 
   const setIsLoggedIn = useAuthStore((s) => s.setIsLoggedIn);
-  const { mutate: login, isPending } = usePostApiV1AuthEmailLogin();
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setErrorMsg('');
-    login(
-      { data: { email, password } },
-      {
-        onSuccess: (res) => {
-          if (res.status !== 200) {
-            setErrorMsg('아이디 또는 비밀번호가 올바르지 않습니다.');
-            return;
-          }
-          const { accessToken, expiresIn, user } = res.data.data;
-          if (user.role !== AuthUserRole.ADMIN) {
-            setErrorMsg('어드민 계정이 아닙니다.');
-            return;
-          }
+    setIsPending(true);
+
+    try {
+      const res = await fetch('/api/v1/auth/admin/email/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const accessToken = data?.data?.accessToken;
+        const expiresIn = data?.data?.expiresIn;
+        if (accessToken && expiresIn) {
           tokenStorage.set(accessToken, expiresIn);
-          setIsLoggedIn(true);
-          router.push('/admin/dashboard');
-        },
-        onError: () => {
-          setErrorMsg('아이디 또는 비밀번호가 올바르지 않습니다.');
-        },
-      },
-    );
+        }
+        setIsLoggedIn(true);
+        router.push(data?.redirectTo ?? '/admin/dashboard');
+      } else {
+        setErrorMsg('아이디 또는 비밀번호가 올바르지 않습니다.');
+      }
+    } catch {
+      setErrorMsg('네트워크 오류가 발생했습니다.');
+    } finally {
+      setIsPending(false);
+    }
   }
 
   return (

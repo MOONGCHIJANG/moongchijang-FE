@@ -6,7 +6,6 @@ import { Icon } from '@iconify/react';
 import { AdminSidebar } from '../_components/AdminSidebar';
 import { tokenStorage } from '@/lib/token';
 import { useAuthStore } from '@/store/authStore';
-import { usePostApiV1AuthLogout } from '@/api/hooks/auth/auth';
 
 export default function AdminAuthenticatedLayout({
   children,
@@ -27,16 +26,11 @@ export default function AdminAuthenticatedLayout({
   }
   const router = useRouter();
   const setIsLoggedIn = useAuthStore((s) => s.setIsLoggedIn);
-  const { mutate: logout } = usePostApiV1AuthLogout();
-
-  function handleLogout() {
-    logout(undefined, {
-      onSettled: () => {
-        tokenStorage.remove();
-        setIsLoggedIn(false);
-        router.push('/admin/login');
-      },
-    });
+  async function handleLogout() {
+    await fetch('/api/v1/auth/logout', { method: 'POST' }).catch(() => {});
+    tokenStorage.remove();
+    setIsLoggedIn(false);
+    router.push('/admin/login');
   }
 
   return (

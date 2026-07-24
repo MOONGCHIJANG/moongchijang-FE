@@ -10,18 +10,12 @@
       "cache": false,
       "persistent": true
     },
-    "lint": {
-      "dependsOn": ["^build"]
-    },
-    "typecheck": {
-      "dependsOn": ["^build"]
-    },
-    "test": {
-      "dependsOn": ["^build"]
-    },
+    "lint": {},
+    "typecheck": {},
+    "test": {},
     "generate": {
-      "cache": true,
-      "outputs": ["src/**/*.ts", "!src/**/*.test.ts"]
+      "cache": false,
+      "env": ["SWAGGER_URL"]
     }
   }
 }

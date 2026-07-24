@@ -27,4 +27,5 @@ jobs:
         run: pnpm install
 
       - name: Publish to Chromatic
+        working-directory: apps/web
         run: pnpm dlx chromatic --project-token=${{ secrets.CHROMATIC_PROJECT_TOKEN }} --auto-accept-changes

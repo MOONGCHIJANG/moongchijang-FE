@@ -54,9 +54,9 @@ jobs:
 
             ${{ steps.build.outcome == 'failure' && '⚠️ **빌드 실패** — Breaking change 가능성 있습니다. 수동 확인이 필요합니다.' || '✅ 빌드 성공' }}
 
-            - `src/api/generated` 업데이트
-            - `src/api/hooks` 업데이트
-            - `src/api/zod` 업데이트
+            - `packages/api-client/src/generated` 업데이트
+            - `packages/api-client/src/hooks` 업데이트
+            - `packages/api-client/src/zod` 업데이트
           base: develop
 
       - name: Auto-merge PR if build succeeded

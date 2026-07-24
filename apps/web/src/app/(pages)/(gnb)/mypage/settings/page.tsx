@@ -1,0 +1,193 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { Icon } from '@iconify/react';
+import {
+  useGetApiV1UsersMe,
+  usePatchApiV1UsersMeRole,
+} from '@moongchijang/api-client/hooks/auth/auth';
+import {
+  AuthUserRole,
+  MyPageRoleSwitchRequestRole,
+} from '@moongchijang/api-client/generated/api.schemas';
+import { refreshAccessToken } from '@moongchijang/api-client/token';
+import { useAuthStore } from '@moongchijang/api-client/authStore';
+import Header from '@/components/Header';
+import Modal from '@/components/Modal';
+import { RoleSwitchBanner } from '@/components/RoleSwitchBanner';
+import { useState } from 'react';
+
+function SettingRow({
+  label,
+  value,
+  onClick,
+  href,
+  labelClassName,
+}: {
+  label: string;
+  value?: string | null;
+  onClick?: () => void;
+  href?: string;
+  labelClassName?: string;
+}) {
+  const inner = (
+    <div className="flex items-center justify-between py-p5">
+      <span
+        className={`heading-sm-regular text-text-basic ${labelClassName ?? ''}`}
+      >
+        {label}
+      </span>
+      <div className="flex items-center gap-g4">
+        {value && (
+          <span className="heading-sm-regular text-text-subtle-inverse">
+            {value}
+          </span>
+        )}
+        <Icon
+          icon="lucide:chevron-right"
+          className="w-6 h-6 text-icon-tertiary"
+        />
+      </div>
+    </div>
+  );
+
+  if (href) {
+    return <Link href={href}>{inner}</Link>;
+  }
+  if (onClick) {
+    return (
+      <button type="button" className="w-full text-left" onClick={onClick}>
+        {inner}
+      </button>
+    );
+  }
+  return <div>{inner}</div>;
+}
+
+export default function SettingsPage() {
+  const router = useRouter();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  const { data: meData } = useGetApiV1UsersMe();
+  const user = meData?.status === 200 ? meData.data?.data : null;
+  const isSeller =
+    user?.role === AuthUserRole.SELLER || user?.hasSellerRole === true;
+
+  const { mutate: switchRole, isPending: isSwitching } =
+    usePatchApiV1UsersMeRole();
+  const storeLogout = useAuthStore((s) => s.logout);
+
+  function handleSwitchToSeller() {
+    if (isSwitching) return;
+    if (user?.role === AuthUserRole.SELLER) {
+      router.push('/seller');
+      return;
+    }
+    switchRole(
+      { data: { role: MyPageRoleSwitchRequestRole.SELLER } },
+      {
+        onSuccess: async () => {
+          // 전환 직후 메모리 accessToken은 옛 역할이므로, 빈 토큰 윈도우 없이
+          // 새 역할 토큰으로 즉시 교체 (로그인 상태 깜빡임 방지)
+          await refreshAccessToken();
+          router.push('/seller');
+        },
+      },
+    );
+  }
+
+  async function handleLogout() {
+    await storeLogout();
+    router.push('/feed');
+  }
+
+  return (
+    <div className="min-h-dvh bg-bg-white flex flex-col">
+      <Header text="마이페이지" />
+
+      {/* 역할 전환 배너 */}
+      {isSeller ? (
+        <RoleSwitchBanner
+          label="사장님 화면으로 전환하기"
+          onClick={handleSwitchToSeller}
+          isOn={user?.role === AuthUserRole.SELLER}
+          disabled={isSwitching}
+        />
+      ) : (
+        <Link
+          href="/signup/seller"
+          className="bg-surface-brand-lighter px-p6 py-p5 flex items-center justify-between"
+        >
+          <span className="heading-sm-semibold text-text-brand">
+            사장님으로 가입하기
+          </span>
+          <Icon
+            icon="lucide:chevron-right"
+            className="w-6 h-6 text-icon-primary"
+          />
+        </Link>
+      )}
+
+      <div className="flex flex-col py-0">
+        {/* 프로필 */}
+        <div className="bg-surface-white px-g5 py-[16px] flex items-center justify-between border-b border-dashed border-divider-default">
+          <div>
+            <p className="heading-md-bold text-text-basic">
+              {user?.nickname ?? '-'}
+            </p>
+            <p className="caption-sm-regular text-text-tertiary mt-p1">
+              {user?.email ?? '-'}
+            </p>
+          </div>
+        </div>
+
+        {/* 정보 */}
+        <div className="bg-surface-white px-g5">
+          <p className="caption-sm-medium text-text-disabled pt-p6 pb-p3">
+            정보
+          </p>
+          <SettingRow
+            label="휴대폰 번호"
+            value={
+              user?.phoneNumber
+                ? '+82 ' + user.phoneNumber.replace(/^0/, '')
+                : undefined
+            }
+            href="/mypage/phone-change"
+          />
+          <SettingRow label="닉네임 변경" href="/mypage/nickname-change" />
+          <SettingRow label="비밀번호 변경" href="/mypage/password-change" />
+        </div>
+
+        <div className="border-t border-border-subtle" />
+
+        {/* 기타 */}
+        <div className="bg-surface-white px-g5">
+          <p className="caption-sm-medium text-text-disabled pt-p6 pb-p3">
+            기타
+          </p>
+          <SettingRow label="이용약관" href="/terms" />
+          <SettingRow
+            label="로그아웃"
+            onClick={() => setShowLogoutModal(true)}
+          />
+          <SettingRow label="탈퇴하기" href="/mypage/withdraw" />
+        </div>
+
+        <div className="border-t border-border-subtle" />
+      </div>
+
+      <Modal
+        isOpen={showLogoutModal}
+        iconType="warning"
+        title="로그아웃"
+        description="정말 로그아웃 하시겠어요?"
+        confirmLabel="로그아웃"
+        cancelLabel="취소"
+        onConfirm={handleLogout}
+        onCancel={() => setShowLogoutModal(false)}
+      />
+    </div>
+  );
+}

@@ -23,14 +23,5 @@
     "turbo": "^2.5.0",
     "typescript": "^5",
     "typescript-eslint": "^8"
-  },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
-      "eslint --cache --fix",
-      "prettier --cache --write"
-    ],
-    "*.{css,md,json,yaml}": [
-      "prettier --cache --write"
-    ]
   }
 }

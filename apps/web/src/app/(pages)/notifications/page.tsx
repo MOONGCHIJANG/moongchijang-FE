@@ -1,0 +1,28 @@
+import React from 'react';
+import NoticeClient from './_components/NoticeClient';
+import { serverFetch } from '@moongchijang/api-client/fetcher';
+import { ApiResponseNotificationListResponse } from '@moongchijang/api-client/generated/api.schemas';
+import { notFound } from 'next/navigation';
+import { getServerAccessToken } from '@moongchijang/api-client/server-auth';
+
+const page = async () => {
+  const token = await getServerAccessToken();
+
+  const responseData = await serverFetch<ApiResponseNotificationListResponse>(
+    `/api/v1/notifications`,
+    token,
+  ).catch((e) => {
+    console.error('Error fetching notifications:', e);
+    return notFound();
+  });
+
+  const notifications = responseData.data;
+
+  return (
+    <>
+      <NoticeClient initialData={notifications} />
+    </>
+  );
+};
+
+export default page;

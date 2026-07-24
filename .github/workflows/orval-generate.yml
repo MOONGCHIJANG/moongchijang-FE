@@ -7,6 +7,8 @@ on:
 
 jobs:
   generate:
+    # develop 이외 브랜치에서 수동 실행 시 해당 브랜치 전체가 develop에 자동머지되는 사고 방지
+    if: github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -20,12 +22,11 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
+      # pnpm 버전은 루트 package.json의 packageManager 필드에서 자동 인식
       - name: Install pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
       - name: Install dependencies
         run: pnpm install

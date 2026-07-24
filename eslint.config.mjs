@@ -19,6 +19,10 @@ const eslintConfig = defineConfig([
     '**/*.d.ts',
     '**/generated/**',
     '**/zod/**',
+    // CommonJS 설정 파일(next.config.js 등)은 각 워크스페이스의
+    // eslint-config-next가 적절한 env로 검사하므로 루트 최소 설정에서는 제외
+    '**/*.config.js',
+    '**/*.config.cjs',
   ]),
 ]);
 

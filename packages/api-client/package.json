@@ -1,0 +1,41 @@
+{
+  "name": "@moongchijang/api-client",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./src/custom-fetch.ts",
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "generate": "orval && tsx scripts/generate-msw-index.ts && tsx scripts/generate-static-registry.ts",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit --project tsconfig.json"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.100.9",
+    "jwt-decode": "^4.0.0",
+    "posthog-js": "^1.376.2",
+    "zod": "^4.3.6",
+    "zustand": "^5.0.13"
+  },
+  "peerDependencies": {
+    "next": "16.2.2",
+    "react": "19.2.4"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9",
+    "@faker-js/faker": "^10.4.0",
+    "@moongchijang/config": "workspace:*",
+    "@mswjs/http-middleware": "^0.10.3",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "dotenv": "^17.4.2",
+    "eslint": "^9",
+    "eslint-config-prettier": "^10.1.8",
+    "msw": "^2.13.0",
+    "orval": "^8.8.1",
+    "tsx": "^4.21.0",
+    "typescript": "^5",
+    "typescript-eslint": "^8"
+  }
+}

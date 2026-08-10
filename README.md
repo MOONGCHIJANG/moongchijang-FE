@@ -303,11 +303,11 @@ Access Token 발급 (JWT)
 
 > **Push to `develop` → AWS Amplify 자동 빌드 & 배포 ([moongchijang.com](https://moongchijang.com))**
 
-| 단계          | 도구        | 주요 작업                                                       |
-| ------------- | ----------- | --------------------------------------------------------------- |
-| **preBuild**  | AWS Amplify | Node.js 22 설정, pnpm 10 설치, `pnpm install --frozen-lockfile` |
-| **build**     | AWS Amplify | `pnpm build` (Next.js 프로덕션 빌드)                            |
-| **artifacts** | AWS Amplify | `.next/` 산출물 배포                                            |
+| 단계          | 도구        | 주요 작업                                                                                                  |
+| ------------- | ----------- | ---------------------------------------------------------------------------------------------------------- |
+| **preBuild**  | AWS Amplify | `.nvmrc`로 Node 설정, corepack으로 pnpm 준비(`packageManager` 필드 기준), `pnpm install --frozen-lockfile` |
+| **build**     | AWS Amplify | `pnpm turbo run build --filter=@moongchijang/web`                                                          |
+| **artifacts** | AWS Amplify | `apps/web/.next/` 산출물 배포                                                                              |
 
 - **환경 변수**: AWS Amplify 콘솔 환경 변수로 관리 — 레포에 평문 미탑재
 
@@ -315,7 +315,7 @@ Access Token 발급 (JWT)
 
 ## 💻 로컬 실행
 
-요구사항: **Node.js 22**, **pnpm 10**
+요구사항: **Node.js 22** (`.nvmrc`), **pnpm** (루트 `package.json`의 `packageManager` 필드 — `corepack enable pnpm` 권장)
 
 ```bash
 # 1. 의존성 설치

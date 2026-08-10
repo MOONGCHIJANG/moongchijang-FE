@@ -5,3 +5,56 @@ packages:
 ignoredBuiltDependencies:
   - sharp
   - unrs-resolver
+
+# 2개 이상의 워크스페이스가 공유하는 의존성은 여기 한 곳에서만 버전을 선언한다.
+# 각 package.json은 "catalog:"로 참조하므로, 업그레이드는 이 파일만 고치면 된다.
+# 한 워크스페이스에서만 쓰는 패키지는 굳이 올리지 않는다(간접 참조만 늘어남).
+catalog:
+  # Next.js / React — 워크스페이스 간 버전이 갈리면 즉시 깨지므로 정확한 버전으로 고정
+  next: 16.2.2
+  eslint-config-next: 16.2.2
+  react: 19.2.4
+  react-dom: 19.2.4
+
+  # 타입 정의
+  '@types/node': ^22 # 런타임(.nvmrc)과 맞춘다
+  '@types/react': ^19
+  '@types/react-dom': ^19
+
+  # 툴체인
+  typescript: ^5
+  eslint: ^9
+  '@eslint/js': ^9
+  typescript-eslint: ^8
+  eslint-config-prettier: ^10.1.8
+
+  # Tailwind
+  tailwindcss: ^4
+  '@tailwindcss/postcss': ^4
+
+  # 공유 런타임 라이브러리 (web+api-client, web+ui)
+  '@tanstack/react-query': ^5.100.9
+  '@tanstack/react-query-devtools': ^5.100.9
+  zod: ^4.3.6
+  zustand: ^5.0.13
+  jwt-decode: ^4.0.0
+  posthog-js: ^1.376.2
+  clsx: ^2.1.1
+  tailwind-merge: ^3.5.0
+  '@iconify/react': ^6.0.2
+
+  # 테스트 / 목킹
+  msw: ^2.13.0
+  '@mswjs/http-middleware': ^0.10.3
+  '@faker-js/faker': ^10.4.0
+  tsx: ^4.21.0
+
+  # Storybook — 10.3.5 계열은 서로 버전이 어긋나면 깨지므로 한 묶음으로 관리
+  # (@storybook/nextjs-vite가 web·ui 양쪽에 있어 계열 전체를 함께 올린다)
+  storybook: ^10.3.5
+  '@storybook/addon-a11y': ^10.3.5
+  '@storybook/addon-docs': ^10.3.5
+  '@storybook/addon-onboarding': ^10.3.5
+  '@storybook/addon-vitest': ^10.3.5
+  '@storybook/nextjs-vite': ^10.3.5
+  eslint-plugin-storybook: ^10.3.5

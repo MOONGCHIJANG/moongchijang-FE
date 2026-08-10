@@ -9,21 +9,21 @@
     "typecheck": "tsc --noEmit --project tsconfig.json"
   },
   "dependencies": {
-    "@iconify/react": "^6.0.2",
-    "clsx": "^2.1.1",
-    "tailwind-merge": "^3.5.0"
+    "@iconify/react": "catalog:",
+    "clsx": "catalog:",
+    "tailwind-merge": "catalog:"
   },
   "peerDependencies": {
-    "react": "19.2.4"
+    "react": "catalog:"
   },
   "devDependencies": {
-    "@eslint/js": "^9",
+    "@eslint/js": "catalog:",
     "@moongchijang/config": "workspace:*",
-    "@storybook/nextjs-vite": "^10.3.5",
-    "@types/react": "^19",
-    "eslint": "^9",
-    "eslint-config-prettier": "^10.1.8",
-    "typescript": "^5",
-    "typescript-eslint": "^8"
+    "@storybook/nextjs-vite": "catalog:",
+    "@types/react": "catalog:",
+    "eslint": "catalog:",
+    "eslint-config-prettier": "catalog:",
+    "typescript": "catalog:",
+    "typescript-eslint": "catalog:"
   }
 }

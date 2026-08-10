@@ -12,30 +12,30 @@
     "typecheck": "tsc --noEmit --project tsconfig.json"
   },
   "dependencies": {
-    "@tanstack/react-query": "^5.100.9",
-    "jwt-decode": "^4.0.0",
-    "posthog-js": "^1.376.2",
-    "zod": "^4.3.6",
-    "zustand": "^5.0.13"
+    "@tanstack/react-query": "catalog:",
+    "jwt-decode": "catalog:",
+    "posthog-js": "catalog:",
+    "zod": "catalog:",
+    "zustand": "catalog:"
   },
   "peerDependencies": {
-    "next": "16.2.2",
-    "react": "19.2.4"
+    "next": "catalog:",
+    "react": "catalog:"
   },
   "devDependencies": {
-    "@eslint/js": "^9",
-    "@faker-js/faker": "^10.4.0",
+    "@eslint/js": "catalog:",
+    "@faker-js/faker": "catalog:",
     "@moongchijang/config": "workspace:*",
-    "@mswjs/http-middleware": "^0.10.3",
-    "@types/node": "^20",
-    "@types/react": "^19",
+    "@mswjs/http-middleware": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
     "dotenv": "^17.4.2",
-    "eslint": "^9",
-    "eslint-config-prettier": "^10.1.8",
-    "msw": "^2.13.0",
+    "eslint": "catalog:",
+    "eslint-config-prettier": "catalog:",
+    "msw": "catalog:",
     "orval": "^8.8.1",
-    "tsx": "^4.21.0",
-    "typescript": "^5",
-    "typescript-eslint": "^8"
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "typescript-eslint": "catalog:"
   }
 }

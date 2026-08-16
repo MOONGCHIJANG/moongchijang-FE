@@ -1,32 +1,62 @@
 version: 1
-frontend:
-  phases:
-    preBuild:
-      commands:
-        # Node 버전은 .nvmrc, pnpm 버전은 package.json의 packageManager 필드에서 읽는다
-        - nvm use
-        - export COREPACK_ENABLE_DOWNLOAD_PROMPT=0
-        # .nvmrc가 floating '22'라 Amplify가 주는 22.x 패치 버전이 고정되지 않는다.
-        # 22.14 미만 Node는 npm 서명키가 오래돼 pnpm 다운로드가 'Cannot find matching
-        # keyid'로 실패하므로 서명 검증을 끈다. 직전 방식(npm install -g pnpm@10)도
-        # 서명 검증이 없었으므로 신뢰 수준은 동일하다(레지스트리 + TLS).
-        - export COREPACK_INTEGRITY_KEYS=0
-        # pnpm만 지정: 인자 없이 enable하면 npm/yarn 심까지 깔려, packageManager가
-        # pnpm으로 강제된 상태에서 레포 내 npm/npx 호출이 전부 거부된다.
-        - corepack enable pnpm
-        - pnpm install --frozen-lockfile
-    build:
-      commands:
-        - pnpm turbo run build --filter=@moongchijang/web
-  artifacts:
-    baseDirectory: apps/web/.next
-    files:
-      - '**/*'
-  cache:
-    paths:
-      - node_modules/**/*
-      - apps/web/node_modules/**/*
-      - apps/web/.next/cache/**/*
-      # corepack이 받아온 pnpm 바이너리. 캐싱하지 않으면 배포마다 레지스트리
-      # 다운로드에 의존하게 된다.
-      - ~/.cache/node/corepack/**/*
+# 모노레포 멀티앱 형식. Amplify 앱 두 개(web용, admin용)가 이 파일 하나를
+# 공유하며, 각 앱은 AMPLIFY_MONOREPO_APP_ROOT 환경변수 값과 일치하는
+# appRoot 블록만 실행한다. (콘솔에서 두 앱 각각 이 환경변수를 설정해야
+# 이 형식이 동작한다 — 아직 안 돼 있으면 배포가 실패한다.)
+applications:
+  - appRoot: apps/web
+    frontend:
+      phases:
+        preBuild:
+          commands:
+            # appRoot 지정 시 명령이 apps/web 안에서 실행된다. pnpm
+            # 워크스페이스 설치·catalog·lockfile은 레포 최상위 기준이라
+            # 먼저 올라가야 한다. nvm use도 여기 와야 루트 .nvmrc를 찾는다.
+            - cd ../..
+            - nvm use
+            - export COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+            - export COREPACK_INTEGRITY_KEYS=0
+            - corepack enable pnpm
+            - pnpm install --frozen-lockfile
+        build:
+          commands:
+            # phase가 바뀌면 작업 폴더가 초기화되므로 다시 최상위로 이동
+            - cd ../..
+            - pnpm turbo run build --filter=@moongchijang/web
+      artifacts:
+        # baseDirectory는 appRoot(apps/web) 기준 상대경로
+        baseDirectory: .next
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - ../../node_modules/**/*
+          - node_modules/**/*
+          - .next/cache/**/*
+          - ~/.cache/node/corepack/**/*
+
+  - appRoot: apps/admin
+    frontend:
+      phases:
+        preBuild:
+          commands:
+            - cd ../..
+            - nvm use
+            - export COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+            - export COREPACK_INTEGRITY_KEYS=0
+            - corepack enable pnpm
+            - pnpm install --frozen-lockfile
+        build:
+          commands:
+            - cd ../..
+            - pnpm turbo run build --filter=@moongchijang/admin
+      artifacts:
+        baseDirectory: .next
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - ../../node_modules/**/*
+          - node_modules/**/*
+          - .next/cache/**/*
+          - ~/.cache/node/corepack/**/*

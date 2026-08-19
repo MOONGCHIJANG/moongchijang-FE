@@ -7,7 +7,7 @@ import type {
   BadRequestResponse,
   EmailLoginRequest,
   ForbiddenResponse,
-  UnauthorizedResponse,
+  UnauthorizedResponse
 } from '../api.schemas';
 
 import { customFetch } from '../../custom-fetch';
@@ -17,56 +17,52 @@ import { customFetch } from '../../custom-fetch';
  * @summary 관리자 이메일 로그인
  */
 export type postApiV1AuthAdminEmailLoginResponse200 = {
-  data: ApiResponseAuthLogin;
-  status: 200;
-};
+  data: ApiResponseAuthLogin
+  status: 200
+}
 
 export type postApiV1AuthAdminEmailLoginResponse400 = {
-  data: BadRequestResponse;
-  status: 400;
-};
+  data: BadRequestResponse
+  status: 400
+}
 
 export type postApiV1AuthAdminEmailLoginResponse401 = {
-  data: UnauthorizedResponse;
-  status: 401;
-};
+  data: UnauthorizedResponse
+  status: 401
+}
 
 export type postApiV1AuthAdminEmailLoginResponse403 = {
-  data: ForbiddenResponse;
-  status: 403;
-};
+  data: ForbiddenResponse
+  status: 403
+}
 
-export type postApiV1AuthAdminEmailLoginResponseSuccess =
-  postApiV1AuthAdminEmailLoginResponse200 & {
-    headers: Headers;
-  };
-export type postApiV1AuthAdminEmailLoginResponseError = (
-  | postApiV1AuthAdminEmailLoginResponse400
-  | postApiV1AuthAdminEmailLoginResponse401
-  | postApiV1AuthAdminEmailLoginResponse403
-) & {
+export type postApiV1AuthAdminEmailLoginResponseSuccess = (postApiV1AuthAdminEmailLoginResponse200) & {
+  headers: Headers;
+};
+export type postApiV1AuthAdminEmailLoginResponseError = (postApiV1AuthAdminEmailLoginResponse400 | postApiV1AuthAdminEmailLoginResponse401 | postApiV1AuthAdminEmailLoginResponse403) & {
   headers: Headers;
 };
 
-export type postApiV1AuthAdminEmailLoginResponse =
-  | postApiV1AuthAdminEmailLoginResponseSuccess
-  | postApiV1AuthAdminEmailLoginResponseError;
+export type postApiV1AuthAdminEmailLoginResponse = (postApiV1AuthAdminEmailLoginResponseSuccess | postApiV1AuthAdminEmailLoginResponseError)
 
 export const getPostApiV1AuthAdminEmailLoginUrl = () => {
-  return `/api/v1/auth/admin/email/login`;
-};
 
-export const postApiV1AuthAdminEmailLogin = async (
-  emailLoginRequest: EmailLoginRequest,
-  options?: RequestInit,
-): Promise<postApiV1AuthAdminEmailLoginResponse> => {
-  return customFetch<postApiV1AuthAdminEmailLoginResponse>(
-    getPostApiV1AuthAdminEmailLoginUrl(),
-    {
-      ...options,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...options?.headers },
-      body: JSON.stringify(emailLoginRequest),
-    },
-  );
-};
+
+
+
+  return `/api/v1/auth/admin/email/login`
+}
+
+export const postApiV1AuthAdminEmailLogin = async (emailLoginRequest: EmailLoginRequest, options?: RequestInit): Promise<postApiV1AuthAdminEmailLoginResponse> => {
+
+  return customFetch<postApiV1AuthAdminEmailLoginResponse>(getPostApiV1AuthAdminEmailLoginUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      emailLoginRequest,)
+  }
+);}
+
+

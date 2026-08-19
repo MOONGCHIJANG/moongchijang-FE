@@ -7,6 +7,8 @@ on:
 
 jobs:
   generate:
+    # develop 이외 브랜치에서 수동 실행 시 해당 브랜치 전체가 develop에 자동머지되는 사고 방지
+    if: github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -17,15 +19,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Node 버전은 .nvmrc에서 자동 인식
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version-file: '.nvmrc'
 
+      # pnpm 버전은 루트 package.json의 packageManager 필드에서 자동 인식
       - name: Install pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
       - name: Install dependencies
         run: pnpm install
@@ -54,9 +56,9 @@ jobs:
 
             ${{ steps.build.outcome == 'failure' && '⚠️ **빌드 실패** — Breaking change 가능성 있습니다. 수동 확인이 필요합니다.' || '✅ 빌드 성공' }}
 
-            - `src/api/generated` 업데이트
-            - `src/api/hooks` 업데이트
-            - `src/api/zod` 업데이트
+            - `packages/api-client/src/generated` 업데이트
+            - `packages/api-client/src/hooks` 업데이트
+            - `packages/api-client/src/zod` 업데이트
           base: develop
 
       - name: Auto-merge PR if build succeeded

@@ -1,0 +1,9 @@
+# pnpm이 생성·관리하는 파일. prettier가 재포맷하면 install 때마다 pnpm이 원래
+# 형식으로 되돌려, 의존성 변화가 없어도 수천 줄짜리 diff가 반복 발생한다.
+pnpm-lock.yaml
+
+# 빌드 산출물
+.next/
+dist/
+storybook-static/
+.turbo/

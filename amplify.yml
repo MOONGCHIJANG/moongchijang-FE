@@ -1,19 +1,65 @@
 version: 1
-frontend:
-  phases:
-    preBuild:
-      commands:
-        - nvm use 22
-        - npm install -g pnpm@10
-        - pnpm install --frozen-lockfile
-    build:
-      commands:
-        - pnpm build
-  artifacts:
-    baseDirectory: .next
-    files:
-      - '**/*'
-  cache:
-    paths:
-      - node_modules/**/*
-      - .next/cache/**/*
+# 모노레포 멀티앱 형식. Amplify 앱 두 개(web용, admin용)가 이 파일 하나를
+# 공유하며, 각 앱은 AMPLIFY_MONOREPO_APP_ROOT 환경변수 값과 일치하는
+# appRoot 블록만 실행한다. (콘솔에서 두 앱 각각 이 환경변수를 설정해야
+# 이 형식이 동작한다 — 아직 안 돼 있으면 배포가 실패한다.)
+applications:
+  - appRoot: apps/web
+    frontend:
+      phases:
+        preBuild:
+          commands:
+            # appRoot 지정 시 명령이 apps/web 안에서 실행된다. pnpm
+            # 워크스페이스 설치·catalog·lockfile은 레포 최상위 기준이라
+            # 먼저 올라가야 한다. nvm use도 여기 와야 루트 .nvmrc를 찾는다.
+            - cd ../..
+            - nvm use
+            - export COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+            - export COREPACK_INTEGRITY_KEYS=0
+            - corepack enable pnpm
+            - pnpm install --frozen-lockfile
+        build:
+          commands:
+            # preBuild의 cd ../..가 끝난 위치(레포 루트)가 build 단계에도
+            # 그대로 유지된다(phase 간 작업 폴더가 초기화되지 않음 — 실제
+            # 배포 로그로 확인됨). 여기서 또 cd ../..를 하면 레포 밖으로
+            # 나가버려 pnpm이 package.json을 못 찾고 실패한다.
+            - pnpm turbo run build --filter=@moongchijang/web
+      artifacts:
+        # baseDirectory는 appRoot(apps/web) 기준 상대경로
+        baseDirectory: .next
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - ../../node_modules/**/*
+          - node_modules/**/*
+          - .next/cache/**/*
+          - ~/.cache/node/corepack/**/*
+
+  - appRoot: apps/admin
+    frontend:
+      phases:
+        preBuild:
+          commands:
+            - cd ../..
+            - nvm use
+            - export COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+            - export COREPACK_INTEGRITY_KEYS=0
+            - corepack enable pnpm
+            - pnpm install --frozen-lockfile
+        build:
+          commands:
+            # web 블록과 동일한 이유로 cd 없이 바로 실행 (preBuild가 끝낸
+            # 레포 루트 위치가 그대로 유지됨)
+            - pnpm turbo run build --filter=@moongchijang/admin
+      artifacts:
+        baseDirectory: .next
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - ../../node_modules/**/*
+          - node_modules/**/*
+          - .next/cache/**/*
+          - ~/.cache/node/corepack/**/*

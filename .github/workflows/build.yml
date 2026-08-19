@@ -15,15 +15,15 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Node 버전은 .nvmrc에서 자동 인식
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version-file: '.nvmrc'
 
+      # pnpm 버전은 루트 package.json의 packageManager 필드에서 자동 인식
       - name: Install pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
       - name: Install dependencies
         run: pnpm install

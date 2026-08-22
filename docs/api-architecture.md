@@ -13,7 +13,7 @@
         │
         │ Orval 생성 함수 호출 (getApiV1GroupBuys 등)
         ▼
-[custom-fetch.ts]
+[packages/api-client/src/custom-fetch.ts]
         │
         │ NEXT_PUBLIC_API_BASE_URL + /api/v1/...
         ▼
@@ -42,7 +42,7 @@
 
 > **Static 모드가 CSR에서 안 되는 이유**: `fetcher.ts`가 `import 'server-only'`를 선언하기 때문에 브라우저에서 import 자체가 불가합니다. Static 모드 분기 로직은 `fetcher.ts` 안에만 존재하므로, Static 모드는 서버 컴포넌트 또는 Route Handler에서만 동작합니다.
 
-Route Handler(`src/app/api/v1/**/route.ts`)는 클라이언트 요청을 `serverFetch`로 프록시해야 할 때 사용합니다. 예를 들어 인증 토큰을 서버에서만 주입해야 하거나, 백엔드에 CORS가 설정되지 않은 경우입니다.
+Route Handler(`apps/web/src/app/api/v1/**/route.ts`)는 클라이언트 요청을 `serverFetch`로 프록시해야 할 때 사용합니다. 예를 들어 인증 토큰을 서버에서만 주입해야 하거나, 백엔드에 CORS가 설정되지 않은 경우입니다.
 
 > **서버 컴포넌트에서 Orval 생성 함수를 직접 사용하는 경우**: `getApiV1GroupBuys` 등 Orval 생성 함수는 `customFetch`를 거칩니다. `customFetch`는 `server-only` 제약이 없으므로 서버 컴포넌트에서도 import할 수 있지만, Mock/Real 모드에서만 동작합니다(Static 모드 분기가 없음). Static 모드에서 서버 데이터가 필요하면 반드시 `serverFetch`를 사용해야 합니다.
 
@@ -52,12 +52,12 @@ Route Handler(`src/app/api/v1/**/route.ts`)는 클라이언트 요청을 `server
 
 ### 1. Orval (`orval.config.ts`) — v8.8.1
 
-OpenAPI(Swagger) 스펙을 읽어 두 가지 결과물을 자동 생성합니다. `dotenv`로 `.env` 파일을 로드하므로 `SWAGGER_URL`을 `.env`에 선언해서 사용할 수 있습니다.
+OpenAPI(Swagger) 스펙을 읽어 두 가지 결과물을 자동 생성합니다. `dotenv`로 `.env` 파일을 로드하므로 `SWAGGER_URL`을 `packages/api-client/.env`에 선언해서 사용할 수 있습니다. (Next.js 앱의 환경변수는 `apps/web/.env`에 별도로 둡니다 — Next.js는 앱 디렉토리의 `.env`만 로드합니다.)
 
-| 설정 키     | 출력 경로                         | 생성 내용                                                       |
-| ----------- | --------------------------------- | --------------------------------------------------------------- |
-| `fetch-api` | `src/api/generated/` (tags-split) | TypeScript 타입 + fetch 함수 + MSW 목 팩토리 (태그별 파일 분리) |
-| `zod-api`   | `src/api/zod/**/*.ts`             | Zod 유효성 검사 스키마                                          |
+| 설정 키     | 출력 경로                                         | 생성 내용                                                       |
+| ----------- | ------------------------------------------------- | --------------------------------------------------------------- |
+| `fetch-api` | `packages/api-client/src/generated/` (tags-split) | TypeScript 타입 + fetch 함수 + MSW 목 팩토리 (태그별 파일 분리) |
+| `zod-api`   | `packages/api-client/src/zod/**/*.ts`             | Zod 유효성 검사 스키마                                          |
 
 모든 생성 파일 상단에는 `/* eslint-disable */`과 `// @ts-nocheck`가 자동 주입됩니다. 빌드 최적화를 위해 TypeScript 타입 체크와 ESLint 검사가 생성 파일에서는 비활성화됩니다.
 
@@ -65,7 +65,7 @@ OpenAPI(Swagger) 스펙을 읽어 두 가지 결과물을 자동 생성합니다
 
 ---
 
-### 2. `src/api/generated/` (Orval 생성 파일들)
+### 2. `packages/api-client/src/generated/` (Orval 생성 파일들)
 
 Orval이 `tags-split` 모드로 설정되어 있으며, 현재 스펙에서는 **단일 `api.ts` 파일**로 생성됩니다 (백엔드 Swagger 태그가 분리되면 태그별 파일로 나뉩니다). 파일 안에는 크게 세 가지가 들어 있으며, **런타임에서 완전히 별도 맥락**으로 사용됩니다.
 
@@ -100,13 +100,13 @@ export const getGetApiV1GroupBuysMockHandler = () => http.get(...);
 
 ---
 
-### 3. `src/lib/custom-fetch.ts`
+### 3. `packages/api-client/src/custom-fetch.ts`
 
 Orval의 `mutator`로 지정된 함수입니다. Orval은 fetch를 직접 호출하지 않고, `orval.config.ts`에 지정된 이 함수를 대신 호출하도록 코드를 생성합니다.
 
 ```ts
 // orval.config.ts
-mutator: { path: './src/lib/custom-fetch.ts', name: 'customFetch' }
+mutator: { path: './packages/api-client/src/custom-fetch.ts', name: 'customFetch' }
 
 // 그 결과 Orval이 이렇게 생성함
 export const getApiV1GroupBuys = async (params?) => {
@@ -146,13 +146,13 @@ type getApiV1GroupBuysResponse = getApiV1GroupBuysResponseSuccess; // status: 20
 
 ---
 
-### 4. `src/lib/fetcher.ts`
+### 4. `packages/api-client/src/fetcher.ts`
 
 **서버 전용** (`import 'server-only'`) fetch 로직입니다. 서버 컴포넌트와 Route Handler에서만 사용합니다.
 
 **왜 `custom-fetch`와 별도로 존재하나요?**
 
-|             | custom-fetch.ts                           | fetcher.ts                  |
+|             | packages/api-client/src/custom-fetch.ts   | fetcher.ts                  |
 | ----------- | ----------------------------------------- | --------------------------- |
 | 존재 이유   | Orval 응답 타입 구조 맞추기               | 환경 분기 + 인증 + 보안     |
 | 실행 환경   | 클라이언트 + 서버 (server-only 제약 없음) | 서버만 (`server-only`)      |
@@ -180,7 +180,7 @@ serverFetchRaw(path, token?, init?): Promise<{ status, data }>
 
 ---
 
-### 5. Route Handler (`src/app/api/v1/**/route.ts`)
+### 5. Route Handler (`apps/web/src/app/api/v1/**/route.ts`)
 
 클라이언트 요청을 `serverFetch`로 프록시하는 Next.js API 라우트입니다.
 
@@ -239,7 +239,7 @@ Orval 자동 생성 목은 타입만 맞추고 값 범위 제한이 없어서 UI
 
 ---
 
-### 7. Static Registry (`src/lib/static-registry.ts`)
+### 7. Static Registry (`packages/api-client/src/static-registry.ts`)
 
 `NEXT_PUBLIC_API_MODE=static`일 때 사용하는 **in-memory 응답 레지스트리**입니다. 실서버 없이 데모 배포할 때 씁니다.
 
@@ -285,14 +285,14 @@ export const PENDING_ENDPOINTS = new Set<string>([
 
 `pnpm generate` 실행 시 Orval 이후에 순서대로 실행됩니다.
 
-| 스크립트                      | 출력 파일                           | 역할                                              |
-| ----------------------------- | ----------------------------------- | ------------------------------------------------- |
-| `generate-msw-index.ts`       | `src/api/generated/index.msw.ts`    | 모든 MSW 핸들러를 배열로 묶은 index 생성          |
-| `generate-static-registry.ts` | `src/api/generated/index.static.ts` | GET 엔드포인트의 URL 패턴 + 응답 팩토리 목록 생성 |
+| 스크립트                      | 출력 파일                                           | 역할                                              |
+| ----------------------------- | --------------------------------------------------- | ------------------------------------------------- |
+| `generate-msw-index.ts`       | `packages/api-client/src/generated/index.msw.ts`    | 모든 MSW 핸들러를 배열로 묶은 index 생성          |
+| `generate-static-registry.ts` | `packages/api-client/src/generated/index.static.ts` | GET 엔드포인트의 URL 패턴 + 응답 팩토리 목록 생성 |
 
 ---
 
-### 9. Zod 스키마 (`src/api/zod/`)
+### 9. Zod 스키마 (`packages/api-client/src/zod/`)
 
 Orval이 OpenAPI 스펙에서 생성한 **런타임 유효성 검사** 스키마입니다.
 
@@ -306,7 +306,7 @@ GetApiV1GroupBuysResponse.parse(data); // 폼 유효성 검사, API 응답 런�
 
 ## 생성 파일을 커밋하는 이유
 
-`src/api/generated/`와 `src/api/zod/`는 자동 생성 파일이지만 **반드시 커밋해야 합니다.**
+`packages/api-client/src/generated/`와 `packages/api-client/src/zod/`는 자동 생성 파일이지만 **반드시 커밋해야 합니다.**
 
 | 이유               | 설명                                                                                                      |
 | ------------------ | --------------------------------------------------------------------------------------------------------- |
@@ -333,26 +333,26 @@ GetApiV1GroupBuysResponse.parse(data); // 폼 유효성 검사, API 응답 런�
 
 ### 건드리지 않아도 되는 것
 
-| 파일                                  | 이유                                                         |
-| ------------------------------------- | ------------------------------------------------------------ |
-| `src/api/generated/` (생성 파일 전체) | Orval 자동 생성 (tags-split), `pnpm generate`로만 갱신       |
-| `src/api/generated/index.msw.ts`      | 스크립트 자동 생성                                           |
-| `src/api/generated/index.static.ts`   | 스크립트 자동 생성                                           |
-| `src/api/zod/**/*.ts`                 | Orval 자동 생성                                              |
-| `scripts/generate-*.ts`               | 생성 스크립트, 구조 변경 없으면 수정 불필요                  |
-| `mocks/dev-server.ts`                 | Express 서버 설정, 포트 변경 등 특별한 경우 외엔 수정 불필요 |
+| 파일                                                  | 이유                                                         |
+| ----------------------------------------------------- | ------------------------------------------------------------ |
+| `packages/api-client/src/generated/` (생성 파일 전체) | Orval 자동 생성 (tags-split), `pnpm generate`로만 갱신       |
+| `packages/api-client/src/generated/index.msw.ts`      | 스크립트 자동 생성                                           |
+| `packages/api-client/src/generated/index.static.ts`   | 스크립트 자동 생성                                           |
+| `packages/api-client/src/zod/**/*.ts`                 | Orval 자동 생성                                              |
+| `scripts/generate-*.ts`                               | 생성 스크립트, 구조 변경 없으면 수정 불필요                  |
+| `mocks/dev-server.ts`                                 | Express 서버 설정, 포트 변경 등 특별한 경우 외엔 수정 불필요 |
 
 ### 필요 시 수정하는 것
 
-| 파일                         | 언제 수정하나요                                        |
-| ---------------------------- | ------------------------------------------------------ |
-| `mocks/handlers.ts`          | override 핸들러 추가/제거 시                           |
-| `mocks/mock-helpers.ts`      | 특정 엔드포인트 faker 데이터 커스텀이 필요할 때        |
-| `src/lib/static-registry.ts` | static 모드에서 엔드포인트 추가/준비중 처리 시         |
-| `src/app/api/v1/**/route.ts` | 새 API에 서버 프록시가 필요할 때                       |
-| `src/lib/custom-fetch.ts`    | 공통 요청 헤더 변경, 인증 방식 변경 시                 |
-| `src/lib/fetcher.ts`         | 서버 fetch 공통 로직 변경, 모드 분기 추가 시           |
-| `orval.config.ts`            | 생성 경로·mutator 변경 등 프로젝트 구조가 크게 바뀔 때 |
+| 파일                                         | 언제 수정하나요                                        |
+| -------------------------------------------- | ------------------------------------------------------ |
+| `mocks/handlers.ts`                          | override 핸들러 추가/제거 시                           |
+| `mocks/mock-helpers.ts`                      | 특정 엔드포인트 faker 데이터 커스텀이 필요할 때        |
+| `packages/api-client/src/static-registry.ts` | static 모드에서 엔드포인트 추가/준비중 처리 시         |
+| `apps/web/src/app/api/v1/**/route.ts`        | 새 API에 서버 프록시가 필요할 때                       |
+| `packages/api-client/src/custom-fetch.ts`    | 공통 요청 헤더 변경, 인증 방식 변경 시                 |
+| `packages/api-client/src/fetcher.ts`         | 서버 fetch 공통 로직 변경, 모드 분기 추가 시           |
+| `orval.config.ts`                            | 생성 경로·mutator 변경 등 프로젝트 구조가 크게 바뀔 때 |
 
 ---
 
@@ -383,8 +383,8 @@ return {
 ## 새 API 추가 시 흐름
 
 1. 백엔드에서 OpenAPI 스펙 업데이트
-2. `pnpm generate` 실행 → `src/api/generated/api.ts`, `index.msw.ts`, `index.static.ts`, `src/api/zod/` 재생성
+2. `pnpm generate` 실행 → `packages/api-client/src/generated/api.ts`, `index.msw.ts`, `index.static.ts`, `packages/api-client/src/zod/` 재생성
 3. 생성된 파일 커밋
 4. 목서버에서 커스텀 응답이 필요하면 `mock-helpers.ts`에 팩토리 함수 추가 후 `handlers.ts`에 override 핸들러 등록
-5. 컴포넌트에서 `src/api/generated/`의 생성 함수 import해서 사용
+5. 컴포넌트에서 `packages/api-client/src/generated/`의 생성 함수 import해서 사용
 6. 인증이 필요하거나 CORS 문제가 있으면 Route Handler 추가 후 `serverFetch`로 연결

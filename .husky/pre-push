@@ -7,4 +7,4 @@ if [ "$BRANCH" = "main" ]; then
 fi
 
 echo "📦 빌드 타입 체크..."
-pnpm tsc --noEmit --project tsconfig.json
+pnpm turbo run typecheck

@@ -66,7 +66,7 @@ export default function AdminAuthenticatedLayout({
       </header>
 
       <div className="flex flex-1 overflow-hidden">
-        <AdminSidebar open={sidebarOpen} />
+        <AdminSidebar open={sidebarOpen} onLogout={handleLogout} />
         <main className="flex-1 overflow-auto bg-gray-50 p-6">{children}</main>
       </div>
     </div>

@@ -38,15 +38,14 @@ const MENU = [
 ];
 
 interface AdminSidebarProps {
-  open: boolean;
   onLogout: () => void;
 }
 
-export function AdminSidebar({ open, onLogout }: AdminSidebarProps) {
+export function AdminSidebar({ onLogout }: AdminSidebarProps) {
   const pathname = usePathname();
 
   return (
-    <aside className="flex shrink-0 flex-col items-center justify-between border-r border-gray-100 bg-bg-white px-[22px] py-[50px] transition-all duration-200">
+    <aside className="flex shrink-0 flex-col items-center justify-between border-r border-gray-100 bg-bg-white px-[22px] py-[50px]">
       <div className="flex flex-col items-center gap-g9">
         {/* next/image의 /_next/image 최적화 프록시는 기본적으로 svg를 허용하지 않아
             next start(프로덕션)에서 400을 반환한다 — 로컬 신뢰 자산이므로 img로 우회 */}
@@ -77,11 +76,9 @@ export function AdminSidebar({ open, onLogout }: AdminSidebarProps) {
                     className={`h-6 w-6 shrink-0 ${isActive ? 'text-primary-400' : 'text-gray-500'}`}
                   />
                 </span>
-                {open && (
-                  <span className="caption-sm-regular whitespace-nowrap text-text-subtle">
-                    {item.label}
-                  </span>
-                )}
+                <span className="caption-sm-regular whitespace-nowrap text-text-subtle">
+                  {item.label}
+                </span>
               </Link>
             );
           })}

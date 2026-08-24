@@ -1,10 +1,11 @@
 'use client';
 
-import { Button, Input } from '@moongchijang/ui';
 import { useAuthStore } from '@moongchijang/api-client/authStore';
 import { tokenStorage } from '@moongchijang/api-client/token';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { PcButton } from '@/components/PcButton';
+import { PcInput } from '@/components/PcInput';
 
 export function LoginForm() {
   const [email, setEmail] = useState('');
@@ -54,37 +55,26 @@ export function LoginForm() {
       className="flex flex-col gap-8 lg:gap-[3.704vh]"
     >
       <div className="flex w-[362px] flex-col gap-3 lg:w-[18.854vw] lg:gap-[1.481vh]">
-        <Input
-          variant="admin"
+        <PcInput
           label="아이디"
           placeholder="아이디를 입력해주세요"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          noHelperSpace
         />
-        <Input
-          variant="admin"
+        <PcInput
           label="비밀번호"
           isPassword
           placeholder="비밀번호를 입력해주세요"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          noHelperSpace
         />
         {errorMessage && (
           <p className="body-sm-regular text-text-error">{errorMessage}</p>
         )}
       </div>
-      <Button
-        type="submit"
-        variant="primary"
-        size="lg"
-        fullWidth
-        disabled={!canSubmit || isPending}
-        className="lg:h-[5.185vh]"
-      >
+      <PcButton type="submit" disabled={!canSubmit || isPending}>
         로그인
-      </Button>
+      </PcButton>
     </form>
   );
 }

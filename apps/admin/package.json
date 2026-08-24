@@ -20,6 +20,7 @@
   "devDependencies": {
     "@iconify-json/lucide": "^1.2.108",
     "@moongchijang/config": "workspace:*",
+    "@storybook/nextjs-vite": "catalog:",
     "@tailwindcss/postcss": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",

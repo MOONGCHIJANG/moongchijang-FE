@@ -160,6 +160,28 @@ export const GetApiV1GroupBuyRequestsRequestIdParams = zod.object({
   requestId: zod.number(),
 });
 
+export const getApiV1GroupBuyRequestsRequestIdBodyProductNameMax = 100;
+
+export const getApiV1GroupBuyRequestsRequestIdBodyImageCountMax = 5;
+
+export const GetApiV1GroupBuyRequestsRequestIdBody = zod.object({
+  productName: zod
+    .string()
+    .max(getApiV1GroupBuyRequestsRequestIdBodyProductNameMax)
+    .describe('승인 확인 팝업에 표시된 공구 제목'),
+  price: zod.number().min(1).describe('승인 확인 팝업에 표시된 공구가'),
+  targetQuantity: zod
+    .number()
+    .min(1)
+    .describe('승인 확인 팝업에 표시된 목표 수량'),
+  pickupDate: zod.iso.date().describe('승인 확인 팝업에 표시된 픽업일'),
+  imageCount: zod
+    .number()
+    .min(1)
+    .max(getApiV1GroupBuyRequestsRequestIdBodyImageCountMax)
+    .describe('승인 확인 팝업에 표시된 이미지 장수'),
+});
+
 export const GetApiV1GroupBuyRequestsRequestIdResponse = zod.object({
   success: zod.boolean(),
   data: zod.object({

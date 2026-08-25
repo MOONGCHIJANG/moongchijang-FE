@@ -22,6 +22,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AdminOwnerGroupBuyRequestApprove,
   ApiResponseGroupBuyRequestDetail,
   ApiResponseGroupBuyRequestList,
   ApiResponseRequestId,
@@ -415,14 +416,16 @@ export const getGetApiV1GroupBuyRequestsRequestIdUrl = (requestId: number,) => {
   return `/api/v1/group-buy-requests/${requestId}`
 }
 
-export const getApiV1GroupBuyRequestsRequestId = async (requestId: number, options?: RequestInit): Promise<getApiV1GroupBuyRequestsRequestIdResponse> => {
+export const getApiV1GroupBuyRequestsRequestId = async (requestId: number,
+    adminOwnerGroupBuyRequestApprove: AdminOwnerGroupBuyRequestApprove, options?: RequestInit): Promise<getApiV1GroupBuyRequestsRequestIdResponse> => {
 
   return customFetch<getApiV1GroupBuyRequestsRequestIdResponse>(getGetApiV1GroupBuyRequestsRequestIdUrl(requestId),
   {
     ...options,
-    method: 'GET'
-
-
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      adminOwnerGroupBuyRequestApprove,)
   }
 );}
 
@@ -430,23 +433,25 @@ export const getApiV1GroupBuyRequestsRequestId = async (requestId: number, optio
 
 
 
-export const getGetApiV1GroupBuyRequestsRequestIdQueryKey = (requestId: number,) => {
+export const getGetApiV1GroupBuyRequestsRequestIdQueryKey = (requestId: number,
+    adminOwnerGroupBuyRequestApprove?: AdminOwnerGroupBuyRequestApprove,) => {
     return [
-    `/api/v1/group-buy-requests/${requestId}`
+    `/api/v1/group-buy-requests/${requestId}`, adminOwnerGroupBuyRequestApprove
     ] as const;
     }
 
 
-export const getGetApiV1GroupBuyRequestsRequestIdQueryOptions = <TData = Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>, TError = ForbiddenResponse | NotFoundResponse>(requestId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetApiV1GroupBuyRequestsRequestIdQueryOptions = <TData = Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>, TError = ForbiddenResponse | NotFoundResponse>(requestId: number,
+    adminOwnerGroupBuyRequestApprove: AdminOwnerGroupBuyRequestApprove, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetApiV1GroupBuyRequestsRequestIdQueryKey(requestId);
+  const queryKey =  queryOptions?.queryKey ?? getGetApiV1GroupBuyRequestsRequestIdQueryKey(requestId,adminOwnerGroupBuyRequestApprove);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>> = ({ signal }) => getApiV1GroupBuyRequestsRequestId(requestId, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>> = ({ signal }) => getApiV1GroupBuyRequestsRequestId(requestId,adminOwnerGroupBuyRequestApprove, { signal, ...requestOptions });
 
 
 
@@ -460,7 +465,8 @@ export type GetApiV1GroupBuyRequestsRequestIdQueryError = ForbiddenResponse | No
 
 
 export function useGetApiV1GroupBuyRequestsRequestId<TData = Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>, TError = ForbiddenResponse | NotFoundResponse>(
- requestId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>, TError, TData>> & Pick<
+ requestId: number,
+    adminOwnerGroupBuyRequestApprove: AdminOwnerGroupBuyRequestApprove, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>,
           TError,
@@ -470,7 +476,8 @@ export function useGetApiV1GroupBuyRequestsRequestId<TData = Awaited<ReturnType<
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetApiV1GroupBuyRequestsRequestId<TData = Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>, TError = ForbiddenResponse | NotFoundResponse>(
- requestId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>, TError, TData>> & Pick<
+ requestId: number,
+    adminOwnerGroupBuyRequestApprove: AdminOwnerGroupBuyRequestApprove, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>,
           TError,
@@ -480,7 +487,8 @@ export function useGetApiV1GroupBuyRequestsRequestId<TData = Awaited<ReturnType<
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetApiV1GroupBuyRequestsRequestId<TData = Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>, TError = ForbiddenResponse | NotFoundResponse>(
- requestId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ requestId: number,
+    adminOwnerGroupBuyRequestApprove: AdminOwnerGroupBuyRequestApprove, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
@@ -488,11 +496,12 @@ export function useGetApiV1GroupBuyRequestsRequestId<TData = Awaited<ReturnType<
  */
 
 export function useGetApiV1GroupBuyRequestsRequestId<TData = Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>, TError = ForbiddenResponse | NotFoundResponse>(
- requestId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ requestId: number,
+    adminOwnerGroupBuyRequestApprove: AdminOwnerGroupBuyRequestApprove, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1GroupBuyRequestsRequestId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetApiV1GroupBuyRequestsRequestIdQueryOptions(requestId,options)
+  const queryOptions = getGetApiV1GroupBuyRequestsRequestIdQueryOptions(requestId,adminOwnerGroupBuyRequestApprove,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

@@ -63,6 +63,14 @@ export const PostApiV1GroupBuysGroupBuyIdPaymentOrdersResponse = zod.object({
     orderName: zod.string(),
     amount: zod.number(),
     customerName: zod.string().nullable(),
+    customerPhoneNumber: zod
+      .string()
+      .nullable()
+      .describe('KG이니시스 customer.phoneNumber 전달용 구매자 연락처'),
+    customerEmail: zod
+      .string()
+      .nullable()
+      .describe('KG이니시스 customer.email 전달용 구매자 이메일'),
   }),
   error: zod.unknown().nullable(),
 });

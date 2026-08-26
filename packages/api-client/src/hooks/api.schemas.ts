@@ -1323,6 +1323,16 @@ export type ApiResponsePaymentOrderCreatedData = {
   amount: number;
   /** @nullable */
   customerName: string | null;
+  /**
+     * KG이니시스 customer.phoneNumber 전달용 구매자 연락처
+     * @nullable
+     */
+  customerPhoneNumber: string | null;
+  /**
+     * KG이니시스 customer.email 전달용 구매자 이메일
+     * @nullable
+     */
+  customerEmail: string | null;
 };
 
 export interface ApiResponsePaymentOrderCreated {
@@ -2855,6 +2865,35 @@ export const AdminOrderDetailOrderStatus = {
   CANCELLED: 'CANCELLED',
 } as const;
 
+export type AdminOrderNotificationHistoryTriggerType = typeof AdminOrderNotificationHistoryTriggerType[keyof typeof AdminOrderNotificationHistoryTriggerType];
+
+
+export const AdminOrderNotificationHistoryTriggerType = {
+  OWNER_ORDER_CONFIRM_REQUIRED_IMMEDIATE: 'OWNER_ORDER_CONFIRM_REQUIRED_IMMEDIATE',
+  OWNER_ORDER_CANCELLED_IMMEDIATE: 'OWNER_ORDER_CANCELLED_IMMEDIATE',
+} as const;
+
+export type AdminOrderNotificationHistoryStatus = typeof AdminOrderNotificationHistoryStatus[keyof typeof AdminOrderNotificationHistoryStatus];
+
+
+export const AdminOrderNotificationHistoryStatus = {
+  PENDING: 'PENDING',
+  SUCCESS: 'SUCCESS',
+  FAILED: 'FAILED',
+} as const;
+
+export interface AdminOrderNotificationHistory {
+  historyId: number;
+  triggerType: AdminOrderNotificationHistoryTriggerType;
+  scheduleKey: string;
+  status: AdminOrderNotificationHistoryStatus;
+  retryCount: number;
+  /** @nullable */
+  processedAt?: string | null;
+  /** @nullable */
+  lastError?: string | null;
+}
+
 export interface AdminOrderDetail {
   /** 발주 관리 식별자. 현재는 groupBuyId와 동일 */
   orderId: number;
@@ -2876,6 +2915,8 @@ export interface AdminOrderDetail {
   targetQuantity: number;
   /** 해당 공구의 환불 대기 건수 */
   pendingRefundCount: number;
+  /** 환불 처리 중인 건이 있어 운영자 안내문구 노출이 필요한지 여부 */
+  pendingRefundNoticeRequired: boolean;
   pickupDate: string;
   pickupTimeStart: string;
   pickupTimeEnd: string;
@@ -2895,6 +2936,8 @@ export interface AdminOrderDetail {
   orderCancelledAt?: string | null;
   /** 발주 확정/연락 등 운영 작업 가능 여부 */
   actionable: boolean;
+  /** 발주 확정 요청 및 발주 취소 사장님 알림 발송 이력 */
+  notificationHistories: AdminOrderNotificationHistory[];
 }
 
 export interface ApiResponseAdminOrderDetail {
@@ -3560,6 +3603,32 @@ export interface AdminOwnerGroupBuyRequestReject {
   rejectionReason: string;
 }
 
+export interface AdminOwnerGroupBuyRequestApprove {
+  /**
+     * 승인 확인 팝업에 표시된 공구 제목
+     * @maxLength 100
+     */
+  productName: string;
+  /**
+     * 승인 확인 팝업에 표시된 공구가
+     * @minimum 1
+     */
+  price: number;
+  /**
+     * 승인 확인 팝업에 표시된 목표 수량
+     * @minimum 1
+     */
+  targetQuantity: number;
+  /** 승인 확인 팝업에 표시된 픽업일 */
+  pickupDate: string;
+  /**
+     * 승인 확인 팝업에 표시된 이미지 장수
+     * @minimum 1
+     * @maximum 5
+     */
+  imageCount: number;
+}
+
 export type ApiResponseAdminOwnerGroupBuyRequestActionDataStatus = typeof ApiResponseAdminOwnerGroupBuyRequestActionDataStatus[keyof typeof ApiResponseAdminOwnerGroupBuyRequestActionDataStatus];
 
 
@@ -3568,11 +3637,20 @@ export const ApiResponseAdminOwnerGroupBuyRequestActionDataStatus = {
   REJECTED: 'REJECTED',
 } as const;
 
+export interface AdminOwnerGroupBuyRequestApprovalSummary {
+  productName: string;
+  price: number;
+  targetQuantity: number;
+  pickupDate: string;
+  imageCount: number;
+}
+
 export type ApiResponseAdminOwnerGroupBuyRequestActionData = {
   requestId: number;
   status: ApiResponseAdminOwnerGroupBuyRequestActionDataStatus;
   /** @nullable */
   groupBuyId?: number | null;
+  approvalSummary?: AdminOwnerGroupBuyRequestApprovalSummary | null;
 };
 
 export interface ApiResponseAdminOwnerGroupBuyRequestAction {

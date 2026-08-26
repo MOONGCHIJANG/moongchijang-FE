@@ -253,6 +253,11 @@ export const GetApiV1AdminOrdersOrderIdResponse = zod.object({
     finalQuantity: zod.number().describe('최종 참여 수량'),
     targetQuantity: zod.number().describe('목표 수량'),
     pendingRefundCount: zod.number().describe('해당 공구의 환불 대기 건수'),
+    pendingRefundNoticeRequired: zod
+      .boolean()
+      .describe(
+        '환불 처리 중인 건이 있어 운영자 안내문구 노출이 필요한지 여부',
+      ),
     pickupDate: zod.iso.date(),
     pickupTimeStart: zod.iso.time({}),
     pickupTimeEnd: zod.iso.time({}),
@@ -267,6 +272,22 @@ export const GetApiV1AdminOrdersOrderIdResponse = zod.object({
     actionable: zod
       .boolean()
       .describe('발주 확정\/연락 등 운영 작업 가능 여부'),
+    notificationHistories: zod
+      .array(
+        zod.object({
+          historyId: zod.number(),
+          triggerType: zod.enum([
+            'OWNER_ORDER_CONFIRM_REQUIRED_IMMEDIATE',
+            'OWNER_ORDER_CANCELLED_IMMEDIATE',
+          ]),
+          scheduleKey: zod.string(),
+          status: zod.enum(['PENDING', 'SUCCESS', 'FAILED']),
+          retryCount: zod.number(),
+          processedAt: zod.iso.datetime({ offset: true }).nullish(),
+          lastError: zod.string().nullish(),
+        }),
+      )
+      .describe('발주 확정 요청 및 발주 취소 사장님 알림 발송 이력'),
   }),
   error: zod.unknown().nullable(),
 });
@@ -298,6 +319,11 @@ export const PostApiV1AdminOrdersOrderIdOwnerContactResponse = zod.object({
     finalQuantity: zod.number().describe('최종 참여 수량'),
     targetQuantity: zod.number().describe('목표 수량'),
     pendingRefundCount: zod.number().describe('해당 공구의 환불 대기 건수'),
+    pendingRefundNoticeRequired: zod
+      .boolean()
+      .describe(
+        '환불 처리 중인 건이 있어 운영자 안내문구 노출이 필요한지 여부',
+      ),
     pickupDate: zod.iso.date(),
     pickupTimeStart: zod.iso.time({}),
     pickupTimeEnd: zod.iso.time({}),
@@ -312,6 +338,22 @@ export const PostApiV1AdminOrdersOrderIdOwnerContactResponse = zod.object({
     actionable: zod
       .boolean()
       .describe('발주 확정\/연락 등 운영 작업 가능 여부'),
+    notificationHistories: zod
+      .array(
+        zod.object({
+          historyId: zod.number(),
+          triggerType: zod.enum([
+            'OWNER_ORDER_CONFIRM_REQUIRED_IMMEDIATE',
+            'OWNER_ORDER_CANCELLED_IMMEDIATE',
+          ]),
+          scheduleKey: zod.string(),
+          status: zod.enum(['PENDING', 'SUCCESS', 'FAILED']),
+          retryCount: zod.number(),
+          processedAt: zod.iso.datetime({ offset: true }).nullish(),
+          lastError: zod.string().nullish(),
+        }),
+      )
+      .describe('발주 확정 요청 및 발주 취소 사장님 알림 발송 이력'),
   }),
   error: zod.unknown().nullable(),
 });
@@ -343,6 +385,11 @@ export const PostApiV1AdminOrdersOrderIdConfirmResponse = zod.object({
     finalQuantity: zod.number().describe('최종 참여 수량'),
     targetQuantity: zod.number().describe('목표 수량'),
     pendingRefundCount: zod.number().describe('해당 공구의 환불 대기 건수'),
+    pendingRefundNoticeRequired: zod
+      .boolean()
+      .describe(
+        '환불 처리 중인 건이 있어 운영자 안내문구 노출이 필요한지 여부',
+      ),
     pickupDate: zod.iso.date(),
     pickupTimeStart: zod.iso.time({}),
     pickupTimeEnd: zod.iso.time({}),
@@ -357,6 +404,22 @@ export const PostApiV1AdminOrdersOrderIdConfirmResponse = zod.object({
     actionable: zod
       .boolean()
       .describe('발주 확정\/연락 등 운영 작업 가능 여부'),
+    notificationHistories: zod
+      .array(
+        zod.object({
+          historyId: zod.number(),
+          triggerType: zod.enum([
+            'OWNER_ORDER_CONFIRM_REQUIRED_IMMEDIATE',
+            'OWNER_ORDER_CANCELLED_IMMEDIATE',
+          ]),
+          scheduleKey: zod.string(),
+          status: zod.enum(['PENDING', 'SUCCESS', 'FAILED']),
+          retryCount: zod.number(),
+          processedAt: zod.iso.datetime({ offset: true }).nullish(),
+          lastError: zod.string().nullish(),
+        }),
+      )
+      .describe('발주 확정 요청 및 발주 취소 사장님 알림 발송 이력'),
   }),
   error: zod.unknown().nullable(),
 });
@@ -388,6 +451,11 @@ export const PostApiV1AdminOrdersOrderIdCancelResponse = zod.object({
     finalQuantity: zod.number().describe('최종 참여 수량'),
     targetQuantity: zod.number().describe('목표 수량'),
     pendingRefundCount: zod.number().describe('해당 공구의 환불 대기 건수'),
+    pendingRefundNoticeRequired: zod
+      .boolean()
+      .describe(
+        '환불 처리 중인 건이 있어 운영자 안내문구 노출이 필요한지 여부',
+      ),
     pickupDate: zod.iso.date(),
     pickupTimeStart: zod.iso.time({}),
     pickupTimeEnd: zod.iso.time({}),
@@ -402,6 +470,22 @@ export const PostApiV1AdminOrdersOrderIdCancelResponse = zod.object({
     actionable: zod
       .boolean()
       .describe('발주 확정\/연락 등 운영 작업 가능 여부'),
+    notificationHistories: zod
+      .array(
+        zod.object({
+          historyId: zod.number(),
+          triggerType: zod.enum([
+            'OWNER_ORDER_CONFIRM_REQUIRED_IMMEDIATE',
+            'OWNER_ORDER_CANCELLED_IMMEDIATE',
+          ]),
+          scheduleKey: zod.string(),
+          status: zod.enum(['PENDING', 'SUCCESS', 'FAILED']),
+          retryCount: zod.number(),
+          processedAt: zod.iso.datetime({ offset: true }).nullish(),
+          lastError: zod.string().nullish(),
+        }),
+      )
+      .describe('발주 확정 요청 및 발주 취소 사장님 알림 발송 이력'),
   }),
   error: zod.unknown().nullable(),
 });
@@ -1110,6 +1194,15 @@ export const PostApiV1AdminOwnerGroupBuyRequestsRequestIdRejectResponse =
       requestId: zod.number(),
       status: zod.enum(['APPROVED', 'REJECTED']),
       groupBuyId: zod.number().nullish(),
+      approvalSummary: zod
+        .object({
+          productName: zod.string(),
+          price: zod.number(),
+          targetQuantity: zod.number(),
+          pickupDate: zod.iso.date(),
+          imageCount: zod.number(),
+        })
+        .nullish(),
     }),
     error: zod.unknown().nullable(),
   });

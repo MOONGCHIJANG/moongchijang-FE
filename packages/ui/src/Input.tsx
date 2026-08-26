@@ -122,6 +122,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => setShowPassword((prev) => !prev)}
+                  aria-label={
+                    showPassword ? '비밀번호 숨기기' : '비밀번호 보기'
+                  }
                 >
                   <Icon
                     icon={showPassword ? 'lucide:eye' : 'lucide:eye-off'}

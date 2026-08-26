@@ -51,9 +51,9 @@ export function LoginForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-8 lg:gap-[3.704vh]"
+      className="flex w-[362px] flex-col lg:w-[18.854vw]"
     >
-      <div className="flex w-[362px] flex-col gap-3 lg:w-[18.854vw] lg:gap-[1.481vh]">
+      <div className="flex flex-col gap-3 lg:gap-[1.481vh]">
         <Input
           variant="admin"
           noHelperSpace
@@ -67,10 +67,13 @@ export function LoginForm() {
           noHelperSpace
           label="비밀번호"
           isPassword
+          isError={!!errorMessage}
           placeholder="비밀번호를 입력해주세요"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+      </div>
+      <div className="flex h-[63px] flex-col justify-center lg:h-[5.833vh]">
         {errorMessage && (
           <p className="body-sm-regular text-text-error">{errorMessage}</p>
         )}

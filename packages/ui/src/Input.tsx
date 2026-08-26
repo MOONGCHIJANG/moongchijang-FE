@@ -67,6 +67,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       variant === 'admin'
         ? 'placeholder:text-gray-400'
         : 'placeholder:text-text-subtle-inverse';
+    const sizeClass = variant === 'admin' ? 'h-10 py-3.5' : 'py-g5';
 
     return (
       <div className="flex flex-col gap-g2 w-full">
@@ -96,7 +97,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               onBlur={(e) => {
                 rest.onBlur?.(e);
               }}
-              className={`w-full py-g5 border rounded-2xlarge body-md-regular focus:outline-none text-icon-basic ${placeholderClass} pr-10 transition-colors duration-200 ${leftIcon ? 'pl-8' : 'px-g4'} ${borderClass}`}
+              className={`w-full ${sizeClass} border rounded-2xlarge body-md-regular focus:outline-none text-icon-basic ${placeholderClass} pr-10 transition-colors duration-200 ${leftIcon ? 'pl-8' : 'px-g4'} ${borderClass}`}
               {...rest}
             />
             <div className="absolute right-g4 top-1/2 -translate-y-1/2 flex items-center gap-g4">

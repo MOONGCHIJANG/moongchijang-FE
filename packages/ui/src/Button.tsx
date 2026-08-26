@@ -11,7 +11,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     | 'tertiary'
     | 'black'
     | 'brand-soft';
-  size?: 'sm' | 'md' | 'lg' | 'cta';
+  size?: 'sm' | 'md' | 'lg' | 'cta' | 'admin';
   fullWidth?: boolean;
 }
 
@@ -33,6 +33,7 @@ const sizes = {
   md: 'h-11 px-4 heading-sm-bold rounded-xl gap-2.5',
   lg: 'h-14 px-6 py-2.5 heading-md-semibold rounded-lg gap-1',
   cta: 'min-w-10 px-1.5 py-[5px] text-[10px] font-bold leading-4 rounded-md gap-2',
+  admin: 'h-11 px-6 py-2 caption-sm-semibold rounded-lg gap-1',
 };
 
 export const Button = ({

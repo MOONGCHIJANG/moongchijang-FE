@@ -115,3 +115,23 @@ export const FocusBrand: Story = {
     focusVariant: 'brand',
   },
 };
+
+// variant=admin: PC 어드민 로그인 입력 스펙 (굵은 라벨, 진한 테두리, clear 버튼 없음)
+export const Admin: Story = {
+  args: {
+    variant: 'admin',
+    noHelperSpace: true,
+    label: '아이디',
+    placeholder: '아이디를 입력해주세요',
+  },
+};
+
+export const AdminPassword: Story = {
+  args: {
+    variant: 'admin',
+    noHelperSpace: true,
+    label: '비밀번호',
+    isPassword: true,
+    placeholder: '비밀번호를 입력해주세요',
+  },
+};

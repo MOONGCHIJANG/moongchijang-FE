@@ -83,7 +83,6 @@ async function getUserRole(accessToken: string): Promise<string | null> {
 }
 
 function roleHomePath(role: string | null): string {
-  if (role === 'ADMIN') return '/admin/dashboard';
   if (role === 'SELLER') return '/seller';
   return '/feed';
 }
@@ -92,11 +91,8 @@ export async function proxy(request: NextRequest) {
   const refreshToken = request.cookies.get('refreshToken')?.value;
   const { pathname } = request.nextUrl;
 
-  // 로그인 유저가 /login 또는 /admin/login 접근 시 역할에 따라 redirect
-  if (
-    (pathname.startsWith('/login') || pathname === '/admin/login') &&
-    refreshToken
-  ) {
+  // 로그인 유저가 /login 접근 시 역할에 따라 redirect
+  if (pathname.startsWith('/login') && refreshToken) {
     const { accessToken, rotated } = await resolveAccessToken(
       request,
       refreshToken,
@@ -114,29 +110,6 @@ export async function proxy(request: NextRequest) {
     }
     if (pathname.startsWith('/login')) {
       return NextResponse.redirect(new URL('/feed', request.url));
-    }
-  }
-
-  // /admin 보호 경로 (admin/login 제외)
-  if (pathname.startsWith('/admin') && pathname !== '/admin/login') {
-    if (!refreshToken) {
-      return NextResponse.redirect(new URL('/admin/login', request.url));
-    }
-    const { accessToken, rotated } = await resolveAccessToken(
-      request,
-      refreshToken,
-    );
-    if (!accessToken) {
-      return NextResponse.redirect(new URL('/admin/login', request.url));
-    }
-    const role = await getUserRole(accessToken);
-    if (role !== 'ADMIN') {
-      return NextResponse.redirect(new URL(roleHomePath(role), request.url));
-    }
-    if (rotated) {
-      const response = NextResponse.next();
-      applyRotation(response, rotated);
-      return response;
     }
   }
 
@@ -195,6 +168,5 @@ export const config = {
     '/login',
     '/login/:path*',
     '/signup/email',
-    '/admin/:path*',
   ],
 };

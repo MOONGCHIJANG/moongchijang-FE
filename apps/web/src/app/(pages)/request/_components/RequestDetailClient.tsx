@@ -41,8 +41,16 @@ interface RequestDetailClientProps {
 }
 
 export function RequestDetailClient({ requestId }: RequestDetailClientProps) {
-  const { data, isLoading, isError } =
-    useGetApiV1GroupBuyRequestsRequestId(requestId);
+  const { data, isLoading, isError } = useGetApiV1GroupBuyRequestsRequestId(
+    requestId,
+    {
+      productName: '',
+      price: 0,
+      targetQuantity: 0,
+      pickupDate: '',
+      imageCount: 0,
+    },
+  );
   const request = data?.status === 200 ? data.data?.data : null;
   const is403 = data?.status === 403;
 

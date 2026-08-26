@@ -106,11 +106,12 @@ export async function proxy(request: NextRequest) {
         applyRotation(response, rotated);
         return response;
       }
-      // role null (users/me 일시 장애) → 로그인 페이지 그대로 노출
+      // role null (users/me 일시 장애) → 로그인 페이지 그대로 노출 (rotation은 유지)
+      const response = NextResponse.next();
+      applyRotation(response, rotated);
+      return response;
     }
-    if (pathname.startsWith('/login')) {
-      return NextResponse.redirect(new URL('/feed', request.url));
-    }
+    return NextResponse.redirect(new URL('/feed', request.url));
   }
 
   // 토큰 없이 /signup/email?step=profile 접근 시 /login으로

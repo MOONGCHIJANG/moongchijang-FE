@@ -4,8 +4,8 @@ import { useAuthStore } from '@moongchijang/api-client/authStore';
 import { tokenStorage } from '@moongchijang/api-client/token';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { PcButton } from '@/components/PcButton';
-import { PcInput } from '@/components/PcInput';
+import { Button } from '@/components/Button';
+import { Input } from '@/components/Input';
 
 export function LoginForm() {
   const [email, setEmail] = useState('');
@@ -55,13 +55,13 @@ export function LoginForm() {
       className="flex flex-col gap-8 lg:gap-[3.704vh]"
     >
       <div className="flex w-[362px] flex-col gap-3 lg:w-[18.854vw] lg:gap-[1.481vh]">
-        <PcInput
+        <Input
           label="아이디"
           placeholder="아이디를 입력해주세요"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
-        <PcInput
+        <Input
           label="비밀번호"
           isPassword
           placeholder="비밀번호를 입력해주세요"
@@ -72,9 +72,9 @@ export function LoginForm() {
           <p className="body-sm-regular text-text-error">{errorMessage}</p>
         )}
       </div>
-      <PcButton type="submit" disabled={!canSubmit || isPending}>
+      <Button type="submit" disabled={!canSubmit || isPending}>
         로그인
-      </PcButton>
+      </Button>
     </form>
   );
 }

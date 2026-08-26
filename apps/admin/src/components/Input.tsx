@@ -3,7 +3,7 @@
 import { Icon } from '@iconify/react';
 import React, { useState } from 'react';
 
-interface PcInputProps extends Omit<
+interface InputProps extends Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
   'type'
 > {
@@ -11,11 +11,7 @@ interface PcInputProps extends Omit<
   isPassword?: boolean;
 }
 
-/**
- * Figma PC_input 스펙(50px 높이, 12px radius, 16/12px padding) 전용
- * admin 데스크톱 입력창. 1920x1080 캔버스 기준 값을 vw/vh로 환산했다.
- */
-export const PcInput = React.forwardRef<HTMLInputElement, PcInputProps>(
+export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ label, isPassword = false, className = '', ...rest }, ref) => {
     const [showPassword, setShowPassword] = useState(false);
     const inputType = isPassword
@@ -25,11 +21,11 @@ export const PcInput = React.forwardRef<HTMLInputElement, PcInputProps>(
       : 'text';
 
     return (
-      <label className="flex flex-col gap-1 lg:gap-[0.37vh]">
+      <label className="flex flex-col gap-1">
         {label && (
           <span className="body-md-semibold text-text-subtle">{label}</span>
         )}
-        <div className="flex h-11 items-center gap-1 rounded-xl border border-border-default px-3 py-4 lg:h-[4.63vh] lg:gap-[0.37vh] lg:rounded-[1.111vh] lg:px-[0.625vw] lg:py-[1.481vh]">
+        <div className="flex h-10 items-center gap-1 rounded-xl border border-border-default px-3 py-3.5">
           <input
             ref={ref}
             type={inputType}
@@ -55,4 +51,4 @@ export const PcInput = React.forwardRef<HTMLInputElement, PcInputProps>(
   },
 );
 
-PcInput.displayName = 'PcInput';
+Input.displayName = 'Input';

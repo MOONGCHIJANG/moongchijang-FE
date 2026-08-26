@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { PcInput } from './PcInput';
+import { Input } from './Input';
 
-const meta: Meta<typeof PcInput> = {
-  title: 'Admin/PcInput',
-  component: PcInput,
+const meta: Meta<typeof Input> = {
+  title: 'Admin/Input',
+  component: Input,
   tags: ['autodocs'],
   parameters: {
     layout: 'centered',
@@ -11,7 +11,7 @@ const meta: Meta<typeof PcInput> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof PcInput>;
+type Story = StoryObj<typeof Input>;
 
 export const Default: Story = {
   args: {

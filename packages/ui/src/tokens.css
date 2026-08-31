@@ -446,6 +446,12 @@
     line-height: var(--line-height-18);
     font-weight: var(--font-weight-regular);
   }
+  /* Figma 원본이 18px/28px를 "caption/sm/semibold"로 명명함 — 위 caption-sm 3종(12px)과 크기가 다름에 유의 */
+  .caption-sm-semibold {
+    font-size: var(--font-size-18);
+    line-height: var(--line-height-28);
+    font-weight: var(--font-weight-semibold);
+  }
 
   /* caption / xs */
   .caption-xs-bold {

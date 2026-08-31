@@ -47,6 +47,62 @@ import {
 } from './mock-helpers';
 import { formatDeadline } from '@/lib/date';
 
+const MOCK_ACCOUNTS = {
+  'test@test.com': {
+    password: 'Test1234!',
+    id: 1,
+    nickname: '테스트유저',
+    role: 'BUYER' as const,
+    accessToken: 'mock-access-token',
+    refreshToken: 'mock-refresh-token-buyer',
+    sellerSignupCompleted: false,
+    hasBuyerRole: true,
+    hasSellerRole: false,
+    canSwitchToBuyer: false,
+    canSwitchToSeller: false,
+  },
+  'admin@test.com': {
+    password: 'Admin1234!',
+    id: 2,
+    nickname: '운영자',
+    role: 'ADMIN' as const,
+    accessToken: 'mock-admin-access-token',
+    refreshToken: 'mock-refresh-token-admin',
+    sellerSignupCompleted: false,
+    hasBuyerRole: false,
+    hasSellerRole: false,
+    canSwitchToBuyer: false,
+    canSwitchToSeller: false,
+  },
+  'seller@test.com': {
+    password: 'Seller1234!',
+    id: 3,
+    nickname: '테스트사장님',
+    role: 'SELLER' as const,
+    accessToken: 'mock-seller-access-token',
+    refreshToken: 'mock-refresh-token-seller',
+    sellerSignupCompleted: true,
+    hasBuyerRole: true,
+    hasSellerRole: true,
+    canSwitchToBuyer: true,
+    canSwitchToSeller: false,
+  },
+} as const;
+
+const TOKEN_TO_ACCOUNT = Object.fromEntries(
+  Object.entries(MOCK_ACCOUNTS).map(([email, acc]) => [
+    acc.accessToken,
+    { email, ...acc },
+  ]),
+);
+
+const REFRESH_TOKEN_TO_ACCOUNT = Object.fromEntries(
+  Object.entries(MOCK_ACCOUNTS).map(([email, acc]) => [
+    acc.refreshToken,
+    { email, ...acc },
+  ]),
+);
+
 // 최근 검색어 인메모리 저장소
 let recentKeywords: { keyword: string; searchedAt: string }[] = [];
 
@@ -301,31 +357,7 @@ const overrideHandlers = [
     await delay(500);
     const body = (await request.json()) as { email: string; password: string };
 
-    const ACCOUNTS = {
-      'test@test.com': {
-        password: 'Test1234!',
-        id: 1,
-        nickname: '테스트유저',
-        role: 'BUYER',
-        accessToken: 'mock-access-token',
-      },
-      'admin@test.com': {
-        password: 'Admin1234!',
-        id: 2,
-        nickname: '운영자',
-        role: 'ADMIN',
-        accessToken: 'mock-admin-access-token',
-      },
-      'seller@test.com': {
-        password: 'Seller1234!',
-        id: 3,
-        nickname: '테스트사장님',
-        role: 'SELLER',
-        accessToken: 'mock-seller-access-token',
-      },
-    } as const;
-
-    const account = ACCOUNTS[body.email as keyof typeof ACCOUNTS];
+    const account = MOCK_ACCOUNTS[body.email as keyof typeof MOCK_ACCOUNTS];
     if (!account || account.password !== body.password) {
       return HttpResponse.json(
         {
@@ -351,6 +383,11 @@ const overrideHandlers = [
             nickname: account.nickname,
             role: account.role,
             signupCompleted: true,
+            sellerSignupCompleted: account.sellerSignupCompleted,
+            hasBuyerRole: account.hasBuyerRole,
+            hasSellerRole: account.hasSellerRole,
+            canSwitchToBuyer: account.canSwitchToBuyer,
+            canSwitchToSeller: account.canSwitchToSeller,
             deletedAt: null,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
@@ -361,8 +398,32 @@ const overrideHandlers = [
       {
         status: 200,
         headers: {
-          'set-cookie':
-            'refreshToken=mock-refresh-token; Path=/; SameSite=Strict; Max-Age=1209600',
+          'set-cookie': `refreshToken=${account.refreshToken}; Path=/; SameSite=Strict; Max-Age=1209600`,
+        },
+      },
+    );
+  }),
+  http.post('*/api/v1/auth/refresh', async ({ request }) => {
+    await delay(200);
+    const cookieHeader = request.headers.get('Cookie') ?? '';
+    const match = cookieHeader.match(/refreshToken=([^;]+)/);
+    const account = match ? REFRESH_TOKEN_TO_ACCOUNT[match[1]] : null;
+    if (!account) {
+      return HttpResponse.json(
+        { success: false, data: null, error: null },
+        { status: 401 },
+      );
+    }
+    return HttpResponse.json(
+      {
+        success: true,
+        data: { accessToken: account.accessToken, expiresIn: 3600 },
+        error: null,
+      },
+      {
+        status: 200,
+        headers: {
+          'set-cookie': `refreshToken=${account.refreshToken}; Path=/; SameSite=Strict; Max-Age=1209600`,
         },
       },
     );
@@ -499,9 +560,28 @@ const overrideHandlers = [
   }),
 
   // 마이페이지
-  http.get('*/api/v1/users/me', async () => {
+  http.get('*/api/v1/users/me', async ({ request }) => {
     await delay(300);
-    return HttpResponse.json(createMyPageUserMeMock());
+    const token = request.headers.get('Authorization')?.replace('Bearer ', '');
+    const account = token ? TOKEN_TO_ACCOUNT[token] : null;
+    const mock = createMyPageUserMeMock();
+    return HttpResponse.json({
+      ...mock,
+      data: {
+        ...mock.data,
+        ...(account && {
+          id: account.id,
+          nickname: account.nickname,
+          role: account.role,
+          email: account.email,
+          sellerSignupCompleted: account.sellerSignupCompleted,
+          hasBuyerRole: account.hasBuyerRole,
+          hasSellerRole: account.hasSellerRole,
+          canSwitchToBuyer: account.canSwitchToBuyer,
+          canSwitchToSeller: account.canSwitchToSeller,
+        }),
+      },
+    });
   }),
   http.get('*/api/v1/users/me/tabs/counts', async () => {
     await delay(300);

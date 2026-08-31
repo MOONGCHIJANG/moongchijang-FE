@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit --project tsconfig.json"
   },
   "dependencies": {
+    "@iconify/react": "catalog:",
     "@moongchijang/api-client": "workspace:*",
     "@moongchijang/ui": "workspace:*",
     "next": "16.2.2",
@@ -17,7 +18,9 @@
     "react-dom": "19.2.4"
   },
   "devDependencies": {
+    "@iconify-json/lucide": "^1.2.108",
     "@moongchijang/config": "workspace:*",
+    "@storybook/nextjs-vite": "catalog:",
     "@tailwindcss/postcss": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",

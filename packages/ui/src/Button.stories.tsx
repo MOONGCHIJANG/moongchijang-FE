@@ -71,3 +71,23 @@ export const SmallDisabled: Story = {
     disabled: true,
   },
 };
+
+// admin: PC 어드민 로그인 버튼 스펙 (h-11, caption-sm-semibold)
+export const Admin: Story = {
+  args: {
+    variant: 'primary',
+    size: 'admin',
+    fullWidth: true,
+    children: '로그인',
+  },
+};
+
+export const AdminDisabled: Story = {
+  args: {
+    variant: 'primary',
+    size: 'admin',
+    fullWidth: true,
+    children: '로그인',
+    disabled: true,
+  },
+};

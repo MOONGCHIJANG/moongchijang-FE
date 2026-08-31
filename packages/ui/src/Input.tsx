@@ -11,6 +11,8 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   leftIcon?: string;
   isError?: boolean;
   focusVariant?: 'default' | 'brand';
+  /** 'admin': 굵은 라벨(body-md-semibold)·진한 테두리(border-default)·clear 버튼 없음 (PC_input 스펙) */
+  variant?: 'default' | 'admin';
   rightButton?: {
     label: string;
     onClick?: () => void;
@@ -34,6 +36,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       leftIcon,
       isError = false,
       focusVariant = 'default',
+      variant = 'default',
       rightButton,
       helperAction,
       onChange,
@@ -46,23 +49,38 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const [showPassword, setShowPassword] = useState(false);
 
     const currentValue = (value as string) ?? '';
-    const showClear = currentValue.length > 0;
+    const showClear = variant === 'admin' ? false : currentValue.length > 0;
     const inputType = isPassword
       ? showPassword
         ? 'text'
         : 'password'
       : 'text';
 
+    const baseBorder =
+      variant === 'admin' ? 'border-border-default' : 'border-border-subtle';
     const borderClass = isError
       ? 'border-border-error'
       : focusVariant === 'brand'
-        ? 'border-border-subtle focus:border-border-brand'
-        : 'border-border-subtle focus:border-text-basic';
+        ? `${baseBorder} focus:border-border-brand`
+        : `${baseBorder} focus:border-text-basic`;
+    const placeholderClass =
+      variant === 'admin'
+        ? 'placeholder:text-gray-400'
+        : 'placeholder:text-text-subtle-inverse';
+    const sizeClass = variant === 'admin' ? 'h-10 py-3.5' : 'py-g5';
 
     return (
       <div className="flex flex-col gap-g2 w-full">
         {label && (
-          <p className="caption-sm-medium text-text-tertiary">{label}</p>
+          <p
+            className={
+              variant === 'admin'
+                ? 'body-md-semibold text-text-subtle'
+                : 'caption-sm-medium text-text-tertiary'
+            }
+          >
+            {label}
+          </p>
         )}
         <div className="flex items-center gap-g3 w-full">
           <div className="relative flex-1">
@@ -79,7 +97,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               onBlur={(e) => {
                 rest.onBlur?.(e);
               }}
-              className={`w-full py-g5 border rounded-2xlarge body-md-regular focus:outline-none text-icon-basic placeholder:text-text-subtle-inverse pr-10 transition-colors duration-200 ${leftIcon ? 'pl-8' : 'px-g4'} ${borderClass}`}
+              className={`w-full ${sizeClass} border rounded-2xlarge body-md-regular focus:outline-none text-icon-basic ${placeholderClass} pr-10 transition-colors duration-200 ${leftIcon ? 'pl-8' : 'px-g4'} ${borderClass}`}
               {...rest}
             />
             <div className="absolute right-g4 top-1/2 -translate-y-1/2 flex items-center gap-g4">
@@ -104,6 +122,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => setShowPassword((prev) => !prev)}
+                  aria-label={
+                    showPassword ? '비밀번호 숨기기' : '비밀번호 보기'
+                  }
                 >
                   <Icon
                     icon={showPassword ? 'lucide:eye' : 'lucide:eye-off'}

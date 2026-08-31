@@ -18,6 +18,7 @@ const processQueue = (token: string | null) => {
 const PUBLIC_URLS = [
   '/auth/refresh',
   '/auth/email/login',
+  '/auth/admin/email/login',
   '/auth/email/signup',
   '/auth/email/availability',
   '/auth/email/verification-codes',

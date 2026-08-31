@@ -20,11 +20,6 @@ export const ADMIN_ICONS: Record<string, IconData> = {
     width: 24,
     height: 24,
   },
-  'iconoir:refresh': {
-    body: '<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M21.888 13.5C21.164 18.311 17.013 22 12 22C6.477 22 2 17.523 2 12S6.477 2 12 2c4.1 0 7.625 2.468 9.168 6"/><path d="M17 8h4.4a.6.6 0 0 0 .6-.6V3"/></g>',
-    width: 24,
-    height: 24,
-  },
   'mynaui:store': {
     body: '<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.996 10.621V19a2 2 0 0 1-2 2H6.004a2 2 0 0 1-1.999-2v-8.379M16.498 8.75c0 3.176 5.155 2.52 4.433-.248l-1.045-4.007A2 2 0 0 0 17.952 3H6.048a2 2 0 0 0-1.934 1.495L3.069 8.502c-.722 2.769 4.433 3.424 4.433.248l.5-5.75m-.5 5.75c0 2.902 4.498 2.902 4.498 0m0 0V3m3.998 0l.5 5.75c0 2.902-4.498 2.902-4.498 0"/>',
     width: 24,

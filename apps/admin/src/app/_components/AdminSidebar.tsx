@@ -15,7 +15,7 @@ const MENU = [
   },
   {
     label: '환불 요청',
-    icon: 'iconoir:refresh',
+    icon: 'figma:refund-refresh',
     href: '/refunds',
   },
   {
@@ -75,14 +75,16 @@ export function AdminSidebar({ onLogout }: AdminSidebarProps) {
       <div className="flex flex-col items-center gap-g9">
         {/* next/image의 /_next/image 최적화 프록시는 기본적으로 svg를 허용하지 않아
             next start(프로덕션)에서 400을 반환한다 — 로컬 신뢰 자산이므로 img로 우회 */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/icons/sidebar-logo-mark.svg"
-          alt="뭉치장 어드민"
-          width={34}
-          height={36}
-          className="h-9 w-auto"
-        />
+        <div className="flex h-[50px] w-[50px] items-center justify-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/icons/sidebar-logo-mark.svg"
+            alt="뭉치장 어드민"
+            width={34}
+            height={36}
+            className="h-9 w-auto"
+          />
+        </div>
         <nav className="flex flex-col items-center gap-g7">
           {MENU.map((item) => {
             const isActive = pathname.startsWith(item.href);

@@ -164,6 +164,9 @@ importers:
       tailwind-merge:
         specifier: 'catalog:'
         version: 3.5.0
+      zustand:
+        specifier: 'catalog:'
+        version: 5.0.13(@types/react@19.2.14)(react@19.2.4)(use-sync-external-store@1.6.0(react@19.2.4))
     devDependencies:
       '@iconify-json/lucide':
         specifier: ^1.2.108

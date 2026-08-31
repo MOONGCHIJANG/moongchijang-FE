@@ -3,6 +3,9 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Icon } from '@iconify/react';
+import { Button } from '@moongchijang/ui';
+import { useEffect, useRef, useState } from 'react';
+import { useAdminIdentityStore } from '@/store/adminIdentityStore';
 
 const MENU = [
   {
@@ -43,6 +46,29 @@ interface AdminSidebarProps {
 
 export function AdminSidebar({ onLogout }: AdminSidebarProps) {
   const pathname = usePathname();
+  const adminName = useAdminIdentityStore((s) => s.name);
+  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
+  const accountMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isAccountMenuOpen) return;
+
+    function handlePointerDown(event: MouseEvent) {
+      if (!accountMenuRef.current?.contains(event.target as Node)) {
+        setIsAccountMenuOpen(false);
+      }
+    }
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') setIsAccountMenuOpen(false);
+    }
+
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isAccountMenuOpen]);
 
   return (
     <aside className="flex shrink-0 flex-col items-center justify-between border-r border-gray-100 bg-bg-white px-[22px] py-[50px]">
@@ -84,12 +110,47 @@ export function AdminSidebar({ onLogout }: AdminSidebarProps) {
           })}
         </nav>
       </div>
-      <button type="button" onClick={onLogout} aria-label="로그아웃">
-        <Icon
-          icon="solar:logout-2-linear"
-          className="h-[30px] w-[30px] text-gray-500"
-        />
-      </button>
+      <div ref={accountMenuRef} className="relative">
+        <button
+          type="button"
+          onClick={() => setIsAccountMenuOpen((prev) => !prev)}
+          aria-haspopup="menu"
+          aria-expanded={isAccountMenuOpen}
+          aria-label="계정 메뉴"
+        >
+          <Icon
+            icon={
+              isAccountMenuOpen
+                ? 'figma:account-circle'
+                : 'figma:account-circle-outline'
+            }
+            className="h-[30px] w-[30px] text-gray-500"
+          />
+        </button>
+        {isAccountMenuOpen && (
+          <div
+            role="menu"
+            className="absolute bottom-0 left-full z-50 ml-3 flex w-40 flex-col gap-g3 rounded-large bg-bg-white p-p4 shadow-[1px_2px_10px_0px_rgba(0,0,0,0.1)]"
+          >
+            <span className="heading-sm-medium px-g2 py-g1 text-text-basic">
+              {adminName ? `${adminName}님` : '관리자'}
+            </span>
+            <Button
+              type="button"
+              role="menuitem"
+              variant="primary"
+              size="admin"
+              fullWidth
+              onClick={() => {
+                setIsAccountMenuOpen(false);
+                onLogout();
+              }}
+            >
+              로그아웃
+            </Button>
+          </div>
+        )}
+      </div>
     </aside>
   );
 }

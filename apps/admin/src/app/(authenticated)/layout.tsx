@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { AdminSidebar } from '../_components/AdminSidebar';
 import { tokenStorage } from '@moongchijang/api-client/token';
 import { useAuthStore } from '@moongchijang/api-client/authStore';
+import { useAdminIdentityStore } from '@/store/adminIdentityStore';
 
 export default function AdminAuthenticatedLayout({
   children,
@@ -12,11 +13,13 @@ export default function AdminAuthenticatedLayout({
 }) {
   const router = useRouter();
   const setIsLoggedIn = useAuthStore((s) => s.setIsLoggedIn);
+  const setAdminName = useAdminIdentityStore((s) => s.setName);
 
   async function handleLogout() {
     await fetch('/api/v1/auth/logout', { method: 'POST' }).catch(() => {});
     tokenStorage.remove();
     setIsLoggedIn(false);
+    setAdminName(null);
     router.push('/login');
   }
 

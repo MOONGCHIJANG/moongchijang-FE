@@ -1,5 +1,5 @@
 import { MetricCard } from './_components/MetricCard';
-import { UrgentAlertBanner } from './_components/UrgentAlertBanner';
+import { AlertBanner } from '@/components/AlertBanner';
 import { UrgentRefundsTable } from './_components/UrgentRefundsTable';
 import { PendingOrdersTable } from './_components/PendingOrdersTable';
 
@@ -95,7 +95,7 @@ export default function AdminDashboardPage() {
           ))}
         </div>
       </div>
-      <UrgentAlertBanner
+      <AlertBanner
         title="긴급 처리 필요"
         description="SLA 초과 환불 요청 3건, 발주 미확정 48시간 초과 1건"
       />

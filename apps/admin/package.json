@@ -13,9 +13,11 @@
     "@iconify/react": "catalog:",
     "@moongchijang/api-client": "workspace:*",
     "@moongchijang/ui": "workspace:*",
+    "clsx": "catalog:",
     "next": "16.2.2",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "tailwind-merge": "catalog:"
   },
   "devDependencies": {
     "@iconify-json/lucide": "^1.2.108",

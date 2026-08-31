@@ -100,6 +100,7 @@
       <img src="https://img.shields.io/badge/Tailwind%20CSS%20v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" />
       <img src="https://img.shields.io/badge/tailwind--merge-06B6D4?style=for-the-badge&logoColor=white" />
       <img src="https://img.shields.io/badge/clsx-F7DF1E?style=for-the-badge&logoColor=black" />
+      <img src="https://img.shields.io/badge/Iconify-1769AA?style=for-the-badge&logo=iconify&logoColor=white" />
     </td>
   </tr>
   <tr>
@@ -154,6 +155,7 @@
       <img src="https://img.shields.io/badge/Husky-000000?style=for-the-badge&logoColor=white" />
       <img src="https://img.shields.io/badge/lint--staged-F05032?style=for-the-badge&logoColor=white" />
       <img src="https://img.shields.io/badge/pnpm%2010-F69220?style=for-the-badge&logo=pnpm&logoColor=white" />
+      <img src="https://img.shields.io/badge/Turborepo-EF4444?style=for-the-badge&logo=turborepo&logoColor=white" />
     </td>
   </tr>
   <tr>
@@ -324,16 +326,24 @@ pnpm install
 # 2. API 코드 생성 (OpenAPI → hooks, schemas, MSW handlers)
 pnpm generate
 
-# 3-a. 실서버 연동 개발
+# 3-a. 실서버 연동 개발 (소비자·판매자 앱)
 pnpm dev
 
 # 3-b. Mock 서버와 함께 개발 (백엔드 없이)
 pnpm dev:mock
+
+# 3-c. 어드민 앱 개발 (http://localhost:3001)
+pnpm dev:admin
 ```
 
 ### 주요 명령어
 
 ```bash
+pnpm dev             # 소비자·판매자 앱 개발 서버
+pnpm dev:mock        # 소비자·판매자 앱 + MSW Mock 서버
+pnpm dev:admin       # 어드민 앱 개발 서버 (포트 3001)
+pnpm build           # 전체 워크스페이스 프로덕션 빌드 (Turborepo)
+pnpm typecheck       # 전체 워크스페이스 타입 체크
 pnpm generate        # Orval 코드젠 (API 변경 시 실행)
 pnpm test            # Vitest 단위 테스트
 pnpm storybook       # Storybook 로컬 서버 (http://localhost:6006)

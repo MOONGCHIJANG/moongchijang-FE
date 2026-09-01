@@ -12,31 +12,39 @@ const MENU = [
     label: '대시보드',
     icon: 'mage:dashboard',
     href: '/dashboard',
+    iconSize: 21,
   },
   {
     label: '환불 요청',
     icon: 'figma:refund-refresh',
     href: '/refunds',
+    // 다른 아이콘은 각진 도형이라 21px 박스를 꽉 채우지만, 이 아이콘은 원형 곡선 위주라
+    // 같은 크기면 더 작아 보인다 — Figma 원본도 23.33px로 더 크게 그려 광학 보정했다.
+    iconSize: 23,
   },
   {
     label: '공구 개설',
     icon: 'mynaui:store',
     href: '/group-buy-requests',
+    iconSize: 21,
   },
   {
     label: 'CS 티켓',
     icon: 'mynaui:ticket',
     href: '/cs-tickets',
+    iconSize: 21,
   },
   {
     label: '발주',
     icon: 'mynaui:truck',
     href: '/orders',
+    iconSize: 21,
   },
   {
     label: '정산',
     icon: 'streamline-plump:wallet',
     href: '/settlements',
+    iconSize: 21,
   },
 ];
 
@@ -101,7 +109,9 @@ export function AdminSidebar({ onLogout }: AdminSidebarProps) {
                 >
                   <Icon
                     icon={item.icon}
-                    className={`h-6 w-6 shrink-0 ${isActive ? 'text-primary-400' : 'text-gray-500'}`}
+                    width={item.iconSize}
+                    height={item.iconSize}
+                    className={`shrink-0 ${isActive ? 'text-primary-400' : 'text-gray-500'}`}
                   />
                 </span>
                 <span className="caption-sm-regular whitespace-nowrap text-text-subtle">

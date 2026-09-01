@@ -9,6 +9,7 @@
 
 import { http, HttpResponse, delay } from 'msw';
 import { generatedHandlers } from '@moongchijang/api-client/generated/index.msw';
+import { AdminDashboardUrgentRefundItemCaseFilter } from '@moongchijang/api-client/generated/api.schemas';
 
 const MOCK_ADMIN_ACCOUNT = {
   email: 'admin@test.com',
@@ -121,7 +122,7 @@ const overrideHandlers = [
         content: [
           {
             requestId: 2401,
-            caseFilter: 'POST_ACHIEVEMENT_CANCEL',
+            caseFilter: AdminDashboardUrgentRefundItemCaseFilter.POST_ACHIEVEMENT_CANCEL,
             consumerName: '김**',
             groupBuyName: '베이글 10개 세트',
             refundAmount: 27000,
@@ -130,7 +131,7 @@ const overrideHandlers = [
           },
           {
             requestId: 2398,
-            caseFilter: 'DISPUTE_OR_DROPOUT_REFUND',
+            caseFilter: AdminDashboardUrgentRefundItemCaseFilter.DISPUTE_OR_DROPOUT_REFUND,
             consumerName: '이**',
             groupBuyName: '마카롱 박스',
             refundAmount: 35000,
@@ -139,7 +140,7 @@ const overrideHandlers = [
           },
           {
             requestId: 2395,
-            caseFilter: 'PICKUP_PERIOD_NO_SHOW',
+            caseFilter: AdminDashboardUrgentRefundItemCaseFilter.PICKUP_PERIOD_NO_SHOW,
             consumerName: '박**',
             groupBuyName: '크루아상 세트',
             refundAmount: 18000,
@@ -203,6 +204,8 @@ const overrideHandlers = [
     });
   }),
 
+  // 대시보드의 "검토 대기 환불" 건수(totalElements)만 확인하는 용도라 content는 비워뒀다.
+  // 환불 목록 화면(/refunds)을 이 핸들러로 개발하려면 totalElements에 맞는 content도 채워야 한다.
   http.get('*/api/v1/admin/refunds', async ({ request }) => {
     await delay(300);
     const status = new URL(request.url).searchParams.get('status');

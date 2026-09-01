@@ -16,7 +16,10 @@ import {
 } from '@moongchijang/api-client/generated/api.schemas';
 
 // caseFilter enum → 표시 라벨. 스펙에 A~G 코드/한글 라벨 매핑표가 없어 enum 의미를 그대로 번역했다.
-const REFUND_CASE_LABELS: Record<AdminDashboardUrgentRefundItemCaseFilter, string> = {
+const REFUND_CASE_LABELS: Record<
+  AdminDashboardUrgentRefundItemCaseFilter,
+  string
+> = {
   ALL: '전체',
   PRE_ACHIEVEMENT_FREE_CANCEL: '달성 전 취소',
   POST_ACHIEVEMENT_CANCEL: '달성 후 취소',
@@ -56,7 +59,7 @@ function formatRefundSla(slaElapsedHours: number) {
 }
 
 function formatOrderElapsedLabel(elapsedHours: number, overdue: boolean) {
-  return overdue ? `${elapsedHours}시간 초과` : `미확정 ${elapsedHours}시간`;
+  return overdue ? `${elapsedHours}시간 경과` : `미확정 ${elapsedHours}시간`;
 }
 
 export default function AdminDashboardPage() {
@@ -65,7 +68,11 @@ export default function AdminDashboardPage() {
     isLoading: isSummaryLoading,
     isError: isSummaryError,
   } = useGetApiV1AdminSummary();
-  const { data: pendingRefundCountResponse } = useGetApiV1AdminRefunds({
+  const {
+    data: pendingRefundCountResponse,
+    isLoading: isPendingRefundCountLoading,
+    isError: isPendingRefundCountError,
+  } = useGetApiV1AdminRefunds({
     status: GetApiV1AdminRefundsStatus.WAITING,
     size: 1,
   });
@@ -95,37 +102,48 @@ export default function AdminDashboardPage() {
       ? unconfirmedOrdersResponse.data.data
       : null;
 
-  if (
+  const isLoading =
     isSummaryLoading ||
+    isPendingRefundCountLoading ||
     isUrgentRefundsLoading ||
-    isUnconfirmedOrdersLoading
-  ) {
-    return (
-      <p className="body-lg-regular text-text-tertiary">
-        불러오는 중입니다...
-      </p>
-    );
-  }
+    isUnconfirmedOrdersLoading;
 
-  if (
+  const isError =
     isSummaryError ||
+    isPendingRefundCountError ||
     isUrgentRefundsError ||
     isUnconfirmedOrdersError ||
     !summary ||
+    pendingRefundCount === null ||
     !urgentRefunds ||
-    !unconfirmedOrders
-  ) {
+    !unconfirmedOrders;
+
+  if (isLoading) {
     return (
-      <p className="body-lg-regular text-accent-red-500">
-        대시보드 데이터를 불러오지 못했습니다.
-      </p>
+      <div className="flex flex-col gap-g6">
+        <h1 className="title-md-bold text-text-basic">대시보드</h1>
+        <p role="status" className="body-lg-regular text-text-tertiary">
+          불러오는 중입니다...
+        </p>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex flex-col gap-g6">
+        <h1 className="title-md-bold text-text-basic">대시보드</h1>
+        <p role="alert" className="body-lg-regular text-accent-red-500">
+          대시보드 데이터를 불러오지 못했습니다.
+        </p>
+      </div>
     );
   }
 
   const metrics = [
     {
       label: '검토 대기 환불',
-      value: pendingRefundCount !== null ? `${pendingRefundCount}건` : '-',
+      value: `${pendingRefundCount}건`,
       description: `총 환불 금액: ${formatCurrency(summary.pendingRefundAmount)}`,
       icon: 'figma:refund-refresh',
       trend: {

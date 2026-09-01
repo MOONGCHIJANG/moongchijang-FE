@@ -1,4 +1,4 @@
-import { StatusBadge } from './StatusBadge';
+import { StatusBadge } from '@/components/StatusBadge';
 
 interface PendingOrderRow {
   orderId: string;

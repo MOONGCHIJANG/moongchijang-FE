@@ -136,7 +136,7 @@ export function AdminSidebar({ onLogout }: AdminSidebarProps) {
                 ? 'figma:account-circle'
                 : 'figma:account-circle-outline'
             }
-            className="h-[30px] w-[30px] text-gray-500"
+            className="h-[44px] w-[44px] text-gray-500"
           />
         </button>
         {isAccountMenuOpen && (

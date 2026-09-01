@@ -21,6 +21,62 @@ const MOCK_ADMIN_ACCOUNT = {
 
 const REFRESH_COOKIE = `refreshToken=${MOCK_ADMIN_ACCOUNT.refreshToken}; Path=/; SameSite=Strict; Max-Age=1209600`;
 
+// 환불 목록 화면(/refunds) 개발·검증용 목업. usePostApiV1AdminRefundsParticipationIdManual
+// 핸들러가 원소를 직접 mutate하므로(binding 자체는 const, 원소 참조는 그대로 유지) 서버가
+// 재시작되기 전까지는 처리 상태가 유지된다.
+const MOCK_REFUNDS = [
+  {
+    participationId: 2401,
+    userName: '김**',
+    productName: '베이글 10개 세트',
+    storeName: '행복한베이커리',
+    paymentAmount: 30000,
+    refundStatus: 'WAITING' as 'WAITING' | 'COMPLETED',
+    refundReason: '달성 후 취소 (픽업 3일 초과)',
+    createdAt: '2026-05-13T14:30:00',
+  },
+  {
+    participationId: 2398,
+    userName: '이**',
+    productName: '마카롱 박스',
+    storeName: '달콤한제과',
+    paymentAmount: 35000,
+    refundStatus: 'WAITING' as 'WAITING' | 'COMPLETED',
+    refundReason: '분쟁/이탈 환불',
+    createdAt: '2026-05-13T16:45:00',
+  },
+  {
+    participationId: 2395,
+    userName: '박**',
+    productName: '크루아상 세트',
+    storeName: '아침빵집',
+    paymentAmount: 18000,
+    refundStatus: 'WAITING' as 'WAITING' | 'COMPLETED',
+    refundReason: '미수령',
+    createdAt: '2026-05-13T09:15:00',
+  },
+  {
+    participationId: 2390,
+    userName: '최**',
+    productName: '식빵 세트',
+    storeName: '행복한빵집',
+    paymentAmount: 12000,
+    refundStatus: 'COMPLETED' as 'WAITING' | 'COMPLETED',
+    refundReason: '목표 미달성',
+    createdAt: '2026-05-12T11:20:00',
+  },
+  {
+    participationId: 2387,
+    userName: '정**',
+    productName: '도넛 박스',
+    storeName: '달콤한아침',
+    paymentAmount: 20000,
+    refundStatus: 'COMPLETED' as 'WAITING' | 'COMPLETED',
+    refundReason: null,
+    createdAt: '2026-05-11T18:05:00',
+  },
+];
+
 const overrideHandlers = [
   http.post('*/api/v1/auth/admin/email/login', async ({ request }) => {
     await delay(500);
@@ -122,7 +178,8 @@ const overrideHandlers = [
         content: [
           {
             requestId: 2401,
-            caseFilter: AdminDashboardUrgentRefundItemCaseFilter.POST_ACHIEVEMENT_CANCEL,
+            caseFilter:
+              AdminDashboardUrgentRefundItemCaseFilter.POST_ACHIEVEMENT_CANCEL,
             consumerName: '김**',
             groupBuyName: '베이글 10개 세트',
             refundAmount: 27000,
@@ -131,7 +188,8 @@ const overrideHandlers = [
           },
           {
             requestId: 2398,
-            caseFilter: AdminDashboardUrgentRefundItemCaseFilter.DISPUTE_OR_DROPOUT_REFUND,
+            caseFilter:
+              AdminDashboardUrgentRefundItemCaseFilter.DISPUTE_OR_DROPOUT_REFUND,
             consumerName: '이**',
             groupBuyName: '마카롱 박스',
             refundAmount: 35000,
@@ -140,7 +198,8 @@ const overrideHandlers = [
           },
           {
             requestId: 2395,
-            caseFilter: AdminDashboardUrgentRefundItemCaseFilter.PICKUP_PERIOD_NO_SHOW,
+            caseFilter:
+              AdminDashboardUrgentRefundItemCaseFilter.PICKUP_PERIOD_NO_SHOW,
             consumerName: '박**',
             groupBuyName: '크루아상 세트',
             refundAmount: 18000,
@@ -204,21 +263,70 @@ const overrideHandlers = [
     });
   }),
 
-  // 대시보드의 "검토 대기 환불" 건수(totalElements)만 확인하는 용도라 content는 비워뒀다.
-  // 환불 목록 화면(/refunds)을 이 핸들러로 개발하려면 totalElements에 맞는 content도 채워야 한다.
   http.get('*/api/v1/admin/refunds', async ({ request }) => {
     await delay(300);
-    const status = new URL(request.url).searchParams.get('status');
+    const url = new URL(request.url);
+    const status = url.searchParams.get('status') ?? 'ALL';
+    const page = Number(url.searchParams.get('page') ?? 0);
+    const size = Number(url.searchParams.get('size') ?? 20);
+
+    const filtered =
+      status === 'ALL'
+        ? MOCK_REFUNDS
+        : MOCK_REFUNDS.filter((item) => item.refundStatus === status);
+
+    const content = filtered.slice(page * size, page * size + size);
+
     return HttpResponse.json({
       success: true,
       data: {
-        content: [],
-        totalElements: status === 'WAITING' ? 12 : 30,
-        totalPages: 1,
+        content,
+        totalElements: filtered.length,
+        totalPages: Math.max(1, Math.ceil(filtered.length / size)),
       },
       error: null,
     });
   }),
+
+  http.post(
+    '*/api/v1/admin/refunds/:participationId/manual',
+    async ({ params }) => {
+      await delay(300);
+      const target = MOCK_REFUNDS.find(
+        (item) => String(item.participationId) === params.participationId,
+      );
+      if (!target) {
+        return HttpResponse.json(
+          {
+            success: false,
+            data: null,
+            error: {
+              code: 'REFUND_NOT_FOUND',
+              message: '환불 요청을 찾을 수 없습니다.',
+              detail: null,
+            },
+          },
+          { status: 409 },
+        );
+      }
+      if (target.refundStatus === 'COMPLETED') {
+        return HttpResponse.json(
+          {
+            success: false,
+            data: null,
+            error: {
+              code: 'REFUND_ALREADY_COMPLETED',
+              message: '이미 처리 완료된 환불 요청입니다.',
+              detail: null,
+            },
+          },
+          { status: 409 },
+        );
+      }
+      target.refundStatus = 'COMPLETED';
+      return HttpResponse.json({ success: true, data: null, error: null });
+    },
+  ),
 ];
 
 export const handlers = [...overrideHandlers, ...generatedHandlers];

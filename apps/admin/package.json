@@ -13,6 +13,8 @@
     "@iconify/react": "catalog:",
     "@moongchijang/api-client": "workspace:*",
     "@moongchijang/ui": "workspace:*",
+    "@tanstack/react-query": "catalog:",
+    "@tanstack/react-query-devtools": "catalog:",
     "clsx": "catalog:",
     "next": "16.2.2",
     "react": "19.2.4",

@@ -1,114 +1,208 @@
+'use client';
+
 import { MetricCard } from './_components/MetricCard';
 import { AlertBanner } from '@/components/AlertBanner';
 import { UrgentRefundsTable } from './_components/UrgentRefundsTable';
 import { PendingOrdersTable } from './_components/PendingOrdersTable';
+import {
+  useGetApiV1AdminSummary,
+  useGetApiV1AdminDashboardUrgentRefunds,
+  useGetApiV1AdminDashboardUnconfirmedOrders,
+  useGetApiV1AdminRefunds,
+} from '@moongchijang/api-client/hooks/admin/admin';
+import {
+  AdminDashboardUrgentRefundItemCaseFilter,
+  GetApiV1AdminRefundsStatus,
+} from '@moongchijang/api-client/generated/api.schemas';
 
-const METRICS = [
-  {
-    label: '검토 대기 환불',
-    value: '12건',
-    description: '총 환불 금액: ₩1,240,000',
-    icon: 'figma:refund-refresh',
-    trend: { text: '전일 대비 -15% ', tone: 'negative' as const },
-  },
-  {
-    label: '개설 승인 대기',
-    value: '5건',
-    description: '평균 검토 시간: 2.3시간',
-    icon: 'figma:hourglass',
-    trend: { text: '전일 대비 +8%', tone: 'positive' as const },
-  },
-  {
-    label: '발주 미확정',
-    value: '12건',
-    description: '48시간 초과: 1건',
-    icon: 'mynaui:truck',
-  },
-  {
-    label: '오늘 처리 완료',
-    value: '28건',
-    description: '환불 18건 · 승인 10건',
-    icon: 'figma:check-circle',
-    trend: { text: '전일 대비 +12%', tone: 'positive' as const },
-  },
-];
+// caseFilter enum → 표시 라벨. 스펙에 A~G 코드/한글 라벨 매핑표가 없어 enum 의미를 그대로 번역했다.
+const REFUND_CASE_LABELS: Record<AdminDashboardUrgentRefundItemCaseFilter, string> = {
+  ALL: '전체',
+  PRE_ACHIEVEMENT_FREE_CANCEL: '달성 전 취소',
+  POST_ACHIEVEMENT_CANCEL: '달성 후 취소',
+  PICKUP_PERIOD_NO_SHOW: '미수령',
+  OWNER_FAULT_CANCEL: '사장님 귀책 취소',
+  TARGET_NOT_MET: '목표 미달성',
+  DISPUTE_OR_DROPOUT_REFUND: '분쟁/이탈 환불',
+};
 
-const URGENT_REFUND_ROWS = [
-  {
-    requestId: 'REF-2401',
-    caseLabel: 'B-달성후',
-    customerName: '김**',
-    itemName: '베이글 10개 세트',
-    amount: '₩27,000',
-    requestedAt: '2026-05-13 14:30',
-    sla: '2시간 초과',
-  },
-  {
-    requestId: 'REF-2398',
-    caseLabel: 'G-분쟁',
-    customerName: '이**',
-    itemName: '마카롱 박스',
-    amount: '₩35,000',
-    requestedAt: '2026-05-13 16:45',
-    sla: '23시간 남음',
-  },
-  {
-    requestId: 'REF-2395',
-    caseLabel: 'D-미수령',
-    customerName: '박**',
-    itemName: '크루아상 세트',
-    amount: '₩18,000',
-    requestedAt: '2026-05-13 09:15',
-    sla: '6시간 초과',
-  },
-];
+const REFUND_SLA_THRESHOLD_HOURS = 24;
+const ORDER_SLA_THRESHOLD_HOURS = 48;
 
-const PENDING_ORDER_ROWS = [
-  {
-    orderId: 'ORD-1523',
-    itemName: '식빵 세트',
-    storeName: '행복한빵집',
-    achievedAt: '2026-05-12',
-    elapsedLabel: '48시간 경과',
-    elapsedHours: 48,
-    slaHours: 48,
-  },
-  {
-    orderId: 'ORD-1519',
-    itemName: '도넛 박스',
-    storeName: '달콤한아침',
-    achievedAt: '2026-05-13',
-    elapsedLabel: '미확정 24시간',
-    elapsedHours: 24,
-    slaHours: 48,
-  },
-];
+function formatCurrency(amount: number) {
+  return `₩${amount.toLocaleString('ko-KR')}`;
+}
+
+function formatChangeRate(rate: number) {
+  return `전일 대비 ${rate > 0 ? '+' : ''}${rate}%`;
+}
+
+function getChangeTone(rate: number): 'positive' | 'negative' {
+  return rate >= 0 ? 'positive' : 'negative';
+}
+
+function formatDateTime(isoDateTime: string) {
+  return isoDateTime.replace('T', ' ').slice(0, 16);
+}
+
+function formatDate(isoDate: string | null | undefined) {
+  return isoDate ? isoDate.slice(0, 10) : '-';
+}
+
+function formatRefundSla(slaElapsedHours: number) {
+  return slaElapsedHours >= REFUND_SLA_THRESHOLD_HOURS
+    ? `${slaElapsedHours - REFUND_SLA_THRESHOLD_HOURS}시간 초과`
+    : `${REFUND_SLA_THRESHOLD_HOURS - slaElapsedHours}시간 남음`;
+}
+
+function formatOrderElapsedLabel(elapsedHours: number, overdue: boolean) {
+  return overdue ? `${elapsedHours}시간 초과` : `미확정 ${elapsedHours}시간`;
+}
 
 export default function AdminDashboardPage() {
+  const {
+    data: summaryResponse,
+    isLoading: isSummaryLoading,
+    isError: isSummaryError,
+  } = useGetApiV1AdminSummary();
+  const { data: pendingRefundCountResponse } = useGetApiV1AdminRefunds({
+    status: GetApiV1AdminRefundsStatus.WAITING,
+    size: 1,
+  });
+  const {
+    data: urgentRefundsResponse,
+    isLoading: isUrgentRefundsLoading,
+    isError: isUrgentRefundsError,
+  } = useGetApiV1AdminDashboardUrgentRefunds();
+  const {
+    data: unconfirmedOrdersResponse,
+    isLoading: isUnconfirmedOrdersLoading,
+    isError: isUnconfirmedOrdersError,
+  } = useGetApiV1AdminDashboardUnconfirmedOrders();
+
+  const summary =
+    summaryResponse?.status === 200 ? summaryResponse.data.data : null;
+  const pendingRefundCount =
+    pendingRefundCountResponse?.status === 200
+      ? pendingRefundCountResponse.data.data.totalElements
+      : null;
+  const urgentRefunds =
+    urgentRefundsResponse?.status === 200
+      ? urgentRefundsResponse.data.data
+      : null;
+  const unconfirmedOrders =
+    unconfirmedOrdersResponse?.status === 200
+      ? unconfirmedOrdersResponse.data.data
+      : null;
+
+  if (
+    isSummaryLoading ||
+    isUrgentRefundsLoading ||
+    isUnconfirmedOrdersLoading
+  ) {
+    return (
+      <p className="body-lg-regular text-text-tertiary">
+        불러오는 중입니다...
+      </p>
+    );
+  }
+
+  if (
+    isSummaryError ||
+    isUrgentRefundsError ||
+    isUnconfirmedOrdersError ||
+    !summary ||
+    !urgentRefunds ||
+    !unconfirmedOrders
+  ) {
+    return (
+      <p className="body-lg-regular text-accent-red-500">
+        대시보드 데이터를 불러오지 못했습니다.
+      </p>
+    );
+  }
+
+  const metrics = [
+    {
+      label: '검토 대기 환불',
+      value: pendingRefundCount !== null ? `${pendingRefundCount}건` : '-',
+      description: `총 환불 금액: ${formatCurrency(summary.pendingRefundAmount)}`,
+      icon: 'figma:refund-refresh',
+      trend: {
+        text: formatChangeRate(summary.pendingRefundAmountChangeRate),
+        tone: getChangeTone(summary.pendingRefundAmountChangeRate),
+      },
+    },
+    {
+      label: '개설 승인 대기',
+      value: `${summary.pendingApprovalCount}건`,
+      description: `평균 검토 시간: ${(summary.averageReviewMinutes / 60).toFixed(1)}시간`,
+      icon: 'figma:hourglass',
+      trend: {
+        text: formatChangeRate(summary.pendingApprovalChangeRate),
+        tone: getChangeTone(summary.pendingApprovalChangeRate),
+      },
+    },
+    {
+      label: '발주 미확정',
+      value: `${summary.unconfirmedOrderCount}건`,
+      description: `48시간 초과: ${summary.unconfirmedOrderOver48hCount}건`,
+      icon: 'mynaui:truck',
+    },
+    {
+      label: '오늘 처리 완료',
+      value: `${summary.todayCompletedRefundCount + summary.todayCompletedApprovalCount}건`,
+      description: `환불 ${summary.todayCompletedRefundCount}건 · 승인 ${summary.todayCompletedApprovalCount}건`,
+      icon: 'figma:check-circle',
+    },
+  ];
+
+  const urgentRefundRows = urgentRefunds.content.map((item) => ({
+    requestId: `REF-${item.requestId}`,
+    caseLabel: REFUND_CASE_LABELS[item.caseFilter],
+    customerName: item.consumerName,
+    itemName: item.groupBuyName,
+    amount: formatCurrency(item.refundAmount),
+    requestedAt: formatDateTime(item.requestedAt),
+    sla: formatRefundSla(item.slaElapsedHours),
+  }));
+
+  const pendingOrderRows = unconfirmedOrders.content.map((item) => ({
+    orderId: `ORD-${item.orderId}`,
+    itemName: item.productName,
+    storeName: item.storeName,
+    achievedAt: formatDate(item.achievedAt),
+    elapsedLabel: formatOrderElapsedLabel(item.elapsedHours, item.overdue),
+    elapsedHours: item.elapsedHours,
+    slaHours: ORDER_SLA_THRESHOLD_HOURS,
+  }));
+
   return (
     <div className="flex flex-col gap-g6">
       <div className="flex flex-col gap-g4">
         <h1 className="title-md-bold text-text-basic">대시보드</h1>
         <div className="flex flex-row gap-g7">
-          {METRICS.map((metric) => (
+          {metrics.map((metric) => (
             <MetricCard key={metric.label} {...metric} />
           ))}
         </div>
       </div>
-      <AlertBanner
-        title="긴급 처리 필요"
-        description="SLA 초과 환불 요청 3건, 발주 미확정 48시간 초과 1건"
-      />
+      {(urgentRefunds.hasUrgentRefunds || summary.hasOrderOver48h) && (
+        <AlertBanner
+          title="긴급 처리 필요"
+          description={`SLA 초과 환불 요청 ${urgentRefunds.totalUrgentCount}건, 발주 미확정 48시간 초과 ${summary.unconfirmedOrderOver48hCount}건`}
+        />
+      )}
       <div className="flex flex-col gap-g4">
         <UrgentRefundsTable
           title="긴급 처리 필요 환불 요청"
           description="SLA 초과 또는 임박한 케이스"
-          rows={URGENT_REFUND_ROWS}
+          rows={urgentRefundRows}
         />
         <PendingOrdersTable
           title="발주 미확정 모니터링"
           description="달성 후 48시간 경과 시 어드민 개입 필요"
-          rows={PENDING_ORDER_ROWS}
+          rows={pendingOrderRows}
         />
       </div>
     </div>

@@ -6,6 +6,7 @@ import type { RefundMockRow } from '../types';
 interface RefundsTableProps {
   rows: RefundMockRow[];
   onProcess: (requestId: string) => void;
+  onSelectRow: (requestId: string) => void;
 }
 
 const HEADERS = [
@@ -50,7 +51,11 @@ function Pill({
 
 const CAN_PROCESS: RefundMockRow['status'][] = ['검토대기', '처리중'];
 
-export function RefundsTable({ rows, onProcess }: RefundsTableProps) {
+export function RefundsTable({
+  rows,
+  onProcess,
+  onSelectRow,
+}: RefundsTableProps) {
   return (
     <div className="overflow-x-auto rounded-large border border-border-subtle">
       <table className="w-full border-collapse">
@@ -81,7 +86,8 @@ export function RefundsTable({ rows, onProcess }: RefundsTableProps) {
             rows.map((row) => (
               <tr
                 key={row.requestId}
-                className="border-b border-border-default"
+                onClick={() => onSelectRow(row.requestId)}
+                className="cursor-pointer border-b border-border-default hover:bg-gray-25"
               >
                 <td className="whitespace-nowrap p-p6 heading-sm-regular text-text-subtle">
                   {row.requestId}
@@ -147,7 +153,10 @@ export function RefundsTable({ rows, onProcess }: RefundsTableProps) {
                       variant="brand-soft"
                       size="admin"
                       className="border border-primary-400"
-                      onClick={() => onProcess(row.requestId)}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onProcess(row.requestId);
+                      }}
                     >
                       처리 전
                     </Button>

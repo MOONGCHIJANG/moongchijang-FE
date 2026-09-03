@@ -5,6 +5,7 @@ import { Icon } from '@iconify/react';
 import { Input } from '@moongchijang/ui';
 import { useGetApiV1AdminDashboardUrgentRefunds } from '@moongchijang/api-client/hooks/admin/admin';
 import { AlertBanner } from '@/components/AlertBanner';
+import { RefundDetailModal } from './_components/RefundDetailModal';
 import { RefundStatusTabs } from './_components/RefundStatusTabs';
 import { RefundsTable } from './_components/RefundsTable';
 import { REFUND_MOCK_ROWS } from './_mock/refundMockData';
@@ -23,9 +24,14 @@ const TABS_WITH_COUNT: (RefundStatus | 'ALL')[] = ['검토대기', '처리중'];
 export default function AdminRefundsPage() {
   const [status, setStatus] = useState<RefundStatus | 'ALL'>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
-  // 목업 데이터라 처리 결과를 서버에 반영할 수 없어, "처리 전" 클릭 시 화면에서만
-  // 처리 완료로 전환해 인터랙션을 보여준다. 실제 API 연동 시 뮤테이션으로 교체 필요.
-  const [completedRequestIds, setCompletedRequestIds] = useState<string[]>([]);
+  const [selectedRequestId, setSelectedRequestId] = useState<string | null>(
+    null,
+  );
+  // 목업 데이터라 처리 결과를 서버에 반영할 수 없어, "처리 전"·상세 모달의 승인/거절
+  // 클릭 시 화면에서만 상태를 전환해 인터랙션을 보여준다. 실제 API 연동 시 뮤테이션으로 교체 필요.
+  const [statusOverrides, setStatusOverrides] = useState<
+    Record<string, RefundStatus>
+  >({});
 
   const { data: urgentRefundsResponse } =
     useGetApiV1AdminDashboardUrgentRefunds();
@@ -37,12 +43,15 @@ export default function AdminRefundsPage() {
   const rows = useMemo(
     () =>
       REFUND_MOCK_ROWS.map((row) =>
-        completedRequestIds.includes(row.requestId)
-          ? { ...row, status: '승인완료' as RefundStatus }
+        statusOverrides[row.requestId]
+          ? { ...row, status: statusOverrides[row.requestId] }
           : row,
       ),
-    [completedRequestIds],
+    [statusOverrides],
   );
+
+  const selectedRow =
+    rows.find((row) => row.requestId === selectedRequestId) ?? null;
 
   const counts = useMemo(() => {
     const base: Record<RefundStatus | 'ALL', number> = {
@@ -129,10 +138,24 @@ export default function AdminRefundsPage() {
         <RefundsTable
           rows={filteredRows}
           onProcess={(requestId) =>
-            setCompletedRequestIds((prev) => [...prev, requestId])
+            setStatusOverrides((prev) => ({ ...prev, [requestId]: '승인완료' }))
           }
+          onSelectRow={setSelectedRequestId}
         />
       </div>
+
+      <RefundDetailModal
+        row={selectedRow}
+        onClose={() => setSelectedRequestId(null)}
+        onApprove={(requestId) => {
+          setStatusOverrides((prev) => ({ ...prev, [requestId]: '승인완료' }));
+          setSelectedRequestId(null);
+        }}
+        onReject={(requestId) => {
+          setStatusOverrides((prev) => ({ ...prev, [requestId]: '거절' }));
+          setSelectedRequestId(null);
+        }}
+      />
     </div>
   );
 }

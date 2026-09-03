@@ -1,47 +1,33 @@
 'use client';
 
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { Icon } from '@iconify/react';
 import { Button, Input } from '@moongchijang/ui';
+import { usePostApiV1AdminRefundsParticipationIdManual } from '@moongchijang/api-client/hooks/admin/admin';
+import {
+  AdminManualRefundRefundReason,
+  type ApiResponseAdminRefundPageDataContentItem,
+} from '@moongchijang/api-client/generated/api.schemas';
 import { Modal } from '@/components/Modal';
-import { AlertBanner } from '@/components/AlertBanner';
-import { StatusBadge } from '@/components/StatusBadge';
 import { cn } from '@/lib/utils';
 import { Chip } from './Chip';
-import type { RefundHistoryEntry, RefundMockRow, RefundStatus } from '../types';
 
 interface RefundDetailModalProps {
-  row: RefundMockRow | null;
+  row: ApiResponseAdminRefundPageDataContentItem | null;
   onClose: () => void;
-  onApprove: (requestId: string) => void;
-  onReject: (requestId: string) => void;
 }
-
-const CAN_DECIDE: RefundStatus[] = ['검토대기', '처리중'];
 
 function formatCurrency(amount: number) {
   return `₩${amount.toLocaleString('ko-KR')}`;
 }
 
-function formatWon(amount: number) {
-  return `${amount.toLocaleString('ko-KR')} 원`;
-}
-
-function Section({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="flex flex-col gap-g5 rounded-large border border-border-subtle bg-bg-white p-g7">
-      <h3 className="heading-lg-bold text-text-subtle">{title}</h3>
-      <div className="h-px bg-border-default" />
-      {children}
-    </section>
-  );
-}
+const REASON_OPTIONS: { value: AdminManualRefundRefundReason; label: string }[] = [
+  { value: AdminManualRefundRefundReason.NOT_ACHIEVED, label: '공구 미달성' },
+  { value: AdminManualRefundRefundReason.EARLY_EXIT, label: '중도 포기' },
+  { value: AdminManualRefundRefundReason.PAYMENT_ERROR, label: '결제 오류' },
+  { value: AdminManualRefundRefundReason.OTHER, label: '기타' },
+];
 
 function InfoGrid({
   items,
@@ -50,7 +36,7 @@ function InfoGrid({
 }) {
   return (
     <div className="flex items-start justify-between gap-g8">
-      <div className="flex shrink-0 flex-col gap-g6">
+      <div className="flex shrink-0 flex-col gap-g5">
         {items.map((item) => (
           <span
             key={item.label}
@@ -60,7 +46,7 @@ function InfoGrid({
           </span>
         ))}
       </div>
-      <div className="flex flex-col items-end gap-g6">
+      <div className="flex flex-col items-end gap-g5">
         {items.map((item) => (
           <div key={item.label} className="heading-sm-regular text-text-basic">
             {item.value}
@@ -71,47 +57,38 @@ function InfoGrid({
   );
 }
 
-function HistoryItem({ entry }: { entry: RefundHistoryEntry }) {
-  return (
-    <div
-      className={cn(
-        'flex flex-col gap-g2 self-stretch rounded-large border-l-2 p-g6',
-        entry.tone === 'warning'
-          ? 'border-secondary-400 bg-secondary-25'
-          : 'border-gray-400 bg-gray-25',
-      )}
-    >
-      <p className="heading-md-bold text-text-basic">{entry.title}</p>
-      <div className="flex flex-col">
-        <span className="body-lg-regular text-text-subtle">
-          {entry.datetime}
-        </span>
-        <span className="body-lg-regular text-text-subtle">
-          {entry.description}
-        </span>
-      </div>
-    </div>
-  );
-}
-
 function RefundDetailContent({
   row,
   onClose,
-  onApprove,
-  onReject,
 }: {
-  row: RefundMockRow;
+  row: ApiResponseAdminRefundPageDataContentItem;
   onClose: () => void;
-  onApprove: (requestId: string) => void;
-  onReject: (requestId: string) => void;
 }) {
-  const [refundAmountInput, setRefundAmountInput] = useState(
-    String(row.refundAmount),
+  const queryClient = useQueryClient();
+  const [reason, setReason] = useState<AdminManualRefundRefundReason>(
+    AdminManualRefundRefundReason.NOT_ACHIEVED,
   );
-  const { detail } = row;
-  // G-분쟁 케이스만 CS 티켓 중재·부분 환불 안내를 노출한다 (Figma node-id=6402-28543 기준).
-  const isDispute = row.caseLabel.startsWith('G');
-  const canDecide = CAN_DECIDE.includes(row.status);
+  const [detailReason, setDetailReason] = useState('');
+
+  const { mutate, isPending, data: mutationResponse } =
+    usePostApiV1AdminRefundsParticipationIdManual({
+      mutation: {
+        onSuccess: (response) => {
+          if (response.status === 200) {
+            queryClient.invalidateQueries({ queryKey: ['/api/v1/admin/refunds'] });
+            queryClient.invalidateQueries({
+              queryKey: ['/api/v1/admin/dashboard/urgent-refunds'],
+            });
+            onClose();
+          }
+        },
+      },
+    });
+
+  const conflictMessage =
+    mutationResponse?.status === 409 ? mutationResponse.data.error.message : null;
+
+  const isWaiting = row.refundStatus === 'WAITING';
 
   return (
     <>
@@ -119,17 +96,11 @@ function RefundDetailContent({
         <div className="flex flex-col gap-g3">
           <div className="flex flex-wrap items-center gap-g4">
             <h2 className="heading-1xl-bold text-text-basic">
-              환불 요청 상세 - {row.requestId}
+              환불 처리 - #{row.participationId}
             </h2>
-            <Chip tone="brand">{row.caseLabel}</Chip>
-            {row.slaLabel && (
-              <div className="inline-flex items-center gap-3.5 rounded-3xlarge bg-[#E8F1FF] px-g4 py-g2">
-                <span className="body-md-bold text-text-info">SLA</span>
-                <span className="body-md-regular text-text-info">
-                  {row.slaLabel}
-                </span>
-              </div>
-            )}
+            <Chip tone={isWaiting ? 'outline' : 'success'}>
+              {isWaiting ? '대기중' : '완료'}
+            </Chip>
           </div>
           <p className="body-md-regular text-text-tertiary">
             {row.storeName} · {row.productName}
@@ -146,230 +117,97 @@ function RefundDetailContent({
       </div>
 
       <div className="flex flex-col gap-g5 p-g7">
-        {isDispute && detail.csTicketId && (
-          <AlertBanner
-            tone="danger"
-            size="lg"
-            title="사장님이 이의를 제기했습니다."
-            description={`CS 티켓(${detail.csTicketId})이 생성되었으며, 중재가 필요합니다.`}
+        <section className="flex flex-col gap-g5 rounded-large border border-border-subtle bg-bg-white p-g7">
+          <InfoGrid
+            items={[
+              { label: '참여 ID', value: row.participationId },
+              { label: '소비자', value: row.userName },
+              { label: '공구명', value: row.productName },
+              { label: '매장명', value: row.storeName },
+              { label: '결제 금액', value: formatCurrency(row.paymentAmount) },
+              { label: '환불 사유', value: row.refundReason ?? '-' },
+              { label: '요청 일시', value: row.createdAt },
+            ]}
           />
+        </section>
+
+        {isWaiting ? (
+          <section className="flex flex-col gap-g5 rounded-large border border-border-subtle bg-bg-white p-g7">
+            <h3 className="heading-lg-bold text-text-subtle">환불 처리</h3>
+            <div className="h-px bg-border-default" />
+
+            <div className="flex flex-col gap-g3">
+              <span className="body-md-semibold text-text-subtle">
+                처리 사유
+              </span>
+              <div className="flex flex-wrap gap-g3">
+                {REASON_OPTIONS.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => setReason(option.value)}
+                    className={cn(
+                      'rounded-full border px-g5 py-g3 body-md-regular transition-colors',
+                      reason === option.value
+                        ? 'border-primary-400 bg-primary-50 text-primary-400'
+                        : 'border-border-default text-text-subtle',
+                    )}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <Input
+              variant="admin"
+              label="상세 사유 (선택)"
+              maxLength={100}
+              value={detailReason}
+              onChange={(event) => setDetailReason(event.target.value)}
+              placeholder="필요 시 상세 사유를 입력하세요"
+            />
+
+            {conflictMessage && (
+              <p className="body-md-regular text-text-error">{conflictMessage}</p>
+            )}
+
+            <Button
+              variant="primary"
+              size="lg"
+              fullWidth
+              disabled={isPending}
+              onClick={() =>
+                mutate({
+                  participationId: row.participationId,
+                  data: {
+                    refundReason: reason,
+                    detailReason: detailReason.trim() || undefined,
+                  },
+                })
+              }
+            >
+              환불 처리
+            </Button>
+          </section>
+        ) : (
+          <div className="flex items-center justify-center rounded-large bg-gray-50 p-g6">
+            <Chip tone="success">이미 처리된 환불입니다</Chip>
+          </div>
         )}
-
-        <div className="grid grid-cols-1 gap-g5 lg:grid-cols-2">
-          <Section title="소비자 정보">
-            <InfoGrid
-              items={[
-                { label: '닉네임', value: row.customerName },
-                { label: '전화번호', value: row.customerPhone },
-                { label: '이메일', value: detail.customerEmail },
-                {
-                  label: '가입 방식',
-                  value: (
-                    <Chip tone="outline">{detail.customerJoinMethod}</Chip>
-                  ),
-                },
-              ]}
-            />
-          </Section>
-
-          <Section title="공구 정보">
-            <InfoGrid
-              items={[
-                { label: '공구명', value: row.productName },
-                {
-                  label: '매장명',
-                  value: `${row.storeName}(${row.storePhone})`,
-                },
-                {
-                  label: '달성 여부',
-                  value: (
-                    <Chip tone={detail.achieved ? 'success' : 'gray'}>
-                      {detail.achieved ? '달성' : '미달성'}
-                    </Chip>
-                  ),
-                },
-                { label: '픽업일', value: detail.pickupDate },
-                { label: '픽업 장소', value: detail.pickupLocation },
-              ]}
-            />
-          </Section>
-        </div>
-
-        <Section title="환불 요청 정보">
-          <InfoGrid
-            items={[
-              {
-                label: '환불 사유',
-                value: <Chip tone="gray">{detail.refundReason}</Chip>,
-              },
-              { label: '요청 일시', value: row.requestedAt },
-              {
-                label: '상세 설명',
-                value: <p className="max-w-sm">{detail.refundDescription}</p>,
-              },
-            ]}
-          />
-        </Section>
-
-        <Section title="결제 정보">
-          <InfoGrid
-            items={[
-              {
-                label: '결제 금액',
-                value: formatCurrency(row.paymentAmount),
-              },
-              { label: '결제 수단', value: detail.paymentMethod },
-              { label: '승인 번호', value: detail.approvalNumber },
-              { label: '결제 일시', value: detail.paidAt },
-            ]}
-          />
-        </Section>
-
-        <Section title="매장 의견">
-          {detail.storeOpinionContent ? (
-            <InfoGrid
-              items={[
-                {
-                  label: '의견 제출 일시',
-                  value: detail.storeOpinionSubmittedAt,
-                },
-                {
-                  label: '의견 내용',
-                  value: (
-                    <p className="max-w-sm">{detail.storeOpinionContent}</p>
-                  ),
-                },
-              ]}
-            />
-          ) : (
-            <p className="heading-sm-regular text-text-tertiary">
-              아직 매장 의견이 제출되지 않았습니다.
-            </p>
-          )}
-        </Section>
-
-        <Section title="처리 이력">
-          <div className="flex flex-col gap-g4">
-            {detail.history.map((entry) => (
-              <HistoryItem
-                key={`${entry.title}-${entry.datetime}`}
-                entry={entry}
-              />
-            ))}
-          </div>
-        </Section>
-
-        <Section title="환불 금액 신청">
-          <div className="flex flex-col gap-g6">
-            <div className="flex items-start justify-between gap-g6">
-              <div className="flex flex-col gap-g6">
-                <span className="heading-sm-medium text-text-basic">
-                  결제 금액
-                </span>
-                <span className="heading-1xl-bold text-text-subtle">
-                  환불 예정 금액
-                </span>
-              </div>
-              <div className="flex flex-col items-end gap-g6">
-                <span className="heading-sm-regular text-text-subtle">
-                  {formatWon(row.paymentAmount)}
-                </span>
-                <span className="heading-1xl-bold text-text-info">
-                  {formatWon(row.refundAmount)}
-                </span>
-              </div>
-            </div>
-
-            {isDispute && (
-              <AlertBanner
-                tone="info"
-                size="sm"
-                title="케이스 G는 부분 환불이 가능합니다. 아래에서 금액을 수정할 수 있습니다."
-              />
-            )}
-
-            <div className="rounded-large border border-border-default p-g7">
-              <div className="flex items-center justify-end gap-g4">
-                <label htmlFor="refund-amount-input" className="sr-only">
-                  환불 금액
-                </label>
-                <Input
-                  id="refund-amount-input"
-                  variant="admin"
-                  noHelperSpace
-                  inputMode="numeric"
-                  className="max-w-32 text-right"
-                  value={refundAmountInput}
-                  onChange={(event) =>
-                    setRefundAmountInput(
-                      event.target.value.replace(/[^0-9]/g, ''),
-                    )
-                  }
-                />
-                <span className="heading-lg-regular text-text-tertiary">
-                  원
-                </span>
-              </div>
-            </div>
-
-            <div className="border-t border-dashed border-border-default" />
-
-            {canDecide ? (
-              <div className="flex flex-col items-center gap-g3">
-                <div className="flex w-full flex-col gap-g4 sm:flex-row">
-                  <Button
-                    variant="primary"
-                    size="lg"
-                    fullWidth
-                    className="gap-g4 bg-info"
-                    onClick={() => onApprove(row.requestId)}
-                  >
-                    <Icon icon="lucide:check" width={22} height={22} />
-                    환불 승인
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    fullWidth
-                    className="gap-g4 border-accent-red-500 bg-bg-white text-accent-red-500"
-                    onClick={() => onReject(row.requestId)}
-                  >
-                    <Icon icon="lucide:circle-x" width={22} height={22} />
-                    환불 거절
-                  </Button>
-                </div>
-                <p className="heading-sm-medium text-text-subtle-inverse">
-                  승인 시 에스크로가 해제되고 PG 환불이 실행됩니다. 신중하게
-                  처리해주세요.
-                </p>
-              </div>
-            ) : (
-              <div className="flex items-center justify-center rounded-large bg-gray-50 p-g6">
-                <StatusBadge label={row.status} />
-              </div>
-            )}
-          </div>
-        </Section>
       </div>
     </>
   );
 }
 
-export function RefundDetailModal({
-  row,
-  onClose,
-  onApprove,
-  onReject,
-}: RefundDetailModalProps) {
+export function RefundDetailModal({ row, onClose }: RefundDetailModalProps) {
   return (
-    <Modal open={row !== null} onClose={onClose} className="max-w-4xl">
+    <Modal open={row !== null} onClose={onClose} className="max-w-2xl">
       {row && (
         <RefundDetailContent
-          key={row.requestId}
+          key={row.participationId}
           row={row}
           onClose={onClose}
-          onApprove={onApprove}
-          onReject={onReject}
         />
       )}
     </Modal>

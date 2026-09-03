@@ -1,10 +1,8 @@
 import { cn } from '@/lib/utils';
 
-type ChipTone = 'brand' | 'gray' | 'outline' | 'success';
+type ChipTone = 'outline' | 'success';
 
 const TONE_CLASS: Record<ChipTone, string> = {
-  brand: 'rounded-full bg-primary-50 px-g4 py-g2 text-primary-400 body-md-bold',
-  gray: 'rounded-full bg-gray-50 px-g4 py-g2 text-text-subtle caption-sm-regular',
   outline:
     'rounded-full border border-border-default bg-bg-white px-g4 py-g2 text-text-subtle caption-sm-regular',
   success:
@@ -17,7 +15,7 @@ interface ChipProps {
   className?: string;
 }
 
-export function Chip({ children, tone = 'gray', className }: ChipProps) {
+export function Chip({ children, tone = 'outline', className }: ChipProps) {
   return (
     <span
       className={cn(

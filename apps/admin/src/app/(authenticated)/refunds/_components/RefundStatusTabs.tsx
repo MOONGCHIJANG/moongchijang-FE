@@ -1,16 +1,16 @@
 import { cn } from '@/lib/utils';
-import type { RefundStatus } from '../types';
+import type { GetApiV1AdminRefundsStatus } from '@moongchijang/api-client/generated/api.schemas';
 
 interface RefundStatusTab {
-  status: RefundStatus | 'ALL';
+  status: GetApiV1AdminRefundsStatus;
   label: string;
   count?: number;
 }
 
 interface RefundStatusTabsProps {
   tabs: RefundStatusTab[];
-  selected: RefundStatus | 'ALL';
-  onSelect: (status: RefundStatus | 'ALL') => void;
+  selected: GetApiV1AdminRefundsStatus;
+  onSelect: (status: GetApiV1AdminRefundsStatus) => void;
 }
 
 export function RefundStatusTabs({

@@ -1,25 +1,21 @@
 import { Button } from '@moongchijang/ui';
-import { StatusBadge } from '@/components/StatusBadge';
-import { cn } from '@/lib/utils';
-import type { RefundMockRow } from '../types';
+import type { ApiResponseAdminRefundPageDataContentItem } from '@moongchijang/api-client/generated/api.schemas';
+import { Chip } from './Chip';
 
 interface RefundsTableProps {
-  rows: RefundMockRow[];
-  onProcess: (requestId: string) => void;
-  onSelectRow: (requestId: string) => void;
+  rows: ApiResponseAdminRefundPageDataContentItem[];
+  isLoading: boolean;
+  onSelectRow: (participationId: number) => void;
 }
 
 const HEADERS = [
-  '요청 ID',
-  '케이스',
+  '참여 ID',
   '소비자',
   '공구명',
   '매장명',
   '결제 금액',
-  '환불 금액',
-  '매장 의견',
+  '환불 사유',
   '요청 일시',
-  'SLA',
   '상태',
   '작업',
 ];
@@ -28,32 +24,9 @@ function formatCurrency(amount: number) {
   return `₩${amount.toLocaleString('ko-KR')}`;
 }
 
-function Pill({
-  children,
-  tone = 'neutral',
-}: {
-  children: React.ReactNode;
-  tone?: 'neutral' | 'brand';
-}) {
-  return (
-    <span
-      className={cn(
-        'inline-flex items-center justify-center rounded-full px-g4 py-g2',
-        tone === 'brand'
-          ? 'bg-primary-50 text-primary-400 body-md-bold'
-          : 'border border-border-default text-text-subtle body-md-regular',
-      )}
-    >
-      {children}
-    </span>
-  );
-}
-
-const CAN_PROCESS: RefundMockRow['status'][] = ['검토대기', '처리중'];
-
 export function RefundsTable({
   rows,
-  onProcess,
+  isLoading,
   onSelectRow,
 }: RefundsTableProps) {
   return (
@@ -73,7 +46,16 @@ export function RefundsTable({
           </tr>
         </thead>
         <tbody>
-          {rows.length === 0 ? (
+          {isLoading ? (
+            <tr>
+              <td
+                colSpan={HEADERS.length}
+                className="p-p8 text-center heading-sm-regular text-text-tertiary"
+              >
+                불러오는 중...
+              </td>
+            </tr>
+          ) : rows.length === 0 ? (
             <tr>
               <td
                 colSpan={HEADERS.length}
@@ -85,30 +67,15 @@ export function RefundsTable({
           ) : (
             rows.map((row) => (
               <tr
-                key={row.requestId}
-                onClick={() => onSelectRow(row.requestId)}
+                key={row.participationId}
+                onClick={() => onSelectRow(row.participationId)}
                 className="cursor-pointer border-b border-border-default hover:bg-gray-25"
               >
                 <td className="whitespace-nowrap p-p6 heading-sm-regular text-text-subtle">
-                  {row.requestId}
+                  {row.participationId}
                 </td>
-                <td className="whitespace-nowrap p-p6">
-                  <div className="flex flex-col items-start gap-g2">
-                    <Pill tone="brand">{row.caseLabel}</Pill>
-                    <span className="heading-sm-regular text-text-basic">
-                      {row.caseDescription}
-                    </span>
-                  </div>
-                </td>
-                <td className="whitespace-nowrap p-p6">
-                  <div className="flex flex-col">
-                    <span className="heading-sm-semibold text-text-basic">
-                      {row.customerName}
-                    </span>
-                    <span className="body-md-regular text-text-tertiary">
-                      {row.customerPhone}
-                    </span>
-                  </div>
+                <td className="whitespace-nowrap p-p6 heading-sm-semibold text-text-basic">
+                  {row.userName}
                 </td>
                 <td className="whitespace-nowrap p-p6 heading-sm-regular text-text-subtle">
                   {row.productName}
@@ -119,46 +86,29 @@ export function RefundsTable({
                 <td className="whitespace-nowrap p-p6 heading-sm-regular text-text-subtle">
                   {formatCurrency(row.paymentAmount)}
                 </td>
-                <td className="whitespace-nowrap p-p6">
-                  <div className="flex flex-col">
-                    <span className="heading-sm-semibold text-text-basic">
-                      {formatCurrency(row.refundAmount)}
-                    </span>
-                    <span className="caption-sm-regular text-accent-red-500">
-                      {row.penaltyLabel}
-                    </span>
-                  </div>
-                </td>
-                <td className="whitespace-nowrap p-p6">
-                  <Pill>{row.storeOpinion}</Pill>
+                <td className="whitespace-nowrap p-p6 heading-sm-regular text-text-subtle">
+                  {row.refundReason ?? '-'}
                 </td>
                 <td className="whitespace-nowrap p-p6 heading-sm-regular text-text-subtle">
-                  {row.requestedAt}
+                  {row.createdAt}
                 </td>
                 <td className="whitespace-nowrap p-p6">
-                  {row.slaLabel ? (
-                    <StatusBadge label={row.slaLabel} />
-                  ) : (
-                    <span className="heading-sm-regular text-text-tertiary">
-                      -
-                    </span>
-                  )}
+                  <Chip tone={row.refundStatus === 'COMPLETED' ? 'success' : 'outline'}>
+                    {row.refundStatus === 'COMPLETED' ? '완료' : '대기중'}
+                  </Chip>
                 </td>
                 <td className="whitespace-nowrap p-p6">
-                  <Pill>{row.status}</Pill>
-                </td>
-                <td className="whitespace-nowrap p-p6">
-                  {CAN_PROCESS.includes(row.status) ? (
+                  {row.refundStatus === 'WAITING' ? (
                     <Button
                       variant="brand-soft"
                       size="admin"
                       className="border border-primary-400"
                       onClick={(event) => {
                         event.stopPropagation();
-                        onProcess(row.requestId);
+                        onSelectRow(row.participationId);
                       }}
                     >
-                      처리 전
+                      처리하기
                     </Button>
                   ) : (
                     <span className="inline-flex h-11 items-center justify-center rounded-lg bg-gray-100 px-g6 caption-sm-semibold text-text-tertiary">

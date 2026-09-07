@@ -99,6 +99,7 @@ const overrideHandlers = [
       data: {
         pendingRefundAmount: 1240000,
         pendingRefundAmountChangeRate: -15,
+        reviewPendingRefundCount: 8,
         pendingApprovalCount: 5,
         averageReviewMinutes: 138,
         pendingApprovalChangeRate: 8,
@@ -122,7 +123,8 @@ const overrideHandlers = [
         content: [
           {
             requestId: 2401,
-            caseFilter: AdminDashboardUrgentRefundItemCaseFilter.POST_ACHIEVEMENT_CANCEL,
+            caseFilter:
+              AdminDashboardUrgentRefundItemCaseFilter.POST_ACHIEVEMENT_CANCEL,
             consumerName: '김**',
             groupBuyName: '베이글 10개 세트',
             refundAmount: 27000,
@@ -131,7 +133,8 @@ const overrideHandlers = [
           },
           {
             requestId: 2398,
-            caseFilter: AdminDashboardUrgentRefundItemCaseFilter.DISPUTE_OR_DROPOUT_REFUND,
+            caseFilter:
+              AdminDashboardUrgentRefundItemCaseFilter.DISPUTE_OR_DROPOUT_REFUND,
             consumerName: '이**',
             groupBuyName: '마카롱 박스',
             refundAmount: 35000,
@@ -140,7 +143,8 @@ const overrideHandlers = [
           },
           {
             requestId: 2395,
-            caseFilter: AdminDashboardUrgentRefundItemCaseFilter.PICKUP_PERIOD_NO_SHOW,
+            caseFilter:
+              AdminDashboardUrgentRefundItemCaseFilter.PICKUP_PERIOD_NO_SHOW,
             consumerName: '박**',
             groupBuyName: '크루아상 세트',
             refundAmount: 18000,

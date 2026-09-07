@@ -8,12 +8,15 @@ import {
   useGetApiV1AdminSummary,
   useGetApiV1AdminDashboardUrgentRefunds,
   useGetApiV1AdminDashboardUnconfirmedOrders,
-  useGetApiV1AdminRefunds,
 } from '@moongchijang/api-client/hooks/admin/admin';
 import {
   AdminDashboardUrgentRefundItemCaseFilter,
-  GetApiV1AdminRefundsStatus,
+  ApiResponseAdminDashboardSummaryData,
 } from '@moongchijang/api-client/generated/api.schemas';
+
+interface AdminSummaryData extends ApiResponseAdminDashboardSummaryData {
+  reviewPendingRefundCount?: number;
+}
 
 // caseFilter enum → 표시 라벨. 스펙에 A~G 코드/한글 라벨 매핑표가 없어 enum 의미를 그대로 번역했다.
 const REFUND_CASE_LABELS: Record<
@@ -69,14 +72,6 @@ export default function AdminDashboardPage() {
     isError: isSummaryError,
   } = useGetApiV1AdminSummary();
   const {
-    data: pendingRefundCountResponse,
-    isLoading: isPendingRefundCountLoading,
-    isError: isPendingRefundCountError,
-  } = useGetApiV1AdminRefunds({
-    status: GetApiV1AdminRefundsStatus.WAITING,
-    size: 1,
-  });
-  const {
     data: urgentRefundsResponse,
     isLoading: isUrgentRefundsLoading,
     isError: isUrgentRefundsError,
@@ -88,11 +83,10 @@ export default function AdminDashboardPage() {
   } = useGetApiV1AdminDashboardUnconfirmedOrders();
 
   const summary =
-    summaryResponse?.status === 200 ? summaryResponse.data.data : null;
-  const pendingRefundCount =
-    pendingRefundCountResponse?.status === 200
-      ? pendingRefundCountResponse.data.data.totalElements
+    summaryResponse?.status === 200
+      ? (summaryResponse.data.data as AdminSummaryData)
       : null;
+  const pendingRefundCount = summary?.reviewPendingRefundCount ?? 0;
   const urgentRefunds =
     urgentRefundsResponse?.status === 200
       ? urgentRefundsResponse.data.data
@@ -103,18 +97,13 @@ export default function AdminDashboardPage() {
       : null;
 
   const isLoading =
-    isSummaryLoading ||
-    isPendingRefundCountLoading ||
-    isUrgentRefundsLoading ||
-    isUnconfirmedOrdersLoading;
+    isSummaryLoading || isUrgentRefundsLoading || isUnconfirmedOrdersLoading;
 
   const isError =
     isSummaryError ||
-    isPendingRefundCountError ||
     isUrgentRefundsError ||
     isUnconfirmedOrdersError ||
     !summary ||
-    pendingRefundCount === null ||
     !urgentRefunds ||
     !unconfirmedOrders;
 

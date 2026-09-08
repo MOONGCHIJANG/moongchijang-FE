@@ -19,6 +19,11 @@ export const GetApiV1AdminSummaryResponse = zod.object({
     pendingRefundAmountChangeRate: zod
       .number()
       .describe('전일 대비 검토 대기 환불 금액 증감률(%)'),
+    reviewPendingRefundCount: zod
+      .number()
+      .describe(
+        '검토 대기 환불 건수. REFUND_PENDING 상태 중 사장님 환불 검토 상태가 PENDING 또는 null인 건수',
+      ),
     pendingApprovalCount: zod.number().describe('개설승인 대기 건수'),
     averageReviewMinutes: zod
       .number()
@@ -1208,70 +1213,305 @@ export const PostApiV1AdminOwnerGroupBuyRequestsRequestIdRejectResponse =
   });
 
 /**
- * @summary 환불 처리 현황 목록 (운영자)
+ * 환불 요청 탭/케이스/키워드 기준으로 어드민 환불 요청 목록을 조회한다.
+ * @summary 운영자 환불 요청 목록 조회
  */
-export const getApiV1AdminRefundsQueryStatusDefault = `ALL`;
-export const getApiV1AdminRefundsQueryPageDefault = 0;
-export const getApiV1AdminRefundsQuerySizeDefault = 20;
-export const getApiV1AdminRefundsQuerySizeMax = 100;
+export const getApiV1AdminRefundRequestsQueryTabDefault = `ALL`;
+export const getApiV1AdminRefundRequestsQueryCaseFilterDefault = `ALL`;
+export const getApiV1AdminRefundRequestsQueryPageDefault = 0;
+export const getApiV1AdminRefundRequestsQuerySizeDefault = 20;
+export const getApiV1AdminRefundRequestsQuerySizeMax = 100;
 
-export const GetApiV1AdminRefundsQueryParams = zod.object({
-  status: zod
-    .enum(['ALL', 'WAITING', 'COMPLETED'])
-    .default(getApiV1AdminRefundsQueryStatusDefault),
-  page: zod.number().default(getApiV1AdminRefundsQueryPageDefault),
+export const GetApiV1AdminRefundRequestsQueryParams = zod.object({
+  tab: zod
+    .enum(['ALL', 'REVIEW_PENDING', 'IN_PROGRESS', 'APPROVED', 'REJECTED'])
+    .default(getApiV1AdminRefundRequestsQueryTabDefault)
+    .describe('전체 \/ 검토 대기 \/ 처리 중 \/ 승인 완료 \/ 거절'),
+  caseFilter: zod
+    .enum([
+      'ALL',
+      'PRE_ACHIEVEMENT_FREE_CANCEL',
+      'POST_ACHIEVEMENT_CANCEL',
+      'PICKUP_PERIOD_NO_SHOW',
+      'OWNER_FAULT_CANCEL',
+      'TARGET_NOT_MET',
+      'DISPUTE_OR_DROPOUT_REFUND',
+    ])
+    .default(getApiV1AdminRefundRequestsQueryCaseFilterDefault)
+    .describe(
+      '전체 \/ 달성 전 자유 취소 \/ 달성 후 취소 \/ 픽업 기간 미수령 \/ 사장님 귀책 취소 \/ 목표 미달성 \/ 분쟁·하차 환불',
+    ),
+  keyword: zod.string().optional().describe('요청 ID, 소비자명, 공구명 검색어'),
+  page: zod.number().default(getApiV1AdminRefundRequestsQueryPageDefault),
   size: zod
     .number()
-    .max(getApiV1AdminRefundsQuerySizeMax)
-    .default(getApiV1AdminRefundsQuerySizeDefault),
+    .max(getApiV1AdminRefundRequestsQuerySizeMax)
+    .default(getApiV1AdminRefundRequestsQuerySizeDefault),
 });
 
-export const GetApiV1AdminRefundsResponse = zod.object({
+export const GetApiV1AdminRefundRequestsResponse = zod.object({
   success: zod.boolean(),
   data: zod.object({
     content: zod.array(
       zod.object({
-        participationId: zod.number(),
-        userName: zod.string(),
-        productName: zod.string(),
-        storeName: zod.string(),
-        paymentAmount: zod.number(),
-        refundStatus: zod.enum(['WAITING', 'COMPLETED']),
-        refundReason: zod.string().nullable(),
-        createdAt: zod.iso.datetime({ offset: true }),
+        requestId: zod
+          .number()
+          .describe('환불 요청 ID. 현재는 participationId와 동일'),
+        caseFilter: zod
+          .enum([
+            'ALL',
+            'PRE_ACHIEVEMENT_FREE_CANCEL',
+            'POST_ACHIEVEMENT_CANCEL',
+            'PICKUP_PERIOD_NO_SHOW',
+            'OWNER_FAULT_CANCEL',
+            'TARGET_NOT_MET',
+            'DISPUTE_OR_DROPOUT_REFUND',
+          ])
+          .describe('환불 케이스'),
+        consumerName: zod.string().describe('소비자명'),
+        groupBuyName: zod.string().describe('공구명'),
+        storeName: zod.string().describe('매장명'),
+        paymentAmount: zod.number().describe('결제 금액'),
+        refundAmount: zod
+          .number()
+          .describe(
+            '환불 금액. 승인 완료는 승인 환불 금액, 검토 대기는 0 또는 입력된 승인 금액',
+          ),
+        ownerOpinion: zod.string().nullish().describe('사장님 의견'),
+        requestedAt: zod.iso
+          .datetime({ offset: true })
+          .describe('환불 요청 일시'),
+        slaRemainingHours: zod.number().describe('24시간 SLA 기준 잔여 시간'),
+        slaWarning: zod.boolean().describe('요청 후 1시간 초과 여부'),
+        status: zod
+          .enum(['REVIEW_PENDING', 'IN_PROGRESS', 'APPROVED', 'REJECTED'])
+          .describe('어드민 환불 요청 처리 상태'),
+        actionable: zod
+          .boolean()
+          .describe(
+            '작업 가능 여부. REVIEW_PENDING\/IN_PROGRESS는 true, APPROVED\/REJECTED는 false',
+          ),
       }),
     ),
     totalElements: zod.number(),
     totalPages: zod.number(),
+    number: zod.number().describe('현재 페이지 번호(0-base)'),
+    size: zod.number().describe('페이지 크기'),
+    hasSlaWarning: zod
+      .boolean()
+      .describe('요청 후 1시간 초과 SLA 경고 건 존재 여부'),
+    slaWarningCount: zod.number().describe('요청 후 1시간 초과 SLA 경고 건수'),
   }),
   error: zod.unknown().nullable(),
 });
 
 /**
- * @summary 수동 환불 처리
+ * @summary 운영자 환불 요청 상세 조회
  */
-export const PostApiV1AdminRefundsParticipationIdManualParams = zod.object({
-  participationId: zod.number(),
+export const GetApiV1AdminRefundRequestsRequestIdParams = zod.object({
+  requestId: zod.number(),
 });
 
-export const postApiV1AdminRefundsParticipationIdManualBodyDetailReasonMax = 100;
-
-export const PostApiV1AdminRefundsParticipationIdManualBody = zod.object({
-  refundReason: zod.enum([
-    'NOT_ACHIEVED',
-    'EARLY_EXIT',
-    'PAYMENT_ERROR',
-    'OTHER',
-  ]),
-  detailReason: zod
-    .string()
-    .max(postApiV1AdminRefundsParticipationIdManualBodyDetailReasonMax)
-    .nullish(),
-});
-
-export const PostApiV1AdminRefundsParticipationIdManualResponse = zod.object({
+export const GetApiV1AdminRefundRequestsRequestIdResponse = zod.object({
   success: zod.boolean(),
-  data: zod.unknown().nullable(),
+  data: zod.object({
+    requestId: zod
+      .number()
+      .describe('환불 요청 ID. 현재는 participationId와 동일'),
+    status: zod
+      .enum(['REVIEW_PENDING', 'IN_PROGRESS', 'APPROVED', 'REJECTED'])
+      .describe('어드민 환불 요청 처리 상태'),
+    slaRemainingHours: zod.number().describe('24시간 SLA 기준 잔여 시간'),
+    slaWarning: zod.boolean().describe('요청 후 1시간 초과 여부'),
+    consumerNickname: zod.string().nullish().describe('소비자 닉네임'),
+    consumerPhoneNumber: zod.string().nullish().describe('소비자 전화번호'),
+    consumerEmail: zod.string().nullish().describe('소비자 이메일'),
+    signupProvider: zod.enum(['KAKAO', 'EMAIL']).describe('가입 방식'),
+    groupBuyName: zod.string().describe('공구명'),
+    storeName: zod.string().describe('매장명'),
+    achieved: zod
+      .boolean()
+      .describe(
+        '공구 달성 여부. ACHIEVED, COMPLETED, CLOSED 상태는 true로 응답',
+      ),
+    pickupDate: zod.iso.date().describe('픽업일(YYYY-MM-DD)'),
+    pickupLocation: zod.string().describe('픽업 장소'),
+    paymentAmount: zod.number().describe('결제 금액'),
+    refundExpectedAmount: zod.number().describe('환불 예정 금액'),
+    paymentMethod: zod.string().nullish().describe('결제 수단'),
+    approvalNumber: zod.string().nullish().describe('승인 번호'),
+    paidAt: zod.iso.datetime({ offset: true }).nullish().describe('결제 일시'),
+    refundReason: zod
+      .string()
+      .describe(
+        '환불 사유 라벨. 자동 환불은 목표 미달성 또는 사장님 귀책 취소로 응답',
+      ),
+    refundReasonDetail: zod.string().nullish().describe('환불 상세 설명'),
+    requestedAt: zod.iso.datetime({ offset: true }).describe('환불 요청 일시'),
+    ownerOpinionSubmittedAt: zod.iso
+      .datetime({ offset: true })
+      .nullish()
+      .describe('사장님 의견 제출 일시'),
+    ownerOpinion: zod.string().nullish().describe('사장님 의견 내용'),
+    histories: zod
+      .array(
+        zod.object({
+          type: zod.string().describe('이력 타입'),
+          occurredAt: zod.iso.datetime({ offset: true }).describe('이력 시각'),
+          memo: zod.string().nullish().describe('이력 메모'),
+        }),
+      )
+      .describe('처리 이력'),
+  }),
+  error: zod.unknown().nullable(),
+});
+
+/**
+ * @summary 운영자 환불 요청 승인 처리
+ */
+export const PatchApiV1AdminRefundRequestsRequestIdApproveParams = zod.object({
+  requestId: zod.number(),
+});
+
+export const patchApiV1AdminRefundRequestsRequestIdApproveBodyRefundAmountMin = 0;
+
+export const PatchApiV1AdminRefundRequestsRequestIdApproveBody = zod.object({
+  refundAmount: zod
+    .number()
+    .min(patchApiV1AdminRefundRequestsRequestIdApproveBodyRefundAmountMin)
+    .describe('환불 승인 금액'),
+});
+
+export const PatchApiV1AdminRefundRequestsRequestIdApproveResponse = zod.object(
+  {
+    success: zod.boolean(),
+    data: zod.object({
+      requestId: zod
+        .number()
+        .describe('환불 요청 ID. 현재는 participationId와 동일'),
+      status: zod
+        .enum(['REVIEW_PENDING', 'IN_PROGRESS', 'APPROVED', 'REJECTED'])
+        .describe('어드민 환불 요청 처리 상태'),
+      slaRemainingHours: zod.number().describe('24시간 SLA 기준 잔여 시간'),
+      slaWarning: zod.boolean().describe('요청 후 1시간 초과 여부'),
+      consumerNickname: zod.string().nullish().describe('소비자 닉네임'),
+      consumerPhoneNumber: zod.string().nullish().describe('소비자 전화번호'),
+      consumerEmail: zod.string().nullish().describe('소비자 이메일'),
+      signupProvider: zod.enum(['KAKAO', 'EMAIL']).describe('가입 방식'),
+      groupBuyName: zod.string().describe('공구명'),
+      storeName: zod.string().describe('매장명'),
+      achieved: zod
+        .boolean()
+        .describe(
+          '공구 달성 여부. ACHIEVED, COMPLETED, CLOSED 상태는 true로 응답',
+        ),
+      pickupDate: zod.iso.date().describe('픽업일(YYYY-MM-DD)'),
+      pickupLocation: zod.string().describe('픽업 장소'),
+      paymentAmount: zod.number().describe('결제 금액'),
+      refundExpectedAmount: zod.number().describe('환불 예정 금액'),
+      paymentMethod: zod.string().nullish().describe('결제 수단'),
+      approvalNumber: zod.string().nullish().describe('승인 번호'),
+      paidAt: zod.iso
+        .datetime({ offset: true })
+        .nullish()
+        .describe('결제 일시'),
+      refundReason: zod
+        .string()
+        .describe(
+          '환불 사유 라벨. 자동 환불은 목표 미달성 또는 사장님 귀책 취소로 응답',
+        ),
+      refundReasonDetail: zod.string().nullish().describe('환불 상세 설명'),
+      requestedAt: zod.iso
+        .datetime({ offset: true })
+        .describe('환불 요청 일시'),
+      ownerOpinionSubmittedAt: zod.iso
+        .datetime({ offset: true })
+        .nullish()
+        .describe('사장님 의견 제출 일시'),
+      ownerOpinion: zod.string().nullish().describe('사장님 의견 내용'),
+      histories: zod
+        .array(
+          zod.object({
+            type: zod.string().describe('이력 타입'),
+            occurredAt: zod.iso
+              .datetime({ offset: true })
+              .describe('이력 시각'),
+            memo: zod.string().nullish().describe('이력 메모'),
+          }),
+        )
+        .describe('처리 이력'),
+    }),
+    error: zod.unknown().nullable(),
+  },
+);
+
+/**
+ * @summary 운영자 환불 요청 거절 처리
+ */
+export const PatchApiV1AdminRefundRequestsRequestIdRejectParams = zod.object({
+  requestId: zod.number(),
+});
+
+export const patchApiV1AdminRefundRequestsRequestIdRejectBodyRejectionReasonMax = 200;
+
+export const PatchApiV1AdminRefundRequestsRequestIdRejectBody = zod.object({
+  rejectionReason: zod
+    .string()
+    .max(patchApiV1AdminRefundRequestsRequestIdRejectBodyRejectionReasonMax)
+    .describe('환불 요청 거절 사유'),
+});
+
+export const PatchApiV1AdminRefundRequestsRequestIdRejectResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    requestId: zod
+      .number()
+      .describe('환불 요청 ID. 현재는 participationId와 동일'),
+    status: zod
+      .enum(['REVIEW_PENDING', 'IN_PROGRESS', 'APPROVED', 'REJECTED'])
+      .describe('어드민 환불 요청 처리 상태'),
+    slaRemainingHours: zod.number().describe('24시간 SLA 기준 잔여 시간'),
+    slaWarning: zod.boolean().describe('요청 후 1시간 초과 여부'),
+    consumerNickname: zod.string().nullish().describe('소비자 닉네임'),
+    consumerPhoneNumber: zod.string().nullish().describe('소비자 전화번호'),
+    consumerEmail: zod.string().nullish().describe('소비자 이메일'),
+    signupProvider: zod.enum(['KAKAO', 'EMAIL']).describe('가입 방식'),
+    groupBuyName: zod.string().describe('공구명'),
+    storeName: zod.string().describe('매장명'),
+    achieved: zod
+      .boolean()
+      .describe(
+        '공구 달성 여부. ACHIEVED, COMPLETED, CLOSED 상태는 true로 응답',
+      ),
+    pickupDate: zod.iso.date().describe('픽업일(YYYY-MM-DD)'),
+    pickupLocation: zod.string().describe('픽업 장소'),
+    paymentAmount: zod.number().describe('결제 금액'),
+    refundExpectedAmount: zod.number().describe('환불 예정 금액'),
+    paymentMethod: zod.string().nullish().describe('결제 수단'),
+    approvalNumber: zod.string().nullish().describe('승인 번호'),
+    paidAt: zod.iso.datetime({ offset: true }).nullish().describe('결제 일시'),
+    refundReason: zod
+      .string()
+      .describe(
+        '환불 사유 라벨. 자동 환불은 목표 미달성 또는 사장님 귀책 취소로 응답',
+      ),
+    refundReasonDetail: zod.string().nullish().describe('환불 상세 설명'),
+    requestedAt: zod.iso.datetime({ offset: true }).describe('환불 요청 일시'),
+    ownerOpinionSubmittedAt: zod.iso
+      .datetime({ offset: true })
+      .nullish()
+      .describe('사장님 의견 제출 일시'),
+    ownerOpinion: zod.string().nullish().describe('사장님 의견 내용'),
+    histories: zod
+      .array(
+        zod.object({
+          type: zod.string().describe('이력 타입'),
+          occurredAt: zod.iso.datetime({ offset: true }).describe('이력 시각'),
+          memo: zod.string().nullish().describe('이력 메모'),
+        }),
+      )
+      .describe('처리 이력'),
+  }),
   error: zod.unknown().nullable(),
 });
 

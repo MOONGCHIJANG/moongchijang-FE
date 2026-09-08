@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { getGetApiV1AdminSummaryResponseMock, getGetApiV1AdminDashboardUnconfirmedOrdersResponseMock, getGetApiV1AdminDashboardUrgentRefundsResponseMock, getGetApiV1AdminOrdersResponseMock, getGetApiV1AdminOrdersOrderIdResponseMock, getGetApiV1AdminCsTicketsResponseMock, getGetApiV1AdminCsTicketsTicketIdResponseMock, getGetApiV1AdminGroupBuyRequestsResponseMock, getGetApiV1AdminGroupBuyRequestsRequestIdResponseMock, getGetApiV1AdminOwnerGroupBuyRequestsResponseMock, getGetApiV1AdminOwnerGroupBuyRequestsRequestIdResponseMock, getGetApiV1AdminRefundsResponseMock, getGetApiV1AdminSettlementsDashboardResponseMock, getGetApiV1AdminSettlementsResponseMock, getGetApiV1AdminSettlementsSettlementIdResponseMock } from './admin/admin.msw';
+import { getGetApiV1AdminSummaryResponseMock, getGetApiV1AdminDashboardUnconfirmedOrdersResponseMock, getGetApiV1AdminDashboardUrgentRefundsResponseMock, getGetApiV1AdminOrdersResponseMock, getGetApiV1AdminOrdersOrderIdResponseMock, getGetApiV1AdminCsTicketsResponseMock, getGetApiV1AdminCsTicketsTicketIdResponseMock, getGetApiV1AdminGroupBuyRequestsResponseMock, getGetApiV1AdminGroupBuyRequestsRequestIdResponseMock, getGetApiV1AdminOwnerGroupBuyRequestsResponseMock, getGetApiV1AdminOwnerGroupBuyRequestsRequestIdResponseMock, getGetApiV1AdminRefundRequestsResponseMock, getGetApiV1AdminRefundRequestsRequestIdResponseMock, getGetApiV1AdminSettlementsDashboardResponseMock, getGetApiV1AdminSettlementsResponseMock, getGetApiV1AdminSettlementsSettlementIdResponseMock } from './admin/admin.msw';
 import { getGetApiV1UsersMeResponseMock, getGetApiV1UsersMeWithdrawalContextResponseMock, getGetApiV1UsersNicknameAvailabilityResponseMock, getGetApiV1UsersMeSellerSettlementAccountResponseMock, getGetApiV1UsersMeSellerBusinessProfileResponseMock, getGetApiV1AuthEmailAvailabilityResponseMock, getGetApiV1UsersMeRegionsResponseMock } from './auth/auth.msw';
 import { getGetApiV1GroupBuysResponseMock, getGetApiV1GroupBuysGroupBuyIdResponseMock, getGetApiV1GroupBuysGroupBuyIdProgressResponseMock, getGetApiV1GroupBuysProgressResponseMock, getGetApiV1GroupBuysGroupBuyIdShareResponseMock, getGetApiV1SearchRecentResponseMock } from './group-buy/group-buy.msw';
 import { getGetApiV1StoresSearchResponseMock, getGetApiV1GroupBuyRequestsResponseMock, getGetApiV1GroupBuyRequestsRequestIdResponseMock } from './group-buy-request/group-buy-request.msw';
@@ -31,7 +31,8 @@ export const generatedStaticMockEntries: StaticMockEntry[] = [
   { urlPattern: '/api/v1/admin/group-buy-requests/:requestId', getResponseData: getGetApiV1AdminGroupBuyRequestsRequestIdResponseMock },
   { urlPattern: '/api/v1/admin/owner-group-buy-requests', getResponseData: getGetApiV1AdminOwnerGroupBuyRequestsResponseMock },
   { urlPattern: '/api/v1/admin/owner-group-buy-requests/:requestId', getResponseData: getGetApiV1AdminOwnerGroupBuyRequestsRequestIdResponseMock },
-  { urlPattern: '/api/v1/admin/refunds', getResponseData: getGetApiV1AdminRefundsResponseMock },
+  { urlPattern: '/api/v1/admin/refund-requests', getResponseData: getGetApiV1AdminRefundRequestsResponseMock },
+  { urlPattern: '/api/v1/admin/refund-requests/:requestId', getResponseData: getGetApiV1AdminRefundRequestsRequestIdResponseMock },
   { urlPattern: '/api/v1/admin/settlements/dashboard', getResponseData: getGetApiV1AdminSettlementsDashboardResponseMock },
   { urlPattern: '/api/v1/admin/settlements', getResponseData: getGetApiV1AdminSettlementsResponseMock },
   { urlPattern: '/api/v1/admin/settlements/:settlementId', getResponseData: getGetApiV1AdminSettlementsSettlementIdResponseMock },

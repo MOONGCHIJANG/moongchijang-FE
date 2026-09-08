@@ -2683,6 +2683,8 @@ export type ApiResponseAdminDashboardSummaryData = {
   pendingRefundAmount: number;
   /** 전일 대비 검토 대기 환불 금액 증감률(%) */
   pendingRefundAmountChangeRate: number;
+  /** 검토 대기 환불 건수. REFUND_PENDING 상태 중 사장님 환불 검토 상태가 PENDING 또는 null인 건수 */
+  reviewPendingRefundCount: number;
   /** 개설승인 대기 건수 */
   pendingApprovalCount: number;
   /** 개설승인 대기 요청의 평균 검토 시간(분) */
@@ -3659,55 +3661,221 @@ export interface ApiResponseAdminOwnerGroupBuyRequestAction {
   error: unknown | null;
 }
 
-export type ApiResponseAdminRefundPageDataContentItemRefundStatus = typeof ApiResponseAdminRefundPageDataContentItemRefundStatus[keyof typeof ApiResponseAdminRefundPageDataContentItemRefundStatus];
+/**
+ * 환불 케이스
+ */
+export type AdminRefundRequestListItemCaseFilter = typeof AdminRefundRequestListItemCaseFilter[keyof typeof AdminRefundRequestListItemCaseFilter];
 
 
-export const ApiResponseAdminRefundPageDataContentItemRefundStatus = {
-  WAITING: 'WAITING',
-  COMPLETED: 'COMPLETED',
+export const AdminRefundRequestListItemCaseFilter = {
+  ALL: 'ALL',
+  PRE_ACHIEVEMENT_FREE_CANCEL: 'PRE_ACHIEVEMENT_FREE_CANCEL',
+  POST_ACHIEVEMENT_CANCEL: 'POST_ACHIEVEMENT_CANCEL',
+  PICKUP_PERIOD_NO_SHOW: 'PICKUP_PERIOD_NO_SHOW',
+  OWNER_FAULT_CANCEL: 'OWNER_FAULT_CANCEL',
+  TARGET_NOT_MET: 'TARGET_NOT_MET',
+  DISPUTE_OR_DROPOUT_REFUND: 'DISPUTE_OR_DROPOUT_REFUND',
 } as const;
 
-export type ApiResponseAdminRefundPageDataContentItem = {
-  participationId: number;
-  userName: string;
-  productName: string;
-  storeName: string;
-  paymentAmount: number;
-  refundStatus: ApiResponseAdminRefundPageDataContentItemRefundStatus;
-  /** @nullable */
-  refundReason: string | null;
-  createdAt: string;
-};
+/**
+ * 어드민 환불 요청 처리 상태
+ */
+export type AdminRefundRequestListItemStatus = typeof AdminRefundRequestListItemStatus[keyof typeof AdminRefundRequestListItemStatus];
 
-export type ApiResponseAdminRefundPageData = {
-  content: ApiResponseAdminRefundPageDataContentItem[];
+
+export const AdminRefundRequestListItemStatus = {
+  REVIEW_PENDING: 'REVIEW_PENDING',
+  IN_PROGRESS: 'IN_PROGRESS',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+} as const;
+
+export interface AdminRefundRequestListItem {
+  /** 환불 요청 ID. 현재는 participationId와 동일 */
+  requestId: number;
+  /** 환불 케이스 */
+  caseFilter: AdminRefundRequestListItemCaseFilter;
+  /** 소비자명 */
+  consumerName: string;
+  /** 공구명 */
+  groupBuyName: string;
+  /** 매장명 */
+  storeName: string;
+  /** 결제 금액 */
+  paymentAmount: number;
+  /** 환불 금액. 승인 완료는 승인 환불 금액, 검토 대기는 0 또는 입력된 승인 금액 */
+  refundAmount: number;
+  /**
+     * 사장님 의견
+     * @nullable
+     */
+  ownerOpinion?: string | null;
+  /** 환불 요청 일시 */
+  requestedAt: string;
+  /** 24시간 SLA 기준 잔여 시간 */
+  slaRemainingHours: number;
+  /** 요청 후 1시간 초과 여부 */
+  slaWarning: boolean;
+  /** 어드민 환불 요청 처리 상태 */
+  status: AdminRefundRequestListItemStatus;
+  /** 작업 가능 여부. REVIEW_PENDING/IN_PROGRESS는 true, APPROVED/REJECTED는 false */
+  actionable: boolean;
+}
+
+export type ApiResponseAdminRefundRequestPageData = {
+  content: AdminRefundRequestListItem[];
   totalElements: number;
   totalPages: number;
+  /** 현재 페이지 번호(0-base) */
+  number: number;
+  /** 페이지 크기 */
+  size: number;
+  /** 요청 후 1시간 초과 SLA 경고 건 존재 여부 */
+  hasSlaWarning: boolean;
+  /** 요청 후 1시간 초과 SLA 경고 건수 */
+  slaWarningCount: number;
 };
 
-export interface ApiResponseAdminRefundPage {
+export interface ApiResponseAdminRefundRequestPage {
   success: boolean;
-  data: ApiResponseAdminRefundPageData;
+  data: ApiResponseAdminRefundRequestPageData;
   error: unknown | null;
 }
 
-export type AdminManualRefundRefundReason = typeof AdminManualRefundRefundReason[keyof typeof AdminManualRefundRefundReason];
+/**
+ * 어드민 환불 요청 처리 상태
+ */
+export type AdminRefundRequestDetailStatus = typeof AdminRefundRequestDetailStatus[keyof typeof AdminRefundRequestDetailStatus];
 
 
-export const AdminManualRefundRefundReason = {
-  NOT_ACHIEVED: 'NOT_ACHIEVED',
-  EARLY_EXIT: 'EARLY_EXIT',
-  PAYMENT_ERROR: 'PAYMENT_ERROR',
-  OTHER: 'OTHER',
+export const AdminRefundRequestDetailStatus = {
+  REVIEW_PENDING: 'REVIEW_PENDING',
+  IN_PROGRESS: 'IN_PROGRESS',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
 } as const;
 
-export interface AdminManualRefund {
-  refundReason: AdminManualRefundRefundReason;
+/**
+ * 가입 방식
+ */
+export type AdminRefundRequestDetailSignupProvider = typeof AdminRefundRequestDetailSignupProvider[keyof typeof AdminRefundRequestDetailSignupProvider];
+
+
+export const AdminRefundRequestDetailSignupProvider = {
+  KAKAO: 'KAKAO',
+  EMAIL: 'EMAIL',
+} as const;
+
+export interface AdminRefundRequestHistoryItem {
+  /** 이력 타입 */
+  type: string;
+  /** 이력 시각 */
+  occurredAt: string;
   /**
-     * @maxLength 100
+     * 이력 메모
      * @nullable
      */
-  detailReason?: string | null;
+  memo?: string | null;
+}
+
+export interface AdminRefundRequestDetail {
+  /** 환불 요청 ID. 현재는 participationId와 동일 */
+  requestId: number;
+  /** 어드민 환불 요청 처리 상태 */
+  status: AdminRefundRequestDetailStatus;
+  /** 24시간 SLA 기준 잔여 시간 */
+  slaRemainingHours: number;
+  /** 요청 후 1시간 초과 여부 */
+  slaWarning: boolean;
+  /**
+     * 소비자 닉네임
+     * @nullable
+     */
+  consumerNickname?: string | null;
+  /**
+     * 소비자 전화번호
+     * @nullable
+     */
+  consumerPhoneNumber?: string | null;
+  /**
+     * 소비자 이메일
+     * @nullable
+     */
+  consumerEmail?: string | null;
+  /** 가입 방식 */
+  signupProvider: AdminRefundRequestDetailSignupProvider;
+  /** 공구명 */
+  groupBuyName: string;
+  /** 매장명 */
+  storeName: string;
+  /** 공구 달성 여부. ACHIEVED, COMPLETED, CLOSED 상태는 true로 응답 */
+  achieved: boolean;
+  /** 픽업일(YYYY-MM-DD) */
+  pickupDate: string;
+  /** 픽업 장소 */
+  pickupLocation: string;
+  /** 결제 금액 */
+  paymentAmount: number;
+  /** 환불 예정 금액 */
+  refundExpectedAmount: number;
+  /**
+     * 결제 수단
+     * @nullable
+     */
+  paymentMethod?: string | null;
+  /**
+     * 승인 번호
+     * @nullable
+     */
+  approvalNumber?: string | null;
+  /**
+     * 결제 일시
+     * @nullable
+     */
+  paidAt?: string | null;
+  /** 환불 사유 라벨. 자동 환불은 목표 미달성 또는 사장님 귀책 취소로 응답 */
+  refundReason: string;
+  /**
+     * 환불 상세 설명
+     * @nullable
+     */
+  refundReasonDetail?: string | null;
+  /** 환불 요청 일시 */
+  requestedAt: string;
+  /**
+     * 사장님 의견 제출 일시
+     * @nullable
+     */
+  ownerOpinionSubmittedAt?: string | null;
+  /**
+     * 사장님 의견 내용
+     * @nullable
+     */
+  ownerOpinion?: string | null;
+  /** 처리 이력 */
+  histories: AdminRefundRequestHistoryItem[];
+}
+
+export interface ApiResponseAdminRefundRequestDetail {
+  success: boolean;
+  data: AdminRefundRequestDetail;
+  error: unknown | null;
+}
+
+export interface AdminRefundRequestApproveRequest {
+  /**
+     * 환불 승인 금액
+     * @minimum 0
+     */
+  refundAmount: number;
+}
+
+export interface AdminRefundRequestRejectRequest {
+  /**
+     * 환불 요청 거절 사유
+     * @maxLength 200
+     */
+  rejectionReason: string;
 }
 
 export type ApiResponseAdminSettlementDashboardData = {
@@ -4643,8 +4811,19 @@ export const GetApiV1AdminOwnerGroupBuyRequestsStatus = {
   REJECTED: 'REJECTED',
 } as const;
 
-export type GetApiV1AdminRefundsParams = {
-status?: GetApiV1AdminRefundsStatus;
+export type GetApiV1AdminRefundRequestsParams = {
+/**
+ * 전체 / 검토 대기 / 처리 중 / 승인 완료 / 거절
+ */
+tab?: GetApiV1AdminRefundRequestsTab;
+/**
+ * 전체 / 달성 전 자유 취소 / 달성 후 취소 / 픽업 기간 미수령 / 사장님 귀책 취소 / 목표 미달성 / 분쟁·하차 환불
+ */
+caseFilter?: GetApiV1AdminRefundRequestsCaseFilter;
+/**
+ * 요청 ID, 소비자명, 공구명 검색어
+ */
+keyword?: string;
 page?: PageParameter;
 /**
  * @maximum 100
@@ -4652,13 +4831,28 @@ page?: PageParameter;
 size?: SizeParameter;
 };
 
-export type GetApiV1AdminRefundsStatus = typeof GetApiV1AdminRefundsStatus[keyof typeof GetApiV1AdminRefundsStatus];
+export type GetApiV1AdminRefundRequestsTab = typeof GetApiV1AdminRefundRequestsTab[keyof typeof GetApiV1AdminRefundRequestsTab];
 
 
-export const GetApiV1AdminRefundsStatus = {
+export const GetApiV1AdminRefundRequestsTab = {
   ALL: 'ALL',
-  WAITING: 'WAITING',
-  COMPLETED: 'COMPLETED',
+  REVIEW_PENDING: 'REVIEW_PENDING',
+  IN_PROGRESS: 'IN_PROGRESS',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+} as const;
+
+export type GetApiV1AdminRefundRequestsCaseFilter = typeof GetApiV1AdminRefundRequestsCaseFilter[keyof typeof GetApiV1AdminRefundRequestsCaseFilter];
+
+
+export const GetApiV1AdminRefundRequestsCaseFilter = {
+  ALL: 'ALL',
+  PRE_ACHIEVEMENT_FREE_CANCEL: 'PRE_ACHIEVEMENT_FREE_CANCEL',
+  POST_ACHIEVEMENT_CANCEL: 'POST_ACHIEVEMENT_CANCEL',
+  PICKUP_PERIOD_NO_SHOW: 'PICKUP_PERIOD_NO_SHOW',
+  OWNER_FAULT_CANCEL: 'OWNER_FAULT_CANCEL',
+  TARGET_NOT_MET: 'TARGET_NOT_MET',
+  DISPUTE_OR_DROPOUT_REFUND: 'DISPUTE_OR_DROPOUT_REFUND',
 } as const;
 
 export type GetApiV1AdminSettlementsDashboardParams = {

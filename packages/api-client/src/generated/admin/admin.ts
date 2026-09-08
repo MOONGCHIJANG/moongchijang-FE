@@ -6,9 +6,10 @@ import type {
   AdminCsTicketUpdateRequest,
   AdminGroupBuyRequestApprove,
   AdminGroupBuyRequestReject,
-  AdminManualRefund,
   AdminOwnerGroupBuyCloseRequestReject,
   AdminOwnerGroupBuyRequestReject,
+  AdminRefundRequestApproveRequest,
+  AdminRefundRequestRejectRequest,
   AdminRequestStatusUpdate,
   ApiResponseAdminCsTicketDetail,
   ApiResponseAdminCsTicketPage,
@@ -22,7 +23,8 @@ import type {
   ApiResponseAdminOwnerGroupBuyRequestAction,
   ApiResponseAdminOwnerGroupBuyRequestDetail,
   ApiResponseAdminOwnerGroupBuyRequestPage,
-  ApiResponseAdminRefundPage,
+  ApiResponseAdminRefundRequestDetail,
+  ApiResponseAdminRefundRequestPage,
   ApiResponseAdminRequestDetail,
   ApiResponseAdminRequestPage,
   ApiResponseAdminSettlementDashboard,
@@ -38,11 +40,10 @@ import type {
   GetApiV1AdminGroupBuyRequestsParams,
   GetApiV1AdminOrdersParams,
   GetApiV1AdminOwnerGroupBuyRequestsParams,
-  GetApiV1AdminRefundsParams,
+  GetApiV1AdminRefundRequestsParams,
   GetApiV1AdminSettlementsDashboardParams,
   GetApiV1AdminSettlementsParams,
   NotFoundResponse,
-  SuccessNoDataResponse,
   UnauthorizedResponse
 } from '../api.schemas';
 
@@ -1143,21 +1144,34 @@ export const postApiV1AdminOwnerGroupBuyRequestsRequestIdReject = async (request
 
 
 /**
- * @summary 환불 처리 현황 목록 (운영자)
+ * 환불 요청 탭/케이스/키워드 기준으로 어드민 환불 요청 목록을 조회한다.
+ * @summary 운영자 환불 요청 목록 조회
  */
-export type getApiV1AdminRefundsResponse200 = {
-  data: ApiResponseAdminRefundPage
+export type getApiV1AdminRefundRequestsResponse200 = {
+  data: ApiResponseAdminRefundRequestPage
   status: 200
 }
 
-export type getApiV1AdminRefundsResponseSuccess = (getApiV1AdminRefundsResponse200) & {
+export type getApiV1AdminRefundRequestsResponse400 = {
+  data: BadRequestResponse
+  status: 400
+}
+
+export type getApiV1AdminRefundRequestsResponse403 = {
+  data: ForbiddenResponse
+  status: 403
+}
+
+export type getApiV1AdminRefundRequestsResponseSuccess = (getApiV1AdminRefundRequestsResponse200) & {
   headers: Headers;
 };
-;
+export type getApiV1AdminRefundRequestsResponseError = (getApiV1AdminRefundRequestsResponse400 | getApiV1AdminRefundRequestsResponse403) & {
+  headers: Headers;
+};
 
-export type getApiV1AdminRefundsResponse = (getApiV1AdminRefundsResponseSuccess)
+export type getApiV1AdminRefundRequestsResponse = (getApiV1AdminRefundRequestsResponseSuccess | getApiV1AdminRefundRequestsResponseError)
 
-export const getGetApiV1AdminRefundsUrl = (params?: GetApiV1AdminRefundsParams,) => {
+export const getGetApiV1AdminRefundRequestsUrl = (params?: GetApiV1AdminRefundRequestsParams,) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
@@ -1169,12 +1183,12 @@ export const getGetApiV1AdminRefundsUrl = (params?: GetApiV1AdminRefundsParams,)
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/v1/admin/refunds?${stringifiedParams}` : `/api/v1/admin/refunds`
+  return stringifiedParams.length > 0 ? `/api/v1/admin/refund-requests?${stringifiedParams}` : `/api/v1/admin/refund-requests`
 }
 
-export const getApiV1AdminRefunds = async (params?: GetApiV1AdminRefundsParams, options?: RequestInit): Promise<getApiV1AdminRefundsResponse> => {
+export const getApiV1AdminRefundRequests = async (params?: GetApiV1AdminRefundRequestsParams, options?: RequestInit): Promise<getApiV1AdminRefundRequestsResponse> => {
 
-  return customFetch<getApiV1AdminRefundsResponse>(getGetApiV1AdminRefundsUrl(params),
+  return customFetch<getApiV1AdminRefundRequestsResponse>(getGetApiV1AdminRefundRequestsUrl(params),
   {
     ...options,
     method: 'GET'
@@ -1185,45 +1199,166 @@ export const getApiV1AdminRefunds = async (params?: GetApiV1AdminRefundsParams, 
 
 
 /**
- * @summary 수동 환불 처리
+ * @summary 운영자 환불 요청 상세 조회
  */
-export type postApiV1AdminRefundsParticipationIdManualResponse200 = {
-  data: SuccessNoDataResponse
+export type getApiV1AdminRefundRequestsRequestIdResponse200 = {
+  data: ApiResponseAdminRefundRequestDetail
   status: 200
 }
 
-export type postApiV1AdminRefundsParticipationIdManualResponse409 = {
+export type getApiV1AdminRefundRequestsRequestIdResponse403 = {
+  data: ForbiddenResponse
+  status: 403
+}
+
+export type getApiV1AdminRefundRequestsRequestIdResponse404 = {
+  data: NotFoundResponse
+  status: 404
+}
+
+export type getApiV1AdminRefundRequestsRequestIdResponseSuccess = (getApiV1AdminRefundRequestsRequestIdResponse200) & {
+  headers: Headers;
+};
+export type getApiV1AdminRefundRequestsRequestIdResponseError = (getApiV1AdminRefundRequestsRequestIdResponse403 | getApiV1AdminRefundRequestsRequestIdResponse404) & {
+  headers: Headers;
+};
+
+export type getApiV1AdminRefundRequestsRequestIdResponse = (getApiV1AdminRefundRequestsRequestIdResponseSuccess | getApiV1AdminRefundRequestsRequestIdResponseError)
+
+export const getGetApiV1AdminRefundRequestsRequestIdUrl = (requestId: number,) => {
+
+
+
+
+  return `/api/v1/admin/refund-requests/${requestId}`
+}
+
+export const getApiV1AdminRefundRequestsRequestId = async (requestId: number, options?: RequestInit): Promise<getApiV1AdminRefundRequestsRequestIdResponse> => {
+
+  return customFetch<getApiV1AdminRefundRequestsRequestIdResponse>(getGetApiV1AdminRefundRequestsRequestIdUrl(requestId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+/**
+ * @summary 운영자 환불 요청 승인 처리
+ */
+export type patchApiV1AdminRefundRequestsRequestIdApproveResponse200 = {
+  data: ApiResponseAdminRefundRequestDetail
+  status: 200
+}
+
+export type patchApiV1AdminRefundRequestsRequestIdApproveResponse400 = {
+  data: BadRequestResponse
+  status: 400
+}
+
+export type patchApiV1AdminRefundRequestsRequestIdApproveResponse403 = {
+  data: ForbiddenResponse
+  status: 403
+}
+
+export type patchApiV1AdminRefundRequestsRequestIdApproveResponse404 = {
+  data: NotFoundResponse
+  status: 404
+}
+
+export type patchApiV1AdminRefundRequestsRequestIdApproveResponse409 = {
   data: ConflictResponse
   status: 409
 }
 
-export type postApiV1AdminRefundsParticipationIdManualResponseSuccess = (postApiV1AdminRefundsParticipationIdManualResponse200) & {
+export type patchApiV1AdminRefundRequestsRequestIdApproveResponseSuccess = (patchApiV1AdminRefundRequestsRequestIdApproveResponse200) & {
   headers: Headers;
 };
-export type postApiV1AdminRefundsParticipationIdManualResponseError = (postApiV1AdminRefundsParticipationIdManualResponse409) & {
+export type patchApiV1AdminRefundRequestsRequestIdApproveResponseError = (patchApiV1AdminRefundRequestsRequestIdApproveResponse400 | patchApiV1AdminRefundRequestsRequestIdApproveResponse403 | patchApiV1AdminRefundRequestsRequestIdApproveResponse404 | patchApiV1AdminRefundRequestsRequestIdApproveResponse409) & {
   headers: Headers;
 };
 
-export type postApiV1AdminRefundsParticipationIdManualResponse = (postApiV1AdminRefundsParticipationIdManualResponseSuccess | postApiV1AdminRefundsParticipationIdManualResponseError)
+export type patchApiV1AdminRefundRequestsRequestIdApproveResponse = (patchApiV1AdminRefundRequestsRequestIdApproveResponseSuccess | patchApiV1AdminRefundRequestsRequestIdApproveResponseError)
 
-export const getPostApiV1AdminRefundsParticipationIdManualUrl = (participationId: number,) => {
-
-
+export const getPatchApiV1AdminRefundRequestsRequestIdApproveUrl = (requestId: number,) => {
 
 
-  return `/api/v1/admin/refunds/${participationId}/manual`
+
+
+  return `/api/v1/admin/refund-requests/${requestId}/approve`
 }
 
-export const postApiV1AdminRefundsParticipationIdManual = async (participationId: number,
-    adminManualRefund: AdminManualRefund, options?: RequestInit): Promise<postApiV1AdminRefundsParticipationIdManualResponse> => {
+export const patchApiV1AdminRefundRequestsRequestIdApprove = async (requestId: number,
+    adminRefundRequestApproveRequest: AdminRefundRequestApproveRequest, options?: RequestInit): Promise<patchApiV1AdminRefundRequestsRequestIdApproveResponse> => {
 
-  return customFetch<postApiV1AdminRefundsParticipationIdManualResponse>(getPostApiV1AdminRefundsParticipationIdManualUrl(participationId),
+  return customFetch<patchApiV1AdminRefundRequestsRequestIdApproveResponse>(getPatchApiV1AdminRefundRequestsRequestIdApproveUrl(requestId),
   {
     ...options,
-    method: 'POST',
+    method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
     body: JSON.stringify(
-      adminManualRefund,)
+      adminRefundRequestApproveRequest,)
+  }
+);}
+
+
+/**
+ * @summary 운영자 환불 요청 거절 처리
+ */
+export type patchApiV1AdminRefundRequestsRequestIdRejectResponse200 = {
+  data: ApiResponseAdminRefundRequestDetail
+  status: 200
+}
+
+export type patchApiV1AdminRefundRequestsRequestIdRejectResponse400 = {
+  data: BadRequestResponse
+  status: 400
+}
+
+export type patchApiV1AdminRefundRequestsRequestIdRejectResponse403 = {
+  data: ForbiddenResponse
+  status: 403
+}
+
+export type patchApiV1AdminRefundRequestsRequestIdRejectResponse404 = {
+  data: NotFoundResponse
+  status: 404
+}
+
+export type patchApiV1AdminRefundRequestsRequestIdRejectResponse409 = {
+  data: ConflictResponse
+  status: 409
+}
+
+export type patchApiV1AdminRefundRequestsRequestIdRejectResponseSuccess = (patchApiV1AdminRefundRequestsRequestIdRejectResponse200) & {
+  headers: Headers;
+};
+export type patchApiV1AdminRefundRequestsRequestIdRejectResponseError = (patchApiV1AdminRefundRequestsRequestIdRejectResponse400 | patchApiV1AdminRefundRequestsRequestIdRejectResponse403 | patchApiV1AdminRefundRequestsRequestIdRejectResponse404 | patchApiV1AdminRefundRequestsRequestIdRejectResponse409) & {
+  headers: Headers;
+};
+
+export type patchApiV1AdminRefundRequestsRequestIdRejectResponse = (patchApiV1AdminRefundRequestsRequestIdRejectResponseSuccess | patchApiV1AdminRefundRequestsRequestIdRejectResponseError)
+
+export const getPatchApiV1AdminRefundRequestsRequestIdRejectUrl = (requestId: number,) => {
+
+
+
+
+  return `/api/v1/admin/refund-requests/${requestId}/reject`
+}
+
+export const patchApiV1AdminRefundRequestsRequestIdReject = async (requestId: number,
+    adminRefundRequestRejectRequest: AdminRefundRequestRejectRequest, options?: RequestInit): Promise<patchApiV1AdminRefundRequestsRequestIdRejectResponse> => {
+
+  return customFetch<patchApiV1AdminRefundRequestsRequestIdRejectResponse>(getPatchApiV1AdminRefundRequestsRequestIdRejectUrl(requestId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      adminRefundRequestRejectRequest,)
   }
 );}
 

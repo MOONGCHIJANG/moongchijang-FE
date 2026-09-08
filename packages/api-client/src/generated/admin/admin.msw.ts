@@ -30,18 +30,18 @@ import type {
   ApiResponseAdminOwnerGroupBuyRequestAction,
   ApiResponseAdminOwnerGroupBuyRequestDetail,
   ApiResponseAdminOwnerGroupBuyRequestPage,
-  ApiResponseAdminRefundPage,
+  ApiResponseAdminRefundRequestDetail,
+  ApiResponseAdminRefundRequestPage,
   ApiResponseAdminRequestDetail,
   ApiResponseAdminRequestPage,
   ApiResponseAdminSettlementDashboard,
   ApiResponseAdminSettlementDetail,
   ApiResponseAdminSettlementPage,
-  ApiResponseGroupBuyRequestDetail,
-  SuccessNoDataResponse
+  ApiResponseGroupBuyRequestDetail
 } from '../api.schemas';
 
 
-export const getGetApiV1AdminSummaryResponseMock = (overrideResponse: Partial<Extract<ApiResponseAdminDashboardSummary, object>> = {}): ApiResponseAdminDashboardSummary => ({success: faker.datatype.boolean(), data: {pendingRefundAmount: faker.number.int(), pendingRefundAmountChangeRate: faker.number.float({fractionDigits: 2}), pendingApprovalCount: faker.number.int(), averageReviewMinutes: faker.number.int(), pendingApprovalChangeRate: faker.number.float({fractionDigits: 2}), unconfirmedOrderCount: faker.number.int(), unconfirmedOrderOver48hCount: faker.number.int(), todayCompletedRefundCount: faker.number.int(), todayCompletedApprovalCount: faker.number.int(), hasOrderOver48h: faker.datatype.boolean()}, error: {}, ...overrideResponse})
+export const getGetApiV1AdminSummaryResponseMock = (overrideResponse: Partial<Extract<ApiResponseAdminDashboardSummary, object>> = {}): ApiResponseAdminDashboardSummary => ({success: faker.datatype.boolean(), data: {pendingRefundAmount: faker.number.int(), pendingRefundAmountChangeRate: faker.number.float({fractionDigits: 2}), reviewPendingRefundCount: faker.number.int(), pendingApprovalCount: faker.number.int(), averageReviewMinutes: faker.number.int(), pendingApprovalChangeRate: faker.number.float({fractionDigits: 2}), unconfirmedOrderCount: faker.number.int(), unconfirmedOrderOver48hCount: faker.number.int(), todayCompletedRefundCount: faker.number.int(), todayCompletedApprovalCount: faker.number.int(), hasOrderOver48h: faker.datatype.boolean()}, error: {}, ...overrideResponse})
 
 export const getGetApiV1AdminDashboardUnconfirmedOrdersResponseMock = (overrideResponse: Partial<Extract<ApiResponseAdminDashboardUnconfirmedOrders, object>> = {}): ApiResponseAdminDashboardUnconfirmedOrders => ({success: faker.datatype.boolean(), data: {totalUnconfirmedCount: faker.number.int(), overdueCount: faker.number.int(), hasOverdue: faker.datatype.boolean(), content: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({orderId: faker.number.int(), groupBuyId: faker.number.int(), productName: faker.string.alpha({length: {min: 10, max: 20}}), storeName: faker.string.alpha({length: {min: 10, max: 20}}), achievedAt: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), undefined]), finalQuantity: faker.number.int(), pendingRefundCount: faker.number.int(), pickupDate: faker.date.past().toISOString().slice(0, 10), elapsedHours: faker.number.int(), overdue: faker.datatype.boolean(), progressRate: faker.number.int(), ownerContacted: faker.datatype.boolean(), ownerContactedAt: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), undefined])})), totalElements: faker.number.int(), totalPages: faker.number.int(), number: faker.number.int(), size: faker.number.int()}, error: {}, ...overrideResponse})
 
@@ -85,9 +85,13 @@ export const getPostApiV1AdminOwnerGroupBuyRequestsRequestIdApproveResponseMock 
 
 export const getPostApiV1AdminOwnerGroupBuyRequestsRequestIdRejectResponseMock = (overrideResponse: Partial<Extract<ApiResponseAdminOwnerGroupBuyRequestAction, object>> = {}): ApiResponseAdminOwnerGroupBuyRequestAction => ({success: faker.datatype.boolean(), data: {requestId: faker.number.int(), status: faker.helpers.arrayElement(['APPROVED','REJECTED'] as const), groupBuyId: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.number.int(), null]), undefined]), approvalSummary: faker.helpers.arrayElement([{...{productName: faker.string.alpha({length: {min: 10, max: 20}}), price: faker.number.int(), targetQuantity: faker.number.int(), pickupDate: faker.date.past().toISOString().slice(0, 10), imageCount: faker.number.int()},}, null])}, error: {}, ...overrideResponse})
 
-export const getGetApiV1AdminRefundsResponseMock = (overrideResponse: Partial<Extract<ApiResponseAdminRefundPage, object>> = {}): ApiResponseAdminRefundPage => ({success: faker.datatype.boolean(), data: {content: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({participationId: faker.number.int(), userName: faker.string.alpha({length: {min: 10, max: 20}}), productName: faker.string.alpha({length: {min: 10, max: 20}}), storeName: faker.string.alpha({length: {min: 10, max: 20}}), paymentAmount: faker.number.int(), refundStatus: faker.helpers.arrayElement(['WAITING','COMPLETED'] as const), refundReason: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), null]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), totalElements: faker.number.int(), totalPages: faker.number.int()}, error: {}, ...overrideResponse})
+export const getGetApiV1AdminRefundRequestsResponseMock = (overrideResponse: Partial<Extract<ApiResponseAdminRefundRequestPage, object>> = {}): ApiResponseAdminRefundRequestPage => ({success: faker.datatype.boolean(), data: {content: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({requestId: faker.number.int(), caseFilter: faker.helpers.arrayElement(['ALL','PRE_ACHIEVEMENT_FREE_CANCEL','POST_ACHIEVEMENT_CANCEL','PICKUP_PERIOD_NO_SHOW','OWNER_FAULT_CANCEL','TARGET_NOT_MET','DISPUTE_OR_DROPOUT_REFUND'] as const), consumerName: faker.string.alpha({length: {min: 10, max: 20}}), groupBuyName: faker.string.alpha({length: {min: 10, max: 20}}), storeName: faker.string.alpha({length: {min: 10, max: 20}}), paymentAmount: faker.number.int(), refundAmount: faker.number.int(), ownerOpinion: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined]), requestedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', slaRemainingHours: faker.number.int(), slaWarning: faker.datatype.boolean(), status: faker.helpers.arrayElement(['REVIEW_PENDING','IN_PROGRESS','APPROVED','REJECTED'] as const), actionable: faker.datatype.boolean()})), totalElements: faker.number.int(), totalPages: faker.number.int(), number: faker.number.int(), size: faker.number.int(), hasSlaWarning: faker.datatype.boolean(), slaWarningCount: faker.number.int()}, error: {}, ...overrideResponse})
 
-export const getPostApiV1AdminRefundsParticipationIdManualResponseMock = (overrideResponse: Partial<Extract<SuccessNoDataResponse, object>> = {}): SuccessNoDataResponse => ({success: faker.datatype.boolean(), data: {}, error: {}, ...overrideResponse})
+export const getGetApiV1AdminRefundRequestsRequestIdResponseMock = (overrideResponse: Partial<Extract<ApiResponseAdminRefundRequestDetail, object>> = {}): ApiResponseAdminRefundRequestDetail => ({success: faker.datatype.boolean(), data: {requestId: faker.number.int(), status: faker.helpers.arrayElement(['REVIEW_PENDING','IN_PROGRESS','APPROVED','REJECTED'] as const), slaRemainingHours: faker.number.int(), slaWarning: faker.datatype.boolean(), consumerNickname: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined]), consumerPhoneNumber: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined]), consumerEmail: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined]), signupProvider: faker.helpers.arrayElement(['KAKAO','EMAIL'] as const), groupBuyName: faker.string.alpha({length: {min: 10, max: 20}}), storeName: faker.string.alpha({length: {min: 10, max: 20}}), achieved: faker.datatype.boolean(), pickupDate: faker.date.past().toISOString().slice(0, 10), pickupLocation: faker.string.alpha({length: {min: 10, max: 20}}), paymentAmount: faker.number.int(), refundExpectedAmount: faker.number.int(), paymentMethod: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined]), approvalNumber: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined]), paidAt: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), undefined]), refundReason: faker.string.alpha({length: {min: 10, max: 20}}), refundReasonDetail: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined]), requestedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ownerOpinionSubmittedAt: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), undefined]), ownerOpinion: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined]), histories: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({type: faker.string.alpha({length: {min: 10, max: 20}}), occurredAt: faker.date.past().toISOString().slice(0, 19) + 'Z', memo: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined])}))}, error: {}, ...overrideResponse})
+
+export const getPatchApiV1AdminRefundRequestsRequestIdApproveResponseMock = (overrideResponse: Partial<Extract<ApiResponseAdminRefundRequestDetail, object>> = {}): ApiResponseAdminRefundRequestDetail => ({success: faker.datatype.boolean(), data: {requestId: faker.number.int(), status: faker.helpers.arrayElement(['REVIEW_PENDING','IN_PROGRESS','APPROVED','REJECTED'] as const), slaRemainingHours: faker.number.int(), slaWarning: faker.datatype.boolean(), consumerNickname: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined]), consumerPhoneNumber: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined]), consumerEmail: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined]), signupProvider: faker.helpers.arrayElement(['KAKAO','EMAIL'] as const), groupBuyName: faker.string.alpha({length: {min: 10, max: 20}}), storeName: faker.string.alpha({length: {min: 10, max: 20}}), achieved: faker.datatype.boolean(), pickupDate: faker.date.past().toISOString().slice(0, 10), pickupLocation: faker.string.alpha({length: {min: 10, max: 20}}), paymentAmount: faker.number.int(), refundExpectedAmount: faker.number.int(), paymentMethod: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined]), approvalNumber: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined]), paidAt: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), undefined]), refundReason: faker.string.alpha({length: {min: 10, max: 20}}), refundReasonDetail: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined]), requestedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ownerOpinionSubmittedAt: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), undefined]), ownerOpinion: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined]), histories: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({type: faker.string.alpha({length: {min: 10, max: 20}}), occurredAt: faker.date.past().toISOString().slice(0, 19) + 'Z', memo: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined])}))}, error: {}, ...overrideResponse})
+
+export const getPatchApiV1AdminRefundRequestsRequestIdRejectResponseMock = (overrideResponse: Partial<Extract<ApiResponseAdminRefundRequestDetail, object>> = {}): ApiResponseAdminRefundRequestDetail => ({success: faker.datatype.boolean(), data: {requestId: faker.number.int(), status: faker.helpers.arrayElement(['REVIEW_PENDING','IN_PROGRESS','APPROVED','REJECTED'] as const), slaRemainingHours: faker.number.int(), slaWarning: faker.datatype.boolean(), consumerNickname: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined]), consumerPhoneNumber: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined]), consumerEmail: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined]), signupProvider: faker.helpers.arrayElement(['KAKAO','EMAIL'] as const), groupBuyName: faker.string.alpha({length: {min: 10, max: 20}}), storeName: faker.string.alpha({length: {min: 10, max: 20}}), achieved: faker.datatype.boolean(), pickupDate: faker.date.past().toISOString().slice(0, 10), pickupLocation: faker.string.alpha({length: {min: 10, max: 20}}), paymentAmount: faker.number.int(), refundExpectedAmount: faker.number.int(), paymentMethod: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined]), approvalNumber: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined]), paidAt: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), undefined]), refundReason: faker.string.alpha({length: {min: 10, max: 20}}), refundReasonDetail: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined]), requestedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ownerOpinionSubmittedAt: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), undefined]), ownerOpinion: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined]), histories: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({type: faker.string.alpha({length: {min: 10, max: 20}}), occurredAt: faker.date.past().toISOString().slice(0, 19) + 'Z', memo: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), undefined])}))}, error: {}, ...overrideResponse})
 
 export const getGetApiV1AdminSettlementsDashboardResponseMock = (overrideResponse: Partial<Extract<ApiResponseAdminSettlementDashboard, object>> = {}): ApiResponseAdminSettlementDashboard => ({success: faker.datatype.boolean(), data: {year: faker.number.int(), month: faker.number.int(), completedSettlementAmount: faker.number.int(), scheduledSettlementAmount: faker.number.int(), platformFeeAmount: faker.number.int(), totalTransactionAmount: faker.number.int()}, error: {}, ...overrideResponse})
 
@@ -360,25 +364,49 @@ export const getPostApiV1AdminOwnerGroupBuyRequestsRequestIdRejectMockHandler = 
   }, options)
 }
 
-export const getGetApiV1AdminRefundsMockHandler = (overrideResponse?: ApiResponseAdminRefundPage | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ApiResponseAdminRefundPage> | ApiResponseAdminRefundPage), options?: RequestHandlerOptions) => {
-  return http.get('*/api/v1/admin/refunds', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+export const getGetApiV1AdminRefundRequestsMockHandler = (overrideResponse?: ApiResponseAdminRefundRequestPage | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ApiResponseAdminRefundRequestPage> | ApiResponseAdminRefundRequestPage), options?: RequestHandlerOptions) => {
+  return http.get('*/api/v1/admin/refund-requests', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
 
     return HttpResponse.json(overrideResponse !== undefined
     ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getGetApiV1AdminRefundsResponseMock(),
+    : getGetApiV1AdminRefundRequestsResponseMock(),
       { status: 200
       })
   }, options)
 }
 
-export const getPostApiV1AdminRefundsParticipationIdManualMockHandler = (overrideResponse?: SuccessNoDataResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<SuccessNoDataResponse> | SuccessNoDataResponse), options?: RequestHandlerOptions) => {
-  return http.post('*/api/v1/admin/refunds/:participationId/manual', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+export const getGetApiV1AdminRefundRequestsRequestIdMockHandler = (overrideResponse?: ApiResponseAdminRefundRequestDetail | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ApiResponseAdminRefundRequestDetail> | ApiResponseAdminRefundRequestDetail), options?: RequestHandlerOptions) => {
+  return http.get('*/api/v1/admin/refund-requests/:requestId', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
 
     return HttpResponse.json(overrideResponse !== undefined
     ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getPostApiV1AdminRefundsParticipationIdManualResponseMock(),
+    : getGetApiV1AdminRefundRequestsRequestIdResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getPatchApiV1AdminRefundRequestsRequestIdApproveMockHandler = (overrideResponse?: ApiResponseAdminRefundRequestDetail | ((info: Parameters<Parameters<typeof http.patch>[1]>[0]) => Promise<ApiResponseAdminRefundRequestDetail> | ApiResponseAdminRefundRequestDetail), options?: RequestHandlerOptions) => {
+  return http.patch('*/api/v1/admin/refund-requests/:requestId/approve', async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getPatchApiV1AdminRefundRequestsRequestIdApproveResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getPatchApiV1AdminRefundRequestsRequestIdRejectMockHandler = (overrideResponse?: ApiResponseAdminRefundRequestDetail | ((info: Parameters<Parameters<typeof http.patch>[1]>[0]) => Promise<ApiResponseAdminRefundRequestDetail> | ApiResponseAdminRefundRequestDetail), options?: RequestHandlerOptions) => {
+  return http.patch('*/api/v1/admin/refund-requests/:requestId/reject', async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getPatchApiV1AdminRefundRequestsRequestIdRejectResponseMock(),
       { status: 200
       })
   }, options)
@@ -442,8 +470,10 @@ export const getAdminMock = () => [
   getGetApiV1AdminOwnerGroupBuyRequestsRequestIdMockHandler(),
   getPostApiV1AdminOwnerGroupBuyRequestsRequestIdApproveMockHandler(),
   getPostApiV1AdminOwnerGroupBuyRequestsRequestIdRejectMockHandler(),
-  getGetApiV1AdminRefundsMockHandler(),
-  getPostApiV1AdminRefundsParticipationIdManualMockHandler(),
+  getGetApiV1AdminRefundRequestsMockHandler(),
+  getGetApiV1AdminRefundRequestsRequestIdMockHandler(),
+  getPatchApiV1AdminRefundRequestsRequestIdApproveMockHandler(),
+  getPatchApiV1AdminRefundRequestsRequestIdRejectMockHandler(),
   getGetApiV1AdminSettlementsDashboardMockHandler(),
   getGetApiV1AdminSettlementsMockHandler(),
   getGetApiV1AdminSettlementsSettlementIdMockHandler()

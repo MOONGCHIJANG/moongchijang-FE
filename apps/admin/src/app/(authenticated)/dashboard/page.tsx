@@ -9,14 +9,7 @@ import {
   useGetApiV1AdminDashboardUrgentRefunds,
   useGetApiV1AdminDashboardUnconfirmedOrders,
 } from '@moongchijang/api-client/hooks/admin/admin';
-import {
-  AdminDashboardUrgentRefundItemCaseFilter,
-  ApiResponseAdminDashboardSummaryData,
-} from '@moongchijang/api-client/generated/api.schemas';
-
-interface AdminSummaryData extends ApiResponseAdminDashboardSummaryData {
-  reviewPendingRefundCount?: number;
-}
+import { AdminDashboardUrgentRefundItemCaseFilter } from '@moongchijang/api-client/generated/api.schemas';
 
 // caseFilter enum → 표시 라벨. 스펙에 A~G 코드/한글 라벨 매핑표가 없어 enum 의미를 그대로 번역했다.
 const REFUND_CASE_LABELS: Record<
@@ -83,9 +76,7 @@ export default function AdminDashboardPage() {
   } = useGetApiV1AdminDashboardUnconfirmedOrders();
 
   const summary =
-    summaryResponse?.status === 200
-      ? (summaryResponse.data.data as AdminSummaryData)
-      : null;
+    summaryResponse?.status === 200 ? summaryResponse.data.data : null;
   const pendingRefundCount = summary?.reviewPendingRefundCount ?? 0;
   const urgentRefunds =
     urgentRefundsResponse?.status === 200

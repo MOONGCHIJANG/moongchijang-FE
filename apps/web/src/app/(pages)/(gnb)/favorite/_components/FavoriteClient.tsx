@@ -4,16 +4,13 @@ import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { useQueryClient } from '@tanstack/react-query';
 import { Icon } from '@iconify/react';
 import Header from '@/components/Header';
 import Toast from '@/app/(pages)/item/[groupBuyId]/_components/Toast';
 import { Chip } from '@/components/Chip';
 import { EmptyState } from '@/app/(pages)/(gnb)/feed/_components/EmptyState';
 import Footer from '@/components/Footer';
-import { WishlistCard } from './WishlistCard';
 import { useWishlistList } from '../_hooks/useWishlistList';
-import { useDeleteApiV1GroupBuysGroupBuyIdWishlist } from '@moongchijang/api-client/hooks/wishlist/wishlist';
 import {
   GetApiV1WishlistsFilter,
   GetApiV1WishlistsSort,
@@ -83,7 +80,6 @@ export function FavoriteClient() {
 }
 
 function FavoriteListContent() {
-  const queryClient = useQueryClient();
   const [filter, setFilter] = useState<WishlistFilter>(
     GetApiV1WishlistsFilter.ALL,
   );
@@ -129,18 +125,6 @@ function FavoriteListContent() {
     observer.observe(sentinel);
     return () => observer.disconnect();
   }, [fetchNextPage]);
-
-  const {
-    mutate: removeWishlist,
-    variables: removingVars,
-    isPending,
-  } = useDeleteApiV1GroupBuysGroupBuyIdWishlist({
-    mutation: {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['/api/v1/wishlists'] });
-      },
-    },
-  });
 
   return (
     <div className="flex flex-col h-full">
@@ -221,36 +205,13 @@ function FavoriteListContent() {
                 <WishlistSkeleton key={i} />
               ))}
             </div>
-          ) : items.length === 0 ? (
-            <EmptyState
-              title={'찜한 공구가 없어요'}
-              description={'마음에 드는 공구를 찜해보세요!'}
-            />
           ) : (
-            <div className="bg-bg-white overflow-hidden pb-5">
-              {items.map((item) => (
-                <Link
-                  key={item.groupBuyId}
-                  href={`/item/${item.groupBuyId}`}
-                  onClick={() =>
-                    logEvent('wishlist_item_click', {
-                      item_id: item.groupBuyId,
-                      item_name: item.productName,
-                    })
-                  }
-                >
-                  <WishlistCard
-                    {...item}
-                    isRemoving={
-                      isPending && removingVars?.groupBuyId === item.groupBuyId
-                    }
-                    onRemove={() =>
-                      removeWishlist({ groupBuyId: item.groupBuyId })
-                    }
-                  />
-                </Link>
-              ))}
-            </div>
+            items.length === 0 && (
+              <EmptyState
+                title={'찜한 공구가 없어요'}
+                description={'마음에 드는 공구를 찜해보세요!'}
+              />
+            )
           )}
           <div ref={sentinelRef} className="h-1" />
           {isFetchingNextPage && (

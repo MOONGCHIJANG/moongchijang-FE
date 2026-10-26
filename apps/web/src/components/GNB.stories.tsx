@@ -32,12 +32,6 @@ export const FeedActive: Story = {
   },
 };
 
-export const RequestActive: Story = {
-  parameters: {
-    nextjs: { navigation: { pathname: '/request' } },
-  },
-};
-
 export const FavoriteActive: Story = {
   parameters: {
     nextjs: { navigation: { pathname: '/favorite' } },

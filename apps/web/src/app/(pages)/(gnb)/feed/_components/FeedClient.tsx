@@ -20,7 +20,6 @@ import { LocationBottomSheet } from './LocationBottomSheet';
 import { SearchOverlay } from './SearchOverlay';
 import { QrModal } from './QrModal';
 import { EmptyState } from './EmptyState';
-import { GroupBuyRequestCard } from './GroupBuyRequestCard';
 import { REGIONS_DATA, Region } from '@/constants/regions';
 import { useShake } from '@/hooks/useShake';
 import {
@@ -30,7 +29,6 @@ import {
 import {
   type ApiResponseSearchAnalysisData,
   ApiResponseSearchAnalysisDataSearchCase,
-  ApiResponseSearchAnalysisDataUiState,
 } from '@moongchijang/api-client/generated/api.schemas';
 import { useGetApiV1PickupsMeNearestQr } from '@moongchijang/api-client/hooks/pickup/pickup';
 import { useAuthStore } from '@moongchijang/api-client/authStore';
@@ -254,27 +252,6 @@ export function FeedClient() {
     });
   };
 
-  const handleOpenRequestSheet = useCallback(() => {
-    if (searchKeyword) {
-      logEvent('group_request_cta_click', {
-        search_term: searchKeyword,
-        source: 'search_empty',
-      });
-    }
-    const params = new URLSearchParams();
-    if (searchAnalysis?.detectedProduct)
-      params.set('bakery', searchAnalysis.detectedProduct);
-    if (searchAnalysis?.detectedRegion)
-      params.set('neighborhood', searchAnalysis.detectedRegion);
-
-    if (searchAnalysis?.detectedProduct && searchAnalysis?.detectedRegion) {
-      params.set('step', 'stores');
-    }
-
-    const qs = params.toString();
-    router.push(`/feed/request${qs ? `?${qs}` : ''}`);
-  }, [router, searchAnalysis, searchKeyword]);
-
   const handleShake = useCallback(() => {
     if (!isLoggedIn) return;
     setIsQrModalOpen(true);
@@ -378,40 +355,6 @@ export function FeedClient() {
                 <FeedCard {...feed} />
               </Link>
             ))}
-            {isSearchMode &&
-            (searchAnalysis?.uiState ===
-              ApiResponseSearchAnalysisDataUiState.RESULTS ||
-              searchAnalysis?.uiState ===
-                ApiResponseSearchAnalysisDataUiState.EMPTY_CAN_REQUEST) ? (
-              <>
-                {searchAnalysis.detectedProduct &&
-                !searchAnalysis.detectedRegion ? (
-                  <GroupBuyRequestCard
-                    icon="/icons/search.svg"
-                    title={`찾으시는 ${searchAnalysis.detectedProduct} 공구가\n없나요?`}
-                    onRequest={handleOpenRequestSheet}
-                  />
-                ) : !searchAnalysis.detectedProduct &&
-                  searchAnalysis.detectedRegion ? (
-                  <GroupBuyRequestCard
-                    icon="/icons/search.svg"
-                    title={`찾으시는 ${searchAnalysis.detectedRegion} 공구가\n없나요?`}
-                    onRequest={handleOpenRequestSheet}
-                  />
-                ) : searchAnalysis.detectedProduct &&
-                  searchAnalysis.detectedRegion ? (
-                  <GroupBuyRequestCard
-                    icon="/icons/search.svg"
-                    title={`찾으시는 ${searchAnalysis.detectedProduct} 공구가\n없나요?`}
-                    onRequest={handleOpenRequestSheet}
-                  />
-                ) : (
-                  <GroupBuyRequestCard onRequest={handleOpenRequestSheet} />
-                )}
-              </>
-            ) : !isSearchMode ? null : (
-              <GroupBuyRequestCard onRequest={handleOpenRequestSheet} />
-            )}
           </>
         )}
 

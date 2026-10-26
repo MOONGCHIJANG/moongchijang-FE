@@ -7,47 +7,6 @@ export type EventParams = {
     entry_source?: string;
   };
 
-  // 공구요청 플로우
-  group_request_start: { source: 'search_empty' | 'gnb' | 'mypage' };
-  group_request_step: { step: number; step_name: string };
-  group_request_submit: Record<string, never>;
-  group_request_submit_success: { store_name: string; product_name: string };
-  group_request_submit_fail: { reason: string };
-  group_request_history_view: Record<string, never>;
-  group_request_status_view: { status: '매장협의중' | '공구결과안내' };
-  groupbuy_request_search_start: { entry_source?: string };
-  groupbuy_request_search: { query_length: number; result_count: number };
-  groupbuy_request_store_select: {
-    store_id: string;
-    result_position: number;
-    has_address: boolean;
-  };
-  groupbuy_request_store_confirm: { store_id: string };
-  groupbuy_request_form_start: { store_id?: string; entry_source?: string };
-  groupbuy_request_field_complete: { field_name: string; value_type?: string };
-  groupbuy_request_submit_click: {
-    filled_field_count: number;
-    has_memo: boolean;
-    quantity: number;
-  };
-  groupbuy_request_confirm_view: {
-    store_id: string;
-    quantity: number;
-    has_memo: boolean;
-  };
-  groupbuy_request_confirm_close: { close_method: 'backdrop' | 'button' };
-  groupbuy_request_submit_attempt: { store_id: string; quantity: number };
-  groupbuy_request_submit_success: {
-    request_id: number;
-    store_id: string;
-    quantity: number;
-  };
-  groupbuy_request_submit_fail: {
-    error_code?: string;
-    error_message_group?: string;
-  };
-  groupbuy_request_detail_view: { request_id: number; request_status: string };
-
   // 로그인/회원가입
   login: { method: 'email' };
   login_fail: { reason: 'wrong_password' | 'unregistered' };
@@ -67,7 +26,6 @@ export type EventParams = {
   // 검색
   search_filter_apply: { filter_type: 'region'; filter_value: string };
   search_chip_select: { chip_name: string };
-  group_request_cta_click: { search_term: string; source: 'search_empty' };
 
   // 상세페이지
   view_item: {
@@ -103,7 +61,6 @@ export type EventParams = {
   // 마이페이지/찜/알림
   mypage_view: Record<string, never>;
   wishlist_view: { item_count: number };
-  wishlist_item_click: { item_id: number; item_name: string };
   notification_view: { unread_count?: number };
   notification_click: {
     notification_type: 'group_open' | 'pickup_reminder' | 'request_result';

@@ -10,12 +10,6 @@ interface GNBProps {
 
 const TABS = [
   { id: 'feed', label: '피드', icon: 'fa7-solid:home', href: '/feed' },
-  {
-    id: 'request',
-    label: '공구요청',
-    icon: 'bi:bag-plus-fill',
-    href: '/request',
-  },
   { id: 'favorite', label: '찜', icon: 'solar:heart-bold', href: '/favorite' },
   {
     id: 'mypage',

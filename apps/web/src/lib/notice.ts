@@ -99,6 +99,6 @@ export function resolveDeeplinkPath(
     case NotificationDeeplinkType.MY_APPLYING:
       return `/mypage`; // TODO: 실제 경로로 수정 필요
     case NotificationDeeplinkType.REQUEST_STATUS:
-      return `/request`;
+      return `/mypage`; // TODO: v2 마이페이지 입점 요청 내역 경로로 수정 필요
   }
 }

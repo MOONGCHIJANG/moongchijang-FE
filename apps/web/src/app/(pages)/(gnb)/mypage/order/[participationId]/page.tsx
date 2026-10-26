@@ -1,7 +1,6 @@
 'use client';
 
-import { use, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { use } from 'react';
 import {
   useGetApiV1UsersMeParticipations,
   useGetApiV1UsersMeRefunds,
@@ -14,7 +13,6 @@ import { useGetApiV1ParticipationsParticipationIdPickup } from '@moongchijang/ap
 import Image from 'next/image';
 import Header from '@/components/Header';
 import Tooltip from '@/components/Tooltip';
-import Modal from '@/components/Modal';
 import { formatShortDate, formatCompactDate } from '@/lib/date';
 
 type OrderVariant =
@@ -72,8 +70,6 @@ export default function OrderDetailPage({
 }) {
   const { participationId } = use(params);
   const id = Number(participationId);
-  const router = useRouter();
-  const [showCancelModal, setShowCancelModal] = useState(false);
 
   const { data: inProgressRes, isPending: isInProgressPending } =
     useGetApiV1UsersMeParticipations({ status: 'IN_PROGRESS' });
@@ -212,20 +208,12 @@ export default function OrderDetailPage({
           </div>
         </div>
 
-        {/* 툴팁 + 주문 취소 */}
+        {/* 툴팁 */}
         {variant === 'active' && (
           <div className="flex flex-col items-center gap-19 mt-g3">
             <div className="relative w-full flex justify-center">
               <Tooltip text="공구가 달성되지 않으면 자동으로 환불돼요" />
             </div>
-            {inProgressItem?.canCancel && (
-              <button
-                className="caption-sm-medium text-text-tertiary underline underline-offset-2"
-                onClick={() => setShowCancelModal(true)}
-              >
-                주문 취소
-              </button>
-            )}
           </div>
         )}
 
@@ -257,15 +245,6 @@ export default function OrderDetailPage({
             </div>
           )}
       </div>
-      <Modal
-        isOpen={showCancelModal}
-        title="정말 취소하시겠어요?"
-        iconType="warning"
-        confirmLabel="취소하기"
-        cancelLabel="다시 생각하기"
-        onConfirm={() => router.push(`/mypage/order/${id}/cancel`)}
-        onCancel={() => setShowCancelModal(false)}
-      />
     </div>
   );
 }

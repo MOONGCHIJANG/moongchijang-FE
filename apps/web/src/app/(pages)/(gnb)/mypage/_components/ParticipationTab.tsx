@@ -102,8 +102,6 @@ export function ParticipationTab({
             quantity={item.quantity}
             paymentAmount={item.paymentAmount}
             imageUrl={item.thumbnailUrl}
-            achievementRate={item.achievementRate}
-            dDay={item.dDay}
           />
         ))
       ) : tabType === 'waiting' ? (

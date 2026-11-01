@@ -18,8 +18,6 @@ interface BaseCardFields {
 
 type ActiveProps = BaseCardFields & {
   variant: 'active';
-  achievementRate: number;
-  dDay: number;
 };
 
 type PickupProps = BaseCardFields & {
@@ -40,12 +38,6 @@ type ParticipationCardProps =
   | PickupProps
   | CompletedProps
   | RefundedProps;
-
-function formatDDay(dDay: number): string {
-  if (dDay === 0) return 'D-day';
-  if (dDay < 0) return `D${dDay}`;
-  return `D-${dDay}`;
-}
 
 export function ParticipationCard(props: ParticipationCardProps) {
   const {
@@ -115,26 +107,6 @@ export function ParticipationCard(props: ParticipationCardProps) {
       </div>
 
       {/* 탭별 분기 */}
-      {variant === 'active' && (
-        <div className="flex flex-col mb-2 gap-g4">
-          <div className="border-t border-dashed border-divider-default" />
-          <div className="flex items-center gap-g3">
-            <span className="shrink-0 px-2 py-[3px] rounded-large bg-surface-brand-lighter text-text-brand caption-xs-bold">
-              마감까지 {formatDDay(props.dDay)}
-            </span>
-            <div className="flex-1 relative h-2 bg-surface-muted rounded-full overflow-hidden">
-              <div
-                className="absolute inset-y-0 left-0 bg-surface-brand rounded-full transition-all"
-                style={{ width: `${Math.min(props.achievementRate, 100)}%` }}
-              />
-            </div>
-            <span className="shrink-0 body-lg-bold text-text-brand">
-              {props.achievementRate}%
-            </span>
-          </div>
-        </div>
-      )}
-
       {variant === 'pickup' && (
         <div className="flex mb-2 border border-border-subtle rounded-large">
           <button

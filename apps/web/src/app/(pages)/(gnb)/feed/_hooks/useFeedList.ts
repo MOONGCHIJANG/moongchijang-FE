@@ -16,8 +16,6 @@ import { FilterId } from '../_components/FilterBar';
 
 const FILTER_MAP: Record<FilterId, GetApiV1GroupBuysFilter> = {
   all: GetApiV1GroupBuysFilter.ALL,
-  due: GetApiV1GroupBuysFilter.CLOSING_SOON,
-  target: GetApiV1GroupBuysFilter.ALMOST_ACHIEVED,
 };
 
 const PAGE_SIZE = 10;

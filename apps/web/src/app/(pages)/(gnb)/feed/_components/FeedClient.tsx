@@ -41,7 +41,7 @@ import { logEvent } from '@/lib/analytics';
 import Footer from '@/components/Footer';
 
 const ALL_REGIONS = REGIONS_DATA.flatMap((city) => city.regions);
-const VALID_FILTERS: FilterId[] = ['all', 'due', 'target'];
+const VALID_FILTERS: FilterId[] = ['all'];
 const DEFAULT_REGION = REGIONS_DATA[0].regions[0];
 
 function filterFromParam(param: string | null): FilterId {
@@ -220,8 +220,6 @@ export function FeedClient() {
 
   const FILTER_NAMES: Record<FilterId, string> = {
     all: '전체',
-    due: '마감임박',
-    target: '달성임박',
   };
 
   const handleFilterChange = (filter: FilterId) => {

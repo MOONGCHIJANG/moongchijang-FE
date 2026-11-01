@@ -6,7 +6,6 @@ import BottomJoin from './_components/BottomJoin';
 import { serverFetch } from '@moongchijang/api-client/fetcher';
 import type { ApiResponseGroupBuyDetailResponse } from '@moongchijang/api-client/generated/api.schemas';
 import { notFound } from 'next/navigation';
-import ViewerToast from './_components/ViewerToast';
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
 import { getServerAccessToken } from '@moongchijang/api-client/server-auth';
@@ -78,7 +77,6 @@ const page = async ({ params }: Props) => {
   return (
     <div>
       <Header />
-      <ViewerToast groupBuyId={Number(groupBuyId)} />
       <TopInfo data={data} />
       <ItemDetail data={data} />
       <BottomJoin data={data} />

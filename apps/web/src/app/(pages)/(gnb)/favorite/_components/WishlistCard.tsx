@@ -12,18 +12,13 @@ interface WishlistCardProps extends WishlistItemResponse {
 
 export const WishlistCard = ({
   thumbnailUrl,
-  dDay,
-  dDayLabel,
   storeName,
   regionLabel,
   productName,
   price,
-  achievementRate,
   onRemove,
   isRemoving = false,
 }: WishlistCardProps) => {
-  const isUrgent = dDay >= 0 && dDay < 4;
-
   return (
     <div
       className={cn(
@@ -41,15 +36,6 @@ export const WishlistCard = ({
             className="object-cover"
           />
         )}
-        <div
-          className={cn(
-            'absolute top-0 left-0 px-2 py-1 caption-xs-bold text-text-basic-inverse',
-            'rounded-tl-xl rounded-br-xl',
-            isUrgent ? 'bg-surface-brand' : 'bg-surface-inverse',
-          )}
-        >
-          {dDayLabel}
-        </div>
       </div>
 
       {/* 컨텐츠 */}
@@ -86,19 +72,6 @@ export const WishlistCard = ({
         <span className="heading-md-bold text-text-basic font-pretendard">
           {(price ?? 0).toLocaleString()}원
         </span>
-
-        {/* 달성률 */}
-        <div className="flex items-center gap-2">
-          <div className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-gray-200">
-            <div
-              className="absolute left-0 top-0 h-full rounded-full bg-surface-brand transition-all"
-              style={{ width: `${achievementRate}%` }}
-            />
-          </div>
-          <span className="body-lg-bold text-text-brand font-pretendard w-8 text-right shrink-0">
-            {achievementRate}%
-          </span>
-        </div>
       </div>
     </div>
   );

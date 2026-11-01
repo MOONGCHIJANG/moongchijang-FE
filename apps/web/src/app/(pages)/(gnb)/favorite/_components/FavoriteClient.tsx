@@ -1,14 +1,11 @@
 'use client';
 
-import { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
-import { Icon } from '@iconify/react';
 import Header from '@/components/Header';
-import Toast from '@/app/(pages)/item/[groupBuyId]/_components/Toast';
-import { Chip } from '@/components/Chip';
 import { EmptyState } from '@/app/(pages)/(gnb)/feed/_components/EmptyState';
 import Footer from '@/components/Footer';
 import { WishlistCard } from './WishlistCard';
@@ -20,17 +17,6 @@ import {
 } from '@moongchijang/api-client/generated/api.schemas';
 import { logEvent } from '@/lib/analytics';
 import { useAuthStore } from '@moongchijang/api-client/authStore';
-
-type WishlistFilter =
-  (typeof GetApiV1WishlistsFilter)[keyof typeof GetApiV1WishlistsFilter];
-type WishlistSort =
-  (typeof GetApiV1WishlistsSort)[keyof typeof GetApiV1WishlistsSort];
-
-const FILTER_TABS: { label: string; value: WishlistFilter }[] = [
-  { label: '전체', value: GetApiV1WishlistsFilter.ALL },
-  { label: '모집중', value: GetApiV1WishlistsFilter.OPEN },
-  { label: '마감임박', value: GetApiV1WishlistsFilter.CLOSING_SOON },
-];
 
 const WishlistSkeleton = () => (
   <div className="flex gap-3 px-4 py-3 bg-bg-white border-b border-border-default">
@@ -84,22 +70,19 @@ export function FavoriteClient() {
 
 function FavoriteListContent() {
   const queryClient = useQueryClient();
-  const [filter, setFilter] = useState<WishlistFilter>(
-    GetApiV1WishlistsFilter.ALL,
-  );
-  const [sort, setSort] = useState<WishlistSort>(GetApiV1WishlistsSort.LATEST);
-  const [excludeClosed, setExcludeClosed] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   const {
     items,
     isLoading,
     totalElements,
-    urgentCount,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useWishlistList(filter, sort, excludeClosed);
+  } = useWishlistList(
+    GetApiV1WishlistsFilter.ALL,
+    GetApiV1WishlistsSort.LATEST,
+  );
 
   const scrollStateRef = useRef({ hasNextPage, isFetchingNextPage });
   useLayoutEffect(() => {
@@ -148,72 +131,6 @@ function FavoriteListContent() {
 
       <div className="flex-1 overflow-y-auto flex flex-col">
         <div className="flex-1">
-          {/* 필터 탭 */}
-          <div className="flex gap-2 px-4 pt-4 pb-2">
-            {FILTER_TABS.map(({ label, value }) => (
-              <Chip
-                key={value}
-                label={
-                  filter === value && totalElements > 0
-                    ? `${label}(${totalElements})`
-                    : label
-                }
-                active={filter === value}
-                onClick={() => setFilter(value)}
-              />
-            ))}
-          </div>
-
-          {/* 마감 제외 · 정렬 */}
-          <div className="flex items-center justify-between px-4 pb-3">
-            {filter === GetApiV1WishlistsFilter.ALL ? (
-              <button
-                type="button"
-                onClick={() => setExcludeClosed((prev) => !prev)}
-                className="flex items-center gap-2"
-              >
-                <Icon
-                  icon={
-                    excludeClosed
-                      ? 'material-symbols:radio-button-checked'
-                      : 'material-symbols:radio-button-unchecked'
-                  }
-                  className={
-                    excludeClosed
-                      ? 'w-4 h-4 text-button-natural'
-                      : 'w-4 h-4 text-icon-tertiary'
-                  }
-                />
-                <span className="caption-sm-regular text-text-basic font-pretendard">
-                  마감 제외
-                </span>
-              </button>
-            ) : (
-              <div />
-            )}
-            <button
-              type="button"
-              onClick={() =>
-                setSort((prev) =>
-                  prev === GetApiV1WishlistsSort.LATEST
-                    ? GetApiV1WishlistsSort.DEADLINE
-                    : GetApiV1WishlistsSort.LATEST,
-                )
-              }
-              className="flex items-center gap-1 caption-sm-regular text-text-basic font-pretendard"
-            >
-              <span>
-                {sort === GetApiV1WishlistsSort.DEADLINE
-                  ? '마감임박순'
-                  : '최신순'}
-              </span>
-              <Icon
-                icon="pepicons-pencil:down-up"
-                className="w-4 h-4 text-icon-basic"
-              />
-            </button>
-          </div>
-
           {/* 목록 */}
           {isLoading ? (
             <div className="bg-bg-white overflow-hidden">
@@ -261,15 +178,6 @@ function FavoriteListContent() {
         </div>
         <Footer hasBottomSticky={false} />
       </div>
-
-      {urgentCount > 0 && (
-        <div className="fixed bottom-[74px] left-1/2 z-40 -translate-x-1/2 w-[calc(100%-32px)] max-w-[408px] flex justify-center">
-          <Toast>
-            마감까지 24시간 이내인 찜한 상품이 {urgentCount}개 있어요.
-            서두르세요!
-          </Toast>
-        </div>
-      )}
     </div>
   );
 }

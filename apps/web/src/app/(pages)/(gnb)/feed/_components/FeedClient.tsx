@@ -262,15 +262,10 @@ export function FeedClient() {
     const params = new URLSearchParams();
     if (searchAnalysis?.detectedProduct)
       params.set('bakery', searchAnalysis.detectedProduct);
-    if (searchAnalysis?.detectedRegion)
-      params.set('neighborhood', searchAnalysis.detectedRegion);
-
-    if (searchAnalysis?.detectedProduct && searchAnalysis?.detectedRegion) {
-      params.set('step', 'stores');
-    }
+    params.set('source', 'search_empty');
 
     const qs = params.toString();
-    router.push(`/feed/request${qs ? `?${qs}` : ''}`);
+    router.push(`/request/new${qs ? `?${qs}` : ''}`);
   }, [router, searchAnalysis, searchKeyword]);
 
   const handleShake = useCallback(() => {

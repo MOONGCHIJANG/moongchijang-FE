@@ -16,12 +16,10 @@ const TopInfo = ({ data }: Props) => {
   const [isShared, setIsShared] = React.useState(false);
 
   useEffect(() => {
-    const itemStatus = new Date(data.deadline) > new Date() ? 'open' : 'closed';
     logEvent('view_item', {
       item_id: data.id,
       item_name: data.productName,
       store_name: data.storeName,
-      item_status: itemStatus,
     });
   }, []);
 
@@ -65,7 +63,7 @@ const TopInfo = ({ data }: Props) => {
                 groupBuyId={data.id}
                 productName={data.productName}
                 imageUrl={data.thumbnailUrl ?? undefined}
-                description={`${data.deadlineDateTimeLabel}까지 · ${data.storeName}`}
+                description={`${data.regionLabel} · ${data.storeName}`}
               />
             </div>
           </div>

@@ -74,7 +74,6 @@ export type EventParams = {
     item_id: number;
     item_name: string;
     store_name: string;
-    item_status: 'open' | 'closed';
   };
   add_to_wishlist: { item_id: number; item_name: string; store_name: string };
   product_share: { item_id: number; share_method: 'link' | 'kakao' };

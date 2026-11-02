@@ -12,7 +12,6 @@ import {
 import { useGetApiV1ParticipationsParticipationIdPickup } from '@moongchijang/api-client/hooks/pickup/pickup';
 import Image from 'next/image';
 import Header from '@/components/Header';
-import Tooltip from '@/components/Tooltip';
 import { formatShortDate, formatCompactDate } from '@/lib/date';
 
 type OrderVariant =
@@ -24,7 +23,7 @@ type OrderVariant =
 
 const MINI_TAG: Record<OrderVariant, { label: string; className: string }> = {
   active: {
-    label: '달성 전',
+    label: '진행 중',
     className: 'bg-surface-brand-lighter text-text-brand',
   },
   waiting: {
@@ -207,15 +206,6 @@ export default function OrderDetailPage({
             )}
           </div>
         </div>
-
-        {/* 툴팁 */}
-        {variant === 'active' && (
-          <div className="flex flex-col items-center gap-19 mt-g3">
-            <div className="relative w-full flex justify-center">
-              <Tooltip text="공구가 달성되지 않으면 자동으로 환불돼요" />
-            </div>
-          </div>
-        )}
 
         {/* 환불 내역 */}
         {(variant === 'refund-pending' || variant === 'refund-completed') &&

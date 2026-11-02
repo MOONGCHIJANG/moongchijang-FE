@@ -125,7 +125,7 @@ const NoticeClient = ({ initialData }: NoticeClientProps) => {
             <div className="flex flex-col gap-g3 items-center">
               <p className="text-center heading-md-bold">아직 알림이 없어요</p>
               <p className="whitespace-pre-line text-center body-md-semibold text-[#757575]">
-                {`공구를 찜하거나 신청하면\n마감·픽업 일정을 알려드려요.`}
+                {`공구를 찜하거나 신청하면\n픽업 일정을 알려드려요.`}
               </p>
             </div>
           </div>

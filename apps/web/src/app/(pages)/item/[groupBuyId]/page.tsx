@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     );
     const data = responseData.data;
     const title = `[뭉치장] ${data.productName} 공구 같이 뭉쳐서 구매하자!`;
-    const description = `${data.deadlineDateTimeLabel}까지 · ${data.storeName}`;
+    const description = `${data.regionLabel} · ${data.storeName}`;
     const ogImage = data.thumbnailUrl
       ? { url: data.thumbnailUrl, alt: data.productName }
       : {

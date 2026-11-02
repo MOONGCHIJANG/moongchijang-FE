@@ -5,7 +5,7 @@ import { Icon } from '@iconify/react';
 import React, { useEffect } from 'react';
 import BottomShare from './BottomShare';
 import { ApiResponseGroupBuyDetailResponseData } from '@moongchijang/api-client/generated/api.schemas';
-import { formatDeadline, formatPickupDate, formatPickupTime } from '@/lib/date';
+import { formatPickupDate, formatPickupTime } from '@/lib/date';
 import { logEvent } from '@/lib/analytics';
 
 interface Props {
@@ -73,38 +73,7 @@ const TopInfo = ({ data }: Props) => {
         </div>
       </div>
 
-      <div className="px-p6 py-p5 rounded-2xlarge flex flex-col gap-g3 bg-bg-white-muted">
-        <div className="flex gap-g1 items-center">
-          <p className="body-md-semibold">달성까지</p>
-          <p className="text-text-tertiary caption-sm-medium">・</p>
-          <p className="text-text-tertiary caption-sm-medium">
-            마감일 {formatDeadline(data.deadline)}
-          </p>
-        </div>
-        <div className="flex gap-g4 items-center">
-          <div className="flex gap-g2 items-center">
-            <Icon
-              icon="mynaui:ticket-solid"
-              className="text-primary-400 w-4 h-4"
-            />
-            <p className="text-text-brand body-md-bold">
-              {data.currentQuantity}/{data.targetQuantity}
-            </p>
-          </div>
-          <div className="h-5 w-px bg-border-subtle" />
-          <div className="flex gap-g3 w-full items-center">
-            <div className="relative flex-1 h-2 rounded-full bg-[#D9D9D9]">
-              <div
-                className="absolute left-0 top-0 h-full rounded-full bg-primary-400"
-                style={{ width: `${Math.min(data.achievementRate, 100)}%` }}
-              />
-            </div>
-            <p className="text-text-brand heading-sm-bold">
-              {data.achievementRate}%
-            </p>
-          </div>
-        </div>
-      </div>
+      {/* TODO(함께사기): 1.2.1 픽업 가능 기간·시간대·매장 휴무 안내로 교체 */}
 
       <div className="p-p2 divide-y divide-dashed divide-border-default">
         <div className="flex justify-between p-p3">

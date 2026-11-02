@@ -12,8 +12,8 @@ interface GroupBuyRequestCardProps {
 export const GroupBuyRequestCard = ({
   icon,
   title = '뭉치장이 원하는 공구에 참여할 수 있도록\n도와드릴게요!',
-  description = '동네와 원하는 베이커리 스타일을 선택하면\n딱 맞는 매장을 추천해드려요',
-  buttonLabel = '✨ 공구 개설 요청하기',
+  description = '입점 검토에 2~5 영업일이 걸려요',
+  buttonLabel = '입점 요청하기',
   onRequest,
 }: GroupBuyRequestCardProps) => {
   return (

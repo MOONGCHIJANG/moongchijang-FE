@@ -84,7 +84,7 @@ export const RequestFormStep = ({
           </button>
 
           <span className="heading-sm-semibold text-text-basic">
-            공구 요청하기
+            입점 요청하기
           </span>
         </div>
       </header>

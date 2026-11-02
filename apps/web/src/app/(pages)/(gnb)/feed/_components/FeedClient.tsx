@@ -323,7 +323,7 @@ export function FeedClient() {
               <EmptyState
                 title={'원하시는 공구가\n아직 없어요'}
                 description={
-                  '다른 검색어를 입력하거나\n공구 개설을 요청해보세요.'
+                  '다른 검색어를 입력하거나\n입점을 요청해보세요.'
                 }
               />
             )}

@@ -15,14 +15,14 @@ function getStatusConfig(status: GroupBuyRequestDetailStatus): {
   if (status === GroupBuyRequestDetailStatus.OPENED) {
     return {
       badge: '검토 완료',
-      statusText: '공구 개설 완료',
+      statusText: '입점 완료',
       badgeClassName: 'bg-surface-default text-text-tertiary',
     };
   }
   if (status === GroupBuyRequestDetailStatus.REJECTED) {
     return {
       badge: '검토 완료',
-      statusText: '공구 개설 불가',
+      statusText: '입점 불가',
       badgeClassName: 'bg-surface-default text-text-tertiary',
     };
   }

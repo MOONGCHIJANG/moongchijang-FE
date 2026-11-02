@@ -18,11 +18,9 @@ import { FeedCard } from './FeedCard';
 import { FeedSkeletonList } from './FeedSkeleton';
 import { LocationBottomSheet } from './LocationBottomSheet';
 import { SearchOverlay } from './SearchOverlay';
-import { QrModal } from './QrModal';
 import { EmptyState } from './EmptyState';
 import { GroupBuyRequestCard } from './GroupBuyRequestCard';
 import { REGIONS_DATA, Region } from '@/constants/regions';
-import { useShake } from '@/hooks/useShake';
 import {
   usePostApiV1Search,
   getGetApiV1SearchRecentQueryKey,
@@ -32,16 +30,14 @@ import {
   ApiResponseSearchAnalysisDataSearchCase,
   ApiResponseSearchAnalysisDataUiState,
 } from '@moongchijang/api-client/generated/api.schemas';
-import { useGetApiV1PickupsMeNearestQr } from '@moongchijang/api-client/hooks/pickup/pickup';
 import { useAuthStore } from '@moongchijang/api-client/authStore';
-import { formatPickupDateTime, formatTime } from '@/lib/date';
 import { useFeedList } from '../_hooks/useFeedList';
 import { useRecentSearches } from '../_hooks/useRecentSearches';
 import { logEvent } from '@/lib/analytics';
 import Footer from '@/components/Footer';
 
 const ALL_REGIONS = REGIONS_DATA.flatMap((city) => city.regions);
-const VALID_FILTERS: FilterId[] = ['all', 'due', 'target'];
+const VALID_FILTERS: FilterId[] = ['all'];
 const DEFAULT_REGION = REGIONS_DATA[0].regions[0];
 
 function filterFromParam(param: string | null): FilterId {
@@ -70,7 +66,6 @@ export function FeedClient() {
   const [selectedRegions, setSelectedRegions] = useState<Region[]>(() =>
     regionsFromParams(searchParams.getAll('districts')),
   );
-  const [isQrModalOpen, setIsQrModalOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchInput, setSearchInput] = useState(
     () => searchParams.get('search') ?? '',
@@ -99,21 +94,6 @@ export function FeedClient() {
     });
 
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
-
-  const { data: nearestQrResponse } = useGetApiV1PickupsMeNearestQr({
-    query: { enabled: isLoggedIn },
-  });
-  const nearestQrData =
-    nearestQrResponse?.status === 200 ? nearestQrResponse.data?.data : null;
-  const qrItem = nearestQrData?.item ?? null;
-  const hasCandidate = nearestQrData?.hasCandidate ?? false;
-  const hasMultipleToday = nearestQrData?.hasMultipleToday ?? false;
-  const isPickupDay = qrItem?.availabilityStatus === 'AVAILABLE';
-  const dDayText = qrItem
-    ? qrItem.dDay === 0
-      ? 'D-day'
-      : `D-${qrItem.dDay}`
-    : '';
 
   const sentinelRef = useRef<HTMLDivElement>(null);
 
@@ -220,8 +200,6 @@ export function FeedClient() {
 
   const FILTER_NAMES: Record<FilterId, string> = {
     all: '전체',
-    due: '마감임박',
-    target: '달성임박',
   };
 
   const handleFilterChange = (filter: FilterId) => {
@@ -264,23 +242,11 @@ export function FeedClient() {
     const params = new URLSearchParams();
     if (searchAnalysis?.detectedProduct)
       params.set('bakery', searchAnalysis.detectedProduct);
-    if (searchAnalysis?.detectedRegion)
-      params.set('neighborhood', searchAnalysis.detectedRegion);
-
-    if (searchAnalysis?.detectedProduct && searchAnalysis?.detectedRegion) {
-      params.set('step', 'stores');
-    }
+    params.set('source', 'search_empty');
 
     const qs = params.toString();
-    router.push(`/feed/request${qs ? `?${qs}` : ''}`);
+    router.push(`/request/new${qs ? `?${qs}` : ''}`);
   }, [router, searchAnalysis, searchKeyword]);
-
-  const handleShake = useCallback(() => {
-    if (!isLoggedIn) return;
-    setIsQrModalOpen(true);
-  }, [isLoggedIn]);
-
-  const { isEnabled, toggleShake } = useShake(handleShake);
 
   const locationDisplayText =
     selectedRegions.length === 1
@@ -297,7 +263,6 @@ export function FeedClient() {
           location={locationDisplayText}
           onLocationClick={() => setIsLocationSheetOpen(true)}
           onNotificationClick={() => router.push('/notifications')}
-          onQrClick={() => setIsQrModalOpen(true)}
           showQr={isLoggedIn}
         />
 
@@ -438,36 +403,6 @@ export function FeedClient() {
         onRemoveRecent={removeRecentSearch}
         onClearRecent={clearRecentSearches}
       />
-
-      {isLoggedIn && (
-        <QrModal
-          isOpen={isQrModalOpen}
-          onClose={() => setIsQrModalOpen(false)}
-          isPickupDay={isPickupDay}
-          hasCandidate={hasCandidate}
-          hasMultipleToday={hasMultipleToday}
-          productName={qrItem?.productName ?? ''}
-          reservationNumber={qrItem?.reservationNumber ?? ''}
-          pickupAddress={qrItem?.pickupLocation ?? ''}
-          pickupTimeStart={
-            qrItem
-              ? formatPickupDateTime(qrItem.pickupDate, qrItem.pickupTimeStart)
-              : ''
-          }
-          pickupTimeEnd={qrItem ? formatTime(qrItem.pickupTimeEnd) : ''}
-          qrCode={qrItem?.qrCode ?? ''}
-          dDayText={dDayText}
-          shakeEnabled={isEnabled}
-          onShakeToggle={() => toggleShake()}
-          onDetailClick={() => {
-            if (qrItem) router.push(`/mypage/pickup/${qrItem.participationId}`);
-          }}
-          onMultiplePickupClick={() => {
-            setIsQrModalOpen(false);
-            router.push('/mypage');
-          }}
-        />
-      )}
     </>
   );
 }

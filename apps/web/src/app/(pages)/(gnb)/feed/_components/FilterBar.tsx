@@ -3,7 +3,7 @@
 import { Chip } from '@/components/Chip';
 import { cn } from '@/lib/utils';
 
-export type FilterId = 'all' | 'due' | 'target';
+export type FilterId = 'all';
 
 interface FilterBarProps {
   activeFilter?: FilterId;
@@ -11,11 +11,7 @@ interface FilterBarProps {
   className?: string;
 }
 
-const FILTERS = [
-  { id: 'all', label: '전체' },
-  { id: 'due', label: '마감임박' },
-  { id: 'target', label: '달성임박' },
-] as const;
+const FILTERS = [{ id: 'all', label: '전체' }] as const;
 
 export const FilterBar = ({
   activeFilter = 'all',

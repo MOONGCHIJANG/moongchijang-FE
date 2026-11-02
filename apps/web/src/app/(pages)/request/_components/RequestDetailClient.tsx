@@ -30,7 +30,7 @@ function getStatusConfig(status: GroupBuyRequestDetailStatus): {
     badge: '검토중',
     statusText:
       status === GroupBuyRequestDetailStatus.IN_CONTACT
-        ? '매장 협의 중'
+        ? '매장 확인 중'
         : '검토 중',
     badgeClassName: 'bg-surface-brand-lighter text-text-brand',
   };

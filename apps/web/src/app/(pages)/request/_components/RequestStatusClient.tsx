@@ -31,9 +31,9 @@ function getStepStates(
 
 const STATUS_MESSAGE: Record<GroupBuyRequestDetailStatus, string> = {
   IN_REVIEW: '요청을 접수했어요',
-  IN_CONTACT: '매장과 최소수량과 가능일을 협의하고 있어요',
-  OPENED: '공구 결과가 알림으로 발송 되었어요',
-  REJECTED: '공구 결과가 알림으로 발송 되었어요',
+  IN_CONTACT: '매장에 입점 가능 여부를 확인하고 있어요',
+  OPENED: '입점 결과가 알림으로 발송 되었어요',
+  REJECTED: '입점 결과가 알림으로 발송 되었어요',
 };
 
 function StepDot({ state }: { state: StepState }) {
@@ -214,13 +214,13 @@ export function RequestStatusClient({ requestId }: RequestStatusClientProps) {
             />
             <TimelineStep
               state={step2}
-              label="매장 협의 중"
+              label="매장 확인 중"
               date={step2Date ? formatDate(step2Date) : undefined}
               showConnector
             />
             <TimelineStep
               state={step3}
-              label="공구 결과 안내"
+              label="입점 결과 안내"
               date={step3Date ? formatDate(step3Date) : undefined}
               showConnector={false}
             />

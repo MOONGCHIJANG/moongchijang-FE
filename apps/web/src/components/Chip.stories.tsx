@@ -27,7 +27,7 @@ type Story = StoryObj<typeof Chip>;
  */
 export const Default: Story = {
   args: {
-    label: '마감임박',
+    label: '이번 주 픽업',
     active: false,
   },
 };
@@ -47,7 +47,7 @@ export const Active: Story = {
  */
 export const Disabled: Story = {
   args: {
-    label: '마감임박',
+    label: '이번 주 픽업',
     active: false,
     disabled: true,
   },
@@ -71,7 +71,7 @@ export const Interactive: Story = {
     );
   },
   args: {
-    label: '마감임박',
+    label: '이번 주 픽업',
   },
 };
 
@@ -80,7 +80,7 @@ export const Interactive: Story = {
  */
 export const FilterGroup: Story = {
   render: () => {
-    const options = ['전체', '마감임박', '달성임박'];
+    const options = ['전체', '이번 주 픽업', '적게 사도 OK'];
     const [active, setActive] = useState('전체');
     return (
       <div className="flex gap-2">

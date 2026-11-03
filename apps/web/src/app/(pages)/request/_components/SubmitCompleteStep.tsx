@@ -31,7 +31,7 @@ export const SubmitCompleteStep = () => {
             />
           </button>
           <span className="heading-sm-semibold text-text-basic">
-            공구 요청하기
+            입점 요청하기
           </span>
         </div>
       </header>
@@ -40,14 +40,14 @@ export const SubmitCompleteStep = () => {
         <div className="flex flex-col items-center gap-3">
           <Image
             src="/images/group-buy-request-complete.svg"
-            alt="공구 요청 완료 일러스트"
+            alt="입점 요청 완료 일러스트"
             width={153}
             height={101}
             style={{ width: 'auto' }}
           />
           <div className="flex flex-col items-center gap-2 text-center w-full">
             <span className="heading-md-bold text-text-basic">
-              뭉치장 공동구매 요청이
+              뭉치장 입점 요청이
               <br />
               완료되었어요!
             </span>

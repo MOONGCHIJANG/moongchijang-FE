@@ -51,7 +51,7 @@ export function RequestListClient() {
   if (!isLoggedIn) {
     return (
       <div className="flex flex-col h-full min-h-[calc(100dvh-58px)]">
-        <Header text="공구 요청하기" showBackButton={false} />
+        <Header text="입점 요청하기" showBackButton={false} />
         <div className="flex-1 flex flex-col items-center justify-center pb-[58px]">
           <div className="flex flex-col items-center gap-g4">
             <Image
@@ -83,7 +83,7 @@ export function RequestListClient() {
 
   return (
     <div className="flex flex-col h-full">
-      <Header text="공구 요청하기" showBackButton={false} />
+      <Header text="입점 요청하기" showBackButton={false} />
 
       <div className="flex-1 overflow-y-auto">
         {isLoading ? (
@@ -125,7 +125,7 @@ export function RequestListClient() {
         <Link href="/request/new">
           <Button size="lg" variant="primary" fullWidth>
             <Icon icon="lucide:plus" className="w-6 h-6" />
-            공구 요청하기
+            입점 요청하기
           </Button>
         </Link>
       </div>

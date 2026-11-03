@@ -6,7 +6,6 @@ import BottomJoin from './_components/BottomJoin';
 import { serverFetch } from '@moongchijang/api-client/fetcher';
 import type { ApiResponseGroupBuyDetailResponse } from '@moongchijang/api-client/generated/api.schemas';
 import { notFound } from 'next/navigation';
-import ViewerToast from './_components/ViewerToast';
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
 import { getServerAccessToken } from '@moongchijang/api-client/server-auth';
@@ -23,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     );
     const data = responseData.data;
     const title = `[뭉치장] ${data.productName} 공구 같이 뭉쳐서 구매하자!`;
-    const description = `${data.deadlineDateTimeLabel}까지 · ${data.storeName}`;
+    const description = `${data.regionLabel} · ${data.storeName}`;
     const ogImage = data.thumbnailUrl
       ? { url: data.thumbnailUrl, alt: data.productName }
       : {
@@ -78,7 +77,6 @@ const page = async ({ params }: Props) => {
   return (
     <div>
       <Header />
-      <ViewerToast groupBuyId={Number(groupBuyId)} />
       <TopInfo data={data} />
       <ItemDetail data={data} />
       <BottomJoin data={data} />

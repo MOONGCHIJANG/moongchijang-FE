@@ -13,7 +13,7 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { FeedTopBar } from './FeedTopBar';
 import { SearchBar } from './SearchBar';
-import { FilterBar, FilterId } from './FilterBar';
+import { FilterBar, FilterId, FILTERS } from './FilterBar';
 import { FeedCard } from './FeedCard';
 import { FeedSkeletonList } from './FeedSkeleton';
 import { LocationBottomSheet } from './LocationBottomSheet';
@@ -37,7 +37,7 @@ import { logEvent } from '@/lib/analytics';
 import Footer from '@/components/Footer';
 
 const ALL_REGIONS = REGIONS_DATA.flatMap((city) => city.regions);
-const VALID_FILTERS: FilterId[] = ['all'];
+const VALID_FILTERS = FILTERS.map((f) => f.id);
 const DEFAULT_REGION = REGIONS_DATA[0].regions[0];
 
 function filterFromParam(param: string | null): FilterId {
@@ -198,12 +198,10 @@ export function FeedClient() {
     setIsSearchOpen(false);
   };
 
-  const FILTER_NAMES: Record<FilterId, string> = {
-    all: '전체',
-  };
-
   const handleFilterChange = (filter: FilterId) => {
-    logEvent('search_chip_select', { chip_name: FILTER_NAMES[filter] });
+    logEvent('search_chip_select', {
+      chip_name: FILTERS.find((f) => f.id === filter)?.label ?? filter,
+    });
     setActiveFilter(filter);
     updateUrl({ filter: filter === 'all' ? null : filter });
   };
@@ -322,9 +320,7 @@ export function FeedClient() {
             {displayItems.length === 0 && (
               <EmptyState
                 title={'원하시는 공구가\n아직 없어요'}
-                description={
-                  '다른 검색어를 입력하거나\n입점을 요청해보세요.'
-                }
+                description={'다른 검색어를 입력하거나\n입점을 요청해보세요.'}
               />
             )}
             {displayItems.map((feed, index) => (

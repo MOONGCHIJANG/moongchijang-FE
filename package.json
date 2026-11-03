@@ -7,6 +7,7 @@
     "dev": "turbo run dev --filter=@moongchijang/web",
     "dev:mock": "turbo run dev:mock --filter=@moongchijang/web",
     "dev:admin": "turbo run dev --filter=@moongchijang/admin",
+    "dev:admin:mock": "turbo run dev:mock --filter=@moongchijang/admin",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",

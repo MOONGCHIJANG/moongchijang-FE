@@ -5,6 +5,7 @@ import { tokenStorage } from '@moongchijang/api-client/token';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Button, Input } from '@moongchijang/ui';
+import { useAdminIdentityStore } from '@/store/adminIdentityStore';
 
 export function LoginForm() {
   const [email, setEmail] = useState('');
@@ -13,6 +14,7 @@ export function LoginForm() {
   const [isPending, setIsPending] = useState(false);
   const router = useRouter();
   const { setIsLoggedIn } = useAuthStore();
+  const setAdminName = useAdminIdentityStore((s) => s.setName);
 
   const canSubmit = email.length > 0 && password.length > 0;
 
@@ -36,6 +38,8 @@ export function LoginForm() {
         if (accessToken && expiresIn) {
           tokenStorage.set(accessToken, expiresIn);
         }
+        const nickname = data?.data?.user?.nickname as string | undefined;
+        setAdminName(nickname || email.split('@')[0]);
         setIsLoggedIn(true);
         router.push('/');
       } else {

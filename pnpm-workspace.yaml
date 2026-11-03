@@ -48,6 +48,11 @@ catalog:
   '@mswjs/http-middleware': ^0.10.3
   '@faker-js/faker': ^10.4.0
   tsx: ^4.21.0
+  express: ^5.2.1
+  cors: ^2.8.6
+  concurrently: ^9.2.1
+  '@types/express': ^5.0.6
+  '@types/cors': ^2.8.19
 
   # Storybook — 10.3.5 계열은 서로 버전이 어긋나면 깨지므로 한 묶음으로 관리
   # (@storybook/nextjs-vite가 web·ui 양쪽에 있어 계열 전체를 함께 올린다)

@@ -11,11 +11,18 @@ interface FilterBarProps {
   className?: string;
 }
 
+const isDev = process.env.NODE_ENV !== 'production';
+
+// v2 필터 API 전까지 신규 칩은 목록이 바뀌지 않으므로 운영에는 노출하지 않음
 export const FILTERS: { id: FilterId; label: string }[] = [
   { id: 'all', label: '전체' },
-  { id: 'thisWeekPickup', label: '이번 주 픽업' },
-  { id: 'smallQuantity', label: '적게 사도 OK' },
-  { id: 'new', label: '새로 들어왔어요' },
+  ...(isDev
+    ? ([
+        { id: 'thisWeekPickup', label: '이번 주 픽업' },
+        { id: 'smallQuantity', label: '적게 사도 OK' },
+        { id: 'new', label: '새로 들어왔어요' },
+      ] as const)
+    : []),
 ];
 
 export const FilterBar = ({

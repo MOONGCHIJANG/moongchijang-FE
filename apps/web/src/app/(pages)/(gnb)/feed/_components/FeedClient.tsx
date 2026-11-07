@@ -98,6 +98,7 @@ export function FeedClient() {
     });
 
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
+  const isInitialized = useAuthStore((s) => s.isInitialized);
   const { todayPickup, myGroupBuys, feedCardExtra } = useFeedHomePlaceholder();
 
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -282,6 +283,7 @@ export function FeedClient() {
 
       <div className="flex flex-col gap-4 px-4">
         {!isSearchMode &&
+          isInitialized &&
           (isLoggedIn ? (
             <>
               {todayPickup && <PickupCard {...todayPickup} />}

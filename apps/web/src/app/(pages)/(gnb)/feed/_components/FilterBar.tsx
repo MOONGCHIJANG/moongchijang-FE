@@ -34,7 +34,8 @@ export const FilterBar = ({
             active={active}
             onClick={() => onFilterChange?.(filter.id)}
             className={cn(
-              !active && 'border border-border-default bg-button-white',
+              !active &&
+                'border border-border-default bg-button-white px-[11px]',
             )}
           />
         );

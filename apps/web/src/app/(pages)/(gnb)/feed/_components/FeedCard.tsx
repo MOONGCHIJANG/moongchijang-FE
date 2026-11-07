@@ -67,7 +67,7 @@ export const FeedCard = ({
             {(price ?? 0).toLocaleString()}원
           </span>
           {unitQuantity != null && (
-            <span className="pb-1.5 caption-sm-medium text-text-tertiary">
+            <span className="pb-0.75 caption-sm-medium text-text-tertiary">
               / {unitQuantity}개
             </span>
           )}
@@ -92,9 +92,12 @@ export const FeedCard = ({
       )}
 
       {teamCount != null && teamCount > 0 && (
-        <div className="flex items-center justify-center gap-0.5 px-2 text-text-brand">
-          <Icon icon="boxicons:community-filled" className="size-[18px]" />
-          <span className="caption-sm-bold">
+        <div className="flex items-center gap-0.5 px-[7px] text-text-brand">
+          <Icon
+            icon="boxicons:community-filled"
+            className="size-[18px] shrink-0"
+          />
+          <span className="whitespace-nowrap caption-sm-bold">
             지금 {teamCount}팀이 함께 모으는 중
           </span>
         </div>

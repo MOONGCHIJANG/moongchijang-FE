@@ -294,9 +294,11 @@ export function FeedClient() {
           ))}
 
         {!isSearchMode && (
+          // top의 124px는 헤더 높이. 패딩·음수 마진은 지나가는 카드를 배경으로 가리면서 위 16px, 아래 8px 간격을 유지
           <FilterBar
             activeFilter={activeFilter}
             onFilterChange={handleFilterChange}
+            className="sticky top-[calc(124px+env(safe-area-inset-top,0px))] z-5 -mx-4 -mb-4 -mt-2 bg-bg-white-muted px-4 py-2"
           />
         )}
 

@@ -402,7 +402,7 @@ export function FeedClient() {
               hasSearchResult &&
               feeds.length > 0 &&
               !hasNextPage && (
-                <>
+                <div className="flex flex-col gap-5 pt-1">
                   <p className="text-center text-[10px] font-medium leading-[18px] text-text-tertiary">
                     {locationDisplayText} 상품은 여기까지예요 ·{' '}
                     <button
@@ -416,7 +416,7 @@ export function FeedClient() {
                   <GroupBuyRequestCard
                     onRequest={() => router.push('/request/new')}
                   />
-                </>
+                </div>
               )
             ) : (
               <GroupBuyRequestCard onRequest={handleOpenRequestSheet} />

@@ -18,7 +18,7 @@ export const GroupBuyRequestCard = ({
   onRequest,
 }: GroupBuyRequestCardProps) => {
   return (
-    <div className="flex flex-col items-center gap-3 rounded-3xlarge border border-dashed border-border-brand-lighter bg-surface-secondary-lighter px-5 py-4">
+    <div className="flex flex-col items-center gap-3 rounded-3xlarge border border-dashed border-border-brand-lighter bg-surface-secondary-lighter px-5.5 py-[15px]">
       <Image src={icon} alt="" width={43} height={50} />
       <div className="flex flex-col items-center gap-1 text-center">
         <p className="whitespace-pre-line text-[18px] font-bold leading-[26px] text-text-basic">
@@ -33,11 +33,14 @@ export const GroupBuyRequestCard = ({
           size="md"
           fullWidth
           onClick={onRequest}
-          className="h-auto px-7 pb-3.5 pt-3"
+          className="h-auto px-[26.4px] pb-[13.2px] pt-[12.1px]"
         >
           {buttonLabel}
         </Button>
-        <Link href="/request" className="caption-sm-regular text-text-tertiary">
+        <Link
+          href="/request"
+          className="pt-0.5 caption-sm-regular text-text-tertiary"
+        >
           내 요청 현황 보기 ›
         </Link>
       </div>

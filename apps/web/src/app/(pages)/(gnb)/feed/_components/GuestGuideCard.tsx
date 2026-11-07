@@ -5,7 +5,7 @@ import { Fragment } from 'react';
 const STEPS = [
   {
     label: '픽업일 선택하기',
-    icon: <Icon icon="uis:calender" className="size-5 text-icon-primary" />,
+    icon: <Icon icon="uis:calender" className="size-5 text-primary-300" />,
   },
   {
     label: '친구 초대하기',
@@ -21,14 +21,14 @@ const STEPS = [
   {
     label: '수량 달성 시 결제',
     icon: (
-      <Icon icon="andrsrxn:money-bag" className="size-5 text-icon-primary" />
+      <Icon icon="andrsrxn:money-bag" className="size-5 text-primary-300" />
     ),
   },
 ];
 
 export const GuestGuideCard = () => {
   return (
-    <div className="flex flex-col gap-2 rounded-2xlarge border border-border-subtle bg-surface-secondary-lighter px-5 pb-4 pt-2.5">
+    <div className="flex flex-col gap-2 rounded-2xlarge border border-border-subtle bg-surface-secondary-lighter px-[19px] pb-[15px] pt-[9px]">
       <p className="text-center body-lg-semibold text-text-basic">
         혼자 15개는 많다면, 친구랑 나눠 사요
       </p>

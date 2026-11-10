@@ -13,6 +13,100 @@ import type {
 import { customFetch } from '../../custom-fetch';
 
 /**
+ * @summary 상품 찜 추가
+ */
+export type postApiV1ProductsProductIdWishlistResponse201 = {
+  data: SuccessNoDataResponse
+  status: 201
+}
+
+export type postApiV1ProductsProductIdWishlistResponse401 = {
+  data: UnauthorizedResponse
+  status: 401
+}
+
+export type postApiV1ProductsProductIdWishlistResponse404 = {
+  data: NotFoundResponse
+  status: 404
+}
+
+export type postApiV1ProductsProductIdWishlistResponseSuccess = (postApiV1ProductsProductIdWishlistResponse201) & {
+  headers: Headers;
+};
+export type postApiV1ProductsProductIdWishlistResponseError = (postApiV1ProductsProductIdWishlistResponse401 | postApiV1ProductsProductIdWishlistResponse404) & {
+  headers: Headers;
+};
+
+export type postApiV1ProductsProductIdWishlistResponse = (postApiV1ProductsProductIdWishlistResponseSuccess | postApiV1ProductsProductIdWishlistResponseError)
+
+export const getPostApiV1ProductsProductIdWishlistUrl = (productId: number,) => {
+
+
+
+
+  return `/api/v1/products/${productId}/wishlist`
+}
+
+export const postApiV1ProductsProductIdWishlist = async (productId: number, options?: RequestInit): Promise<postApiV1ProductsProductIdWishlistResponse> => {
+
+  return customFetch<postApiV1ProductsProductIdWishlistResponse>(getPostApiV1ProductsProductIdWishlistUrl(productId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+/**
+ * @summary 상품 찜 해제
+ */
+export type deleteApiV1ProductsProductIdWishlistResponse200 = {
+  data: SuccessNoDataResponse
+  status: 200
+}
+
+export type deleteApiV1ProductsProductIdWishlistResponse401 = {
+  data: UnauthorizedResponse
+  status: 401
+}
+
+export type deleteApiV1ProductsProductIdWishlistResponse404 = {
+  data: NotFoundResponse
+  status: 404
+}
+
+export type deleteApiV1ProductsProductIdWishlistResponseSuccess = (deleteApiV1ProductsProductIdWishlistResponse200) & {
+  headers: Headers;
+};
+export type deleteApiV1ProductsProductIdWishlistResponseError = (deleteApiV1ProductsProductIdWishlistResponse401 | deleteApiV1ProductsProductIdWishlistResponse404) & {
+  headers: Headers;
+};
+
+export type deleteApiV1ProductsProductIdWishlistResponse = (deleteApiV1ProductsProductIdWishlistResponseSuccess | deleteApiV1ProductsProductIdWishlistResponseError)
+
+export const getDeleteApiV1ProductsProductIdWishlistUrl = (productId: number,) => {
+
+
+
+
+  return `/api/v1/products/${productId}/wishlist`
+}
+
+export const deleteApiV1ProductsProductIdWishlist = async (productId: number, options?: RequestInit): Promise<deleteApiV1ProductsProductIdWishlistResponse> => {
+
+  return customFetch<deleteApiV1ProductsProductIdWishlistResponse>(getDeleteApiV1ProductsProductIdWishlistUrl(productId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+/**
  * @summary 찜 추가
  */
 export type postApiV1GroupBuysGroupBuyIdWishlistResponse201 = {

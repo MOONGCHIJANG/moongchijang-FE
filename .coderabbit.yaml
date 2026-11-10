@@ -106,8 +106,12 @@ reviews:
     - path: 'packages/api-client/src/**'
       instructions: |
         - 수기 코드 영역입니다(`generated/`, `hooks/`, `zod/`는 생성물이라 리뷰 제외). 수기 Zod 스키마는 `src/schemas/`에 둡니다.
-        - `orval.config.ts`의 `customFetch` mutator 설정을 제거·변경하면 지적합니다.
         - 토큰·쿠키·refresh 로직 변경은 보안 관점(토큰 노출, rotation 깨짐, 무한 refresh 루프)으로 꼼꼼히 봅니다.
+
+    - path: 'packages/api-client/orval.config.ts'
+      instructions: |
+        - `customFetch` mutator 설정을 제거·변경하면 지적합니다. 생성 코드가 이 mutator를 통해 인증·refresh를 처리합니다.
+        - 생성 결과가 기대와 다를 때는 생성물이 아니라 이 파일이나 `scripts/`를 고치는 것이 맞습니다.
 
     - path: 'packages/ui/src/**'
       instructions: |

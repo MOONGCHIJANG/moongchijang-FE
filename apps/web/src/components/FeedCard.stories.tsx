@@ -20,9 +20,7 @@ const meta: Meta<typeof FeedCard> = {
     productName: '두바이쫀득쿠키 4개입',
     price: 18000,
     thumbnailUrl: 'https://picsum.photos/seed/feed/360/280',
-    unitQuantity: 1,
     minQuantity: 15,
-    closedDayLabel: '월 휴무',
   },
 };
 

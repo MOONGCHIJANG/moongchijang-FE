@@ -9,9 +9,7 @@ import { cn } from '@/lib/utils';
 export type FeedCardExtra = {
   isNew?: boolean;
   minQuantity?: number;
-  closedDayLabel?: string;
   teamCount?: number;
-  unitQuantity?: number;
 };
 
 type FeedCardProps = {
@@ -36,12 +34,8 @@ export const FeedCard = ({
   action,
   isNew,
   minQuantity,
-  closedDayLabel,
   teamCount,
-  unitQuantity,
 }: FeedCardProps) => {
-  const hasBadges = minQuantity != null || !!closedDayLabel;
-
   return (
     <div className="flex flex-col gap-2 overflow-hidden rounded-xlarge bg-bg-white pb-2 shadow-[0_0_10px_0_rgba(0,0,0,0.2)]">
       <div className="relative h-[140px] w-full shrink-0 bg-gray-200">
@@ -79,19 +73,12 @@ export const FeedCard = ({
         <span className="truncate heading-sm-semibold text-text-basic">
           {productName}
         </span>
-        <div className="flex items-end gap-1">
-          <span className="heading-1xl-semibold text-text-basic">
-            {(price ?? 0).toLocaleString()}원
-          </span>
-          {unitQuantity != null && (
-            <span className="pb-0.75 caption-sm-medium text-text-tertiary">
-              / {unitQuantity}개
-            </span>
-          )}
-        </div>
+        <span className="heading-1xl-semibold text-text-basic">
+          {(price ?? 0).toLocaleString()}원
+        </span>
       </div>
 
-      {(hasBadges || action) && (
+      {(minQuantity != null || action) && (
         <div className="flex items-center justify-between px-2">
           <div className="flex gap-1">
             {minQuantity != null && (
@@ -102,13 +89,6 @@ export const FeedCard = ({
                 )}
               >
                 최소 {minQuantity}개부터
-              </span>
-            )}
-            {closedDayLabel && (
-              <span
-                className={cn(BADGE, 'bg-surface-default text-text-tertiary')}
-              >
-                {closedDayLabel}
               </span>
             )}
           </div>

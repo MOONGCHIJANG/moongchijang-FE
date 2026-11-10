@@ -63,9 +63,7 @@ const MY_GROUP_BUYS: MyGroupBuy[] = [
 const FEED_CARD_EXTRA: FeedCardExtra = {
   isNew: true,
   minQuantity: 15,
-  closedDayLabel: '월 휴무',
   teamCount: 3,
-  unitQuantity: 1,
 };
 
 export function useFeedHomePlaceholder() {

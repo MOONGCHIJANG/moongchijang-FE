@@ -14,8 +14,12 @@ import {
 } from '@moongchijang/api-client/generated/api.schemas';
 import { FilterId } from '../_components/FilterBar';
 
+// v2 필터 API 전까지 신규 칩은 전체 목록을 그대로 조회
 const FILTER_MAP: Record<FilterId, GetApiV1GroupBuysFilter> = {
   all: GetApiV1GroupBuysFilter.ALL,
+  thisWeekPickup: GetApiV1GroupBuysFilter.ALL,
+  smallQuantity: GetApiV1GroupBuysFilter.ALL,
+  new: GetApiV1GroupBuysFilter.ALL,
 };
 
 const PAGE_SIZE = 10;

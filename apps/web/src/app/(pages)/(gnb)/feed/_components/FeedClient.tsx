@@ -13,13 +13,16 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { FeedTopBar } from './FeedTopBar';
 import { SearchBar } from './SearchBar';
-import { FilterBar, FilterId } from './FilterBar';
-import { FeedCard } from './FeedCard';
+import { FilterBar, FilterId, FILTERS } from './FilterBar';
+import { FeedCard } from '@/components/FeedCard';
 import { FeedSkeletonList } from './FeedSkeleton';
 import { LocationBottomSheet } from './LocationBottomSheet';
 import { SearchOverlay } from './SearchOverlay';
 import { EmptyState } from './EmptyState';
 import { GroupBuyRequestCard } from './GroupBuyRequestCard';
+import { PickupCard } from './PickupCard';
+import { MyGroupBuySection } from './MyGroupBuySection';
+import { GuestGuideCard } from './GuestGuideCard';
 import { REGIONS_DATA, Region } from '@/constants/regions';
 import {
   usePostApiV1Search,
@@ -33,11 +36,12 @@ import {
 import { useAuthStore } from '@moongchijang/api-client/authStore';
 import { useFeedList } from '../_hooks/useFeedList';
 import { useRecentSearches } from '../_hooks/useRecentSearches';
+import { useFeedHomePlaceholder } from '../_hooks/useFeedHomePlaceholder';
 import { logEvent } from '@/lib/analytics';
 import Footer from '@/components/Footer';
 
 const ALL_REGIONS = REGIONS_DATA.flatMap((city) => city.regions);
-const VALID_FILTERS: FilterId[] = ['all'];
+const VALID_FILTERS = FILTERS.map((f) => f.id);
 const DEFAULT_REGION = REGIONS_DATA[0].regions[0];
 
 function filterFromParam(param: string | null): FilterId {
@@ -94,6 +98,8 @@ export function FeedClient() {
     });
 
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
+  const isInitialized = useAuthStore((s) => s.isInitialized);
+  const { todayPickup, myGroupBuys, feedCardExtra } = useFeedHomePlaceholder();
 
   const sentinelRef = useRef<HTMLDivElement>(null);
 
@@ -198,12 +204,10 @@ export function FeedClient() {
     setIsSearchOpen(false);
   };
 
-  const FILTER_NAMES: Record<FilterId, string> = {
-    all: '전체',
-  };
-
   const handleFilterChange = (filter: FilterId) => {
-    logEvent('search_chip_select', { chip_name: FILTER_NAMES[filter] });
+    logEvent('search_chip_select', {
+      chip_name: FILTERS.find((f) => f.id === filter)?.label ?? filter,
+    });
     setActiveFilter(filter);
     updateUrl({ filter: filter === 'all' ? null : filter });
   };
@@ -256,7 +260,7 @@ export function FeedClient() {
   return (
     <>
       <header
-        className="sticky top-0 z-10 flex flex-col gap-3 bg-bg-white-muted px-5 pb-2 pt-4"
+        className="sticky top-0 z-10 flex flex-col gap-3 bg-bg-white-muted px-4 pb-2 pt-4"
         style={{ paddingTop: 'calc(16px + env(safe-area-inset-top, 0px))' }}
       >
         <FeedTopBar
@@ -275,13 +279,31 @@ export function FeedClient() {
             }}
           />
         </div>
-        <FilterBar
-          activeFilter={activeFilter}
-          onFilterChange={handleFilterChange}
-        />
       </header>
 
-      <div className="flex flex-col gap-4 px-5">
+      <div className="flex flex-col gap-4 px-4">
+        {!isSearchMode &&
+          isInitialized &&
+          (isLoggedIn ? (
+            <>
+              {todayPickup && <PickupCard {...todayPickup} />}
+              {myGroupBuys.length > 0 && (
+                <MyGroupBuySection items={myGroupBuys} />
+              )}
+            </>
+          ) : (
+            <GuestGuideCard />
+          ))}
+
+        {!isSearchMode && (
+          // top의 124px는 헤더 높이. 패딩·음수 마진은 지나가는 카드를 배경으로 가리면서 위 16px, 아래 8px 간격을 유지
+          <FilterBar
+            activeFilter={activeFilter}
+            onFilterChange={handleFilterChange}
+            className="sticky top-[calc(124px+env(safe-area-inset-top,0px))] z-5 -mx-4 -mb-4 -mt-2 bg-bg-white-muted px-4 py-2"
+          />
+        )}
+
         {isDisplayLoading ? (
           <FeedSkeletonList />
         ) : !isSearchMode && !hasSearchResult ? (
@@ -295,26 +317,32 @@ export function FeedClient() {
               <div className="mt-3 h-14 border-l-2 border-dashed border-surface-brand" />
               <div className="h-2 w-2 rounded-full bg-surface-brand" />
             </div>
-            <div className="-mx-5 -mt-4 flex flex-col gap-4 rounded-t-3xl bg-bg-white px-5 pt-5 pb-5">
+            <div className="-mx-4 -mt-4 flex flex-col gap-4 rounded-t-3xl bg-bg-white px-4 pt-5 pb-5">
               <span className="heading-sm-bold text-text-basic font-pretendard">
                 지금 인기 있는 공구 상품
               </span>
-              {feeds.map((feed, index) => (
-                <Link
-                  key={feed.id}
-                  href={`/item/${feed.id}`}
-                  onClick={() =>
-                    logEvent('feed_item_click', {
-                      item_id: feed.id,
-                      item_name: feed.productName,
-                      store_name: feed.storeName,
-                      position: index,
-                    })
-                  }
-                >
-                  <FeedCard {...feed} />
-                </Link>
-              ))}
+              <div className="grid grid-cols-2 gap-x-3.5 gap-y-4">
+                {feeds.map((feed, index) => (
+                  <Link
+                    key={feed.id}
+                    href={`/item/${feed.id}`}
+                    onClick={() =>
+                      logEvent('feed_item_click', {
+                        item_id: feed.id,
+                        item_name: feed.productName,
+                        store_name: feed.storeName,
+                        position: index,
+                      })
+                    }
+                  >
+                    <FeedCard
+                      {...feed}
+                      {...feedCardExtra}
+                      locationLabel={feed.districtLabel}
+                    />
+                  </Link>
+                ))}
+              </div>
             </div>
           </>
         ) : (
@@ -322,27 +350,33 @@ export function FeedClient() {
             {displayItems.length === 0 && (
               <EmptyState
                 title={'원하시는 공구가\n아직 없어요'}
-                description={
-                  '다른 검색어를 입력하거나\n입점을 요청해보세요.'
-                }
+                description={'다른 검색어를 입력하거나\n입점을 요청해보세요.'}
               />
             )}
-            {displayItems.map((feed, index) => (
-              <Link
-                key={feed.id}
-                href={`/item/${feed.id}`}
-                onClick={() =>
-                  logEvent('feed_item_click', {
-                    item_id: feed.id,
-                    item_name: feed.productName,
-                    store_name: feed.storeName,
-                    position: index,
-                  })
-                }
-              >
-                <FeedCard {...feed} />
-              </Link>
-            ))}
+            {displayItems.length > 0 && (
+              <div className="grid grid-cols-2 gap-x-3.5 gap-y-4">
+                {displayItems.map((feed, index) => (
+                  <Link
+                    key={feed.id}
+                    href={`/item/${feed.id}`}
+                    onClick={() =>
+                      logEvent('feed_item_click', {
+                        item_id: feed.id,
+                        item_name: feed.productName,
+                        store_name: feed.storeName,
+                        position: index,
+                      })
+                    }
+                  >
+                    <FeedCard
+                      {...feed}
+                      {...feedCardExtra}
+                      locationLabel={feed.districtLabel}
+                    />
+                  </Link>
+                ))}
+              </div>
+            )}
             {isSearchMode &&
             (searchAnalysis?.uiState ===
               ApiResponseSearchAnalysisDataUiState.RESULTS ||
@@ -374,7 +408,27 @@ export function FeedClient() {
                   <GroupBuyRequestCard onRequest={handleOpenRequestSheet} />
                 )}
               </>
-            ) : !isSearchMode ? null : (
+            ) : !isSearchMode ? (
+              hasSearchResult &&
+              feeds.length > 0 &&
+              !hasNextPage && (
+                <div className="flex flex-col gap-5 pt-1">
+                  <p className="text-center text-[10px] font-medium leading-[18px] text-text-tertiary">
+                    {locationDisplayText} 상품은 여기까지예요 ·{' '}
+                    <button
+                      type="button"
+                      className="underline"
+                      onClick={() => setIsLocationSheetOpen(true)}
+                    >
+                      다른 지역 보기
+                    </button>
+                  </p>
+                  <GroupBuyRequestCard
+                    onRequest={() => router.push('/request/new')}
+                  />
+                </div>
+              )
+            ) : (
               <GroupBuyRequestCard onRequest={handleOpenRequestSheet} />
             )}
           </>

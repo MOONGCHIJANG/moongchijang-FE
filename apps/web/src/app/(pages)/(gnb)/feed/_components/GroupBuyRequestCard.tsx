@@ -1,5 +1,6 @@
 import { Button } from '@moongchijang/ui';
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface GroupBuyRequestCardProps {
   icon?: string;
@@ -10,33 +11,39 @@ interface GroupBuyRequestCardProps {
 }
 
 export const GroupBuyRequestCard = ({
-  icon,
-  title = '뭉치장이 원하는 공구에 참여할 수 있도록\n도와드릴게요!',
-  description = '입점 검토에 2~5 영업일이 걸려요',
+  icon = '/icons/search.svg',
+  title = '원하는 매장·상품이 없나요?',
+  description = '가게 이름과 상품을 알려주시면 뭉치장이 입점을 요청해볼게요',
   buttonLabel = '입점 요청하기',
   onRequest,
 }: GroupBuyRequestCardProps) => {
   return (
-    <div className="min-h-60 rounded-2xl border border-dashed border-border-brand-lighter bg-surface-secondary-lighter p-5 flex flex-col justify-center gap-8">
+    <div className="flex flex-col items-center gap-3 rounded-3xlarge border border-dashed border-border-brand-lighter bg-surface-secondary-lighter px-5.5 py-[15px]">
+      <Image src={icon} alt="" width={43} height={50} />
       <div className="flex flex-col items-center gap-1 text-center">
-        {icon && (
-          <Image src={icon} alt="" width={48} height={48} className="mb-1" />
-        )}
-        <p className="heading-md-bold text-text-basic font-pretendard whitespace-pre-line">
+        <p className="whitespace-pre-line text-[18px] font-bold leading-[26px] text-text-basic">
           {title}
         </p>
-        <p className="body-lg-regular text-text-tertiary font-pretendard whitespace-pre-line">
+        <p className="whitespace-pre-line body-sm-regular text-text-tertiary">
           {description}
         </p>
       </div>
-      <Button
-        size="md"
-        fullWidth
-        onClick={onRequest}
-        className="px-7 pt-3 pb-3.5 h-auto"
-      >
-        {buttonLabel}
-      </Button>
+      <div className="flex w-full flex-col items-center gap-2">
+        <Button
+          size="md"
+          fullWidth
+          onClick={onRequest}
+          className="h-auto px-[26.4px] pb-[13.2px] pt-[12.1px]"
+        >
+          {buttonLabel}
+        </Button>
+        <Link
+          href="/request"
+          className="pt-0.5 caption-sm-regular text-text-tertiary"
+        >
+          내 요청 현황 보기 ›
+        </Link>
+      </div>
     </div>
   );
 };

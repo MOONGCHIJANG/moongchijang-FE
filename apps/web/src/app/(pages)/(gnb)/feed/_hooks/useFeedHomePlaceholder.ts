@@ -1,6 +1,8 @@
 // 피드 v2 화면용 임시 데이터. 서버 API가 나오면 Orval 훅으로 교체하고 이 파일을 삭제합니다.
 // 운영 빌드에서 가짜 데이터가 노출되지 않도록 개발 환경에서만 값을 채웁니다.
 
+import type { FeedCardExtra } from '@/components/FeedCard';
+
 export type TodayPickup = {
   pickupAtLabel: string;
   productName: string;
@@ -18,14 +20,6 @@ export type MyGroupBuy = {
   | { status: 'transfer'; amount: number }
   | { status: 'collecting'; currentQuantity: number; targetQuantity: number }
 );
-
-export type FeedCardExtra = {
-  isNew?: boolean;
-  minQuantity?: number;
-  closedDayLabel?: string;
-  teamCount?: number;
-  unitQuantity?: number;
-};
 
 const isDev = process.env.NODE_ENV !== 'production';
 

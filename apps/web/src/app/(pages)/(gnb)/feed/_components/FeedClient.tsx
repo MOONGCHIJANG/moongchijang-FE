@@ -14,7 +14,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { FeedTopBar } from './FeedTopBar';
 import { SearchBar } from './SearchBar';
 import { FilterBar, FilterId, FILTERS } from './FilterBar';
-import { FeedCard } from './FeedCard';
+import { FeedCard } from '@/components/FeedCard';
 import { FeedSkeletonList } from './FeedSkeleton';
 import { LocationBottomSheet } from './LocationBottomSheet';
 import { SearchOverlay } from './SearchOverlay';
@@ -335,7 +335,11 @@ export function FeedClient() {
                       })
                     }
                   >
-                    <FeedCard {...feed} {...feedCardExtra} />
+                    <FeedCard
+                      {...feed}
+                      {...feedCardExtra}
+                      locationLabel={feed.districtLabel}
+                    />
                   </Link>
                 ))}
               </div>
@@ -364,7 +368,11 @@ export function FeedClient() {
                       })
                     }
                   >
-                    <FeedCard {...feed} {...feedCardExtra} />
+                    <FeedCard
+                      {...feed}
+                      {...feedCardExtra}
+                      locationLabel={feed.districtLabel}
+                    />
                   </Link>
                 ))}
               </div>

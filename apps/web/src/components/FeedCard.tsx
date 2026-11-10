@@ -1,26 +1,39 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import Image from 'next/image';
 import { Icon } from '@iconify/react';
-import type { GroupBuyFeedItemResponse } from '@moongchijang/api-client/generated/api.schemas';
-import type { FeedCardExtra } from '../_hooks/useFeedHomePlaceholder';
+import { cn } from '@/lib/utils';
 
-// FeedCardExtra 필드는 아직 피드 API에 없어 값이 올 때만 노출
-type FeedCardProps = Pick<
-  GroupBuyFeedItemResponse,
-  'storeName' | 'districtLabel' | 'productName' | 'price' | 'thumbnailUrl'
-> &
-  FeedCardExtra;
+// 아직 피드 API에 없는 필드라 값이 올 때만 노출
+export type FeedCardExtra = {
+  isNew?: boolean;
+  minQuantity?: number;
+  closedDayLabel?: string;
+  teamCount?: number;
+  unitQuantity?: number;
+};
+
+type FeedCardProps = {
+  storeName: string;
+  locationLabel: string;
+  productName: string;
+  price?: number;
+  thumbnailUrl?: string | null;
+  /** 배지 줄 오른쪽 슬롯 (예: 찜 화면의 하트 버튼) */
+  action?: ReactNode;
+} & FeedCardExtra;
 
 const BADGE =
   'min-w-10 rounded-medium px-1.75 py-1.25 text-center caption-xs-bold';
 
 export const FeedCard = ({
   storeName,
-  districtLabel,
+  locationLabel,
   productName,
   price,
   thumbnailUrl,
+  action,
   isNew,
   minQuantity,
   closedDayLabel,
@@ -42,7 +55,10 @@ export const FeedCard = ({
         )}
         {isNew && (
           <span
-            className={`${BADGE} absolute left-2.5 top-2.25 bg-surface-brand text-text-basic-inverse`}
+            className={cn(
+              BADGE,
+              'absolute left-2.5 top-2.25 bg-surface-brand text-text-basic-inverse',
+            )}
           >
             NEW
           </span>
@@ -53,10 +69,11 @@ export const FeedCard = ({
         <div className="flex items-center gap-1 text-text-tertiary">
           <Icon
             icon="typcn:location"
+            aria-hidden
             className="h-[18px] w-4 shrink-0 text-icon-primary"
           />
           <span className="truncate caption-sm-medium">
-            {storeName} | {districtLabel}
+            {storeName} | {locationLabel}
           </span>
         </div>
         <span className="truncate heading-sm-semibold text-text-basic">
@@ -74,20 +91,28 @@ export const FeedCard = ({
         </div>
       </div>
 
-      {hasBadges && (
-        <div className="flex gap-1 px-2">
-          {minQuantity != null && (
-            <span
-              className={`${BADGE} bg-surface-brand-lighter text-text-brand`}
-            >
-              최소 {minQuantity}개부터
-            </span>
-          )}
-          {closedDayLabel && (
-            <span className={`${BADGE} bg-surface-default text-text-tertiary`}>
-              {closedDayLabel}
-            </span>
-          )}
+      {(hasBadges || action) && (
+        <div className="flex items-center justify-between px-2">
+          <div className="flex gap-1">
+            {minQuantity != null && (
+              <span
+                className={cn(
+                  BADGE,
+                  'bg-surface-brand-lighter text-text-brand',
+                )}
+              >
+                최소 {minQuantity}개부터
+              </span>
+            )}
+            {closedDayLabel && (
+              <span
+                className={cn(BADGE, 'bg-surface-default text-text-tertiary')}
+              >
+                {closedDayLabel}
+              </span>
+            )}
+          </div>
+          {action}
         </div>
       )}
 
@@ -95,6 +120,7 @@ export const FeedCard = ({
         <div className="flex items-center gap-0.5 px-[7px] text-text-brand">
           <Icon
             icon="boxicons:community-filled"
+            aria-hidden
             className="size-[18px] shrink-0"
           />
           <span className="whitespace-nowrap caption-sm-bold">

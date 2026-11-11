@@ -2,32 +2,24 @@
 import { Button } from '@moongchijang/ui';
 import { Icon } from '@iconify/react';
 import { useEffect, useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import {
-  postApiV1GroupBuysGroupBuyIdWishlist,
-  deleteApiV1GroupBuysGroupBuyIdWishlist,
-} from '@moongchijang/api-client/generated/wishlist/wishlist';
 import { ApiResponseGroupBuyDetailResponseData } from '@moongchijang/api-client/generated/api.schemas';
 import { useRouter } from 'next/navigation';
 import { logEvent } from '@/lib/analytics';
 import { ToastBlack } from '@/components/ToastBlack';
 import { ToastTooltip } from '@/components/ToastTooltip';
+import { getOrderAvailability } from '../_lib/orderAvailability';
+import { useWishlist } from '../_hooks/useWishlist';
 
 interface Props {
   data: ApiResponseGroupBuyDetailResponseData;
 }
 
 const BottomJoin = ({ data }: Props) => {
-  const queryClient = useQueryClient();
   const router = useRouter();
-  const [liked, setLiked] = useState(data.isWishlisted);
-
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const { liked, toggleWishlist, toastMessage } = useWishlist(data);
   const [showGuideToast, setShowGuideToast] = useState(false);
 
-  const isOrderable = data.canParticipate && !data.isClosed;
-  // TODO: 재오픈 날짜 API 필드가 생기면 연결 (예: '10/20(월)부터 다시 열려요')
-  const reopenLabel: string | null = null;
+  const { isOrderable, reopenLabel } = getOrderAvailability(data);
 
   // 진입 시 '같이 사기' 위 안내 토스트를 잠깐 보여줬다가 자연스럽게 숨김
   useEffect(() => {
@@ -39,46 +31,6 @@ const BottomJoin = ({ data }: Props) => {
       clearTimeout(hideTimer);
     };
   }, [isOrderable]);
-
-  const handleWishlist = async () => {
-    const next = !liked;
-    setLiked(next);
-    if (next) {
-      logEvent('add_to_wishlist', {
-        item_id: data.id,
-        item_name: data.productName,
-        store_name: data.storeName,
-      });
-    }
-
-    try {
-      const result = next
-        ? await postApiV1GroupBuysGroupBuyIdWishlist(data.id)
-        : await deleteApiV1GroupBuysGroupBuyIdWishlist(data.id);
-
-      const isSuccess =
-        (result.status as number) >= 200 && (result.status as number) < 300;
-      if (!isSuccess) {
-        setLiked(!next);
-        if (
-          (result.status as number) === 401 ||
-          (result.status as number) === 403
-        ) {
-          setToastMessage('로그인 후에 이용해주세요.');
-        } else {
-          setToastMessage('오류가 발생했습니다. 다시 시도해주세요.');
-        }
-        setTimeout(() => setToastMessage(null), 3_500);
-        return;
-      }
-      queryClient.invalidateQueries({ queryKey: ['/api/v1/wishlists'] });
-      router.refresh();
-    } catch {
-      setLiked(!next);
-      setToastMessage('로그인 후에 이용해주세요.');
-      setTimeout(() => setToastMessage(null), 3_500);
-    }
-  };
 
   // TODO(함께사기): 혼자 사기 / 같이 사기 이동 경로·이벤트가 정해지면 분기
   const handleJoin = () => {
@@ -98,7 +50,7 @@ const BottomJoin = ({ data }: Props) => {
             aria-label={liked ? '찜 해제' : '찜하기'}
             aria-pressed={liked}
             className="flex shrink-0 items-center justify-center w-11 h-11 p-p5 rounded-2xlarge bg-button-white cursor-pointer"
-            onClick={handleWishlist}
+            onClick={toggleWishlist}
           >
             <Icon
               icon={liked ? 'solar:heart-bold' : 'solar:heart-outline'}
@@ -143,9 +95,7 @@ const BottomJoin = ({ data }: Props) => {
           className="h-13 flex-col gap-0 rounded-2xlarge"
         >
           <span>지금은 주문할 수 있는 날짜가 없어요</span>
-          {reopenLabel && (
-            <span className="caption-sm-regular">{reopenLabel}</span>
-          )}
+          <span className="caption-sm-regular">{reopenLabel}</span>
         </Button>
       )}
       {toastMessage && (

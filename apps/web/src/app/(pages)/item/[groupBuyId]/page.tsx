@@ -76,7 +76,7 @@ const page = async ({ params }: Props) => {
 
   return (
     <div>
-      <Header />
+      <Header text="상품 상세" />
       <TopInfo data={data} />
       <ItemDetail data={data} />
       <BottomJoin data={data} />

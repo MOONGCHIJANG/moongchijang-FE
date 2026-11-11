@@ -1,43 +1,93 @@
-import React from 'react';
+import type { ReactNode } from 'react';
+
+interface GuideSection {
+  title: string;
+  items: ReactNode[];
+}
+
+const GUIDE_SECTIONS: GuideSection[] = [
+  {
+    title: '주문과 결제',
+    items: [
+      <>
+        최소 수량이 모이기 전에는 <b>아무도 결제하지 않아요</b>. 모이지 않으면
+        방이 닫히고 나가는 돈도 없어요.
+      </>,
+      <>
+        최소 수량이 모이면 참여자 확약을 받고,{' '}
+        <b>총대(대표 구매자) 1명이 매장에 전체 금액을 결제해요.</b>
+      </>,
+      '결제가 끝나면 매장이 바로 제작을 시작해서 취소·환불은 매장 정책에 따라요.',
+    ],
+  },
+  {
+    title: '정산',
+    items: [
+      <>
+        참여자는 총대에게 <b>계좌이체로 각자 몫을 보내요</b>. 금액은 뭉치장이
+        계산해서 고정해요.
+      </>,
+      <>
+        뭉치장은 <b>어떤 대금도 받지 않아요.</b> 이용자 간 송금에 관여하지 않고
+        환불·중재도 하지 않아요.
+      </>,
+      <>
+        정산 마감은 <b>픽업 24시간 전</b>이에요. 그때까지 보내지 않으면 그
+        수량은 총대 몫이 돼요.
+      </>,
+    ],
+  },
+  {
+    title: '픽업',
+    items: [
+      <>
+        픽업은 <b>총대 1명이 QR</b>로 받아요. 참여자는 총대에게 나눠 받아요.
+      </>,
+      '픽업 시간 안에 방문하지 않으면 매장 정책에 따라요.',
+      <>
+        받은 상품을 <b>되팔거나 다시 나눠 파는 것은 금지</b>돼 있어요.
+      </>,
+    ],
+  },
+];
 
 const GuideLine = () => {
   return (
-    <div className="px-p6 pt-p7 pb-p10 bg-bg-white-muted flex flex-col gap-g4">
-      <p className="heading-md-bold">뭉치장 단체 구매 시 유의사항</p>
-      <p className="text-text-disabled whitespace-pre-line caption-sm-medium">
-        {`결제 및 환불관련
-          ・ 참여 시 결제 금액은 에스크로 방식으로 보관되며, 목표 수량 달성 후 매장에 정산됩니다
-          ・ 목표 수량 미달성 시 마감일 기준 영업일 1일 이내 결제 수단으로 전액 자동 환불됩니다
-          ・ 환불 처리 후 실제 입금까지 카드사 기준 3~5 영업일이 소요될 수 있습니다
-          ・ 참여 취소(이탈)는 목표 수량 달성 확정 전까지만 마이페이지에서 직접 신청 가능합니다
-          ・ 달성 확정 이후에는 단순 변심에 의한 취소 및 환불이 불가합니다
-          ・ 부분 취소는 불가하며, 참여 수량 전체 단위로만 취소됩니다
-          
-          픽업
-          ・ 픽업 장소 및 가능 시간은 공구 상세페이지에서 반드시 사전 확인해 주세요
-          ・ 지정된 픽업 시간 내에 방문하지 않으실 경우 환불이 불가합니다
-          ・ 픽업 당일 매장 사정(재료 소진, 제조 지연 등)에 따라 픽업 시간이 변경될 수 있으며, 변경 시 앱 알림 및 문자로 사전 안내드립니다
-          ・ 수령 시 마이페이지의 QR코드를 매장 직원에게 제시해 주세요
-          ・ QR코드는 본인 확인 및 수량 확인 용도로 사용되며, 1회 사용 후 자동 만료됩니다
-          ・ 대리 수령 시에도 QR코드를 반드시 지참해야 하며, QR코드 미지참 시 수령이 거부될 수 있습니다
-          ・ 수령 완료 후 상품의 수량·상태를 즉시 확인해 주세요. 수령 완료 처리 이후 상품 문제는 매장에 직접 문의하셔야 합니다
-          
-          구매 조건
-          ・ 본 공구는 목표 수량 달성 즉시 매장에 발주가 진행되므로, 전자상거래법 제17조에 따른 청약철회가 불가한 상품입니다 (주문 제작 식품)
-          ・ 1인 최대 구매 수량은 공구마다 상이하며, 상세페이지에서 확인하실 수 있습니다
-          ・ 미성년자의 경우 법정대리인의 동의 후 구매하시기 바랍니다
-          
-          상품 관련
-          ・ 상품 이미지 및 설명은 실제와 다소 차이가 있을 수 있습니다
-          ・ 상품 내 알레르기 유발 성분은 매장에 직접 문의해 주세요
-          ・ 베이커리 특성상 당일 제조 상품이므로 수령 후 가능한 빠르게 섭취해 주세요
-          ・ 보관 방법 및 유통기한은 수령 시 매장에서 안내받으실 수 있습니다
-          
-          서비스 이용
-          ・ 뭉치장은 공구 개설·운영을 중개하는 플랫폼으로, 상품의 제조·품질에 대한 직접적인 책임은 해당 매장에 있습니다
-          ・ 매장 사정으로 공구가 취소될 경우 결제 금액 전액이 환불되며 이 외 추가 보상은 제공되지 않습니다
-          ・ 서비스 이용 중 문의사항은 앱 내 고객센터 또는 moongchijang@gmail.com 으로 접수해 주세요`}
-      </p>
+    <div className="flex flex-col gap-3.5 px-p6 pt-3.5 pb-p10 bg-bg-white">
+      {/* TODO: 임시 제목 — 디자인 확정 시 문구·스타일 변경 가능 */}
+      <p className="heading-md-bold">뭉치장 유의사항</p>
+
+      {GUIDE_SECTIONS.map(({ title, items }) => (
+        <section key={title} className="flex flex-col">
+          <p className="body-sm-bold text-text-basic">{title}</p>
+          <ul className="flex flex-col pt-1.5 body-sm-medium text-text-tertiary [&_b]:font-bold">
+            {items.map((item, index) => (
+              <li key={index} className="relative pl-2.5">
+                <span
+                  aria-hidden
+                  className="absolute left-0 font-bold text-text-subtle"
+                >
+                  ·
+                </span>
+                {item}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+
+      <div className="pt-2.5 border-t border-border-default caption-xs-medium text-text-subtle-inverse">
+        <p>
+          뭉치장은 통신판매중개자이며 판매 당사자가 아닙니다. 판매자는 각
+          매장이며 상품 대금은 매장 계좌로 직접 정산됩니다. 상품의
+          품질·픽업·환불 책임은 매장과 총대에게 있습니다.
+        </p>
+        {/* TODO: 통신판매업 신고번호 확정 시 교체 */}
+        <p>
+          뭉치장 · 사업자등록번호 104-30-52578 · 통신판매업 신고 [번호] ·
+          중개수수료 0원
+        </p>
+      </div>
     </div>
   );
 };

@@ -92,6 +92,7 @@
   --color-button-disabled-border: var(--color-gray-400);
   --color-button-natural: var(--color-gray-700);
   --color-button-white: var(--color-gray-0);
+  --color-button-blue: var(--color-info);
 
   /* Semantic / Brand */
   --color-brand-primary: var(--color-primary-400);
@@ -144,6 +145,7 @@
   --color-text-basic-inverse: var(--color-gray-0);
   --color-text-error: var(--color-accent-red-600);
   --color-text-info: var(--color-info);
+  --color-text-secondary: var(--color-secondary-600);
   --color-text-alpha: var(--color-alpha-black-50);
 
   /* Semantic / Icon */

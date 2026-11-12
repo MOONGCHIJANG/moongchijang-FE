@@ -1,5 +1,5 @@
 'use client';
-import NumStepper from './NumStepper';
+import NumStepper from '@/components/NumStepper';
 import Image from 'next/image';
 
 type Props = {

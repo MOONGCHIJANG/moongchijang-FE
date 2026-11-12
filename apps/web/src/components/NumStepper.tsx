@@ -1,8 +1,8 @@
 'use client';
 
 import Tooltip from '@/components/Tooltip';
-import { Icon } from '@iconify/react';
-import React, { useState } from 'react';
+import { SvgIcon } from '@/components/SvgIcon';
+import { useState } from 'react';
 
 type NumStepperProps = {
   max?: number | null;
@@ -37,15 +37,16 @@ const NumStepper = ({ max, value, onChange }: NumStepperProps) => {
 
   return (
     <div className="relative inline-flex flex-col items-center">
-      <div className="rounded-large px-g2 py-g2 gap-g2 flex border border-border-subtle items-center">
+      <div className="rounded-large px-g4 py-g2 gap-g4 flex border border-border-subtle items-center">
         <button
           onClick={() => update(count - 1)}
           disabled={isMin}
-          className="disabled:cursor-not-allowed p-g2"
+          className="disabled:cursor-not-allowed"
         >
-          <Icon
-            icon="ic:baseline-minus"
-            className={`w-3 h-3 ${isMin ? 'text-icon-disabled' : 'text-icon-basic'}`}
+          <SvgIcon
+            src="/icons/minus.svg"
+            size={12}
+            className={isMin ? 'text-icon-disabled' : 'text-icon-basic'}
           />
         </button>
         <input
@@ -74,11 +75,12 @@ const NumStepper = ({ max, value, onChange }: NumStepperProps) => {
         <button
           onClick={() => update(count + 1)}
           disabled={isMax}
-          className="disabled:cursor-not-allowed p-g2"
+          className="disabled:cursor-not-allowed"
         >
-          <Icon
-            icon="ic:baseline-plus"
-            className={`w-3 h-3 ${isMax ? 'text-icon-disabled' : 'text-icon-basic'}`}
+          <SvgIcon
+            src="/icons/plus.svg"
+            size={12}
+            className={isMax ? 'text-icon-disabled' : 'text-icon-basic'}
           />
         </button>
       </div>

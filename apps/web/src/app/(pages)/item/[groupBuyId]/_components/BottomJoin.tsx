@@ -38,7 +38,17 @@ const BottomJoin = ({ data }: Props) => {
       item_id: data.id,
       item_name: data.productName,
     });
+  };
+
+  // TODO(혼자사기): 보류 — 경로 확정 전까지 기존 참여 페이지로 이동
+  const handleSolo = () => {
+    handleJoin();
     router.push(`/item/${data.id}/join`);
+  };
+
+  const handleOpen = () => {
+    handleJoin();
+    router.push(`/item/${data.id}/open`);
   };
 
   return (
@@ -63,7 +73,7 @@ const BottomJoin = ({ data }: Props) => {
             variant="outline"
             size="md"
             className="w-24 shrink-0 rounded-2xlarge text-text-disabled cursor-pointer"
-            onClick={handleJoin}
+            onClick={handleSolo}
           >
             혼자 사기
           </Button>
@@ -80,7 +90,7 @@ const BottomJoin = ({ data }: Props) => {
               size="md"
               fullWidth
               className="rounded-2xlarge cursor-pointer"
-              onClick={handleJoin}
+              onClick={handleOpen}
             >
               같이 사기
             </Button>

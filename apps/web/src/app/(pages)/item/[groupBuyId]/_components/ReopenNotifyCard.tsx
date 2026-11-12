@@ -1,9 +1,9 @@
 'use client';
 
 import { Button } from '@moongchijang/ui';
-import { Icon } from '@iconify/react';
 import type { ApiResponseGroupBuyDetailResponseData } from '@moongchijang/api-client/generated/api.schemas';
 import { ToastBlack } from '@/components/ToastBlack';
+import { SvgIcon } from '@/components/SvgIcon';
 import { useWishlist } from '../_hooks/useWishlist';
 
 interface Props {
@@ -31,7 +31,7 @@ const ReopenNotifyCard = ({ data }: Props) => {
         onClick={toggleWishlist}
         className="gap-g1 px-p5 rounded-xlarge border border-border-brand cursor-pointer disabled:border-transparent"
       >
-        <Icon icon="solar:heart-bold" width={16} height={16} />
+        <SvgIcon src="/icons/heart-fill.svg" size={16} />
         {liked ? '알림 신청 완료' : '찜하고 알림 받기'}
       </Button>
       {toastMessage && (

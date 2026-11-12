@@ -81,7 +81,7 @@ const BottomJoin = ({ data }: Props) => {
             <div className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2">
               <ToastTooltip
                 variant="dark"
-                icon="mdi:hand-clap"
+                icon="/icons/hand-clap.svg"
                 message="친구랑 뭉쳐서 부담 줄이기"
                 isVisible={showGuideToast}
               />

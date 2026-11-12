@@ -35,7 +35,7 @@ export const Brand: Story = { args: { variant: 'brand' } };
 export const CustomIcon: Story = {
   args: {
     variant: 'dark',
-    icon: 'mdi:hand-clap',
+    icon: '/icons/hand-clap.svg',
     message: '친구랑 뭉쳐서 부담 줄이기',
   },
 };

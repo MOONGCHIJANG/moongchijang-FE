@@ -1,7 +1,7 @@
 'use client';
 
-import { Icon } from '@iconify/react';
 import { cn } from '@/lib/utils';
+import { SvgIcon } from '@/components/SvgIcon';
 
 export type ToastTooltipVariant = 'default' | 'dark' | 'brand';
 
@@ -10,14 +10,12 @@ interface ToastTooltipProps {
   /** 기본 노출 여부 (false면 페이드 아웃) */
   isVisible?: boolean;
   variant?: ToastTooltipVariant;
-  /** iconify 아이콘 이름. 기본값: 번개(material-symbols-light:bolt-rounded) */
+  /** public 아이콘 경로. 기본값: 번개('/icons/bolt.svg') */
   icon?: string;
   /** 아이콘 색상 등 덮어쓰기용 */
   iconClassName?: string;
   className?: string;
 }
-
-const DEFAULT_ICON = 'material-symbols-light:bolt-rounded';
 
 const VARIANT_STYLE: Record<
   ToastTooltipVariant,
@@ -53,7 +51,7 @@ export const ToastTooltip = ({
   message,
   isVisible = true,
   variant = 'default',
-  icon = DEFAULT_ICON,
+  icon = '/icons/bolt.svg',
   iconClassName,
   className,
 }: ToastTooltipProps) => {
@@ -81,10 +79,9 @@ export const ToastTooltip = ({
       >
         {/* 아이콘 영역 24px, 내부 여백 상하 1px / 좌우 1.25px */}
         <span className="flex size-6 shrink-0 items-center justify-center px-[1.25px] py-px">
-          <Icon
-            icon={icon}
-            width="100%"
-            height="100%"
+          <SvgIcon
+            src={icon}
+            size="100%"
             className={cn(style.icon, iconClassName)}
           />
         </span>

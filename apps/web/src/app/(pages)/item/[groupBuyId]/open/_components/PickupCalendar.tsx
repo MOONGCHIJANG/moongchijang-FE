@@ -1,8 +1,8 @@
 'use client';
 
-import { Icon } from '@iconify/react';
 import { useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { SvgIcon } from '@/components/SvgIcon';
 import {
   type DateKey,
   addMonths,
@@ -42,7 +42,7 @@ const PickupCalendar = ({
   const canNext = compareYearMonth(viewMonth, max) < 0;
 
   return (
-    <div className="mx-[5px] flex flex-col gap-g7 px-p5 py-p6 rounded-2xlarge border border-border-subtle bg-surface-white">
+    <div className="mx-1.25 flex flex-col gap-g7 px-p5 py-p6 rounded-2xlarge border border-border-subtle bg-surface-white">
       <div className="flex items-center justify-center gap-g11">
         <MonthArrow
           direction="prev"
@@ -135,14 +135,12 @@ const MonthArrow = ({ direction, disabled, onClick }: MonthArrowProps) => (
       disabled ? 'text-icon-disabled' : 'text-icon-basic cursor-pointer',
     )}
   >
-    <Icon
-      icon={
+    <SvgIcon
+      src={
         direction === 'prev'
-          ? 'eva:arrow-ios-back-fill'
-          : 'eva:arrow-ios-forward-fill'
+          ? '/icons/arrow-ios-back.svg'
+          : '/icons/arrow-ios-forward.svg'
       }
-      width={24}
-      height={24}
     />
   </button>
 );

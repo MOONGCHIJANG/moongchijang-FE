@@ -2,37 +2,67 @@
 
 import Tooltip from '@/components/Tooltip';
 import { SvgIcon } from '@/components/SvgIcon';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+
+const TOAST_DURATION = 2000;
 
 type NumStepperProps = {
+  /** 최소 수량 (기본 1) */
+  min?: number;
   max?: number | null;
   value?: number;
   onChange?: (value: number) => void;
+  /** 처음 렌더될 때 한 번 띄울 안내 (예: '최소 구매 수량으로 자동 설정되었어요') */
+  initialNotice?: string;
 };
 
-const NumStepper = ({ max, value, onChange }: NumStepperProps) => {
-  const [internalCount, setInternalCount] = useState(1);
-  const [showToast, setShowToast] = useState(false);
+const NumStepper = ({
+  min = 1,
+  max,
+  value,
+  onChange,
+  initialNotice,
+}: NumStepperProps) => {
+  const [internalCount, setInternalCount] = useState(min);
+  const [toast, setToast] = useState<string | null>(initialNotice ?? null);
+  const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const count = value ?? internalCount;
-  const isMin = count <= 1;
+  const isMin = count <= min;
   const isMax = max != null && count >= max;
 
-  const update = (next: number) => {
-    if (next < 1) return;
-    if (max != null && next > max) return;
+  const showToast = (message: string | null) => {
+    clearTimeout(timerRef.current);
+    setToast(message);
+    if (message) {
+      timerRef.current = setTimeout(() => setToast(null), TOAST_DURATION);
+    }
+  };
+
+  // initialNotice 자동 숨김 + 언마운트 시 타이머 정리
+  useEffect(() => {
+    if (initialNotice) {
+      timerRef.current = setTimeout(() => setToast(null), TOAST_DURATION);
+    }
+    return () => clearTimeout(timerRef.current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const commit = (next: number) => {
     if (onChange) {
       onChange(next);
     } else {
       setInternalCount(next);
     }
+    showToast(
+      max != null && next === max ? `최대 ${max}개 구매 가능해요` : null,
+    );
+  };
 
-    if (max != null && next === max) {
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 2000);
-    } else {
-      setShowToast(false);
-    }
+  const update = (next: number) => {
+    if (next < min) return;
+    if (max != null && next > max) return;
+    commit(next);
   };
 
   return (
@@ -53,23 +83,13 @@ const NumStepper = ({ max, value, onChange }: NumStepperProps) => {
           type="number"
           className="body-md-bold text-center min-w-7.5 bg-transparent outline-none w-12 hide-arrows"
           value={count}
-          min={1}
+          min={min}
           max={max ?? undefined}
           onChange={(e) => {
             let val = Number(e.target.value);
-            if (isNaN(val) || val < 1) val = 1;
-            if (max != null && val > max) {
-              val = max;
-              setShowToast(true);
-              setTimeout(() => setShowToast(false), 2000);
-            } else {
-              setShowToast(false);
-            }
-            if (onChange) {
-              onChange(val);
-            } else {
-              setInternalCount(val);
-            }
+            if (isNaN(val) || val < min) val = min;
+            if (max != null && val > max) val = max;
+            commit(val);
           }}
         />
         <button
@@ -84,7 +104,7 @@ const NumStepper = ({ max, value, onChange }: NumStepperProps) => {
           />
         </button>
       </div>
-      {showToast && <Tooltip text={`최대 ${max}개 구매 가능해요`} />}
+      {toast && <Tooltip text={toast} />}
     </div>
   );
 };

@@ -28,6 +28,8 @@ function isLoginRequired(pathname: string): boolean {
   if (pathname.startsWith('/notifications')) return true;
   if (pathname.startsWith('/seller')) return true;
   if (pathname.startsWith('/item') && pathname.endsWith('/join')) return true;
+  if (pathname.startsWith('/item') && pathname.endsWith('/open')) return true;
+  if (pathname.startsWith('/item') && pathname.includes('/solo')) return true;
   return false;
 }
 

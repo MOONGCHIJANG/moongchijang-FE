@@ -40,10 +40,9 @@ const BottomJoin = ({ data }: Props) => {
     });
   };
 
-  // TODO(혼자사기): 보류 — 경로 확정 전까지 기존 참여 페이지로 이동
   const handleSolo = () => {
     handleJoin();
-    router.push(`/item/${data.id}/join`);
+    router.push(`/item/${data.id}/solo`);
   };
 
   const handleOpen = () => {

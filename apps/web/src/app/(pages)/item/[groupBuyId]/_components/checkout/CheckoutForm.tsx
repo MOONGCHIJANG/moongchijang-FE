@@ -5,18 +5,26 @@ import Image from 'next/image';
 type Props = {
   quantity: number;
   onQuantityChange: (value: number) => void;
+  /** 기본 1. 혼자 사기는 전체 최소 수량(targetQuantity) */
+  minQuantity?: number;
   maxQuantity: number | null;
+  /** 진입 시 스테퍼 아래 한 번 띄울 안내 */
+  quantityNotice?: string;
   productName: string;
   productAmount: number;
   feeAmount: number;
   totalAmount: number;
-  productImage: string;
+  /** 없으면(null·빈 문자열) 회색 자리 표시 */
+  productImage?: string | null;
 };
 
-const JoinForm = ({
+/** 상품·수량 카드 + 결제 금액 카드 (참여하기 / 혼자 사기 결제 공통) */
+const CheckoutForm = ({
   quantity,
   onQuantityChange,
+  minQuantity,
   maxQuantity,
+  quantityNotice,
   productName,
   productAmount,
   feeAmount,
@@ -28,13 +36,18 @@ const JoinForm = ({
       {/* 상품 카드 */}
       <div className="rounded-2xlarge bg-surface-white border border-border-subtle p-p5 flex items-center justify-between">
         <div className="flex gap-g4 items-center">
-          <Image
-            src={productImage}
-            alt="상품 이미지"
-            width={60}
-            height={60}
-            className="w-15 h-15 rounded-xlarge bg-gray-200 object-cover"
-          />
+          {productImage ? (
+            <Image
+              src={productImage}
+              alt="상품 이미지"
+              width={60}
+              height={60}
+              className="w-15 h-15 rounded-xlarge bg-gray-200 object-cover"
+            />
+          ) : (
+            // 썸네일이 없으면 같은 크기의 회색 자리만 표시
+            <div className="w-15 h-15 shrink-0 rounded-xlarge bg-gray-200" />
+          )}
           <div className="flex flex-col gap-g2">
             <p className="body-md-bold">{productName}</p>
             <p className="caption-sm-regular">
@@ -43,7 +56,9 @@ const JoinForm = ({
           </div>
         </div>
         <NumStepper
+          min={minQuantity}
           max={maxQuantity}
+          initialNotice={quantityNotice}
           value={quantity}
           onChange={onQuantityChange}
         />
@@ -83,4 +98,4 @@ const JoinForm = ({
   );
 };
 
-export default JoinForm;
+export default CheckoutForm;

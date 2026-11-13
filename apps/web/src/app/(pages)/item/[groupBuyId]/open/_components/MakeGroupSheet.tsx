@@ -6,6 +6,7 @@ import { Button } from '@moongchijang/ui';
 import { BottomSheet } from '@/components/BottomSheet';
 import { AlertBanner } from '@/components/AlertBanner';
 import NumStepper from '@/components/NumStepper';
+import PickupSummaryCard from '../../_components/pickup/PickupSummaryCard';
 
 const SETTLEMENT_NOTICE = [
   '결제는 구매 가능 수량이 모이면 총대인 내가 한 번에 해요',
@@ -57,23 +58,13 @@ const MakeGroupSheet = ({
           </div>
 
           <div className="flex flex-col gap-g3 px-p6">
-            <div className="flex items-center justify-between px-p5 py-p3 rounded-xlarge border border-border-subtle">
-              <div className="flex flex-col gap-g1">
-                <p className="heading-sm-semibold text-text-basic">
-                  {pickupLabel} 픽업
-                </p>
-                <p className="caption-sm-medium text-text-tertiary">
-                  결제 마감 {paymentDeadlineLabel}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={onClose}
-                className="caption-sm-medium text-text-subtle-inverse cursor-pointer"
-              >
-                변경
-              </button>
-            </div>
+            <PickupSummaryCard
+              pickupLabel={pickupLabel}
+              subText={`결제 마감 ${paymentDeadlineLabel}`}
+              onChange={onClose}
+              className="px-p5 py-p3"
+              changeButtonClassName="text-text-subtle-inverse"
+            />
 
             <div className="flex flex-col gap-g2">
               <p className="caption-sm-medium text-text-tertiary">

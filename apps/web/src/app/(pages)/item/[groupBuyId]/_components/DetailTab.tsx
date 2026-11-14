@@ -9,7 +9,7 @@ const DetailTab = ({ activeTab, onTabClick }: DetailTabProps) => {
   return (
     <div className="flex sticky top-14 z-5 bg-bg-white">
       <button
-        className={`flex-1 text-center pt-p6 pb-p5 cursor-pointer transition-colors duration-150 font-medium text-base ${
+        className={`flex-1 text-center pt-p6 pb-p5 cursor-pointer transition-colors duration-150 text-base ${
           activeTab === 'description'
             ? 'text-text-basic border-b-2 border-button-natural body-md-bold'
             : 'text-text-tertiary body-md-regular'
@@ -21,7 +21,7 @@ const DetailTab = ({ activeTab, onTabClick }: DetailTabProps) => {
         상품 설명
       </button>
       <button
-        className={`flex-1 text-center pt-p6 pb-p5 cursor-pointer transition-colors duration-150 font-medium text-base ${
+        className={`flex-1 text-center pt-p6 pb-p5 cursor-pointer transition-colors duration-150 text-base ${
           activeTab === 'guidelines'
             ? 'text-text-basic border-b-2 border-button-natural body-md-bold'
             : 'text-text-tertiary body-md-regular'

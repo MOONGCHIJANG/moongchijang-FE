@@ -19,6 +19,14 @@ import {
 
 const BASE = (process.env.NEXT_PUBLIC_API_BASE_URL ?? '').replace(/\/$/, '');
 
+// 로컬 개발 전용: .env 에 DEV_FAKE_TOKEN 을 넣으면 로그인 없이 보호 경로 접근
+// 실제 API 에 가짜 토큰이 전달되지 않도록 mock 모드(NEXT_PUBLIC_API_MODE=mock)에서만 동작
+const DEV_FAKE_TOKEN =
+  process.env.NODE_ENV === 'development' &&
+  process.env.NEXT_PUBLIC_API_MODE === 'mock'
+    ? process.env.DEV_FAKE_TOKEN
+    : undefined;
+
 // Server Component 에서 accessToken 이 필요한 경로 prefix
 const SSR_AUTH_PREFIXES = ['/item', '/seller', '/notifications'];
 
@@ -28,6 +36,8 @@ function isLoginRequired(pathname: string): boolean {
   if (pathname.startsWith('/notifications')) return true;
   if (pathname.startsWith('/seller')) return true;
   if (pathname.startsWith('/item') && pathname.endsWith('/join')) return true;
+  if (pathname.startsWith('/item') && pathname.endsWith('/open')) return true;
+  if (pathname.startsWith('/item') && pathname.includes('/solo')) return true;
   return false;
 }
 
@@ -123,7 +133,7 @@ export async function proxy(request: NextRequest) {
   }
 
   // 보호 경로: 미로그인 시 /login
-  if (isLoginRequired(pathname) && !refreshToken) {
+  if (isLoginRequired(pathname) && !refreshToken && !DEV_FAKE_TOKEN) {
     const response = NextResponse.redirect(new URL('/login', request.url));
     response.cookies.set('pendingRedirect', pathname, {
       path: '/',
@@ -147,6 +157,8 @@ export async function proxy(request: NextRequest) {
       rotated = resolved.rotated;
       if (resolved.accessToken)
         requestHeaders.set('x-access-token', resolved.accessToken);
+    } else if (DEV_FAKE_TOKEN) {
+      requestHeaders.set('x-access-token', DEV_FAKE_TOKEN);
     }
 
     const response = NextResponse.next({
@@ -155,6 +167,8 @@ export async function proxy(request: NextRequest) {
     applyRotation(response, rotated);
     return response;
   }
+
+  return NextResponse.next();
 }
 
 export const config = {

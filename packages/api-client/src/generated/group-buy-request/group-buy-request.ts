@@ -3,7 +3,6 @@
  * // 이 파일은 Orval이 자동 생성합니다. 직접 수정하지 마세요.
  */
 import type {
-  AdminOwnerGroupBuyRequestApprove,
   ApiResponseGroupBuyRequestDetail,
   ApiResponseGroupBuyRequestList,
   ApiResponseRequestId,
@@ -192,16 +191,14 @@ export const getGetApiV1GroupBuyRequestsRequestIdUrl = (requestId: number,) => {
   return `/api/v1/group-buy-requests/${requestId}`
 }
 
-export const getApiV1GroupBuyRequestsRequestId = async (requestId: number,
-    adminOwnerGroupBuyRequestApprove: AdminOwnerGroupBuyRequestApprove, options?: RequestInit): Promise<getApiV1GroupBuyRequestsRequestIdResponse> => {
+export const getApiV1GroupBuyRequestsRequestId = async (requestId: number, options?: RequestInit): Promise<getApiV1GroupBuyRequestsRequestIdResponse> => {
 
   return customFetch<getApiV1GroupBuyRequestsRequestIdResponse>(getGetApiV1GroupBuyRequestsRequestIdUrl(requestId),
   {
     ...options,
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      adminOwnerGroupBuyRequestApprove,)
+    method: 'GET'
+
+
   }
 );}
 

@@ -37,6 +37,192 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 /**
+ * @summary 상품 찜 추가
+ */
+export type postApiV1ProductsProductIdWishlistResponse201 = {
+  data: SuccessNoDataResponse
+  status: 201
+}
+
+export type postApiV1ProductsProductIdWishlistResponse401 = {
+  data: UnauthorizedResponse
+  status: 401
+}
+
+export type postApiV1ProductsProductIdWishlistResponse404 = {
+  data: NotFoundResponse
+  status: 404
+}
+
+export type postApiV1ProductsProductIdWishlistResponseSuccess = (postApiV1ProductsProductIdWishlistResponse201) & {
+  headers: Headers;
+};
+export type postApiV1ProductsProductIdWishlistResponseError = (postApiV1ProductsProductIdWishlistResponse401 | postApiV1ProductsProductIdWishlistResponse404) & {
+  headers: Headers;
+};
+
+export type postApiV1ProductsProductIdWishlistResponse = (postApiV1ProductsProductIdWishlistResponseSuccess | postApiV1ProductsProductIdWishlistResponseError)
+
+export const getPostApiV1ProductsProductIdWishlistUrl = (productId: number,) => {
+
+
+
+
+  return `/api/v1/products/${productId}/wishlist`
+}
+
+export const postApiV1ProductsProductIdWishlist = async (productId: number, options?: RequestInit): Promise<postApiV1ProductsProductIdWishlistResponse> => {
+
+  return customFetch<postApiV1ProductsProductIdWishlistResponse>(getPostApiV1ProductsProductIdWishlistUrl(productId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getPostApiV1ProductsProductIdWishlistMutationOptions = <TError = UnauthorizedResponse | NotFoundResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiV1ProductsProductIdWishlist>>, TError,{productId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof postApiV1ProductsProductIdWishlist>>, TError,{productId: number}, TContext> => {
+
+const mutationKey = ['postApiV1ProductsProductIdWishlist'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postApiV1ProductsProductIdWishlist>>, {productId: number}> = (props) => {
+          const {productId} = props ?? {};
+
+          return  postApiV1ProductsProductIdWishlist(productId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostApiV1ProductsProductIdWishlistMutationResult = NonNullable<Awaited<ReturnType<typeof postApiV1ProductsProductIdWishlist>>>
+
+    export type PostApiV1ProductsProductIdWishlistMutationError = UnauthorizedResponse | NotFoundResponse
+
+    /**
+ * @summary 상품 찜 추가
+ */
+export const usePostApiV1ProductsProductIdWishlist = <TError = UnauthorizedResponse | NotFoundResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiV1ProductsProductIdWishlist>>, TError,{productId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postApiV1ProductsProductIdWishlist>>,
+        TError,
+        {productId: number},
+        TContext
+      > => {
+      return useMutation(getPostApiV1ProductsProductIdWishlistMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary 상품 찜 해제
+ */
+export type deleteApiV1ProductsProductIdWishlistResponse200 = {
+  data: SuccessNoDataResponse
+  status: 200
+}
+
+export type deleteApiV1ProductsProductIdWishlistResponse401 = {
+  data: UnauthorizedResponse
+  status: 401
+}
+
+export type deleteApiV1ProductsProductIdWishlistResponse404 = {
+  data: NotFoundResponse
+  status: 404
+}
+
+export type deleteApiV1ProductsProductIdWishlistResponseSuccess = (deleteApiV1ProductsProductIdWishlistResponse200) & {
+  headers: Headers;
+};
+export type deleteApiV1ProductsProductIdWishlistResponseError = (deleteApiV1ProductsProductIdWishlistResponse401 | deleteApiV1ProductsProductIdWishlistResponse404) & {
+  headers: Headers;
+};
+
+export type deleteApiV1ProductsProductIdWishlistResponse = (deleteApiV1ProductsProductIdWishlistResponseSuccess | deleteApiV1ProductsProductIdWishlistResponseError)
+
+export const getDeleteApiV1ProductsProductIdWishlistUrl = (productId: number,) => {
+
+
+
+
+  return `/api/v1/products/${productId}/wishlist`
+}
+
+export const deleteApiV1ProductsProductIdWishlist = async (productId: number, options?: RequestInit): Promise<deleteApiV1ProductsProductIdWishlistResponse> => {
+
+  return customFetch<deleteApiV1ProductsProductIdWishlistResponse>(getDeleteApiV1ProductsProductIdWishlistUrl(productId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteApiV1ProductsProductIdWishlistMutationOptions = <TError = UnauthorizedResponse | NotFoundResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteApiV1ProductsProductIdWishlist>>, TError,{productId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteApiV1ProductsProductIdWishlist>>, TError,{productId: number}, TContext> => {
+
+const mutationKey = ['deleteApiV1ProductsProductIdWishlist'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteApiV1ProductsProductIdWishlist>>, {productId: number}> = (props) => {
+          const {productId} = props ?? {};
+
+          return  deleteApiV1ProductsProductIdWishlist(productId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteApiV1ProductsProductIdWishlistMutationResult = NonNullable<Awaited<ReturnType<typeof deleteApiV1ProductsProductIdWishlist>>>
+
+    export type DeleteApiV1ProductsProductIdWishlistMutationError = UnauthorizedResponse | NotFoundResponse
+
+    /**
+ * @summary 상품 찜 해제
+ */
+export const useDeleteApiV1ProductsProductIdWishlist = <TError = UnauthorizedResponse | NotFoundResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteApiV1ProductsProductIdWishlist>>, TError,{productId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteApiV1ProductsProductIdWishlist>>,
+        TError,
+        {productId: number},
+        TContext
+      > => {
+      return useMutation(getDeleteApiV1ProductsProductIdWishlistMutationOptions(options), queryClient);
+    }
+    /**
  * @summary 찜 추가
  */
 export type postApiV1GroupBuysGroupBuyIdWishlistResponse201 = {

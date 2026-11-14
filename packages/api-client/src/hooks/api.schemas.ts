@@ -1060,6 +1060,248 @@ export interface ApiResponseShareMeta {
   error: unknown | null;
 }
 
+export type ProductFeedItemStorageType = typeof ProductFeedItemStorageType[keyof typeof ProductFeedItemStorageType];
+
+
+export const ProductFeedItemStorageType = {
+  ROOM_TEMPERATURE: 'ROOM_TEMPERATURE',
+  REFRIGERATED: 'REFRIGERATED',
+  FROZEN: 'FROZEN',
+} as const;
+
+export interface ProductFeedStore {
+  storeId: number;
+  name: string;
+  region: string;
+  district: string;
+}
+
+/**
+ * @nullable
+ */
+export type ProductFeedItemUnavailableReason = typeof ProductFeedItemUnavailableReason[keyof typeof ProductFeedItemUnavailableReason] | null;
+
+
+export const ProductFeedItemUnavailableReason = {
+  PRODUCT_NOT_FOR_SALE: 'PRODUCT_NOT_FOR_SALE',
+  STORE_NOT_FOR_SALE: 'STORE_NOT_FOR_SALE',
+  NO_AVAILABLE_PICKUP_DATE: 'NO_AVAILABLE_PICKUP_DATE',
+} as const;
+
+export interface ProductFeedItem {
+  productId: number;
+  categoryCode: string;
+  name: string;
+  /** @nullable */
+  thumbnailUrl?: string | null;
+  unitPrice: number;
+  minQuantity: number;
+  maxQuantity: number;
+  storageType: ProductFeedItemStorageType;
+  store: ProductFeedStore;
+  /** @nullable */
+  earliestPickupDate?: string | null;
+  /** @nullable */
+  holidaySummary?: string | null;
+  isNew: boolean;
+  isWishlisted: boolean;
+  canPurchase: boolean;
+  /** @nullable */
+  unavailableReason?: ProductFeedItemUnavailableReason;
+  activeTogetherRoomCount: number;
+}
+
+export type ApiResponseProductFeedData = {
+  items: ProductFeedItem[];
+  /** @nullable */
+  nextCursor?: string | null;
+  hasNext: boolean;
+};
+
+export interface ApiResponseProductFeed {
+  success: boolean;
+  data: ApiResponseProductFeedData;
+  error: unknown | null;
+}
+
+export type ProductDetailStorageType = typeof ProductDetailStorageType[keyof typeof ProductDetailStorageType];
+
+
+export const ProductDetailStorageType = {
+  ROOM_TEMPERATURE: 'ROOM_TEMPERATURE',
+  REFRIGERATED: 'REFRIGERATED',
+  FROZEN: 'FROZEN',
+} as const;
+
+export type ProductDetailPickupHolidaysItemType = typeof ProductDetailPickupHolidaysItemType[keyof typeof ProductDetailPickupHolidaysItemType];
+
+
+export const ProductDetailPickupHolidaysItemType = {
+  REGULAR: 'REGULAR',
+  TEMPORARY: 'TEMPORARY',
+} as const;
+
+/**
+ * @nullable
+ */
+export type ProductDetailUnavailableReason = typeof ProductDetailUnavailableReason[keyof typeof ProductDetailUnavailableReason] | null;
+
+
+export const ProductDetailUnavailableReason = {
+  PRODUCT_NOT_FOR_SALE: 'PRODUCT_NOT_FOR_SALE',
+  STORE_NOT_FOR_SALE: 'STORE_NOT_FOR_SALE',
+  NO_AVAILABLE_PICKUP_DATE: 'NO_AVAILABLE_PICKUP_DATE',
+} as const;
+
+export type ProductDetailStore = {
+  storeId: number;
+  name: string;
+  region: string;
+  district: string;
+  address: string;
+  /** @nullable */
+  phoneNumber?: string | null;
+  /** @nullable */
+  placeId?: string | null;
+};
+
+export type ProductDetailPickupAvailableDatesItemTimeSlotsItem = {
+  startTime: string;
+  endTime: string;
+};
+
+export type ProductDetailPickupAvailableDatesItem = {
+  date: string;
+  timeSlots: ProductDetailPickupAvailableDatesItemTimeSlotsItem[];
+};
+
+export type ProductDetailPickupHolidaysItem = {
+  type: ProductDetailPickupHolidaysItemType;
+  /** @nullable */
+  dayOfWeek?: number | null;
+  /** @nullable */
+  date?: string | null;
+  /** @nullable */
+  reason?: string | null;
+};
+
+export type ProductDetailPickup = {
+  preparationDays: number;
+  availableFrom: string;
+  availableUntil: string;
+  availableDates: ProductDetailPickupAvailableDatesItem[];
+  holidays: ProductDetailPickupHolidaysItem[];
+};
+
+export interface ProductDetail {
+  productId: number;
+  categoryCode: string;
+  name: string;
+  description: string;
+  /** @nullable */
+  thumbnailUrl?: string | null;
+  imageUrls: string[];
+  unitPrice: number;
+  minQuantity: number;
+  maxQuantity: number;
+  storageType: ProductDetailStorageType;
+  store: ProductDetailStore;
+  pickup: ProductDetailPickup;
+  isWishlisted: boolean;
+  canPurchase: boolean;
+  /** @nullable */
+  unavailableReason?: ProductDetailUnavailableReason;
+}
+
+export interface ApiResponseProductDetail {
+  success: boolean;
+  data: ProductDetail;
+  error: unknown | null;
+}
+
+export type ApiResponseProductShareData = {
+  productId: number;
+  productName: string;
+  storeName: string;
+  /** @nullable */
+  imageUrl?: string | null;
+  shareUrl: string;
+};
+
+export interface ApiResponseProductShare {
+  success: boolean;
+  data: ApiResponseProductShareData;
+  error: unknown | null;
+}
+
+export type ApiResponseHomeTogetherStatusDataTodayPickupsItemRole = typeof ApiResponseHomeTogetherStatusDataTodayPickupsItemRole[keyof typeof ApiResponseHomeTogetherStatusDataTodayPickupsItemRole];
+
+
+export const ApiResponseHomeTogetherStatusDataTodayPickupsItemRole = {
+  ORGANIZER: 'ORGANIZER',
+  PARTICIPANT: 'PARTICIPANT',
+} as const;
+
+export type ApiResponseHomeTogetherStatusDataTodayPickupsItem = {
+  roomId: number;
+  role: ApiResponseHomeTogetherStatusDataTodayPickupsItemRole;
+  productName: string;
+  quantity: number;
+  storeName: string;
+  pickupDate: string;
+  pickupTimeStart: string;
+  pickupTimeEnd: string;
+  canOpenQr: boolean;
+};
+
+export type ApiResponseHomeTogetherStatusDataRoomsItemRole = typeof ApiResponseHomeTogetherStatusDataRoomsItemRole[keyof typeof ApiResponseHomeTogetherStatusDataRoomsItemRole];
+
+
+export const ApiResponseHomeTogetherStatusDataRoomsItemRole = {
+  ORGANIZER: 'ORGANIZER',
+  PARTICIPANT: 'PARTICIPANT',
+} as const;
+
+export type ApiResponseHomeTogetherStatusDataRoomsItemNextAction = typeof ApiResponseHomeTogetherStatusDataRoomsItemNextAction[keyof typeof ApiResponseHomeTogetherStatusDataRoomsItemNextAction];
+
+
+export const ApiResponseHomeTogetherStatusDataRoomsItemNextAction = {
+  NONE: 'NONE',
+  PAY: 'PAY',
+  TRANSFER: 'TRANSFER',
+  PICKUP: 'PICKUP',
+} as const;
+
+export type ApiResponseHomeTogetherStatusDataRoomsItem = {
+  roomId: number;
+  role: ApiResponseHomeTogetherStatusDataRoomsItemRole;
+  /** @nullable */
+  productId?: number | null;
+  productName: string;
+  storeName: string;
+  currentQuantity: number;
+  minQuantity: number;
+  maxQuantity: number;
+  paymentDeadlineAt: string;
+  nextAction: ApiResponseHomeTogetherStatusDataRoomsItemNextAction;
+};
+
+export type ApiResponseHomeTogetherStatusData = {
+  hasActiveRooms: boolean;
+  showTogetherRoomModule: boolean;
+  showFirstVisitGuide: boolean;
+  togetherTabBadgeCount: number;
+  isTodayPickupLeader: boolean;
+  todayPickups: ApiResponseHomeTogetherStatusDataTodayPickupsItem[];
+  rooms: ApiResponseHomeTogetherStatusDataRoomsItem[];
+};
+
+export interface ApiResponseHomeTogetherStatus {
+  success: boolean;
+  data: ApiResponseHomeTogetherStatusData;
+  error: unknown | null;
+}
+
 export interface GroupBuyRequestCreate {
   /** @maxLength 100 */
   storeName: string;
@@ -1099,10 +1341,6 @@ export interface GroupBuyRequestCreate {
   longitude?: number | null;
   /** @maxLength 100 */
   productName: string;
-  /** @minimum 1 */
-  desiredQuantity: number;
-  /** 오늘 이후 날짜 */
-  desiredPickupDate: string;
   /**
      * @maxLength 500
      * @nullable
@@ -1121,28 +1359,30 @@ export interface ApiResponseRequestId {
 }
 
 /**
- * IN_REVIEW=검토 중 / IN_CONTACT=매장 컨택 중 /
-OPENED=공구 개설 완료 / REJECTED=개설 불가
+ * REQUEST_RECEIVED=요청 접수 / IN_REVIEW=검토 중 /
+STORE_CONFIRMING=매장 확인 중 / COMPLETED=입점 완료 / UNAVAILABLE=입점 불가
 
  */
 export type GroupBuyRequestDetailStatus = typeof GroupBuyRequestDetailStatus[keyof typeof GroupBuyRequestDetailStatus];
 
 
 export const GroupBuyRequestDetailStatus = {
+  REQUEST_RECEIVED: 'REQUEST_RECEIVED',
   IN_REVIEW: 'IN_REVIEW',
-  IN_CONTACT: 'IN_CONTACT',
-  OPENED: 'OPENED',
-  REJECTED: 'REJECTED',
+  STORE_CONFIRMING: 'STORE_CONFIRMING',
+  COMPLETED: 'COMPLETED',
+  UNAVAILABLE: 'UNAVAILABLE',
 } as const;
 
 export type GroupBuyRequestDetailStatusHistoryItemStatus = typeof GroupBuyRequestDetailStatusHistoryItemStatus[keyof typeof GroupBuyRequestDetailStatusHistoryItemStatus];
 
 
 export const GroupBuyRequestDetailStatusHistoryItemStatus = {
+  REQUEST_RECEIVED: 'REQUEST_RECEIVED',
   IN_REVIEW: 'IN_REVIEW',
-  IN_CONTACT: 'IN_CONTACT',
-  OPENED: 'OPENED',
-  REJECTED: 'REJECTED',
+  STORE_CONFIRMING: 'STORE_CONFIRMING',
+  COMPLETED: 'COMPLETED',
+  UNAVAILABLE: 'UNAVAILABLE',
 } as const;
 
 export type GroupBuyRequestDetailStatusHistoryItem = {
@@ -1167,21 +1407,19 @@ export interface GroupBuyRequestDetail {
   /** @nullable */
   longitude?: number | null;
   productName: string;
-  desiredQuantity: number;
-  desiredPickupDate: string;
   /** @nullable */
   additionalNote?: string | null;
-  /** IN_REVIEW=검토 중 / IN_CONTACT=매장 컨택 중 /
-  OPENED=공구 개설 완료 / REJECTED=개설 불가
+  /** REQUEST_RECEIVED=요청 접수 / IN_REVIEW=검토 중 /
+  STORE_CONFIRMING=매장 확인 중 / COMPLETED=입점 완료 / UNAVAILABLE=입점 불가
    */
   status: GroupBuyRequestDetailStatus;
   /**
-     * status=REJECTED 시 노출
+     * status=UNAVAILABLE 시 노출
      * @nullable
      */
   rejectionReason: string | null;
   /**
-     * status=OPENED 시 개설된 공구 id
+     * status=COMPLETED 시 개설된 공구 id
      * @nullable
      */
   openedGroupBuyId: number | null;
@@ -1951,19 +2189,17 @@ export type ApiResponseMypageGroupBuyRequestListDataItemStatus = typeof ApiRespo
 
 
 export const ApiResponseMypageGroupBuyRequestListDataItemStatus = {
-  SUBMITTED: 'SUBMITTED',
+  REQUEST_RECEIVED: 'REQUEST_RECEIVED',
   IN_REVIEW: 'IN_REVIEW',
-  IN_CONTACT: 'IN_CONTACT',
-  OPENED: 'OPENED',
-  REJECTED: 'REJECTED',
+  STORE_CONFIRMING: 'STORE_CONFIRMING',
+  COMPLETED: 'COMPLETED',
+  UNAVAILABLE: 'UNAVAILABLE',
 } as const;
 
 export type ApiResponseMypageGroupBuyRequestListDataItem = {
   productName: string;
   status: ApiResponseMypageGroupBuyRequestListDataItemStatus;
   storeName: string;
-  desiredPickupDate: string;
-  desiredQuantity: number;
   requestId: number;
 };
 
@@ -3139,18 +3375,17 @@ export type ApiResponseAdminRequestPageDataContentItemStatus = typeof ApiRespons
 
 
 export const ApiResponseAdminRequestPageDataContentItemStatus = {
+  REQUEST_RECEIVED: 'REQUEST_RECEIVED',
   IN_REVIEW: 'IN_REVIEW',
-  IN_CONTACT: 'IN_CONTACT',
-  OPENED: 'OPENED',
-  REJECTED: 'REJECTED',
+  STORE_CONFIRMING: 'STORE_CONFIRMING',
+  COMPLETED: 'COMPLETED',
+  UNAVAILABLE: 'UNAVAILABLE',
 } as const;
 
 export type ApiResponseAdminRequestPageDataContentItem = {
   requestId: number;
   storeName: string;
   productName: string;
-  desiredQuantity: number;
-  desiredPickupDate: string;
   status: ApiResponseAdminRequestPageDataContentItemStatus;
   requesterId: number;
   /** @nullable */
@@ -3217,20 +3452,22 @@ export type ApiResponseAdminRequestDetailDataStatus = typeof ApiResponseAdminReq
 
 
 export const ApiResponseAdminRequestDetailDataStatus = {
+  REQUEST_RECEIVED: 'REQUEST_RECEIVED',
   IN_REVIEW: 'IN_REVIEW',
-  IN_CONTACT: 'IN_CONTACT',
-  OPENED: 'OPENED',
-  REJECTED: 'REJECTED',
+  STORE_CONFIRMING: 'STORE_CONFIRMING',
+  COMPLETED: 'COMPLETED',
+  UNAVAILABLE: 'UNAVAILABLE',
 } as const;
 
 export type ApiResponseAdminRequestDetailDataStatusHistoryItemStatus = typeof ApiResponseAdminRequestDetailDataStatusHistoryItemStatus[keyof typeof ApiResponseAdminRequestDetailDataStatusHistoryItemStatus];
 
 
 export const ApiResponseAdminRequestDetailDataStatusHistoryItemStatus = {
+  REQUEST_RECEIVED: 'REQUEST_RECEIVED',
   IN_REVIEW: 'IN_REVIEW',
-  IN_CONTACT: 'IN_CONTACT',
-  OPENED: 'OPENED',
-  REJECTED: 'REJECTED',
+  STORE_CONFIRMING: 'STORE_CONFIRMING',
+  COMPLETED: 'COMPLETED',
+  UNAVAILABLE: 'UNAVAILABLE',
 } as const;
 
 export type ApiResponseAdminRequestDetailDataStatusHistoryItem = {
@@ -3255,8 +3492,6 @@ export type ApiResponseAdminRequestDetailData = {
   /** @nullable */
   longitude?: number | null;
   productName: string;
-  desiredQuantity: number;
-  desiredPickupDate: string;
   /** @nullable */
   additionalNote?: string | null;
   status: ApiResponseAdminRequestDetailDataStatus;
@@ -3279,22 +3514,23 @@ export type AdminRequestStatusUpdateTargetStatus = typeof AdminRequestStatusUpda
 
 
 export const AdminRequestStatusUpdateTargetStatus = {
+  REQUEST_RECEIVED: 'REQUEST_RECEIVED',
   IN_REVIEW: 'IN_REVIEW',
-  IN_CONTACT: 'IN_CONTACT',
-  OPENED: 'OPENED',
-  REJECTED: 'REJECTED',
+  STORE_CONFIRMING: 'STORE_CONFIRMING',
+  COMPLETED: 'COMPLETED',
+  UNAVAILABLE: 'UNAVAILABLE',
 } as const;
 
 export interface AdminRequestStatusUpdate {
   targetStatus: AdminRequestStatusUpdateTargetStatus;
   /**
-     * targetStatus=REJECTED 시 필수
+     * targetStatus=UNAVAILABLE 시 필수
      * @maxLength 500
      * @nullable
      */
   rejectionReason?: string | null;
   /**
-     * targetStatus=OPENED 시 필수. 실제 개설된 공구 id이며 존재 검증 후 개설 알림 발송에 사용
+     * targetStatus=COMPLETED 시 필수. 실제 개설된 공구 id이며 존재 검증 후 개설 알림 발송에 사용
      * @nullable
      */
   openedGroupBuyId?: number | null;
@@ -3403,8 +3639,8 @@ export type ApiResponseAdminGroupBuyRequestActionDataStatus = typeof ApiResponse
 
 
 export const ApiResponseAdminGroupBuyRequestActionDataStatus = {
-  OPENED: 'OPENED',
-  REJECTED: 'REJECTED',
+  COMPLETED: 'COMPLETED',
+  UNAVAILABLE: 'UNAVAILABLE',
 } as const;
 
 export type ApiResponseAdminGroupBuyRequestActionData = {
@@ -4496,6 +4732,34 @@ export type GetApiV1StoresSearchParams = {
 keyword: string;
 };
 
+export type GetApiV1ProductsParams = {
+categoryCodes?: string[];
+districts?: string[];
+pickupThisWeek?: boolean;
+smallQuantity?: boolean;
+newOnly?: boolean;
+sort?: GetApiV1ProductsSort;
+/**
+ * @nullable
+ */
+cursor?: string | null;
+/**
+ * @minimum 1
+ * @maximum 100
+ */
+limit?: number;
+};
+
+export type GetApiV1ProductsSort = typeof GetApiV1ProductsSort[keyof typeof GetApiV1ProductsSort];
+
+
+export const GetApiV1ProductsSort = {
+  LATEST: 'LATEST',
+  PRICE_LOW: 'PRICE_LOW',
+  MIN_QUANTITY: 'MIN_QUANTITY',
+  TOGETHER_POPULAR: 'TOGETHER_POPULAR',
+} as const;
+
 export type PostApiV1GroupBuyOpenRequestsBody = {
   /**
      * 알림 신청 대상 지역(동/구 등)
@@ -4780,10 +5044,11 @@ export type GetApiV1AdminGroupBuyRequestsStatus = typeof GetApiV1AdminGroupBuyRe
 
 export const GetApiV1AdminGroupBuyRequestsStatus = {
   ALL: 'ALL',
+  REQUEST_RECEIVED: 'REQUEST_RECEIVED',
   IN_REVIEW: 'IN_REVIEW',
-  IN_CONTACT: 'IN_CONTACT',
-  OPENED: 'OPENED',
-  REJECTED: 'REJECTED',
+  STORE_CONFIRMING: 'STORE_CONFIRMING',
+  COMPLETED: 'COMPLETED',
+  UNAVAILABLE: 'UNAVAILABLE',
 } as const;
 
 export type GetApiV1AdminOwnerGroupBuyRequestsParams = {

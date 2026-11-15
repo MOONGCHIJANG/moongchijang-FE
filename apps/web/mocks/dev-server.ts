@@ -5,29 +5,7 @@
  * - 엔드포인트 추가/수정은 mocks/handlers.ts 에서 합니다.
  */
 
-import express from 'express';
-import cors from 'cors';
-import { createMiddleware } from '@mswjs/http-middleware';
+import { createMockServer } from '@moongchijang/api-client/mock-server';
 import { handlers } from './handlers';
 
-const app = express();
-const PORT = 9090;
-
-app.use(
-  cors({
-    origin: /^http:\/\/localhost:\d+$/,
-    credentials: true,
-  }),
-);
-app.use(express.json());
-app.use((req, _res, next) => {
-  console.log(`[Mock] ${req.method} ${req.path}`);
-  next();
-});
-
-app.use(createMiddleware(...handlers));
-
-app.listen(PORT, () => {
-  console.log(`[Mock] Server running on http://localhost:${PORT}`);
-  console.log(`[Mock] ${handlers.length}개 엔드포인트 등록됨`);
-});
+createMockServer(handlers, 9090, 'Mock');

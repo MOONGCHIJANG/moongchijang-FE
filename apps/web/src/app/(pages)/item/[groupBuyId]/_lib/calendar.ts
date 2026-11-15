@@ -63,7 +63,10 @@ export const getMonthRange = (
 export const getInitialMonth = (
   today: Date,
   availableDates: DateKey[],
+  selectedDate?: DateKey | null,
 ): YearMonth => {
+  // 이미 선택된 날짜(URL 복원)가 있으면 그 달부터 보여줌
+  if (selectedDate) return toYearMonth(parseDateKey(selectedDate));
   const first = [...availableDates].sort()[0];
   return toYearMonth(first ? parseDateKey(first) : today);
 };

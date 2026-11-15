@@ -12,7 +12,8 @@ import {
 } from '../../_lib/pickupDates';
 import {
   type PickupSelection,
-  parsePickupSelection,
+  parsePickupDate,
+  parsePickupTime,
   toPickupQuery,
 } from '../../_lib/pickupSelection';
 import PickupCalendar from './PickupCalendar';
@@ -40,18 +41,14 @@ const PickupStep = ({
   renderNotice,
 }: Props) => {
   const searchParams = useSearchParams();
-  const [initial] = useState(() =>
-    parsePickupSelection(
-      searchParams.get('date'),
-      searchParams.get('time'),
-      todayKey,
-    ),
+  // 날짜만 고른 상태(?date=)도 복원하고, 시간은 날짜가 유효할 때만 복원
+  const [selectedDate, setSelectedDate] = useState<DateKey | null>(() =>
+    parsePickupDate(searchParams.get('date'), todayKey),
   );
-  const [selectedDate, setSelectedDate] = useState<DateKey | null>(
-    initial?.date ?? null,
-  );
-  const [selectedTime, setSelectedTime] = useState<string | null>(
-    initial?.time ?? null,
+  const [selectedTime, setSelectedTime] = useState<string | null>(() =>
+    parsePickupDate(searchParams.get('date'), todayKey)
+      ? parsePickupTime(searchParams.get('time'))
+      : null,
   );
 
   // TODO(API): 픽업 가능 날짜·시간 API 반영 시 교체

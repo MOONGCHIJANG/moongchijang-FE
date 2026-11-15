@@ -19,19 +19,28 @@ export interface PickupSelection {
 export const toPickupQuery = ({ date, time }: PickupSelection): string =>
   new URLSearchParams({ date, time }).toString();
 
-/**
- * 쿼리 값을 검증해 선택 가능한 일시일 때만 반환.
- * TODO(API): 픽업 가능 날짜·시간 API 반영 시 검증 기준 교체
- */
+// TODO(API): 픽업 가능 날짜·시간 API 반영 시 검증 기준 교체
+/** 쿼리의 날짜가 선택 가능한 날짜일 때만 반환 */
+export const parsePickupDate = (
+  date: string | null | undefined,
+  todayKey: DateKey,
+): DateKey | null =>
+  date && getMockPickupDates(todayKey).includes(date) ? date : null;
+
+/** 쿼리의 시간이 선택 가능한 시간일 때만 반환 */
+export const parsePickupTime = (
+  time: string | null | undefined,
+): string | null => (time && getMockPickupTimes().includes(time) ? time : null);
+
+/** 날짜·시간이 모두 선택 가능한 일시일 때만 반환 */
 export const parsePickupSelection = (
   date: string | null | undefined,
   time: string | null | undefined,
   todayKey: DateKey,
 ): PickupSelection | null => {
-  if (!date || !time) return null;
-  if (!getMockPickupDates(todayKey).includes(date)) return null;
-  if (!getMockPickupTimes().includes(time)) return null;
-  return { date, time };
+  const validDate = parsePickupDate(date, todayKey);
+  const validTime = parsePickupTime(time);
+  return validDate && validTime ? { date: validDate, time: validTime } : null;
 };
 
 /** '9/23(수) 15:00' */

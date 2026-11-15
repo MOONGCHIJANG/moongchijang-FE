@@ -38,12 +38,9 @@ const SoloCheckoutClient = ({ groupBuy, selection }: Props) => {
   const pickupQuery = toPickupQuery(selection);
 
   // 픽업 일시 선택 화면으로 돌아가기 — 선택값은 쿼리로 유지됨
+  // (history.back 은 결제 화면에 바로 들어온 경우 엉뚱한 화면으로 갈 수 있어 경로로 직접 이동)
   const handleChangePickup = () => {
-    if (window.history.length > 1) {
-      router.back();
-    } else {
-      router.replace(`/item/${groupBuy.id}/solo?${pickupQuery}`);
-    }
+    router.replace(`/item/${groupBuy.id}/solo?${pickupQuery}`);
   };
 
   // 같은 픽업 일시로 같이 사기 바텀시트 열기

@@ -32,7 +32,7 @@ const PickupCalendar = ({
   const today = parseDateKey(todayKey);
   const { min, max } = getMonthRange(today, availableDates);
   const [viewMonth, setViewMonth] = useState(() =>
-    getInitialMonth(today, availableDates),
+    getInitialMonth(today, availableDates, selectedDate),
   );
 
   const availableSet = useMemo(() => new Set(availableDates), [availableDates]);

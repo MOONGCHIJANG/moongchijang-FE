@@ -135,11 +135,16 @@ export async function proxy(request: NextRequest) {
   // 보호 경로: 미로그인 시 /login
   if (isLoginRequired(pathname) && !refreshToken && !DEV_FAKE_TOKEN) {
     const response = NextResponse.redirect(new URL('/login', request.url));
-    response.cookies.set('pendingRedirect', pathname, {
-      path: '/',
-      maxAge: 60 * 5,
-      sameSite: 'lax',
-    });
+    // 쿼리까지 저장해 로그인 후 선택한 픽업 일시(?date=&time=) 등이 유지되도록
+    response.cookies.set(
+      'pendingRedirect',
+      `${pathname}${request.nextUrl.search}`,
+      {
+        path: '/',
+        maxAge: 60 * 5,
+        sameSite: 'lax',
+      },
+    );
     return response;
   }
 

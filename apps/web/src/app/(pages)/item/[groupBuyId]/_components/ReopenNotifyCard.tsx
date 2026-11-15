@@ -15,7 +15,7 @@ interface Props {
  * 찜 완료 후에는 비활성 상태로 고정된다.
  */
 const ReopenNotifyCard = ({ data }: Props) => {
-  const { liked, toggleWishlist, toastMessage } = useWishlist(data);
+  const { liked, isPending, toggleWishlist, toastMessage } = useWishlist(data);
 
   return (
     <div className="flex w-full flex-col gap-g2 p-p5 rounded-xlarge border border-border-subtle bg-surface-white">
@@ -27,7 +27,7 @@ const ReopenNotifyCard = ({ data }: Props) => {
         variant="brand-soft"
         size="sm"
         fullWidth
-        disabled={liked}
+        disabled={liked || isPending}
         onClick={toggleWishlist}
         className="gap-g1 px-p5 rounded-xlarge border border-border-brand cursor-pointer disabled:border-transparent"
       >

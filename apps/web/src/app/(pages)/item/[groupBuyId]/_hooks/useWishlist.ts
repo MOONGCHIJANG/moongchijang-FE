@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import {
@@ -20,6 +20,9 @@ export const useWishlist = (data: ApiResponseGroupBuyDetailResponseData) => {
   const queryClient = useQueryClient();
   const router = useRouter();
   const [liked, setLiked] = useState(data.isWishlisted);
+  const [isPending, setIsPending] = useState(false);
+  // 같은 렌더 안의 연속 클릭까지 막기 위해 ref 로도 가드
+  const pendingRef = useRef(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (message: string) => {
@@ -28,6 +31,11 @@ export const useWishlist = (data: ApiResponseGroupBuyDetailResponseData) => {
   };
 
   const toggleWishlist = async () => {
+    // 이전 요청이 끝나기 전 재클릭은 무시 (중첩 요청 시 화면·서버 상태 불일치 방지)
+    if (pendingRef.current) return;
+    pendingRef.current = true;
+    setIsPending(true);
+
     const next = !liked;
     setLiked(next);
     if (next) {
@@ -58,8 +66,11 @@ export const useWishlist = (data: ApiResponseGroupBuyDetailResponseData) => {
     } catch {
       setLiked(!next);
       showToast('로그인 후에 이용해주세요.');
+    } finally {
+      pendingRef.current = false;
+      setIsPending(false);
     }
   };
 
-  return { liked, toggleWishlist, toastMessage };
+  return { liked, isPending, toggleWishlist, toastMessage };
 };

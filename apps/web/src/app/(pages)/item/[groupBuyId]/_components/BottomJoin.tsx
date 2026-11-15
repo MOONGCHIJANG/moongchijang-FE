@@ -16,7 +16,7 @@ interface Props {
 
 const BottomJoin = ({ data }: Props) => {
   const router = useRouter();
-  const { liked, toggleWishlist, toastMessage } = useWishlist(data);
+  const { liked, isPending, toggleWishlist, toastMessage } = useWishlist(data);
   const [showGuideToast, setShowGuideToast] = useState(false);
 
   const { isOrderable, reopenLabel } = getOrderAvailability(data);
@@ -58,6 +58,7 @@ const BottomJoin = ({ data }: Props) => {
             type="button"
             aria-label={liked ? '찜 해제' : '찜하기'}
             aria-pressed={liked}
+            disabled={isPending}
             className="flex shrink-0 items-center justify-center w-11 h-11 p-p5 rounded-2xlarge bg-button-white cursor-pointer"
             onClick={toggleWishlist}
           >

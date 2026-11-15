@@ -69,6 +69,8 @@ const NumStepper = ({
     <div className="relative inline-flex flex-col items-center">
       <div className="rounded-large px-g4 py-g2 gap-g4 flex border border-border-subtle items-center">
         <button
+          type="button"
+          aria-label="수량 줄이기"
           onClick={() => update(count - 1)}
           disabled={isMin}
           className="disabled:cursor-not-allowed"
@@ -81,18 +83,24 @@ const NumStepper = ({
         </button>
         <input
           type="number"
+          inputMode="numeric"
+          step={1}
+          aria-label="구매 수량"
           className="body-md-bold text-center min-w-7.5 bg-transparent outline-none w-12 hide-arrows"
           value={count}
           min={min}
           max={max ?? undefined}
           onChange={(e) => {
-            let val = Number(e.target.value);
-            if (isNaN(val) || val < min) val = min;
+            // 소수 입력(1.5 등)은 정수로 내림
+            let val = Math.floor(Number(e.target.value));
+            if (!Number.isFinite(val) || val < min) val = min;
             if (max != null && val > max) val = max;
             commit(val);
           }}
         />
         <button
+          type="button"
+          aria-label="수량 늘리기"
           onClick={() => update(count + 1)}
           disabled={isMax}
           className="disabled:cursor-not-allowed"

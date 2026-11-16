@@ -29,6 +29,7 @@ const DetailTab = ({ activeTab, onTabClick }: DetailTabProps) => {
           onClick={() => onTabClick(key)}
           tabIndex={0}
           type="button"
+          aria-current={activeTab === key ? 'location' : undefined}
         >
           {label}
         </button>

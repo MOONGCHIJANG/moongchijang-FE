@@ -5,6 +5,26 @@
 import * as zod from 'zod';
 
 /**
+ * @summary 상품 찜 추가
+ */
+export const PostApiV1ProductsProductIdWishlistParams = zod.object({
+  productId: zod.number(),
+});
+
+/**
+ * @summary 상품 찜 해제
+ */
+export const DeleteApiV1ProductsProductIdWishlistParams = zod.object({
+  productId: zod.number(),
+});
+
+export const DeleteApiV1ProductsProductIdWishlistResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.unknown().nullable(),
+  error: zod.unknown().nullable(),
+});
+
+/**
  * @summary 찜 추가
  */
 export const PostApiV1GroupBuysGroupBuyIdWishlistParams = zod.object({

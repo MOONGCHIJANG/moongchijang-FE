@@ -742,7 +742,14 @@ export const getApiV1AdminGroupBuyRequestsQuerySizeMax = 100;
 
 export const GetApiV1AdminGroupBuyRequestsQueryParams = zod.object({
   status: zod
-    .enum(['ALL', 'IN_REVIEW', 'IN_CONTACT', 'OPENED', 'REJECTED'])
+    .enum([
+      'ALL',
+      'REQUEST_RECEIVED',
+      'IN_REVIEW',
+      'STORE_CONFIRMING',
+      'COMPLETED',
+      'UNAVAILABLE',
+    ])
     .default(getApiV1AdminGroupBuyRequestsQueryStatusDefault),
   keyword: zod
     .string()
@@ -765,9 +772,13 @@ export const GetApiV1AdminGroupBuyRequestsResponse = zod.object({
         requestId: zod.number(),
         storeName: zod.string(),
         productName: zod.string(),
-        desiredQuantity: zod.number(),
-        desiredPickupDate: zod.iso.date(),
-        status: zod.enum(['IN_REVIEW', 'IN_CONTACT', 'OPENED', 'REJECTED']),
+        status: zod.enum([
+          'REQUEST_RECEIVED',
+          'IN_REVIEW',
+          'STORE_CONFIRMING',
+          'COMPLETED',
+          'UNAVAILABLE',
+        ]),
         requesterId: zod.number(),
         requesterName: zod.string().nullish(),
         originalPrice: zod
@@ -822,15 +833,25 @@ export const GetApiV1AdminGroupBuyRequestsRequestIdResponse = zod.object({
     latitude: zod.number().nullish(),
     longitude: zod.number().nullish(),
     productName: zod.string(),
-    desiredQuantity: zod.number(),
-    desiredPickupDate: zod.iso.date(),
     additionalNote: zod.string().nullish(),
-    status: zod.enum(['IN_REVIEW', 'IN_CONTACT', 'OPENED', 'REJECTED']),
+    status: zod.enum([
+      'REQUEST_RECEIVED',
+      'IN_REVIEW',
+      'STORE_CONFIRMING',
+      'COMPLETED',
+      'UNAVAILABLE',
+    ]),
     rejectionReason: zod.string().nullish(),
     openedGroupBuyId: zod.number().nullish(),
     statusHistory: zod.array(
       zod.object({
-        status: zod.enum(['IN_REVIEW', 'IN_CONTACT', 'OPENED', 'REJECTED']),
+        status: zod.enum([
+          'REQUEST_RECEIVED',
+          'IN_REVIEW',
+          'STORE_CONFIRMING',
+          'COMPLETED',
+          'UNAVAILABLE',
+        ]),
         changedAt: zod.iso.datetime({ offset: true }),
       }),
     ),
@@ -849,17 +870,23 @@ export const PatchApiV1AdminGroupBuyRequestsRequestIdStatusParams = zod.object({
 export const patchApiV1AdminGroupBuyRequestsRequestIdStatusBodyRejectionReasonMax = 500;
 
 export const PatchApiV1AdminGroupBuyRequestsRequestIdStatusBody = zod.object({
-  targetStatus: zod.enum(['IN_REVIEW', 'IN_CONTACT', 'OPENED', 'REJECTED']),
+  targetStatus: zod.enum([
+    'REQUEST_RECEIVED',
+    'IN_REVIEW',
+    'STORE_CONFIRMING',
+    'COMPLETED',
+    'UNAVAILABLE',
+  ]),
   rejectionReason: zod
     .string()
     .max(patchApiV1AdminGroupBuyRequestsRequestIdStatusBodyRejectionReasonMax)
     .nullish()
-    .describe('targetStatus=REJECTED 시 필수'),
+    .describe('targetStatus=UNAVAILABLE 시 필수'),
   openedGroupBuyId: zod
     .number()
     .nullish()
     .describe(
-      'targetStatus=OPENED 시 필수. 실제 개설된 공구 id이며 존재 검증 후 개설 알림 발송에 사용',
+      'targetStatus=COMPLETED 시 필수. 실제 개설된 공구 id이며 존재 검증 후 개설 알림 발송에 사용',
     ),
 });
 
@@ -876,25 +903,35 @@ export const PatchApiV1AdminGroupBuyRequestsRequestIdStatusResponse =
       latitude: zod.number().nullish(),
       longitude: zod.number().nullish(),
       productName: zod.string(),
-      desiredQuantity: zod.number(),
-      desiredPickupDate: zod.iso.date(),
       additionalNote: zod.string().nullish(),
       status: zod
-        .enum(['IN_REVIEW', 'IN_CONTACT', 'OPENED', 'REJECTED'])
+        .enum([
+          'REQUEST_RECEIVED',
+          'IN_REVIEW',
+          'STORE_CONFIRMING',
+          'COMPLETED',
+          'UNAVAILABLE',
+        ])
         .describe(
-          'IN_REVIEW=검토 중 \/ IN_CONTACT=매장 컨택 중 \/\nOPENED=공구 개설 완료 \/ REJECTED=개설 불가\n',
+          'REQUEST_RECEIVED=요청 접수 \/ IN_REVIEW=검토 중 \/\nSTORE_CONFIRMING=매장 확인 중 \/ COMPLETED=입점 완료 \/ UNAVAILABLE=입점 불가\n',
         ),
       rejectionReason: zod
         .string()
         .nullable()
-        .describe('status=REJECTED 시 노출'),
+        .describe('status=UNAVAILABLE 시 노출'),
       openedGroupBuyId: zod
         .number()
         .nullable()
-        .describe('status=OPENED 시 개설된 공구 id'),
+        .describe('status=COMPLETED 시 개설된 공구 id'),
       statusHistory: zod.array(
         zod.object({
-          status: zod.enum(['IN_REVIEW', 'IN_CONTACT', 'OPENED', 'REJECTED']),
+          status: zod.enum([
+            'REQUEST_RECEIVED',
+            'IN_REVIEW',
+            'STORE_CONFIRMING',
+            'COMPLETED',
+            'UNAVAILABLE',
+          ]),
           changedAt: zod.iso
             .datetime({ offset: true })
             .describe(
@@ -1015,7 +1052,7 @@ export const PostApiV1AdminGroupBuyRequestsRequestIdRejectResponse = zod.object(
     success: zod.boolean(),
     data: zod.object({
       requestId: zod.number(),
-      status: zod.enum(['OPENED', 'REJECTED']),
+      status: zod.enum(['COMPLETED', 'UNAVAILABLE']),
       groupBuyId: zod.number().nullish(),
     }),
     error: zod.unknown().nullable(),

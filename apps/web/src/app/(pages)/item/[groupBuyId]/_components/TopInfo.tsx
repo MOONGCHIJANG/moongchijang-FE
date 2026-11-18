@@ -7,6 +7,12 @@ import BottomShare from './BottomShare';
 import { ApiResponseGroupBuyDetailResponseData } from '@moongchijang/api-client/generated/api.schemas';
 import { formatPickupDate, formatPickupTime } from '@/lib/date';
 import { logEvent } from '@/lib/analytics';
+import { ChipV2 } from '@/components/Chip-V2';
+import { cn } from '@/lib/utils';
+import { getOrderAvailability } from '../_lib/orderAvailability';
+import InfoTable, { type InfoRow } from './InfoTable';
+import StoreClosedCard from './StoreClosedCard';
+import ReopenNotifyCard from './ReopenNotifyCard';
 
 interface Props {
   data: ApiResponseGroupBuyDetailResponseData;
@@ -14,6 +20,25 @@ interface Props {
 
 const TopInfo = ({ data }: Props) => {
   const [isShared, setIsShared] = React.useState(false);
+  const availability = getOrderAvailability(data);
+  const { isOrderable } = availability;
+
+  const infoRows: InfoRow[] = isOrderable
+    ? [
+        { label: '픽업 가능 일자', value: formatPickupDate(data.pickupDate) },
+        {
+          label: '픽업 가능 시간',
+          value: `${formatPickupTime(data.pickupTimeStart)}~${formatPickupTime(data.pickupTimeEnd)}`,
+        },
+        { label: '픽업 장소', value: data.pickupLocation },
+        { label: '매장명', value: data.storeName },
+        { label: '매장 휴무일', value: '매주 월요일 · 9/24(목) 임시휴무' },
+      ]
+    : [
+        { label: '주문 가능일', value: availability.nextOrderableLabel },
+        { label: '최소 수량', value: availability.minQuantityLabel },
+        { label: '픽업 장소', value: data.pickupLocation },
+      ];
 
   useEffect(() => {
     logEvent('view_item', {
@@ -22,8 +47,6 @@ const TopInfo = ({ data }: Props) => {
       store_name: data.storeName,
     });
   }, []);
-
-  const pickupText = `픽업 ${formatPickupDate(data.pickupDate)}`;
 
   return (
     <div className="flex flex-col gap-g3 p-4">
@@ -41,7 +64,7 @@ const TopInfo = ({ data }: Props) => {
         ) : (
           <div className="w-full h-65 rounded-3xlarge bg-gray-100" />
         )}
-        <div className="flex flex-col gap-g2">
+        <div className="flex flex-col gap-g4">
           <div className="flex flex-col gap-g1">
             <div className="flex gap-g2 text-text-tertiary items-center caption-sm-medium">
               <Icon
@@ -49,8 +72,6 @@ const TopInfo = ({ data }: Props) => {
                 className="h-3 w-3 text-primary-400"
               />
               <p>{data.regionLabel}</p>
-              <p>・</p>
-              <p>{pickupText}</p>
             </div>
             <div className="flex justify-between items-center">
               <p className="heading-lg-bold">{data.productName}</p>
@@ -67,39 +88,41 @@ const TopInfo = ({ data }: Props) => {
               />
             </div>
           </div>
-          <p className="heading-1xl-bold">{data.price.toLocaleString()}원</p>
+          <div className="flex justify-between items-center">
+            <div className="flex gap-g2">
+              <ChipV2
+                label="최소 00개부터 주문"
+                size="m"
+                variant="brandLighter"
+              />
+              <ChipV2 label="최대 00개" size="m" variant="yellow" />
+            </div>
+            <div
+              className={cn(
+                'flex gap-g2 items-baseline',
+                isOrderable ? 'text-text-basic' : 'text-text-disabled',
+              )}
+            >
+              <p className="heading-1xl-bold">{data.price.toLocaleString()}</p>
+              <p className="py-p2 body-md-semibold">/ 1개</p>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* TODO(함께사기): 1.2.1 픽업 가능 기간·시간대·매장 휴무 안내로 교체 */}
 
-      <div className="p-p2 divide-y divide-dashed divide-border-default">
-        <div className="flex justify-between p-p3">
-          <p className="text-text-disabled caption-sm-bold">픽업 일시</p>
-          <p className="caption-sm-medium">
-            {formatPickupDate(data.pickupDate)}
-            {` `}
-            {formatPickupTime(data.pickupTimeStart)}~
-            {formatPickupTime(data.pickupTimeEnd)}
-          </p>
+      {!isOrderable && (
+        <StoreClosedCard periodLabel={availability.closedPeriodLabel} />
+      )}
+
+      <InfoTable rows={infoRows} />
+
+      {!isOrderable && (
+        <div className="pt-1">
+          <ReopenNotifyCard data={data} />
         </div>
-        <div className="flex justify-between p-p3">
-          <p className="text-text-disabled caption-sm-bold">픽업 장소</p>
-          <p className="caption-sm-medium">{data.pickupLocation}</p>
-        </div>
-        <div className="flex justify-between p-p3">
-          <p className="text-text-disabled caption-sm-bold">매장명</p>
-          <p className="caption-sm-medium">{data.storeName}</p>
-        </div>
-        <div className="flex justify-between p-p3">
-          <p className="text-text-disabled caption-sm-bold">
-            최대 구매 가능 수량
-          </p>
-          <p className="caption-sm-medium">
-            {data.maxQuantity != null ? `${data.maxQuantity}개` : '제한 없음'}
-          </p>
-        </div>
-      </div>
+      )}
     </div>
   );
 };

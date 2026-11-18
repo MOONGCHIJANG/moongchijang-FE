@@ -4,9 +4,10 @@ import * as PortOne from '@portone/browser-sdk/v2';
 import { useTermsSheetStore } from '@/store/termsSheetStore';
 
 import ItemSummary from './ItemSummary';
-import JoinForm from './JoinForm';
 import AgreeTermsSheet from './AgreeTermsSheet';
-import PaymentButton from './PaymentButton';
+import CheckoutForm from '../../_components/checkout/CheckoutForm';
+import PaymentButton from '../../_components/checkout/PaymentButton';
+import { getPaymentAmounts } from '../../_lib/paymentAmount';
 import type { ApiResponseGroupBuyDetailResponseData } from '@moongchijang/api-client/generated/api.schemas';
 import {
   getApiV1GroupBuysGroupBuyIdCheckout,
@@ -24,9 +25,6 @@ type Props = {
   groupBuyId: string;
   groupBuy: ApiResponseGroupBuyDetailResponseData;
 };
-
-// 수수료 변경 시 해당 값 수정 → 30% 라면 30
-const FEE_RATE = 0;
 
 const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
   // TODO: 마감됨 페이지 접근 시 처리
@@ -171,9 +169,10 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
   };
 
   // 표시용 금액은 groupBuy.price 기반으로 유지 (checkout 응답 전)
-  const productAmount = groupBuy.price * quantity;
-  const feeAmount = Math.floor((productAmount * FEE_RATE) / 100);
-  const totalAmount = productAmount + feeAmount;
+  const { productAmount, feeAmount, totalAmount } = getPaymentAmounts(
+    groupBuy.price,
+    quantity,
+  );
 
   return (
     <div className="relative bg-bg-white-muted p-4 pb-24 min-h-dvh">
@@ -181,7 +180,7 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center" />
       )}
       <ItemSummary groupBuy={groupBuy} />
-      <JoinForm
+      <CheckoutForm
         quantity={quantity}
         onQuantityChange={setQuantity}
         maxQuantity={groupBuy.maxQuantity ?? null}
@@ -189,7 +188,7 @@ const JoinPageClient = ({ groupBuyId, groupBuy }: Props) => {
         productAmount={productAmount}
         feeAmount={feeAmount}
         totalAmount={totalAmount}
-        productImage={groupBuy.thumbnailUrl || ''}
+        productImage={groupBuy.thumbnailUrl}
       />
       <AgreeTermsSheet
         isOpen={isTermsSheetOpen}

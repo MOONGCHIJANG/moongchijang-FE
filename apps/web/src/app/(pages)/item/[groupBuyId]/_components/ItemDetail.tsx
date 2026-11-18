@@ -126,6 +126,7 @@ const ItemDetail = ({ data }: Props) => {
               </div>
               <p className="heading-sm-semibold">
                 {formatPickupDate(data.pickupDate)}
+                {` `}
                 {formatPickupTime(data.pickupTimeStart)}~
                 {formatPickupTime(data.pickupTimeEnd)}
               </p>
